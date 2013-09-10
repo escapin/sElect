@@ -35,7 +35,7 @@ public class Voter {
 		this.decryptor = decryptor;
 		this.signer = signer;
 		this.server1enc = RegisterEnc.getEncryptor(Params.SERVER1ID, Params.ENC_DOMAIN);
-		this.server1ver = RegisterSig.getVerifier(Params.SERVER2ID, Params.SIG_DOMAIN);
+		this.server1ver = RegisterSig.getVerifier(Params.SERVER1ID, Params.SIG_DOMAIN);
 		this.server2enc = RegisterEnc.getEncryptor(Params.SERVER2ID, Params.ENC_DOMAIN);
 		this.noncegen = new NonceGen();
 	}
