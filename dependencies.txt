@@ -1,0 +1,10 @@
+to be put in the  'lib' subfolder:
+
+    apache-ant-1.8.4/
+    bcprov-jdk15on-147.jar
+    bcprov-jdk16-146.jar
+    bctest-jdk15on-147.jar
+    javaparser-1.0.8.jar
+    javaparser-1.0.8-src.zip
+    junit-4.8.2.jar
+    sqljet-1.1.6.jar
