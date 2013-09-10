@@ -1,16 +1,81 @@
 package de.uni.trier.infsec.targetRS3System;
 
+import static de.uni.trier.infsec.utils.MessageTools.first;
+import static de.uni.trier.infsec.utils.MessageTools.second;
+import static de.uni.trier.infsec.utils.MessageTools.byteArrayToInt;
+import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
+import de.uni.trier.infsec.functionalities.pkienc.Encryptor;
+import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
+import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
+import de.uni.trier.infsec.functionalities.pkisig.Signer;
+import de.uni.trier.infsec.functionalities.pkisig.Verifier;
+import de.uni.trier.infsec.lib.network.NetworkError;
+
 public class CollectingServer {
-	
+
+	public static final int NumberOfVoters = 50;
+
+	private final Decryptor decryptor;
+	private final Signer signer;
+	private final boolean[] ballotCast;
+
+
+	public static class Error extends Exception {
+		private static final long serialVersionUID = 2280511187763698373L;
+		private String description;
+		public Error(String description) {
+			this.description = description;
+		}
+		public String toString() {
+			return "Collecting Server Error: " + description;
+		}
+	}
+
+	public CollectingServer(Signer signer, Decryptor decryptor) {
+		this.signer = signer;
+		this.decryptor = decryptor;
+		ballotCast = new boolean[NumberOfVoters];
+		// initially no voter has cast their ballot:
+		for(int i=0; i<NumberOfVoters; ++i)
+			ballotCast[i] = false;
+	}
+
 	/**
 	 * Process a new ballot and return a response. Response in null, if the
 	 * ballot is rejected.
 	 */
-	public byte[] collectBallot(byte[] ballot) {
-		// TODO: implement onCollectBallot
-		return null;
+	public byte[] collectBallot(byte[] ballot) throws Error, NetworkError, RegisterSig.PKIError, RegisterEnc.PKIError {
+		byte[] idMsg = first(ballot);
+		int voter_id = byteArrayToInt(idMsg);
+		if( voter_id<0 || voter_id>=NumberOfVoters )
+			throw new Error("Invalid voter identifier");
+		if( ballotCast[voter_id] )
+			throw new Error("Ballot already cast");
+
+		// fetch the voter's verifier and encryptor (if it fails, let if fail now)
+		Verifier voter_verifier =  RegisterSig.getVerifier(voter_id, Params.SIG_DOMAIN);
+		Encryptor voter_encryptor = RegisterEnc.getEncryptor(voter_id, Params.ENC_DOMAIN);
+
+		// take the ballot into the parts
+		byte[] encrypted_inner_ballot_with_signature = second(ballot);
+		byte[] encrypted_inner_ballot = first(encrypted_inner_ballot_with_signature);
+		byte[] signature_on_encrypted_inner_ballot = second(encrypted_inner_ballot_with_signature);
+
+		// verify the voter's signature on her encrypted inner ballot
+		if( ! voter_verifier.verify(signature_on_encrypted_inner_ballot, encrypted_inner_ballot) )
+			throw new Error("Wrong signature");
+
+		// decrypt the inner ballot
+		byte[] inner_ballot = decryptor.decrypt(encrypted_inner_ballot);
+
+		// TODO: store the inner ballot
+		//       (remember to record the fact in ballotCast)
+
+		// format and return the response (the inner ballot signed by the server and encrypted for the voter)
+		byte[] response = voter_encryptor.encrypt(signer.sign(inner_ballot));
+		return response;
 	}
-	
+
 	/**
 	 * Return the signer partial result (content of the input tally), to be 
 	 * posted on the bulletin board. Returns null if the result is not ready.
@@ -19,4 +84,5 @@ public class CollectingServer {
 		// TODO: implement onPublishResult
 		return null;
 	}
+
 }

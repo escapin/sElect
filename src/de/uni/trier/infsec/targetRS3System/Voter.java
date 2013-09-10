@@ -40,6 +40,8 @@ public class Voter {
 		this.noncegen = new NonceGen();
 	}
 
+	// TODO: signed messages should carry election ID
+
 	/**
 	 * Creates a ballot containing the given vote.
 	 * 
