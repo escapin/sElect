@@ -36,4 +36,16 @@ public class Utils
 				rest = MessageTools.second(rest);
 		}
 	}
+	
+	/**
+	 * Checks whether 'messgeList' treated as an encoded array of messages
+	 * contains 'mesage'. 
+	 */
+	public static boolean contains(byte[] messageList, byte[] message ) 
+	{
+		for( MessageSplitIter iter = new MessageSplitIter(messageList); iter.notEmpty(); iter.next() )
+			if (MessageTools.equal(iter.current(), message))
+				return true;
+		return false;
+	}
 }

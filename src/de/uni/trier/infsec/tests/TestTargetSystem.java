@@ -11,9 +11,11 @@ import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
 import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
 import de.uni.trier.infsec.functionalities.pkisig.Signer;
+import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.targetRS3System.CollectingServer;
 import de.uni.trier.infsec.targetRS3System.FinalServer;
 import de.uni.trier.infsec.targetRS3System.Params;
+import de.uni.trier.infsec.targetRS3System.Utils;
 import de.uni.trier.infsec.targetRS3System.Voter;
 import de.uni.trier.infsec.utils.MessageTools;
 
@@ -106,12 +108,39 @@ public class TestTargetSystem extends TestCase
 			assertTrue("Voter not in the list of voting voters", found);
 		}		
 		
+		
+		// get the result (content of the bulletin board) of the collecting server
+		byte[] signedPublicData = colServer.getResult();
+		
+		// and split it
+		byte[] publicData = MessageTools.first(signedPublicData);
+		byte[] signatureOnPublicData = MessageTools.second(signedPublicData);
+
+		// check the signature on it
+		Verifier colServerVer = RegisterSig.getVerifier(Params.SERVER1ID, Params.SIG_DOMAIN);
+		boolean signature_ok =  colServerVer.verify(signatureOnPublicData, publicData);
+		assertTrue("Incorrect signature on the public data of the collectin server",  signature_ok);
+		
+		// extract ballots and voter list
+		byte[] ballotsAsAMessage = MessageTools.first(publicData);
+		byte[] votersAsAMessage = MessageTools.second(publicData);
+		
+		// lets take some voter
+		Voter selected_voter = voters[3];
+		byte[] voter_id = MessageTools.intToByteArray(selected_voter.getId());
+		
+		// and check if she is listed in the result
+		assertTrue("Voter not listed in the result", 
+				   Utils.contains(votersAsAMessage, voter_id));
+		
+		// check whether her inner ballot is listed in the result
+		assertTrue("Inner ballot not in the result",
+				   Utils.contains(ballotsAsAMessage, selected_voter.getInnerBallot()));
 	}
 	
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		System.out.println("Set Up!");
 		if (colServer == null ) {
 			PKI.useLocalMode();
 			File f = new File(PKIServerCore.DEFAULT_DATABASE);

@@ -26,5 +26,10 @@ public class TestUtils extends TestCase {
 			assertTrue("Unexpected message", MessageTools.equal(iter.current(), messageArr[ind]));
 			++ind;
 		}
+		
+		// and again this way
+		for (int i=0; i<messageArr.length; ++i) {
+			assertTrue("Missing mesage",  Utils.contains(blob, messageArr[i]) );
+		}
 	}
 }

@@ -87,6 +87,10 @@ public class Voter {
 		return server1ver.verify(signature, inner_ballot);
 	}
 	
+	public int getId() {
+		return id;
+	}
+	
 	public byte[] getInnerBallot() {
 		return inner_ballot;
 	}

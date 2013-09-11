@@ -151,6 +151,8 @@ public class CollectingServer {
 		return b;
 	}
 	
+	// METHODS FOR TESTING //
+	
 	/**
 	 * For testing.
 	 */
