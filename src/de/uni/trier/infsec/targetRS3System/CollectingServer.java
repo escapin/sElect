@@ -1,8 +1,10 @@
 package de.uni.trier.infsec.targetRS3System;
 
+import de.uni.trier.infsec.utils.MessageTools;
 import static de.uni.trier.infsec.utils.MessageTools.first;
 import static de.uni.trier.infsec.utils.MessageTools.second;
 import static de.uni.trier.infsec.utils.MessageTools.byteArrayToInt;
+import static de.uni.trier.infsec.utils.MessageTools.concatenate;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkienc.Encryptor;
 import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
@@ -111,12 +113,33 @@ public class CollectingServer {
 	 */
 	public byte[] getResult() 
 	{
-		// if the result is taken, voting should not be possible any longer
+		// if the result is given out, voting should not be possible any longer
 		inVotingPahse = false;
-		// TODO: implement getResult
-		return null;
+
+		// concatenate all the (inner) ballots
+		// TODO: we need to sort the ballots
+		byte[] ballotsAsAMessage = Utils.concatenateMessageArray(ballots, numberOfCastBallots);
+
+		// concatenate all the voters who voted
+		// TODO: we need to sort the voters
+		byte[][] vv = new byte[numberOfCastBallots][];
+		int ind = 0;
+		for (int id=0; id<NumberOfVoters; ++id) {
+			if (voterVoted[id])
+				vv[ind++] = MessageTools.intToByteArray(id);
+		}
+		byte[] votersAsAMessage = Utils.concatenateMessageArray(vv);
+
+		// put them (ballots and the voters) together
+		byte[] publicData = concatenate(ballotsAsAMessage, votersAsAMessage);
+
+		// sign the public data
+		byte[] signature = signer.sign(publicData);
+		byte[] publicDataWithSignature = MessageTools.concatenate(publicData, signature);
+
+		return publicDataWithSignature;
 	}
-	
+
 	/**
 	 * For testing. Returns array of cast ballots.
 	 */
