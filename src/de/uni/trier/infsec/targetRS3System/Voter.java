@@ -86,4 +86,16 @@ public class Voter {
 		byte[] signature = decryptor.decrypt(response);
 		return server1ver.verify(signature, inner_ballot);
 	}
+	
+	public byte[] getInnerBallot() {
+		return inner_ballot;
+	}
+	
+	public byte[] getNonce() {
+		return nonce;
+	}
+	
+	public byte getVote() {
+		return vote;
+	}
 }

@@ -24,7 +24,7 @@ public class CollectingServer {
 	
 	// STATE (PRIVATE)
 	
-	private final boolean[] voted = new boolean[NumberOfVoters]; // which ballots are already cast
+	private final boolean[] voterVoted = new boolean[NumberOfVoters]; // which ballots are already cast
 	private boolean inVotingPahse = true; // indicates if the system is still in the voting phase
 	private final byte[][] ballots = new byte[NumberOfVoters][]; // (inner ballots which have been cast) 
 	private int numberOfCastBallots = 0; 
@@ -34,7 +34,8 @@ public class CollectingServer {
 	/**
 	 * Error thrown if a collected message is ill-formed.
 	 */
-	public static class Error extends Exception {
+	public static class Error extends Exception 
+	{
 		private static final long serialVersionUID = 2280511187763698373L;
 		private String description;
 		public Error(String description) {
@@ -47,12 +48,13 @@ public class CollectingServer {
 
 	// CONSTRUCTORS
 	
-	public CollectingServer(Signer signer, Decryptor decryptor) {
+	public CollectingServer(Signer signer, Decryptor decryptor) 
+	{
 		this.signer = signer;
 		this.decryptor = decryptor;
 		// initially no voter has cast their ballot:
 		for(int i=0; i<NumberOfVoters; ++i)
-			voted[i] = false;
+			voterVoted[i] = false;
 	}
 
 	// PUBLIC METHODS
@@ -61,7 +63,8 @@ public class CollectingServer {
 	 * Process a new ballot and return a response. Response in null, if the
 	 * ballot is rejected.
 	 */
-	public byte[] collectBallot(byte[] ballot) throws Error, NetworkError, RegisterSig.PKIError, RegisterEnc.PKIError {
+	public byte[] collectBallot(byte[] ballot) throws Error, NetworkError, RegisterSig.PKIError, RegisterEnc.PKIError 
+	{
 		if (!inVotingPahse)
 			throw new Error("Voting phase is over");
 		
@@ -72,7 +75,7 @@ public class CollectingServer {
 			throw new Error("Invalid voter identifier");
 		
 		// check if the voter has already voted
-		if( voted[voter_id] )
+		if( voterVoted[voter_id] )
 			throw new Error("Ballot already cast");
 
 		// fetch the voter's verifier and encryptor (if it fails, let if fail now);
@@ -93,7 +96,7 @@ public class CollectingServer {
 		byte[] inner_ballot = decryptor.decrypt(encrypted_inner_ballot);
 
 		// accept and store the ballot
-		voted[voter_id] = true;
+		voterVoted[voter_id] = true;
 		assert(numberOfCastBallots<NumberOfVoters);
 		ballots[numberOfCastBallots] = inner_ballot; // shouldn't we store the copy of this message?
 		numberOfCastBallots++;
@@ -104,12 +107,40 @@ public class CollectingServer {
 	}
 
 	/**
-	 * Return the signer partial result (content of the input tally), to be 
-	 * posted on the bulletin board. Returns null if the result is not ready.
+	 * Return the result (content of the input tally), to be publicly posted. 
 	 */
-	public byte[] publishResult() {
-		// TODO: implement onPublishResult
+	public byte[] getResult() 
+	{
+		// if the result is taken, voting should not be possible any longer
+		inVotingPahse = false;
+		// TODO: implement getResult
 		return null;
+	}
+	
+	/**
+	 * For testing. Returns array of cast ballots.
+	 */
+	public byte[][] getBallots()
+	{
+		byte[][] b = new byte[numberOfCastBallots][];
+		for (int i=0; i<numberOfCastBallots; ++i)
+			b[i] = ballots[i];
+		return b;
+	}
+	
+	/**
+	 * For testing.
+	 */
+	public int[] getListOfVotersWhoVoted()
+	{
+		int[] l = new int[numberOfCastBallots];
+		int ind = 0;
+		for (int id=0; id<NumberOfVoters; ++id) {
+			if (voterVoted[id])
+				l[ind++] = id;
+		}
+		assert(ind == numberOfCastBallots-1);
+		return l;
 	}
 
 }
