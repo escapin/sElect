@@ -13,13 +13,27 @@ import de.uni.trier.infsec.lib.network.NetworkError;
 
 public class CollectingServer {
 
+	// CONSTANTS
+	
 	public static final int NumberOfVoters = 50;
-
+	
+	// CRYPTOGRAPHIC FUNCTIONALITIES
+	
 	private final Decryptor decryptor;
 	private final Signer signer;
-	private final boolean[] ballotCast;
+	
+	// STATE (PRIVATE)
+	
+	private final boolean[] voted = new boolean[NumberOfVoters]; // which ballots are already cast
+	private boolean inVotingPahse = true; // indicates if the system is still in the voting phase
+	private final byte[][] ballots = new byte[NumberOfVoters][]; // (inner ballots which have been cast) 
+	private int numberOfCastBallots = 0; 
 
-
+	// CLASSES
+	
+	/**
+	 * Error thrown if a collected message is ill-formed.
+	 */
 	public static class Error extends Exception {
 		private static final long serialVersionUID = 2280511187763698373L;
 		private String description;
@@ -31,28 +45,38 @@ public class CollectingServer {
 		}
 	}
 
+	// CONSTRUCTORS
+	
 	public CollectingServer(Signer signer, Decryptor decryptor) {
 		this.signer = signer;
 		this.decryptor = decryptor;
-		ballotCast = new boolean[NumberOfVoters];
 		// initially no voter has cast their ballot:
 		for(int i=0; i<NumberOfVoters; ++i)
-			ballotCast[i] = false;
+			voted[i] = false;
 	}
 
+	// PUBLIC METHODS
+	
 	/**
 	 * Process a new ballot and return a response. Response in null, if the
 	 * ballot is rejected.
 	 */
 	public byte[] collectBallot(byte[] ballot) throws Error, NetworkError, RegisterSig.PKIError, RegisterEnc.PKIError {
+		if (!inVotingPahse)
+			throw new Error("Voting phase is over");
+		
+		// check the voter id
 		byte[] idMsg = first(ballot);
 		int voter_id = byteArrayToInt(idMsg);
 		if( voter_id<0 || voter_id>=NumberOfVoters )
 			throw new Error("Invalid voter identifier");
-		if( ballotCast[voter_id] )
+		
+		// check if the voter has already voted
+		if( voted[voter_id] )
 			throw new Error("Ballot already cast");
 
-		// fetch the voter's verifier and encryptor (if it fails, let if fail now)
+		// fetch the voter's verifier and encryptor (if it fails, let if fail now);
+		// these steps can throw a NetworkError or one of the PKIErrors
 		Verifier voter_verifier =  RegisterSig.getVerifier(voter_id, Params.SIG_DOMAIN);
 		Encryptor voter_encryptor = RegisterEnc.getEncryptor(voter_id, Params.ENC_DOMAIN);
 
@@ -68,9 +92,12 @@ public class CollectingServer {
 		// decrypt the inner ballot
 		byte[] inner_ballot = decryptor.decrypt(encrypted_inner_ballot);
 
-		// TODO: store the inner ballot
-		//       (remember to record the fact in ballotCast)
-
+		// accept and store the ballot
+		voted[voter_id] = true;
+		assert(numberOfCastBallots<NumberOfVoters);
+		ballots[numberOfCastBallots] = inner_ballot; // shouldn't we store the copy of this message?
+		numberOfCastBallots++;
+		
 		// format and return the response (the inner ballot signed by the server and encrypted for the voter)
 		byte[] response = voter_encryptor.encrypt(signer.sign(inner_ballot));
 		return response;
