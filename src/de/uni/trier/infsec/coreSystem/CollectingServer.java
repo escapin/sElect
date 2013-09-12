@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.targetRS3System;
+package de.uni.trier.infsec.coreSystem;
 
 import de.uni.trier.infsec.utils.MessageTools;
 import static de.uni.trier.infsec.utils.MessageTools.first;

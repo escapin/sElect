@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.targetRS3System;
+package de.uni.trier.infsec.coreSystem;
 
 import de.uni.trier.infsec.functionalities.nonce.NonceGen;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;

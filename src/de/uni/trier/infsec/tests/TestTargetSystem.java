@@ -5,6 +5,11 @@ import java.io.File;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+import de.uni.trier.infsec.coreSystem.CollectingServer;
+import de.uni.trier.infsec.coreSystem.FinalServer;
+import de.uni.trier.infsec.coreSystem.Params;
+import de.uni.trier.infsec.coreSystem.Utils;
+import de.uni.trier.infsec.coreSystem.Voter;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pki.PKIServerCore;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
@@ -12,11 +17,6 @@ import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
 import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
 import de.uni.trier.infsec.functionalities.pkisig.Signer;
 import de.uni.trier.infsec.functionalities.pkisig.Verifier;
-import de.uni.trier.infsec.targetRS3System.CollectingServer;
-import de.uni.trier.infsec.targetRS3System.FinalServer;
-import de.uni.trier.infsec.targetRS3System.Params;
-import de.uni.trier.infsec.targetRS3System.Utils;
-import de.uni.trier.infsec.targetRS3System.Voter;
 import de.uni.trier.infsec.utils.MessageTools;
 
 

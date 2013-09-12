@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.targetRS3System;
+package de.uni.trier.infsec.coreSystem;
 
 public class Params {
 	public static final int    SERVER1ID = -1;

@@ -1,12 +1,12 @@
-package de.uni.trier.infsec.targetRS3System;
+package de.uni.trier.infsec.coreSystem;
 
+import de.uni.trier.infsec.coreSystem.Utils.MessageSplitIter;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
 import de.uni.trier.infsec.functionalities.pkisig.RegisterSig.PKIError;
 import de.uni.trier.infsec.functionalities.pkisig.Signer;
 import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.lib.network.NetworkError;
-import de.uni.trier.infsec.targetRS3System.Utils.MessageSplitIter;
 import de.uni.trier.infsec.utils.MessageTools;
 
 public class FinalServer 
