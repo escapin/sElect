@@ -26,10 +26,17 @@ public class Voter {
 	private final Encryptor server2enc; // encryptor of the second server (the final server)
 	private final NonceGen noncegen;    // nonce generation functionality
 
-	private byte[] nonce = null;           // the most recent nonce (used to create the ballot)
-	private byte[] vote_with_nonce = null; // the most recent concatenation of the vote and the nonce
-	private byte[] inner_ballot = null;    // the most recent inner ballot 
+	private byte[] nonce = null;            // the most recent nonce (used to create the ballot)
+	private byte[] vote_with_nonce = null;  // the most recent concatenation of the vote and the nonce
+	private byte[] inner_ballot = null;     // the most recent inner ballot
+	private byte[] server_signature = null; // server's signature on the response
 
+	public static class Receipt {
+		public byte[] nonce;
+		public byte[] inner_ballot;
+		public byte[] server_signature;
+	}
+	
 	public Voter(int id, byte vote, Decryptor decryptor, Signer signer) throws NetworkError, RegisterEnc.PKIError, RegisterSig.PKIError {
 		this.id = id;
 		this.vote = vote;
@@ -72,6 +79,14 @@ public class Voter {
 		byte[] outer_ballot = concatenate(idMsg, encrypted_inner_ballot_with_signature);
 		return outer_ballot;
 	}
+	
+	/**
+	 *  Uses previously generated inner ballot to prepare a now ballot (for re-voting)
+	 */
+	public byte[] reCreateBallot(Receipt receipt) {
+		// TOTO: reCreateBallot
+		return null;
+	}
 
 	/**
 	 * Checks whether the response is correct (using the nonce previously
@@ -83,9 +98,19 @@ public class Voter {
 	 *
 	 * that is an encrypted signature of the collecting server on inner_ballot.
 	 */
-	public boolean responseIsCorrect(byte[] response) {
-		byte[] signature = decryptor.decrypt(response);
-		return server1ver.verify(signature, inner_ballot);
+	// TODO: let this method return some enum value (like 'response_ok', 'already_voted')
+	//       (check the tag of the repsonse)
+	public boolean validateResponse(byte[] response) {
+		server_signature = decryptor.decrypt(response);
+		return server1ver.verify(server_signature, inner_ballot);
+	}
+
+	public Receipt getReceipt() {
+		Receipt r = new Receipt();
+		r.inner_ballot = inner_ballot;
+		r.nonce = nonce;
+		r.server_signature = server_signature;
+		return r;
 	}
 	
 	public int getId() {

@@ -35,16 +35,16 @@ public class TestTargetSystem extends TestCase
 		// deliver it to the collecting server
 		byte[] response = colServer.collectBallot(ballot);
 		// check whether the responce is correct
-		boolean ok = voter.responseIsCorrect(response);
+		boolean ok = voter.validateResponse(response);
 		assertTrue(ok);
 
 		// make the voter create another ballot
 		voter.createBallot();
 		// now it should not accept the old response
-		ok = voter.responseIsCorrect(response);
+		ok = voter.validateResponse(response);
 		assertFalse(ok);
 		// and neither this garbage
-		ok = voter.responseIsCorrect(ballot);
+		ok = voter.validateResponse(ballot);
 		assertFalse(ok);
 		
 		// try vote again
@@ -70,12 +70,12 @@ public class TestTargetSystem extends TestCase
 			Voter v = createVoter(i, (byte)13);
 			voters[i] = v;
 		}
-		
+
 		// make them vote
 		for (int i=0; i<5; ++i) {
 			byte[] ballot = voters[i].createBallot();
 			byte[] response = colServer.collectBallot(ballot);
-			boolean ok = voters[i].responseIsCorrect(response);
+			boolean ok = voters[i].validateResponse(response);
 			assertTrue(ok);			
 		}
 		

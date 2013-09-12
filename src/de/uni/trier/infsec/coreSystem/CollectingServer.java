@@ -25,7 +25,9 @@ public class CollectingServer
 	private final boolean[] voterVoted = new boolean[Params.NumberOfVoters]; // which ballots are already cast
 	private boolean inVotingPahse = true; // indicates if the system is still in the voting phase
 	private final byte[][] ballots = new byte[Params.NumberOfVoters][]; // (inner ballots which have been cast) 
-	private int numberOfCastBallots = 0; 
+	private int numberOfCastBallots = 0;
+	
+	// TODO: perhaps the server should store the voters signatures on her ballot
 
 	// CLASSES
 	
@@ -61,6 +63,7 @@ public class CollectingServer
 	 * Process a new ballot and return a response. Response in null, if the
 	 * ballot is rejected.
 	 */
+	// TODO: return error messages instead of throwing exceptions
 	public byte[] collectBallot(byte[] ballot) throws Error, NetworkError, RegisterSig.PKIError, RegisterEnc.PKIError 
 	{
 		if (!inVotingPahse)
@@ -73,6 +76,7 @@ public class CollectingServer
 			throw new Error("Invalid voter identifier");
 		
 		// check if the voter has already voted
+		// TODO: if the voter re-votes with the same inner ballot, the server should reply with its signature
 		if( voterVoted[voter_id] )
 			throw new Error("Ballot already cast");
 
