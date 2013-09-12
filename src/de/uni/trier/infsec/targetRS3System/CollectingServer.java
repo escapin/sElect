@@ -13,12 +13,8 @@ import de.uni.trier.infsec.functionalities.pkisig.Signer;
 import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.lib.network.NetworkError;
 
-public class CollectingServer {
-
-	// CONSTANTS
-	
-	public static final int NumberOfVoters = 50;
-	
+public class CollectingServer 
+{
 	// CRYPTOGRAPHIC FUNCTIONALITIES
 	
 	private final Decryptor decryptor;
@@ -26,9 +22,9 @@ public class CollectingServer {
 	
 	// STATE (PRIVATE)
 	
-	private final boolean[] voterVoted = new boolean[NumberOfVoters]; // which ballots are already cast
+	private final boolean[] voterVoted = new boolean[Params.NumberOfVoters]; // which ballots are already cast
 	private boolean inVotingPahse = true; // indicates if the system is still in the voting phase
-	private final byte[][] ballots = new byte[NumberOfVoters][]; // (inner ballots which have been cast) 
+	private final byte[][] ballots = new byte[Params.NumberOfVoters][]; // (inner ballots which have been cast) 
 	private int numberOfCastBallots = 0; 
 
 	// CLASSES
@@ -55,7 +51,7 @@ public class CollectingServer {
 		this.signer = signer;
 		this.decryptor = decryptor;
 		// initially no voter has cast their ballot:
-		for(int i=0; i<NumberOfVoters; ++i)
+		for(int i=0; i<Params.NumberOfVoters; ++i)
 			voterVoted[i] = false;
 	}
 
@@ -73,7 +69,7 @@ public class CollectingServer {
 		// check the voter id
 		byte[] idMsg = first(ballot);
 		int voter_id = byteArrayToInt(idMsg);
-		if( voter_id<0 || voter_id>=NumberOfVoters )
+		if( voter_id<0 || voter_id>=Params.NumberOfVoters )
 			throw new Error("Invalid voter identifier");
 		
 		// check if the voter has already voted
@@ -99,7 +95,7 @@ public class CollectingServer {
 
 		// accept and store the ballot
 		voterVoted[voter_id] = true;
-		assert(numberOfCastBallots<NumberOfVoters);
+		assert(numberOfCastBallots<Params.NumberOfVoters);
 		ballots[numberOfCastBallots] = inner_ballot; // shouldn't we store the copy of this message?
 		numberOfCastBallots++;
 		
@@ -124,7 +120,7 @@ public class CollectingServer {
 		// TODO: we need to sort the voters
 		byte[][] vv = new byte[numberOfCastBallots][];
 		int ind = 0;
-		for (int id=0; id<NumberOfVoters; ++id) {
+		for (int id=0; id<Params.NumberOfVoters; ++id) {
 			if (voterVoted[id])
 				vv[ind++] = MessageTools.intToByteArray(id);
 		}
@@ -160,7 +156,7 @@ public class CollectingServer {
 	{
 		int[] l = new int[numberOfCastBallots];
 		int ind = 0;
-		for (int id=0; id<NumberOfVoters; ++id) {
+		for (int id=0; id<Params.NumberOfVoters; ++id) {
 			if (voterVoted[id])
 				l[ind++] = id;
 		}

@@ -26,8 +26,9 @@ public class Voter {
 	private final Encryptor server2enc; // encryptor of the second server (the final server)
 	private final NonceGen noncegen;    // nonce generation functionality
 
-	private byte[] nonce = null;        // the most recent nonce (used to create the ballot)
-	private byte[] inner_ballot = null; // the most recent inner ballot 
+	private byte[] nonce = null;           // the most recent nonce (used to create the ballot)
+	private byte[] vote_with_nonce = null; // the most recent concatenation of the vote and the nonce
+	private byte[] inner_ballot = null;    // the most recent inner ballot 
 
 	public Voter(int id, byte vote, Decryptor decryptor, Signer signer) throws NetworkError, RegisterEnc.PKIError, RegisterSig.PKIError {
 		this.id = id;
@@ -63,8 +64,8 @@ public class Voter {
 		byte[] idMsg = intToByteArray(id);
 
 		nonce = noncegen.nextNonce(); // note that we store the noce for further use
-		byte[] vote_with_nonce = concatenate(voteMsg,nonce);
-		inner_ballot = server2enc.encrypt(vote_with_nonce); // note that the inner_ballot is stored as well
+		vote_with_nonce = concatenate(voteMsg,nonce); // as above
+		inner_ballot = server2enc.encrypt(vote_with_nonce);  // as above
 		byte[] encrypted_inner_ballot = server1enc.encrypt(inner_ballot);
 		byte[] signature_on_encrypted_inner_ballot = signer.sign(encrypted_inner_ballot);
 		byte[] encrypted_inner_ballot_with_signature = concatenate(encrypted_inner_ballot, signature_on_encrypted_inner_ballot); 
@@ -101,5 +102,9 @@ public class Voter {
 	
 	public byte getVote() {
 		return vote;
+	}
+	
+	public byte[] getVoteWithNonce() {
+		return vote_with_nonce;
 	}
 }

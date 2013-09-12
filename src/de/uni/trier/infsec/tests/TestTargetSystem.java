@@ -62,7 +62,7 @@ public class TestTargetSystem extends TestCase
 	}
 	
 	@Test
-	public void testBallotCollecting() throws Exception 
+	public void testVotingProcess() throws Exception 
 	{
 		// create 5 voters with ids 0..4
 		Voter[] voters = new Voter[5];
@@ -108,18 +108,17 @@ public class TestTargetSystem extends TestCase
 			assertTrue("Voter not in the list of voting voters", found);
 		}		
 		
-		
 		// get the result (content of the bulletin board) of the collecting server
-		byte[] signedPublicData = colServer.getResult();
+		byte[] signedTally = colServer.getResult();
 		
 		// and split it
-		byte[] publicData = MessageTools.first(signedPublicData);
-		byte[] signatureOnPublicData = MessageTools.second(signedPublicData);
+		byte[] publicData = MessageTools.first(signedTally);
+		byte[] signatureOnPublicData = MessageTools.second(signedTally);
 
 		// check the signature on it
 		Verifier colServerVer = RegisterSig.getVerifier(Params.SERVER1ID, Params.SIG_DOMAIN);
 		boolean signature_ok =  colServerVer.verify(signatureOnPublicData, publicData);
-		assertTrue("Incorrect signature on the public data of the collectin server",  signature_ok);
+		assertTrue("Incorrect signature on the public data of the collecting server",  signature_ok);
 		
 		// extract ballots and voter list
 		byte[] ballotsAsAMessage = MessageTools.first(publicData);
@@ -136,6 +135,27 @@ public class TestTargetSystem extends TestCase
 		// check whether her inner ballot is listed in the result
 		assertTrue("Inner ballot not in the result",
 				   Utils.contains(ballotsAsAMessage, selected_voter.getInnerBallot()));
+		
+		// deliver the data to the second server
+		byte[] signedResult = finServer.processInputTally(signedTally);
+		
+		// check the signature on the result
+		byte[] result = MessageTools.first(signedResult);
+		byte[] signatureOnResult = MessageTools.second(signedResult);
+		Verifier finServerVer = RegisterSig.getVerifier(Params.SERVER2ID, Params.SIG_DOMAIN);
+		signature_ok = finServerVer.verify(signatureOnResult, result);
+		assertTrue("Incorrect signature on the result of the final server",  signature_ok);
+		
+		// check if the selected voter can find her nonce and vote
+		byte[] voteWithNonce = selected_voter.getVoteWithNonce();
+		assertTrue("Voter's nonce not in the final result",
+				   Utils.contains(result, voteWithNonce));
+		
+		// make sure that another (fresh) entry is not in the result
+		selected_voter.createBallot(); // now the receipt data has changed
+		byte[] anotherVoteWithNonce = selected_voter.getVoteWithNonce();
+		assertFalse("Unexpected entry in the result",
+				    Utils.contains(result, anotherVoteWithNonce));
 	}
 	
 	@Override
@@ -154,33 +174,33 @@ public class TestTargetSystem extends TestCase
 
 	private CollectingServer createCollectingServer() throws Exception {
 		// create the collecting server's functionalities
-		Decryptor server_decryptor = new  Decryptor();
-		Signer server_signer = new Signer();
+		Decryptor decryptor = new  Decryptor();
+		Signer signer = new Signer();
 		// register the collecting server
-		RegisterEnc.registerEncryptor(server_decryptor.getEncryptor(), Params.SERVER1ID, Params.ENC_DOMAIN);
-		RegisterSig.registerVerifier(server_signer.getVerifier(), Params.SERVER1ID, Params.SIG_DOMAIN);
+		RegisterEnc.registerEncryptor(decryptor.getEncryptor(), Params.SERVER1ID, Params.ENC_DOMAIN);
+		RegisterSig.registerVerifier(signer.getVerifier(), Params.SERVER1ID, Params.SIG_DOMAIN);
 		// create the collecting server
-		return new CollectingServer(server_signer, server_decryptor);		
+		return new CollectingServer(signer, decryptor);		
 	}
 
 	private FinalServer createFinalServer() throws Exception {
 		// create the final server' functionalities
-		Decryptor server2_decryptor = new  Decryptor();
-		Signer server2_signer = new Signer();
+		Decryptor decryptor = new  Decryptor();
+		Signer signer = new Signer();
 		// register the final server
-		RegisterEnc.registerEncryptor(server2_decryptor.getEncryptor(), Params.SERVER2ID, Params.ENC_DOMAIN);
-		RegisterSig.registerVerifier(server2_signer.getVerifier(), Params.SERVER2ID, Params.SIG_DOMAIN);
-		return null; // TODO: create and return the server
+		RegisterEnc.registerEncryptor(decryptor.getEncryptor(), Params.SERVER2ID, Params.ENC_DOMAIN);
+		RegisterSig.registerVerifier(signer.getVerifier(), Params.SERVER2ID, Params.SIG_DOMAIN);
+		return new FinalServer(signer, decryptor);
 	}
 	
 	private Voter createVoter(int id, byte vote) throws Exception {
 		// create voter's functionalities
-		Decryptor voter_decryptor = new  Decryptor();
-		Signer voter_signer = new Signer();
+		Decryptor decryptor = new  Decryptor();
+		Signer signer = new Signer();
 		// register
-		RegisterEnc.registerEncryptor(voter_decryptor.getEncryptor(), id, Params.ENC_DOMAIN);
-		RegisterSig.registerVerifier(voter_signer.getVerifier(), id, Params.SIG_DOMAIN);
-		// create the votert
-		return new Voter(id, vote, voter_decryptor, voter_signer);		
+		RegisterEnc.registerEncryptor(decryptor.getEncryptor(), id, Params.ENC_DOMAIN);
+		RegisterSig.registerVerifier(signer.getVerifier(), id, Params.SIG_DOMAIN);
+		// create the voter
+		return new Voter(id, vote, decryptor, signer);		
 	}
 }
