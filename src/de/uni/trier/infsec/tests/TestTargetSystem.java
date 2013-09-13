@@ -28,7 +28,7 @@ public class TestTargetSystem extends TestCase
 	@Test
 	public void testClientServerExhange() throws Exception
 	{
-		Voter voter = createVoter(10, (byte)13);
+		Voter voter = createVoter(10, 13);
 		
 		// create the ballot
 		byte[] ballot = voter.createBallot();
@@ -193,14 +193,14 @@ public class TestTargetSystem extends TestCase
 		return new FinalServer(signer, decryptor);
 	}
 	
-	private Voter createVoter(int id, byte vote) throws Exception {
+	private Voter createVoter(int voterID, int electionID) throws Exception {
 		// create voter's functionalities
 		Decryptor decryptor = new  Decryptor();
 		Signer signer = new Signer();
 		// register
-		RegisterEnc.registerEncryptor(decryptor.getEncryptor(), id, Params.ENC_DOMAIN);
-		RegisterSig.registerVerifier(signer.getVerifier(), id, Params.SIG_DOMAIN);
+		RegisterEnc.registerEncryptor(decryptor.getEncryptor(), voterID, Params.ENC_DOMAIN);
+		RegisterSig.registerVerifier(signer.getVerifier(), voterID, Params.SIG_DOMAIN);
 		// create the voter
-		return new Voter(id, vote, decryptor, signer);		
+		return new Voter(voterID, electionID, decryptor, signer);		
 	}
 }
