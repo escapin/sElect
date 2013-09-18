@@ -1,6 +1,6 @@
 to be put in the  'lib' subfolder:
 
-    apache-ant-1.8.4/
+    antlr-runtime-3.4.jar
     bcprov-jdk15on-147.jar
     bcprov-jdk16-146.jar
     bctest-jdk15on-147.jar

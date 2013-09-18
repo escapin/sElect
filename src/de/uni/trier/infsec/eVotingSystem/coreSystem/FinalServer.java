@@ -1,6 +1,6 @@
-package de.uni.trier.infsec.coreSystem;
+package de.uni.trier.infsec.eVotingSystem.coreSystem;
 
-import de.uni.trier.infsec.coreSystem.Utils.MessageSplitIter;
+import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.MessageSplitIter;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
 import de.uni.trier.infsec.functionalities.pkisig.RegisterSig.PKIError;
@@ -36,7 +36,7 @@ public class FinalServer
 	
 	// CONSTRUCTORS
 	
-	public FinalServer(Signer signer, Decryptor decryptor) throws PKIError, NetworkError {
+	public FinalServer(int electionID, Decryptor decryptor, Signer signer) throws PKIError, NetworkError {
 		this.signer = signer;
 		this.decryptor = decryptor;
 		// fetch the functionalities of the collecting server
