@@ -17,7 +17,7 @@ public class PKIServerCore implements PKIServer {
 	private static final String DB_COLUMN_NAME_KEY = "KEY";
 	// Table PKI stores ID and corresponding Public Key in hex-representation
 	private static final String DB_TABLE_CREATE_PKE = "CREATE TABLE " + DB_TABLE_NAME_PKE + " (ID TEXT NOT NULL PRIMARY KEY, " + DB_COLUMN_NAME_KEY + " TEXT NOT NULL)";
-	private static boolean dbInitialized = false;
+	public static boolean dbInitialized = false;
 	
 	
 	
@@ -85,6 +85,8 @@ public class PKIServerCore implements PKIServer {
 		try {
 			File dbFile = new File(DEFAULT_DATABASE);
 			if (!dbFile.exists()) {
+				if(db!=null)
+					db.close();
 				// We need to initialize a completely new Database
 				db = SqlJetDb.open(dbFile, true);
 				db.createTable(DB_TABLE_CREATE_PKE);

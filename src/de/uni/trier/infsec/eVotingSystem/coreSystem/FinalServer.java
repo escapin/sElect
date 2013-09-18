@@ -65,10 +65,10 @@ public class FinalServer
 		// retrieve and process ballots (store decrypted entries in 'entries')
 		byte[] ballotsAsAMessage = MessageTools.first(publicData);
 		for( MessageSplitIter iter = new MessageSplitIter(ballotsAsAMessage); iter.notEmpty(); iter.next() ) {
-			byte[] voteWithNonce = decryptor.decrypt(iter.current());
-			if (voteWithNonce == null) // decryption failed
+			byte[] nonce_vote = decryptor.decrypt(iter.current());
+			if (nonce_vote == null) // decryption failed
 				throw new Error("Wrong data (decryption failed)");
-			entries[nextEntry] = voteWithNonce;
+			entries[nextEntry] = nonce_vote;
 			++nextEntry;
 		}
 		

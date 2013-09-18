@@ -5,11 +5,14 @@ import java.io.File;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+
 import de.uni.trier.infsec.eVotingSystem.coreSystem.CollectingServer;
 import de.uni.trier.infsec.eVotingSystem.coreSystem.FinalServer;
 import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
 import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils;
 import de.uni.trier.infsec.eVotingSystem.coreSystem.Voter;
+import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.MessageSplitIter;
+import de.uni.trier.infsec.functionalities.nonce.NonceGen;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pki.PKIServerCore;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
@@ -31,68 +34,63 @@ public class TestTargetSystem extends TestCase
 	public void testClientServerExhange() throws Exception
 	{
 		
-		int voterID=01;
+		int voterID=10;
 		Voter voter = createVoter(voterID, electionID);
 		
 		// create the ballot
-		byte[] ballot = voter.createBallot("Angela".getBytes());
+		byte[] ballot = voter.createBallot("C1".getBytes());
 		// deliver it to the collecting server
 		byte[] response = colServer.collectBallot(ballot);
 		// check whether the response is correct
-		byte[] responce_tag=voter.validateResponse(response);
-		assertTrue(Utilities.arrayEqual(responce_tag, Params.VOTE_COLLECTED));
+		byte[] response_tag=voter.validateResponse(response);
+		assertTrue(Utilities.arrayEqual(response_tag, Params.VOTE_COLLECTED));
 
 		// make the voter create another ballot
 		ballot=voter.createBallot("Peer".getBytes());
 		// deliver it to the collecting server
 		response = colServer.collectBallot(ballot);
-		// now it should not accept the old response
-		responce_tag = voter.validateResponse(response);
-		assertTrue(Utilities.arrayEqual(responce_tag, Params.ALREADY_VOTED));
+		// now it should not accept this response
+		response_tag = voter.validateResponse(response);
+		assertTrue(Utilities.arrayEqual(response_tag, Params.ALREADY_VOTED));
+		
 		
 		Voter.Receipt voterReceipt = voter.getReceipt();
 		ballot=voter.reCreateBallot(voterReceipt);
 		// deliver it to the collecting server
 		response = colServer.collectBallot(ballot);
-		// check whether the response is again that the vote is collected
-		responce_tag=voter.validateResponse(response);
-		assertTrue(Utilities.arrayEqual(responce_tag, Params.VOTE_COLLECTED));
+		// not it should accept the old response
+		response_tag=voter.validateResponse(response);
+		assertTrue(Utilities.arrayEqual(response_tag, Params.VOTE_COLLECTED));
 		
-		/*
-		// and neither this garbage
-		ok = voter.validateResponse(ballot);
-		assertFalse(ok);
-		
-		// try vote again
-		try {
-			colServer.collectBallot(ballot);
-			fail("Revoging -- exception expected");
-		} catch (CollectingServer.Error e) {}
-		
+		// and try validate some trash
+		try{
+			response_tag = voter.validateResponse(ballot);
+			fail("Revoking -- exception expected");
+		} catch (Voter.MalformedMessage e) {}	
+	
 		// try vote with some trash
 		try {
 			colServer.collectBallot(response);
 			fail("Voting with trash -- exception expected");
-		} catch (CollectingServer.Error e) {}
-		*/
+		} catch (CollectingServer.MalformedMessage e) {}
+		
 	}
-	/*
+	
 	@Test
 	public void testVotingProcess() throws Exception 
 	{
 		// create 5 voters with ids 0..4
 		Voter[] voters = new Voter[5];
-		for (int i=0; i<5; ++i) {
-			Voter v = createVoter(i, (byte)13);
-			voters[i] = v;
-		}
-
+		for (int i=0; i<5; ++i)
+			voters[i] = createVoter(i, electionID);
+		
 		// make them vote
+		byte[] vote = "C2".getBytes();
 		for (int i=0; i<5; ++i) {
-			byte[] ballot = voters[i].createBallot();
+			byte[] ballot = voters[i].createBallot(vote);
 			byte[] response = colServer.collectBallot(ballot);
-			boolean ok = voters[i].validateResponse(response);
-			assertTrue(ok);			
+			byte[] response_tag = voters[i].validateResponse(response);
+			assertTrue(Utilities.arrayEqual(response_tag, Params.VOTE_COLLECTED));			
 		}
 		
 		// get the list of voters who voted and check it
@@ -116,7 +114,7 @@ public class TestTargetSystem extends TestCase
 		for (int id=0; id<5; ++id) {
 			boolean found = false;
 			for(int i=0; i<ballots.length; ++i) {
-				if (MessageTools.equal(ballots[i], voters[id].getInnerBallot())) {
+				if (MessageTools.equal(ballots[i], voters[id].getReceipt().getInnerBallot())) {
 					found = true;
 					break;
 				}
@@ -142,7 +140,7 @@ public class TestTargetSystem extends TestCase
 		
 		// lets take some voter
 		Voter selected_voter = voters[3];
-		byte[] voter_id = MessageTools.intToByteArray(selected_voter.getId());
+		byte[] voter_id = MessageTools.intToByteArray(selected_voter.getVoterId());
 		
 		// and check if she is listed in the result
 		assertTrue("Voter not listed in the result", 
@@ -150,7 +148,7 @@ public class TestTargetSystem extends TestCase
 		
 		// check whether her inner ballot is listed in the result
 		assertTrue("Inner ballot not in the result",
-				   Utils.contains(ballotsAsAMessage, selected_voter.getInnerBallot()));
+				   Utils.contains(ballotsAsAMessage, selected_voter.getReceipt().getInnerBallot()));
 		
 		// deliver the data to the second server
 		byte[] signedResult = finServer.processInputTally(signedTally);
@@ -163,30 +161,40 @@ public class TestTargetSystem extends TestCase
 		assertTrue("Incorrect signature on the result of the final server",  signature_ok);
 		
 		// check if the selected voter can find her nonce and vote
-		byte[] voteWithNonce = selected_voter.getVoteWithNonce();
-		assertTrue("Voter's nonce not in the final result",
-				   Utils.contains(result, voteWithNonce));
+		byte[] voterNonce = selected_voter.getReceipt().getNonce();
 		
-		// make sure that another (fresh) entry is not in the result
-		selected_voter.createBallot(); // now the receipt data has changed
-		byte[] anotherVoteWithNonce = selected_voter.getVoteWithNonce();
-		assertFalse("Unexpected entry in the result",
-				    Utils.contains(result, anotherVoteWithNonce));
+		boolean contains = false;
+		for( MessageSplitIter iter = new MessageSplitIter(result); !contains && iter.notEmpty(); iter.next() )
+			contains=MessageTools.equal(MessageTools.first(iter.current()), voterNonce);
+		assertTrue("Voter's nonce not in the final result",	contains);
+		
+		// make sure that another (fresh) nonce is not in the result
+		NonceGen noncegen = new NonceGen(); 
+		byte[] anotherFreshNonce = noncegen.newNonce();
+		contains = false;
+		for( MessageSplitIter iter = new MessageSplitIter(result); !contains && iter.notEmpty(); iter.next() )
+			contains=MessageTools.equal(MessageTools.first(iter.current()), anotherFreshNonce);
+		assertFalse("Unexpected entry in the result", contains);
 	}
-	*/
+	
 	
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		if (colServer == null ) {
-			PKI.useLocalMode();
-			File f = new File(PKIServerCore.DEFAULT_DATABASE);
-			f.delete();
-			colServer = createCollectingServer(electionID);
-			finServer = createFinalServer(electionID);
+		File dbFile = new File(PKIServerCore.DEFAULT_DATABASE);
+		if (dbFile.exists()){
+			dbFile.delete();
+			PKIServerCore.dbInitialized=false;
+			//FIXME: this solution is not elegant: I had to change the visibility of this variable!
 		}
+		PKI.useLocalMode();
+		colServer = createCollectingServer(electionID);
+		finServer = createFinalServer(electionID);
 	}
-	
+//	dbFile = new File(PKIServerCore.DEFAULT_DATABASE + "-journal");
+//	if (dbFile.exists())
+//		dbFile.delete();
+
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
 	private CollectingServer createCollectingServer(int electionID) throws Exception {

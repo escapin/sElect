@@ -10,12 +10,12 @@ import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
 import de.uni.trier.infsec.functionalities.pkisig.Signer;
 import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.lib.network.NetworkError;
-import static de.uni.trier.infsec.utils.MessageTools.*;
-//import static de.uni.trier.infsec.utils.MessageTools.intToByteArray;
-//import static de.uni.trier.infsec.utils.MessageTools.byteArrayToInt;
-//import static de.uni.trier.infsec.utils.MessageTools.concatenate;
-//import static de.uni.trier.infsec.utils.MessageTools.first;
-//import static de.uni.trier.infsec.utils.MessageTools.second;
+import static de.uni.trier.infsec.utils.MessageTools.intToByteArray;
+import static de.uni.trier.infsec.utils.MessageTools.byteArrayToInt;
+import static de.uni.trier.infsec.utils.MessageTools.concatenate;
+import static de.uni.trier.infsec.utils.MessageTools.first;
+import static de.uni.trier.infsec.utils.MessageTools.second;
+import static de.uni.trier.infsec.utils.MessageTools.copyOf;
 /**
  * Core voter's client class. It provides cryptographic operations (formating a ballot) 
  * of a voter.
@@ -31,22 +31,32 @@ public class Voter {
 	private final Encryptor server2enc; // encryptor of the second server (the final server)
 	private final NonceGen noncegen;    // nonce generation functionality
 	
-
-	private byte[] nonce = null;            // the most recent nonce (used to create the ballot)
-	private byte[] vote_with_nonce = null;  // the most recent concatenation of the vote and the nonce
-	private byte[] inner_ballot = null;     // the most recent inner ballot
-	private byte[] server_signature = null; // server's signature on the response
-
 	public static class Receipt {
-		public byte[] nonce;
-		public byte[] inner_ballot;
-		public byte[] server_signature;
-		public Receipt(byte[] nonce, byte[] inner_ballot, byte[] server_signature){
+		private int electionID;
+		private byte[] nonce;
+		private byte[] inner_ballot;
+		private byte[] server_signature;
+		private Receipt(int electionID, byte[] nonce, byte[] inner_ballot){
+			this.electionID=electionID;
 			this.nonce=nonce;
-			this.inner_ballot=inner_ballot;
-			this.server_signature=server_signature;
+			this.inner_ballot=inner_ballot;	
+			this.server_signature=null; // it remains NULL until the server will reply with the proper signature
+		}
+		public int getElectionID(){
+			return electionID;
+		}
+		public byte[] getNonce(){
+			return nonce;
+		}
+		public byte[] getInnerBallot(){
+			return inner_ballot;
+		}
+		public byte[] getServerSign(){
+			return server_signature;
 		}
 	}
+	
+	private Receipt receipt;
 	
 	public Voter(int voterID, int electionID, Decryptor decryptor, Signer signer) throws NetworkError, RegisterEnc.PKIError, RegisterSig.PKIError {
 		this.voterID = voterID;
@@ -79,18 +89,23 @@ public class Voter {
 		byte[] voteMsg = copyOf(vote);
 			//FIXME: according to Ralf suggestion in POSTCloudStorageSystem, we should change the nonce functionality
 			// 			from 'nextNonce' to 'newNonce' also in CryptoJavaGeneric
-			nonce = noncegen.newNonce(); // note that we store the nonce for further use
-			vote_with_nonce = concatenate(voteMsg, nonce); // as above
-			inner_ballot = server2enc.encrypt(vote_with_nonce);  // as above
-		
+			byte[] nonce = noncegen.newNonce(); // note that we store the nonce for further use
+			byte[] nonce_vote = concatenate(nonce, voteMsg); // as above
+			byte[] inner_ballot = server2enc.encrypt(nonce_vote);  // as above
+			
+			if(receipt==null) // create the receipt only if it's not already created
+				receipt=new Receipt(electionID, nonce,inner_ballot);
 			return createOuterBallot(inner_ballot);
 	}
 	
 	/**
-	 *  Uses previously generated inner ballot to prepare a new ballot (for re-voting)
+	 *  Uses previously generated inner ballot to prepare a new ballot (for re-voting) 
 	 */
-	public byte[] reCreateBallot(Receipt receipt) {
-		return createOuterBallot(receipt.inner_ballot);
+	public byte[] reCreateBallot(Receipt r) throws ReceiptError {
+		if(r.getElectionID()!=electionID) // if r is NULL it will throw a NullPointerException without copy it to receipt
+			throw new ReceiptError("The receipt is not for the current election");
+		receipt=r; //FIXME: security issue: is it ok accept any receipt as a correct one? maybe just copyOf(r)
+		return createOuterBallot(receipt.getInnerBallot());
 	}
 	
 	private byte[] createOuterBallot(byte[] inner_ballot){
@@ -146,8 +161,13 @@ public class Voter {
 			byte[] rejectedReason = second(tag_payload);
 			return rejectedReason; 
 		}
-		else if(Arrays.equals(tag, Params.ACCEPTED))
-			server_signature=second(tag_payload);
+		else if(Arrays.equals(tag, Params.ACCEPTED)){
+			byte[] server_signature=second(tag_payload);
+			if(receipt!=null)
+				receipt.server_signature=server_signature;
+			else
+				throw new ReceiptError("Validating a responce without having the correspondent receipt");
+		}
 		else
 			throw new MalformedMessage("The server's reply is malformed");
 		
@@ -155,32 +175,16 @@ public class Voter {
 	}
 
 	
-
-	
 	public Receipt getReceipt() {
-		//TODO: build the receipt only when the vote is correctly collected
-		return new Receipt(nonce, inner_ballot, server_signature);
+		return receipt;
 	}
 	
-	
-	public int getId() {
+	public int getVoterId() {
 		return voterID;
 	}
 	
-	public byte[] getInnerBallot() {
-		return inner_ballot;
-	}
-	
-	public byte[] getNonce() {
-		return nonce;
-	}
-	
-	public int getElectionID() {
+	public int getElectionId() {
 		return electionID;
-	}
-	
-	public byte[] getVoteWithNonce() {
-		return vote_with_nonce;
 	}
 	
 	
@@ -207,6 +211,16 @@ public class Voter {
 	 */
 	public class MalformedMessage extends PollError {
 		public MalformedMessage(String msg){
+			super(msg);
+		}
+	}
+	
+	/**
+	 * Exception thrown when either the receipt has still to be created 
+	 * or it is malformed.	
+	 */
+	public class ReceiptError extends PollError{
+		public ReceiptError(String msg){
 			super(msg);
 		}
 	}

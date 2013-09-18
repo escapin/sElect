@@ -10,11 +10,11 @@ import de.uni.trier.infsec.functionalities.pkisig.Signer;
 import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.utils.Utilities;
-import static de.uni.trier.infsec.utils.MessageTools.*;
-//import static de.uni.trier.infsec.utils.MessageTools.first;
-//import static de.uni.trier.infsec.utils.MessageTools.second;
-//import static de.uni.trier.infsec.utils.MessageTools.byteArrayToInt;
-//import static de.uni.trier.infsec.utils.MessageTools.concatenate;
+import static de.uni.trier.infsec.utils.MessageTools.first;
+import static de.uni.trier.infsec.utils.MessageTools.second;
+import static de.uni.trier.infsec.utils.MessageTools.byteArrayToInt;
+import static de.uni.trier.infsec.utils.MessageTools.intToByteArray;
+import static de.uni.trier.infsec.utils.MessageTools.concatenate;
 
 public class CollectingServer 
 {
@@ -70,7 +70,6 @@ public class CollectingServer
 	 *  inner_ballot(s), based on an array whose length is NumberOfVoters, with the assumption
 	 *	that a voterID is a number between 0 and NumberOfVoters-1.
 	 *
-	 * @throws  
 	 */
 	public byte[] collectBallot(byte[] ballot) throws MalformedMessage, NetworkError, RegisterSig.PKIError, RegisterEnc.PKIError{
 		
@@ -81,7 +80,7 @@ public class CollectingServer
 		boolean rejected=false;
 		if( rejected=vb.electionID!=electionID )
 			rejected_reason=concatenate(Params.REJECTED, Params.INVALID_ELECTION_ID);
-		else if( rejected=(vb.voterID<=0 || vb.voterID>Params.NumberOfVoters) )
+		else if( rejected=(vb.voterID<0 || vb.voterID>=Params.NumberOfVoters) )
 			rejected_reason=concatenate(Params.REJECTED, Params.INVALID_VOTER_ID);
 		else if( rejected=!inVotingPahse )
 			rejected_reason=concatenate(Params.REJECTED, Params.ELECTION_OVER);
@@ -188,27 +187,24 @@ public class CollectingServer
 		inVotingPahse = false;
 
 		// sort the ballots
-		Arrays.sort(ballots, new java.util.Comparator<byte[]>() {
+		byte[][] bb = new byte[numberOfCastBallots][];
+		for (int id=0,ind=0; id<Params.NumberOfVoters; ++id) {
+			if (ballots[id]!=null)
+				bb[ind++] = ballots[id];
+		}
+		// maybe for the verification process, it's better to implement our sort algorithm
+		Arrays.sort(bb, new java.util.Comparator<byte[]>() {
 		    public int compare(byte[] a1, byte[] a2) {
-		    	// null greater than every other vote
-		    	if(a1==null && a2==null)
-		    		return 0;
-		    	else if(a1==null)
-		    		return +1;
-		    	else if(a2==null)
-		    		return -1;
 		    	return Utils.compare(a1, a2);
 		    }
 		});
 		// concatenate all the (inner) ballots
-		byte[] ballotsAsAMessage = Utils.concatenateMessageArray(ballots, numberOfCastBallots);
-		//byte[] ballotsAsAMessage = Utils.concatenateMessageArray(Utilities.copyOf(ballots, numberOfCastBallots), numberOfCastBallots);
-
+		byte[] ballotsAsAMessage = Utils.concatenateMessageArray(bb, numberOfCastBallots);
+		
 		// concatenate all the voters who voted
 		// the voters are already sorted ascending
 		byte[][] vv = new byte[numberOfCastBallots][];
-		int ind = 0;
-		for (int id=0; id<Params.NumberOfVoters; ++id) {
+		for (int id=0,ind=0; id<Params.NumberOfVoters; ++id) {
 			if (ballots[id]!=null)
 				vv[ind++] = intToByteArray(id);
 		}

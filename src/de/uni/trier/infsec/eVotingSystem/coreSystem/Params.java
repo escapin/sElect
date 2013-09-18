@@ -17,7 +17,7 @@ public class Params {
 	// Storage
 	public static final String PATH_STORAGE = System.getProperty("java.io.tmpdir") + File.separator + "eVotingSystem" + File.separator;
 	
-	public static byte[] VOTE_COLLECTED 		= {0x20};		// the vote has been correctly collecte (tag 'ACCEPTED')
+	public static byte[] VOTE_COLLECTED 		= {0x20};		// the vote has been correctly collected (tag 'ACCEPTED')
 	public static byte[] INVALID_ELECTION_ID 	= {0x21};		// Invalid election identifier
 	public static byte[] INVALID_VOTER_ID 		= {0x22};		// Invalid voter identifier	
 	public static byte[] ELECTION_OVER 			= {0x23}; 		// Voting phase is over

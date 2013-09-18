@@ -32,7 +32,7 @@ How-To run the E-voting System process:
     keys to folder %TEMP%/eVotingSystem/voter$(voter_id).info
     NOTE:
     	we require that the voterID is a number between 1 and Params.NumberOfVoters:
-    				0 < voterID <= Params.NumberOfVoters
+    				0 <= voterID < Params.NumberOfVoters
 
 
 EXAMPLE:

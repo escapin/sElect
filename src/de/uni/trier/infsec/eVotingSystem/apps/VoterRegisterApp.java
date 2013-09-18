@@ -18,16 +18,19 @@ public class VoterRegisterApp {
 		System.setProperty("remotemode", Boolean.toString(true));
 		int voterID=0;
 		if (args.length != 1) {
-			System.out.println("Wrong number of Arguments!\nExpected: VoterRegisterApp <user_id [int]>\nExample: VoterRegisterApp 01");
+			System.out.println("Wrong number of Arguments!\nExpected: VoterRegisterApp <voter_id [int]>\nExample: VoterRegisterApp 01");
 			System.exit(0);
 		} else {
 			try {				
 				voterID = Integer.parseInt(args[0]);
 			} catch (Exception e) {
-				System.out.println("Something is wrong with arguments!\nExpected: VoterRegisterApp <user_id [int]>\nExample: VoterRegisterApp 01");
+				System.out.println("Something is wrong with arguments!\nExpected: VoterRegisterApp <voter_id [int]>\nExample: VoterRegisterApp 01");
 				e.printStackTrace();
 				System.exit(0);
 			}
+			if(voterID<0 || voterID>=Params.NumberOfVoters)
+				System.out.println("Voter identifier out of range!\nExpected: \n\t 0 <= voter_id < " + Params.NumberOfVoters);
+				System.exit(0);
 			VoterRegisterApp.register(voterID);
 		}
 	}	
