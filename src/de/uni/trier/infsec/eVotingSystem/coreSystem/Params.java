@@ -22,5 +22,4 @@ public class Params {
 	public static byte[] INVALID_VOTER_ID 		= {0x22};		// Invalid voter identifier	
 	public static byte[] ELECTION_OVER 			= {0x23}; 		// Voting phase is over
 	public static byte[] ALREADY_VOTED 			= {0x24};		// Already voted with a different ballot
-	//It would be better to have a new enum type, but then how can we obtain a byte array from it?
 }

@@ -25,7 +25,7 @@ public class CollectingServer
 	
 	// STATE (PRIVATE)
 	
-	private boolean inVotingPahse = true; // indicates if the system is still in the voting phase
+	private boolean inVotingPhase; // indicates if the system is still in the voting phase
 	private final int electionID;
 	private final byte[][] ballots = new byte[Params.NumberOfVoters][]; // (inner ballots which have been cast) 
 	private int numberOfCastBallots = 0;
@@ -54,6 +54,7 @@ public class CollectingServer
 		this.signer = signer;
 		this.decryptor = decryptor;
 		this.electionID=electionID;
+		inVotingPhase=true;
 		// initially no voter has cast their ballot:
 		for(int i=0; i<Params.NumberOfVoters; ++i)
 			ballots[i]=null;
@@ -78,16 +79,18 @@ public class CollectingServer
 		
 		byte[] rejected_reason={};
 		boolean rejected=false;
-		if( rejected=vb.electionID!=electionID )
+		if( rejected=(vb.electionID!=electionID) )
 			rejected_reason=concatenate(Params.REJECTED, Params.INVALID_ELECTION_ID);
 		else if( rejected=(vb.voterID<0 || vb.voterID>=Params.NumberOfVoters) )
 			rejected_reason=concatenate(Params.REJECTED, Params.INVALID_VOTER_ID);
-		else if( rejected=!inVotingPahse )
+		else if( rejected=(!inVotingPhase) )
 			rejected_reason=concatenate(Params.REJECTED, Params.ELECTION_OVER);
 		else if( rejected=(ballots[vb.voterID]!=null && !Utilities.arrayEqual(vb.inner_ballot, ballots[vb.voterID])) )	// check whether the vote has already voted
 			rejected_reason=concatenate(Params.REJECTED, Params.ALREADY_VOTED);
 		
-		byte[] elIDmsg=intToByteArray(electionID);
+		byte[] elIDmsg=intToByteArray(vb.electionID); 
+		// since the two electionIDs could be different, we have to reply with the voter one
+														
 		if(rejected)
 			/* SHAPE OF THE RESPONSE
 			 * 	 [electionID, REJECTED, rejectedReason]
@@ -103,7 +106,7 @@ public class CollectingServer
 		byte[] elID_inner_ballot=concatenate(elIDmsg,vb.inner_ballot);
 		byte[] accepted_elID_inner_ballot=concatenate(Params.ACCEPTED,elID_inner_ballot);
 		byte[] serverSign=signer.sign(accepted_elID_inner_ballot);
-		// TODO: perhaps the server should store the voters signatures on her ballot
+		// TODO: perhaps the server should store the voters signatures on her ballot. Let's discuss about it!
 		
 		byte[] accepted_serverSign=concatenate(Params.ACCEPTED,serverSign);
 		/*
@@ -184,7 +187,7 @@ public class CollectingServer
 	public byte[] getResult() 
 	{
 		// if the result is given out, voting should not be possible any longer
-		inVotingPahse = false;
+		inVotingPhase = false;
 
 		// sort the ballots
 		byte[][] bb = new byte[numberOfCastBallots][];
@@ -230,7 +233,10 @@ public class CollectingServer
 	
 	
 	// METHODS FOR TESTING //
-	
+	/* FIXME: Should we delete these two methods and change the Test according to it?
+	 * 		These two methods could be somehow misleading for someone using this
+	 *		class. For instance, I confused the method getBallots() with getResult()
+	 */
 	
 	/**
 	 * For testing. Returns array of cast ballots.

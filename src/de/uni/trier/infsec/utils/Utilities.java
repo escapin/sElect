@@ -39,10 +39,10 @@ public class Utilities {
 	/**
 	 *	Checks two Arrays for equality 
 	 */
-	public static boolean arrayEqual(byte[] voter, byte[] tmpVoter) {
-		if (voter.length != tmpVoter.length) return false;
-		for (int i = 0; i < voter.length; i++) {
-			if (voter[i] != tmpVoter[i]) return false;
+	public static boolean arrayEqual(byte[] a1, byte[] a2) {
+		if (a1.length != a2.length) return false;
+		for (int i = 0; i < a1.length; i++) {
+			if (a1[i] != a2[i]) return false;
 		}
 		return true;
 	}

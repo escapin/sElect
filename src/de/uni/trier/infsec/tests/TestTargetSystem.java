@@ -34,7 +34,7 @@ public class TestTargetSystem extends TestCase
 	public void testClientServerExhange() throws Exception
 	{
 		
-		int voterID=10;
+		int voterID=1;
 		Voter voter = createVoter(voterID, electionID);
 		
 		// create the ballot
@@ -74,6 +74,38 @@ public class TestTargetSystem extends TestCase
 			fail("Voting with trash -- exception expected");
 		} catch (CollectingServer.MalformedMessage e) {}
 		
+		//create a voter with a different electionID
+		Voter voter2=createVoter(voterID+2, electionID+2);
+		// create the ballot
+		ballot = voter2.createBallot("C2".getBytes());
+		// deliver it to the collecting server
+		response = colServer.collectBallot(ballot);
+		// now the response_tag should say the electionID is incorrect
+		response_tag=voter2.validateResponse(response);
+		assertTrue(Utilities.arrayEqual(response_tag, Params.INVALID_ELECTION_ID));
+		
+		//create a voter with a wrong voterID
+		Voter voter3=createVoter(Params.NumberOfVoters, electionID);
+		// create the ballot
+		ballot = voter3.createBallot("C3".getBytes());
+		// deliver it to the collecting server
+		response = colServer.collectBallot(ballot);
+		// now the response_tag should say the voterID is incorrect
+		response_tag=voter3.validateResponse(response);
+		assertTrue(Utilities.arrayEqual(response_tag, Params.INVALID_VOTER_ID));
+		
+		
+		// try to vote when the election is over
+		colServer.getResult();
+		// create a correct voter
+		Voter voter4=createVoter(voterID+4,electionID);
+		// create the ballot
+		ballot=voter4.createBallot("C4".getBytes());
+		// create the ballot
+		response = colServer.collectBallot(ballot);
+		// now the response_tag should say the election is over
+		response_tag=voter4.validateResponse(response);
+		assertTrue(Utilities.arrayEqual(response_tag, Params.ELECTION_OVER));
 	}
 	
 	@Test
@@ -184,8 +216,13 @@ public class TestTargetSystem extends TestCase
 		File dbFile = new File(PKIServerCore.DEFAULT_DATABASE);
 		if (dbFile.exists()){
 			dbFile.delete();
-			PKIServerCore.dbInitialized=false;
-			//FIXME: this solution is not elegant: I had to change the visibility of this variable!
+			PKIServerCore.initDB();
+			/* FIXME: I had to change the visibility of this method from private to public.
+			 * Check whether it could introduce other issues in the use of the this class
+			 * and of the PKI functionality in general. I don't think so, but better a double check!
+			 * If everything is fine, for further testing, please change it also in the 
+			 * CryptoJavaGeneric and remove the FIXME also in the code of PKIServerCore.initDB()
+			 */
 		}
 		PKI.useLocalMode();
 		colServer = createCollectingServer(electionID);

@@ -17,7 +17,7 @@ public class PKIServerCore implements PKIServer {
 	private static final String DB_COLUMN_NAME_KEY = "KEY";
 	// Table PKI stores ID and corresponding Public Key in hex-representation
 	private static final String DB_TABLE_CREATE_PKE = "CREATE TABLE " + DB_TABLE_NAME_PKE + " (ID TEXT NOT NULL PRIMARY KEY, " + DB_COLUMN_NAME_KEY + " TEXT NOT NULL)";
-	public static boolean dbInitialized = false;
+	private static boolean dbInitialized = false;
 	
 	
 	
@@ -81,7 +81,10 @@ public class PKIServerCore implements PKIServer {
 	// We store the public keys in the SQLite DB (located in system temp directory)
 
 	private static SqlJetDb db = null;
-	private static void initDB() {
+	/* FIXME: visibility of this method changed from private to public
+	 * Is everything still fine?
+	 */
+	public static void initDB() {
 		try {
 			File dbFile = new File(DEFAULT_DATABASE);
 			if (!dbFile.exists()) {

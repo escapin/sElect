@@ -85,7 +85,11 @@ public class Voter {
 	 * generated nonce, and Enc_Si(msg) denotes the message msg encrypted with 
 	 * the public key of the server Si.  
 	 */
-	public byte[] createBallot(byte[] vote) {
+	public byte[] createBallot(byte[] vote) { 
+		/* TODO: Let's discuss whether it is better to have also 'electionID' as parameter or not.
+		 *	In that way we allow Voter(s) to vote for several elections but 
+		 *	we would have to provide the correct receipt before validating each response
+		 */ 
 		byte[] voteMsg = copyOf(vote);
 			//FIXME: according to Ralf suggestion in POSTCloudStorageSystem, we should change the nonce functionality
 			// 			from 'nextNonce' to 'newNonce' also in CryptoJavaGeneric
@@ -104,7 +108,8 @@ public class Voter {
 	public byte[] reCreateBallot(Receipt r) throws ReceiptError {
 		if(r.getElectionID()!=electionID) // if r is NULL it will throw a NullPointerException without copy it to receipt
 			throw new ReceiptError("The receipt is not for the current election");
-		receipt=r; //FIXME: security issue: is it ok accept any receipt as a correct one? maybe just copyOf(r)
+		receipt=r; //FIXME: security issue: should we accept any receipt as a correct one? maybe just copyOf(r)
+					// Let's think about it
 		return createOuterBallot(receipt.getInnerBallot());
 	}
 	
