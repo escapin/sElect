@@ -36,7 +36,7 @@ public class FinalServer
 	
 	// CONSTRUCTORS
 	
-	public FinalServer(int electionID, Decryptor decryptor, Signer signer) throws PKIError, NetworkError {
+	public FinalServer(byte[] electionID, Decryptor decryptor, Signer signer) throws PKIError, NetworkError {
 		this.signer = signer;
 		this.decryptor = decryptor;
 		// fetch the functionalities of the collecting server

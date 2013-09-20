@@ -21,14 +21,14 @@ import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
 import de.uni.trier.infsec.functionalities.pkisig.Signer;
 import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.utils.MessageTools;
-import de.uni.trier.infsec.utils.Utilities;
 
 
 public class TestTargetSystem extends TestCase  
 {
 	private static CollectingServer colServer;
 	private static FinalServer finServer;
-	private int electionID=100;
+	private byte[] electionID = {100};
+	private byte[] electionID2 = {101};
 	
 	@Test
 	public void testClientServerExhange() throws Exception
@@ -39,28 +39,35 @@ public class TestTargetSystem extends TestCase
 		
 		// create the ballot
 		byte[] ballot = voter.createBallot("C1".getBytes());
+		assertNotNull(ballot);
 		// deliver it to the collecting server
 		byte[] response = colServer.collectBallot(ballot);
 		// check whether the response is correct
-		byte[] response_tag=voter.validateResponse(response);
-		assertTrue(Utilities.arrayEqual(response_tag, Params.VOTE_COLLECTED));
+		Voter.ResponseTag response_tag = voter.validateResponse(response);
+		assertTrue(response_tag == Voter.ResponseTag.VOTE_COLLECTED);
 
-		// make the voter create another ballot
-		ballot=voter.createBallot("Peer".getBytes());
-		// deliver it to the collecting server
-		response = colServer.collectBallot(ballot);
-		// now it should not accept this response
-		response_tag = voter.validateResponse(response);
-		assertTrue(Utilities.arrayEqual(response_tag, Params.ALREADY_VOTED));
-		
-		
-		Voter.Receipt voterReceipt = voter.getReceipt();
-		ballot=voter.reCreateBallot(voterReceipt);
+		// now this should fail
+		ballot=voter.createBallot("C1".getBytes());
+		assertTrue(ballot == null);
+				
+		// testing re-voting
+		ballot=voter.reCreateBallot();
+		assertNotNull(ballot);
 		// deliver it to the collecting server
 		response = colServer.collectBallot(ballot);
 		// not it should accept the old response
 		response_tag=voter.validateResponse(response);
-		assertTrue(Utilities.arrayEqual(response_tag, Params.VOTE_COLLECTED));
+		assertTrue(response_tag == Voter.ResponseTag.VOTE_COLLECTED);
+
+		// testing voting for a different candidate
+		ballot = voter.forceCreateBallot("C9".getBytes());
+		assertNotNull(ballot);
+		// deliver it to the collecting server
+		response = colServer.collectBallot(ballot);
+		// now it should not accept this response
+		response_tag = voter.validateResponse(response);
+		assertTrue(response_tag == Voter.ResponseTag.ALREADY_VOTED);
+		
 		
 		// and try validate some trash
 		try{
@@ -75,14 +82,15 @@ public class TestTargetSystem extends TestCase
 		} catch (CollectingServer.MalformedMessage e) {}
 		
 		//create a voter with a different electionID
-		Voter voter2=createVoter(voterID+2, electionID+2);
+		Voter voter2=createVoter(voterID+2, electionID2);
 		// create the ballot
 		ballot = voter2.createBallot("C2".getBytes());
 		// deliver it to the collecting server
 		response = colServer.collectBallot(ballot);
 		// now the response_tag should say the electionID is incorrect
 		response_tag=voter2.validateResponse(response);
-		assertTrue(Utilities.arrayEqual(response_tag, Params.INVALID_ELECTION_ID));
+		assertTrue(response_tag == Voter.ResponseTag.INVALID_ELECTION_ID);
+
 		
 		//create a voter with a wrong voterID
 		Voter voter3=createVoter(Params.NumberOfVoters, electionID);
@@ -92,7 +100,8 @@ public class TestTargetSystem extends TestCase
 		response = colServer.collectBallot(ballot);
 		// now the response_tag should say the voterID is incorrect
 		response_tag=voter3.validateResponse(response);
-		assertTrue(Utilities.arrayEqual(response_tag, Params.INVALID_VOTER_ID));
+		assertTrue(response_tag == Voter.ResponseTag.INVALID_VOTER_ID);
+
 		
 		
 		// try to vote when the election is over
@@ -105,7 +114,8 @@ public class TestTargetSystem extends TestCase
 		response = colServer.collectBallot(ballot);
 		// now the response_tag should say the election is over
 		response_tag=voter4.validateResponse(response);
-		assertTrue(Utilities.arrayEqual(response_tag, Params.ELECTION_OVER));
+		assertTrue(response_tag == Voter.ResponseTag.ELECTION_OVER);
+
 	}
 	
 	@Test
@@ -121,8 +131,9 @@ public class TestTargetSystem extends TestCase
 		for (int i=0; i<5; ++i) {
 			byte[] ballot = voters[i].createBallot(vote);
 			byte[] response = colServer.collectBallot(ballot);
-			byte[] response_tag = voters[i].validateResponse(response);
-			assertTrue(Utilities.arrayEqual(response_tag, Params.VOTE_COLLECTED));			
+			Voter.ResponseTag response_tag = voters[i].validateResponse(response);
+			assertTrue(response_tag == Voter.ResponseTag.VOTE_COLLECTED);
+
 		}
 		
 		// get the list of voters who voted and check it
@@ -146,7 +157,7 @@ public class TestTargetSystem extends TestCase
 		for (int id=0; id<5; ++id) {
 			boolean found = false;
 			for(int i=0; i<ballots.length; ++i) {
-				if (MessageTools.equal(ballots[i], voters[id].getReceipt().getInnerBallot())) {
+				if (MessageTools.equal(ballots[i], voters[id].getReceipt().innerBallot)) {
 					found = true;
 					break;
 				}
@@ -180,7 +191,7 @@ public class TestTargetSystem extends TestCase
 		
 		// check whether her inner ballot is listed in the result
 		assertTrue("Inner ballot not in the result",
-				   Utils.contains(ballotsAsAMessage, selected_voter.getReceipt().getInnerBallot()));
+				   Utils.contains(ballotsAsAMessage, selected_voter.getReceipt().innerBallot));
 		
 		// deliver the data to the second server
 		byte[] signedResult = finServer.processInputTally(signedTally);
@@ -193,7 +204,7 @@ public class TestTargetSystem extends TestCase
 		assertTrue("Incorrect signature on the result of the final server",  signature_ok);
 		
 		// check if the selected voter can find her nonce and vote
-		byte[] voterNonce = selected_voter.getReceipt().getNonce();
+		byte[] voterNonce = selected_voter.getReceipt().nonce;
 		
 		boolean contains = false;
 		for( MessageSplitIter iter = new MessageSplitIter(result); !contains && iter.notEmpty(); iter.next() )
@@ -234,7 +245,7 @@ public class TestTargetSystem extends TestCase
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	private CollectingServer createCollectingServer(int electionID) throws Exception {
+	private CollectingServer createCollectingServer(byte[] electionID) throws Exception {
 		// create the collecting server's functionalities
 		Decryptor decryptor = new  Decryptor();
 		Signer signer = new Signer();
@@ -245,7 +256,7 @@ public class TestTargetSystem extends TestCase
 		return new CollectingServer(electionID, decryptor, signer);		
 	}
 
-	private FinalServer createFinalServer(int electionID) throws Exception {
+	private FinalServer createFinalServer(byte[] electionID) throws Exception {
 		// create the final server' functionalities
 		Decryptor decryptor = new  Decryptor();
 		Signer signer = new Signer();
@@ -255,7 +266,7 @@ public class TestTargetSystem extends TestCase
 		return new FinalServer(electionID, decryptor, signer);
 	}
 	
-	private Voter createVoter(int id, int electionID) throws Exception {
+	private Voter createVoter(int id, byte[] electionID) throws Exception {
 		// create voter's functionalities
 		Decryptor decryptor = new  Decryptor();
 		Signer signer = new Signer();

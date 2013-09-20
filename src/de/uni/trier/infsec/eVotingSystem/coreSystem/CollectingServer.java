@@ -9,6 +9,7 @@ import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
 import de.uni.trier.infsec.functionalities.pkisig.Signer;
 import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.lib.network.NetworkError;
+import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.utils.Utilities;
 import static de.uni.trier.infsec.utils.MessageTools.first;
 import static de.uni.trier.infsec.utils.MessageTools.second;
@@ -26,7 +27,7 @@ public class CollectingServer
 	// STATE (PRIVATE)
 	
 	private boolean inVotingPhase; // indicates if the system is still in the voting phase
-	private final int electionID;
+	private final byte[] electionID;
 	private final byte[][] ballots = new byte[Params.NumberOfVoters][]; // (inner ballots which have been cast) 
 	private int numberOfCastBallots = 0;
 	
@@ -50,7 +51,7 @@ public class CollectingServer
 
 	// CONSTRUCTORS
 	
-	public CollectingServer(int electionID, Decryptor decryptor, Signer signer) {
+	public CollectingServer(byte[] electionID, Decryptor decryptor, Signer signer) {
 		this.signer = signer;
 		this.decryptor = decryptor;
 		this.electionID=electionID;
@@ -79,7 +80,7 @@ public class CollectingServer
 		
 		byte[] rejected_reason={};
 		boolean rejected=false;
-		if( rejected=(vb.electionID!=electionID) )
+		if( rejected=(!MessageTools.equal(vb.electionID, electionID)) )
 			rejected_reason=concatenate(Params.REJECTED, Params.INVALID_ELECTION_ID);
 		else if( rejected=(vb.voterID<0 || vb.voterID>=Params.NumberOfVoters) )
 			rejected_reason=concatenate(Params.REJECTED, Params.INVALID_VOTER_ID);
@@ -88,14 +89,13 @@ public class CollectingServer
 		else if( rejected=(ballots[vb.voterID]!=null && !Utilities.arrayEqual(vb.inner_ballot, ballots[vb.voterID])) )	// check whether the vote has already voted
 			rejected_reason=concatenate(Params.REJECTED, Params.ALREADY_VOTED);
 		
-		byte[] elIDmsg=intToByteArray(vb.electionID); 
 		// since the two electionIDs could be different, we have to reply with the voter one
 														
 		if(rejected)
 			/* SHAPE OF THE RESPONSE
 			 * 	 [electionID, REJECTED, rejectedReason]
 			 */
-			return buildSecureChannel(vb.voterID, concatenate(elIDmsg, rejected_reason));
+			return buildSecureChannel(vb.voterID, concatenate(vb.electionID, rejected_reason));
 		
 		if(ballots[vb.voterID]==null){
 			numberOfCastBallots++;
@@ -103,7 +103,7 @@ public class CollectingServer
 			ballots[vb.voterID]=vb.inner_ballot;
 		}
 		// build the server signature as receipt for the voter
-		byte[] elID_inner_ballot=concatenate(elIDmsg,vb.inner_ballot);
+		byte[] elID_inner_ballot=concatenate(vb.electionID, vb.inner_ballot);
 		byte[] accepted_elID_inner_ballot=concatenate(Params.ACCEPTED,elID_inner_ballot);
 		byte[] serverSign=signer.sign(accepted_elID_inner_ballot);
 		// TODO: perhaps the server should store the voters signatures on her ballot. Let's discuss about it!
@@ -113,16 +113,16 @@ public class CollectingServer
 		 * SHAPE OF THE RESPONSE
 		 * 	 [electionID, ACCEPTED, serverSignature(ACCEPTED, electionID, innerBallot)]
 		 */
-		return buildSecureChannel(vb.voterID, concatenate(elIDmsg, accepted_serverSign));				
+		return buildSecureChannel(vb.voterID, concatenate(vb.electionID, accepted_serverSign));				
 	}
 
 	
 	private class VoterBallot {
 		int voterID;
-		int electionID;
+		byte[] electionID;
 		byte[] inner_ballot;
 		
-		VoterBallot(int voterID, int electionID, byte[] inner_ballot) {
+		VoterBallot(int voterID, byte[] electionID, byte[] inner_ballot) {
 			this.voterID=voterID;
 			this.electionID=electionID;
 			this.inner_ballot=inner_ballot;
@@ -154,10 +154,9 @@ public class CollectingServer
 		byte[] signVoter=second(payload_sign);
 		if (!voter_verifier.verify(signVoter, payload))
 			throw new MalformedMessage();
-		byte[] elIDmsg=first(payload);
+		byte[] elID=first(payload);
 		if(voterIDmsg.length!=4) // since electionID is supposed to be a integer, its length must be 4 bytes
 			throw new MalformedMessage();
-		int elID = byteArrayToInt(elIDmsg);
 		byte[] inner_ballot=second(payload);
 		
 		return new VoterBallot(voterID, elID, inner_ballot); 
