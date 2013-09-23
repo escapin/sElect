@@ -20,37 +20,30 @@ import static de.uni.trier.infsec.utils.MessageTools.concatenate;
 public class CollectingServer 
 {
 	// CRYPTOGRAPHIC FUNCTIONALITIES
-	
+
 	private final Decryptor decryptor;
 	private final Signer signer;
-	
-	// STATE (PRIVATE)
-	
+
+
+	// STATE
+
 	private boolean inVotingPhase; // indicates if the system is still in the voting phase
 	private final byte[] electionID;
 	private final byte[][] ballots = new byte[Params.NumberOfVoters][]; // (inner ballots which have been cast) 
 	private int numberOfCastBallots = 0;
-	
-	
+
+
 	// CLASSES
-	
+
 	/**
-	 * Error thrown if a collected message is ill-formed.
+	 * Exception thrown when the request we received does not conform
+	 * to an expected format (we get, for instance, a trash message). 
 	 */
-	public static class Error extends Exception 
-	{
-		private static final long serialVersionUID = 2280511187763698373L;
-		private String description;
-		public Error(String description) {
-			this.description = description;
-		}
-		public String toString() {
-			return "Collecting Server Error: " + description;
-		}
-	}
+	public static class MalformedMessage extends Exception {}
+
 
 	// CONSTRUCTORS
-	
+
 	public CollectingServer(byte[] electionID, Decryptor decryptor, Signer signer) {
 		this.signer = signer;
 		this.decryptor = decryptor;
@@ -62,10 +55,13 @@ public class CollectingServer
 	}
 
 	// PUBLIC METHODS
-	
+
 	/**
-	 * Process a new ballot and return a response. Response in null, if the
-	 * ballot is rejected.
+	 * Process a new ballot and return a response. A response can be either a standard
+	 * response (if the ballot has been accepted) or an error response. The method
+	 * may also produce no response (if it is not able / not willing to produce it),
+	 * but instead throw an exception. This is the case, if the message is malformed or 
+	 * is not authorized by an eligible voter. 
 	 *
 	 * NOTE: 
 	 * 	for the sake of the verification process, we implement a simple way to store 
@@ -73,113 +69,60 @@ public class CollectingServer
 	 *	that a voterID is a number between 0 and NumberOfVoters-1.
 	 *
 	 */
-	public byte[] collectBallot(byte[] ballot) throws MalformedMessage, NetworkError, RegisterSig.PKIError, RegisterEnc.PKIError{
-		
-		VoterBallot vb = decryptValidateRequest(ballot);
-		
-		
-		byte[] rejected_reason={};
-		boolean rejected=false;
-		if( rejected=(!MessageTools.equal(vb.electionID, electionID)) )
-			rejected_reason=concatenate(Params.REJECTED, Params.INVALID_ELECTION_ID);
-		else if( rejected=(vb.voterID<0 || vb.voterID>=Params.NumberOfVoters) )
-			rejected_reason=concatenate(Params.REJECTED, Params.INVALID_VOTER_ID);
-		else if( rejected=(!inVotingPhase) )
-			rejected_reason=concatenate(Params.REJECTED, Params.ELECTION_OVER);
-		else if( rejected=(ballots[vb.voterID]!=null && !Utilities.arrayEqual(vb.inner_ballot, ballots[vb.voterID])) )	// check whether the vote has already voted
-			rejected_reason=concatenate(Params.REJECTED, Params.ALREADY_VOTED);
-		
-		// since the two electionIDs could be different, we have to reply with the voter one
-														
-		if(rejected)
-			/* SHAPE OF THE RESPONSE
-			 * 	 [electionID, REJECTED, rejectedReason]
-			 */
-			return buildSecureChannel(vb.voterID, concatenate(vb.electionID, rejected_reason));
-		
-		if(ballots[vb.voterID]==null){
-			numberOfCastBallots++;
-			// STORE the inner_ballot		
-			ballots[vb.voterID]=vb.inner_ballot;
-		}
-		// build the server signature as receipt for the voter
-		byte[] elID_inner_ballot=concatenate(vb.electionID, vb.inner_ballot);
-		byte[] accepted_elID_inner_ballot=concatenate(Params.ACCEPTED,elID_inner_ballot);
-		byte[] serverSign=signer.sign(accepted_elID_inner_ballot);
-		// TODO: perhaps the server should store the voters signatures on her ballot. Let's discuss about it!
-		
-		byte[] accepted_serverSign=concatenate(Params.ACCEPTED,serverSign);
-		/*
-		 * SHAPE OF THE RESPONSE
-		 * 	 [electionID, ACCEPTED, serverSignature(ACCEPTED, electionID, innerBallot)]
-		 */
-		return buildSecureChannel(vb.voterID, concatenate(vb.electionID, accepted_serverSign));				
-	}
+	public byte[] collectBallot(byte[] ballot) throws MalformedMessage, NetworkError, RegisterSig.PKIError, RegisterEnc.PKIError {
 
-	
-	private class VoterBallot {
-		int voterID;
-		byte[] electionID;
-		byte[] inner_ballot;
-		
-		VoterBallot(int voterID, byte[] electionID, byte[] inner_ballot) {
-			this.voterID=voterID;
-			this.electionID=electionID;
-			this.inner_ballot=inner_ballot;
-		}
-	}
-	
-	/**
-	 * Decrypt the message, verify that it's a response of the server to our request
-	 * (otherwise an exception is thrown). 
-	 * 
-	 * @param ballot the voter ballot
-	 * @return a VoterBallot object
-	 * @throws MalformedMessage if something went wrong during the validation process
-	 */
-	private VoterBallot decryptValidateRequest(byte[] ballot) throws MalformedMessage, NetworkError, RegisterSig.PKIError{ 
+		// Decrypt, check the signature, and deconstruct the input ballot.
+		// If this step fails, an exception is thrown (there is no response to be send back):
+		//
 		byte[] id_payload_sign = decryptor.decrypt(ballot);
-		
 		byte[] voterIDmsg = first(id_payload_sign);
 		if(voterIDmsg.length!=4) // since clientID is supposed to be a integer, its length must be 4 bytes
 			throw new MalformedMessage();
 		int voterID = byteArrayToInt(voterIDmsg);
-		
-		byte[] payload_sign= second(id_payload_sign);
-		
-		// fetch the voter's verifier (if it fails, let if fail now);
-		// these steps can throw a NetworkError or one of the PKIErrors
-		Verifier voter_verifier =  RegisterSig.getVerifier(voterID, Params.SIG_DOMAIN);
-		byte[] payload=first(payload_sign);
-		byte[] signVoter=second(payload_sign);
-		if (!voter_verifier.verify(signVoter, payload))
+		if( voterID<0 || voterID>=Params.NumberOfVoters ) // only accept requests from eligible voters
 			throw new MalformedMessage();
-		byte[] elID=first(payload);
-		if(voterIDmsg.length!=4) // since electionID is supposed to be a integer, its length must be 4 bytes
+		byte[] payload_sign = second(id_payload_sign);
+		byte[] payload = first(payload_sign);
+		byte[] signVoter = second(payload_sign);
+		Verifier voter_verifier = RegisterSig.getVerifier(voterID, Params.SIG_DOMAIN); // (may throw NetworkError or PKIerror) 
+		if (!voter_verifier.verify(signVoter, payload))  // only accept signed requests (by an eligible voter)
 			throw new MalformedMessage();
-		byte[] inner_ballot=second(payload);
-		
-		return new VoterBallot(voterID, elID, inner_ballot); 
+		byte[] elID = first(payload);
+		byte[] innerBallot=second(payload);
+
+		// Check if the ballot is to be rejected (with an error response).
+		//
+		byte[] problem = null;  // null means that everything is ok 
+		if( !MessageTools.equal(elID, electionID) )
+			problem =  Params.INVALID_ELECTION_ID;
+		else if( !inVotingPhase )
+			problem = Params.ELECTION_OVER;
+		else if( ballots[voterID]!=null && !Utilities.arrayEqual(innerBallot, ballots[voterID]) )	// check whether the vote has already voted
+			problem = Params.ALREADY_VOTED;
+
+		if (problem != null) { // there is a problem; create an error response of the form [electionID, REJECTED, rejectedReason]
+			return encapsulateResponse(voterID, concatenate(elID, concatenate(Params.REJECTED, problem)));
+			// note that we reply with the election identifier as provided in the voter's request
+		}
+
+		// No errors -- record the ballot and return a standard response of the form
+		// [electionID, ACCEPTED, serverSignature(ACCEPTED, electionID, innerBallot)]
+		//
+		if(ballots[voterID] == null) { // store the inner ballot (only if the voter has sent it for the first time)
+			numberOfCastBallots++;
+			ballots[voterID] = innerBallot; 
+		}
+		// create receipt for the voter
+		byte[] elID_innerBallot = concatenate(electionID, innerBallot);
+		byte[] accepted_elID_innerBallot = concatenate(Params.ACCEPTED, elID_innerBallot);
+		byte[] receipt = signer.sign(accepted_elID_innerBallot);
+		// TODO: perhaps the server should store voters' signatures
+
+		byte[] accepted_serverSign=concatenate(Params.ACCEPTED, receipt);
+		return encapsulateResponse(voterID, concatenate(electionID, accepted_serverSign));
 	}
-	
-	/**
-	 * Add voterID, sign then encrypt to send everything to the voter.  
-	 * @throws NetworkError 
-	 * @throws RegisterEnc.PKIError 
-	 */
-	private byte[] buildSecureChannel(int voterID, byte[] payload) throws NetworkError, RegisterEnc.PKIError{
-		// 1. add voterID
-		byte[] id_payload = concatenate(intToByteArray(voterID), payload);
-		// 2. server signature
-		byte[] signServer = signer.sign(id_payload);
-		byte[] id_payload_signature = concatenate(id_payload, signServer);
-		// 3. encryption with the voter public key
-		Encryptor voter_encryptor = RegisterEnc.getEncryptor(voterID, Params.ENC_DOMAIN);
-		byte[] response=voter_encryptor.encrypt(id_payload_signature);
-		
-		return response;
-	}
-	
+
+
 	/**
 	 * Return the result (content of the input tally), to be publicly posted. 
 	 */
@@ -196,15 +139,15 @@ public class CollectingServer
 		}
 		// maybe for the verification process, it's better to implement our sort algorithm
 		Arrays.sort(bb, new java.util.Comparator<byte[]>() {
-		    public int compare(byte[] a1, byte[] a2) {
-		    	return Utils.compare(a1, a2);
-		    }
+			public int compare(byte[] a1, byte[] a2) {
+				return Utils.compare(a1, a2);
+			}
 		});
+
 		// concatenate all the (inner) ballots
 		byte[] ballotsAsAMessage = Utils.concatenateMessageArray(bb, numberOfCastBallots);
-		
-		// concatenate all the voters who voted
-		// the voters are already sorted ascending
+
+		// concatenate identifiers of the voters who voted (they are already "sorted")
 		byte[][] vv = new byte[numberOfCastBallots][];
 		for (int id=0,ind=0; id<Params.NumberOfVoters; ++id) {
 			if (ballots[id]!=null)
@@ -212,31 +155,44 @@ public class CollectingServer
 		}
 		byte[] votersAsAMessage = Utils.concatenateMessageArray(vv);
 
-		// put them (ballots and the voters) together
-		byte[] publicData = concatenate(ballotsAsAMessage, votersAsAMessage);
+		// put together the election ID, inner ballots, and list of voters
+		byte[] result = concatenate(electionID, concatenate(ballotsAsAMessage, votersAsAMessage));
+		
+		// sign the result
+		byte[] signature = signer.sign(result);
+		byte[] resultWithSignature = concatenate(result, signature);
 
-		// sign the public data
-		byte[] signature = signer.sign(publicData);
-		byte[] publicDataWithSignature = concatenate(publicData, signature);
-
-		return publicDataWithSignature;
+		return resultWithSignature;
 	}
 
+
+	// PRIVATE METHODS
+
 	/**
-	 * Exception thrown when the request we received does not conform
-	 * to an expected format (we get, for instance, a trash message). 
+	 * Add voterID, sign, then encrypt with the voter's public key  
+	 * @throws NetworkError 
+	 * @throws RegisterEnc.PKIError 
 	 */
-	@SuppressWarnings("serial")
-	public static class MalformedMessage extends Exception {}
-	
-	
-	
+	private byte[] encapsulateResponse(int voterID, byte[] payload) throws NetworkError, RegisterEnc.PKIError {
+		// add voterID
+		byte[] id_payload = concatenate(intToByteArray(voterID), payload);
+		// add server signature
+		byte[] signServer = signer.sign(id_payload);
+		byte[] id_payload_signature = concatenate(id_payload, signServer);
+		// encryption with the voter public key
+		Encryptor voter_encryptor = RegisterEnc.getEncryptor(voterID, Params.ENC_DOMAIN);
+		byte[] response=voter_encryptor.encrypt(id_payload_signature);
+
+		return response;
+	}
+
+
 	// METHODS FOR TESTING //
 	/* FIXME: Should we delete these two methods and change the Test according to it?
 	 * 		These two methods could be somehow misleading for someone using this
 	 *		class. For instance, I confused the method getBallots() with getResult()
 	 */
-	
+
 	/**
 	 * For testing. Returns array of cast ballots.
 	 */
@@ -248,7 +204,7 @@ public class CollectingServer
 				b[ind++] = ballots[i];
 		return b;
 	}
-	
+
 	/**
 	 * For testing.
 	 */

@@ -19,7 +19,7 @@ public class Params {
 	
 	public static byte[] VOTE_COLLECTED 		= {0x20};		// the vote has been correctly collected (tag 'ACCEPTED')
 	public static byte[] INVALID_ELECTION_ID 	= {0x21};		// Invalid election identifier
-	public static byte[] INVALID_VOTER_ID 		= {0x22};		// Invalid voter identifier	
+	// public static byte[] INVALID_VOTER_ID 		= {0x22};		// Invalid voter identifier	
 	public static byte[] ELECTION_OVER 			= {0x23}; 		// Voting phase is over
 	public static byte[] ALREADY_VOTED 			= {0x24};		// Already voted with a different ballot
 }

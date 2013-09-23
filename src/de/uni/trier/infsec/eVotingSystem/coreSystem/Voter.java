@@ -184,8 +184,8 @@ public class Voter
 			byte[] reason = second(tag_payload);
 			if (Utilities.arrayEqual(reason, Params.INVALID_ELECTION_ID))
 				return ResponseTag.INVALID_ELECTION_ID;
-			else if (Utilities.arrayEqual(reason, Params.INVALID_VOTER_ID))
-				return ResponseTag.INVALID_VOTER_ID;
+			// else if (Utilities.arrayEqual(reason, Params.INVALID_VOTER_ID))
+			//	return ResponseTag.INVALID_VOTER_ID;
 			else if (Utilities.arrayEqual(reason, Params.ELECTION_OVER))
 				return ResponseTag.ELECTION_OVER;
 			else if (Utilities.arrayEqual(reason, Params.ALREADY_VOTED))

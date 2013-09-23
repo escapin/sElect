@@ -97,13 +97,12 @@ public class TestTargetSystem extends TestCase
 		// create the ballot
 		ballot = voter3.createBallot("C3".getBytes());
 		// deliver it to the collecting server
-		response = colServer.collectBallot(ballot);
-		// now the response_tag should say the voterID is incorrect
-		response_tag=voter3.validateResponse(response);
-		assertTrue(response_tag == Voter.ResponseTag.INVALID_VOTER_ID);
+		try {
+			colServer.collectBallot(ballot);
+			fail("Not eligible voter");
+		} catch (CollectingServer.MalformedMessage e) {}
 
-		
-		
+
 		// try to vote when the election is over
 		colServer.getResult();
 		// create a correct voter
@@ -177,9 +176,15 @@ public class TestTargetSystem extends TestCase
 		boolean signature_ok =  colServerVer.verify(signatureOnPublicData, publicData);
 		assertTrue("Incorrect signature on the public data of the collecting server",  signature_ok);
 		
-		// extract ballots and voter list
-		byte[] ballotsAsAMessage = MessageTools.first(publicData);
-		byte[] votersAsAMessage = MessageTools.second(publicData);
+		// extract election id, ballots, and voter list
+		byte[] el_id = MessageTools.first(publicData);
+		byte[] restOfPublicData = MessageTools.second(publicData);
+		byte[] ballotsAsAMessage = MessageTools.first(restOfPublicData);
+		byte[] votersAsAMessage = MessageTools.second(restOfPublicData);
+		
+		// check the returned election ID
+		assertTrue("Wrong election id in the partial result",
+				   MessageTools.equal(el_id, electionID));
 		
 		// lets take some voter
 		Voter selected_voter = voters[3];

@@ -15,6 +15,8 @@ public class FinalServer
 	private final Signer signer;
 	private final Decryptor decryptor;
 	private final Verifier collectingServerVerif;
+	// Other private parameters
+	private final byte[] electionID;
 	
 	
 	// CLASSES
@@ -39,9 +41,9 @@ public class FinalServer
 	public FinalServer(byte[] electionID, Decryptor decryptor, Signer signer) throws PKIError, NetworkError {
 		this.signer = signer;
 		this.decryptor = decryptor;
+		this.electionID = electionID;
 		// fetch the functionalities of the collecting server
 		this.collectingServerVerif = RegisterSig.getVerifier(Params.SERVER1ID, Params.SIG_DOMAIN);
-		
 	}
 	
 	// PUBLIC METHODS
@@ -57,13 +59,18 @@ public class FinalServer
 		byte[] signature = MessageTools.second(data);
 		if (!collectingServerVerif.verify(signature, publicData))
 			throw new Error("Wrong signature");
+		
+		byte[] el_id = MessageTools.first(publicData);
+		if (!MessageTools.equal(el_id, electionID))
+			throw new Error("Wrong election ID");
+		byte[] partialResult = MessageTools.second(publicData);
 
 		// create array to collect entries (votes with nonces)
 		byte[][] entries = new byte[Params.NumberOfVoters][];
 		int nextEntry = 0;
 		
 		// retrieve and process ballots (store decrypted entries in 'entries')
-		byte[] ballotsAsAMessage = MessageTools.first(publicData);
+		byte[] ballotsAsAMessage = MessageTools.first(partialResult);
 		for( MessageSplitIter iter = new MessageSplitIter(ballotsAsAMessage); iter.notEmpty(); iter.next() ) {
 			byte[] nonce_vote = decryptor.decrypt(iter.current());
 			if (nonce_vote == null) // decryption failed
