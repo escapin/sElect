@@ -81,9 +81,7 @@ public class PKIServerCore implements PKIServer {
 	// We store the public keys in the SQLite DB (located in system temp directory)
 
 	private static SqlJetDb db = null;
-	/* FIXME: visibility of this method changed from private to public
-	 * Is everything still fine?
-	 */
+
 	public static void initDB() {
 		try {
 			File dbFile = new File(DEFAULT_DATABASE);
