@@ -199,7 +199,7 @@ public class TestTargetSystem extends TestCase
 				   Utils.contains(ballotsAsAMessage, selected_voter.getReceipt().innerBallot));
 		
 		// deliver the data to the second server
-		byte[] signedResult = finServer.processInputTally(signedTally);
+		byte[] signedResult = finServer.processTally(signedTally);
 		
 		// check the signature on the result
 		byte[] result = MessageTools.first(signedResult);
@@ -208,11 +208,18 @@ public class TestTargetSystem extends TestCase
 		signature_ok = finServerVer.verify(signatureOnResult, result);
 		assertTrue("Incorrect signature on the result of the final server",  signature_ok);
 		
+		// check the election id in the result
+		byte[] result_el_id = MessageTools.first(result);
+		assertTrue("Invalid election ID in the result",
+				   MessageTools.equal(result_el_id, electionID));
+		
+		byte[] result_entries = MessageTools.second(result);
+		
 		// check if the selected voter can find her nonce and vote
 		byte[] voterNonce = selected_voter.getReceipt().nonce;
 		
 		boolean contains = false;
-		for( MessageSplitIter iter = new MessageSplitIter(result); !contains && iter.notEmpty(); iter.next() )
+		for( MessageSplitIter iter = new MessageSplitIter(result_entries); !contains && iter.notEmpty(); iter.next() )
 			contains=MessageTools.equal(MessageTools.first(iter.current()), voterNonce);
 		assertTrue("Voter's nonce not in the final result",	contains);
 		
@@ -220,7 +227,7 @@ public class TestTargetSystem extends TestCase
 		NonceGen noncegen = new NonceGen(); 
 		byte[] anotherFreshNonce = noncegen.newNonce();
 		contains = false;
-		for( MessageSplitIter iter = new MessageSplitIter(result); !contains && iter.notEmpty(); iter.next() )
+		for( MessageSplitIter iter = new MessageSplitIter(result_entries); !contains && iter.notEmpty(); iter.next() )
 			contains=MessageTools.equal(MessageTools.first(iter.current()), anotherFreshNonce);
 		assertFalse("Unexpected entry in the result", contains);
 	}
@@ -233,12 +240,6 @@ public class TestTargetSystem extends TestCase
 		if (dbFile.exists()){
 			dbFile.delete();
 			PKIServerCore.initDB();
-			/* FIXME: I had to change the visibility of this method from private to public.
-			 * Check whether it could introduce other issues in the use of the this class
-			 * and of the PKI functionality in general. I don't think so, but better a double check!
-			 * If everything is fine, for further testing, please change it also in the 
-			 * CryptoJavaGeneric and remove the FIXME also in the code of PKIServerCore.initDB()
-			 */
 		}
 		PKI.useLocalMode();
 		colServer = createCollectingServer(electionID);

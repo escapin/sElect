@@ -1,5 +1,7 @@
 package de.uni.trier.infsec.eVotingSystem.coreSystem;
 
+import java.util.Arrays;
+
 import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.MessageSplitIter;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
@@ -23,11 +25,10 @@ public class FinalServer
 	/**
 	 * Error thrown if the input data is ill-formed.
 	 */
-	public static class Error extends Exception 
+	public static class MalformedData extends Exception 
 	{
-		private static final long serialVersionUID = -7774319355577426610L;
 		private String description;
-		public Error(String description) {
+		public MalformedData(String description) {
 			this.description = description;
 		}
 		public String toString() {
@@ -53,39 +54,44 @@ public class FinalServer
 	 * by the collecting server. Returns the signed result of the election 
 	 * (to be publicly posted). 
 	 */
-	public byte[] processInputTally(byte[] data) throws Error {
+	public byte[] processTally(byte[] data) throws MalformedData {
 		// verify the signature of server1
-		byte[] publicData = MessageTools.first(data);
+		byte[] payload = MessageTools.first(data);
 		byte[] signature = MessageTools.second(data);
-		if (!collectingServerVerif.verify(signature, publicData))
-			throw new Error("Wrong signature");
+		if (!collectingServerVerif.verify(signature, payload))
+			throw new MalformedData("Wrong signature");
 		
-		byte[] el_id = MessageTools.first(publicData);
+		// check that election id in the processed data
+		byte[] el_id = MessageTools.first(payload);
 		if (!MessageTools.equal(el_id, electionID))
-			throw new Error("Wrong election ID");
-		byte[] partialResult = MessageTools.second(publicData);
-
-		// create array to collect entries (votes with nonces)
-		byte[][] entries = new byte[Params.NumberOfVoters][];
-		int nextEntry = 0;
+			throw new MalformedData("Wrong election ID");
 		
 		// retrieve and process ballots (store decrypted entries in 'entries')
-		byte[] ballotsAsAMessage = MessageTools.first(partialResult);
+		byte[] ballotsAsAMessage = MessageTools.first(MessageTools.second(payload)); // ignore the list of voters		
+		byte[][] entries = new byte[Params.NumberOfVoters][];
+		int numberOfEntries = 0;
 		for( MessageSplitIter iter = new MessageSplitIter(ballotsAsAMessage); iter.notEmpty(); iter.next() ) {
 			byte[] nonce_vote = decryptor.decrypt(iter.current());
 			if (nonce_vote == null) // decryption failed
-				throw new Error("Wrong data (decryption failed)");
-			entries[nextEntry] = nonce_vote;
-			++nextEntry;
+				throw new MalformedData("Wrong data (decryption failed)");
+			entries[numberOfEntries] = nonce_vote;
+			++numberOfEntries;
 		}
 		
+		// sort the entries
+		Arrays.sort(entries, 0, numberOfEntries, new java.util.Comparator<byte[]>() {
+			public int compare(byte[] a1, byte[] a2) {
+				return Utils.compare(a1, a2);
+			}
+		});
+		
 		// format entries as one message
-		byte[] entriesAsAMessage = Utils.concatenateMessageArray(entries, nextEntry);
+		byte[] entriesAsAMessage = Utils.concatenateMessageArray(entries, numberOfEntries);
 		
-		// sign them
-		byte[] signatureOnEntries =  signer.sign(entriesAsAMessage);
-		byte[] signedEntries = MessageTools.concatenate(entriesAsAMessage, signatureOnEntries);
-		
-		return signedEntries;
+		// add election id and sign them
+		byte[] result = MessageTools.concatenate(electionID, entriesAsAMessage);
+		byte[] signatureOnResult = signer.sign(result);
+		byte[] signedResult = MessageTools.concatenate(result, signatureOnResult);
+		return signedResult;
 	}
 }

@@ -137,7 +137,6 @@ public class CollectingServer
 			if (ballots[id]!=null)
 				bb[ind++] = ballots[id];
 		}
-		// maybe for the verification process, it's better to implement our sort algorithm
 		Arrays.sort(bb, new java.util.Comparator<byte[]>() {
 			public int compare(byte[] a1, byte[] a2) {
 				return Utils.compare(a1, a2);
