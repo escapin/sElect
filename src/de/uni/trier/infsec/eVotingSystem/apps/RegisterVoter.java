@@ -1,26 +1,16 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils;
-import de.uni.trier.infsec.functionalities.pki.PKI;
-import de.uni.trier.infsec.functionalities.pkienc.*;
-import de.uni.trier.infsec.functionalities.pkisig.*;
-import de.uni.trier.infsec.lib.network.NetworkError;
-import de.uni.trier.infsec.utils.MessageTools;
 
-public class VoterRegisterApp {
+public class RegisterVoter {
 
 	public static void main(String[] args) {
-		System.setProperty("remotemode", Boolean.toString(true));
 		int voterID=0;
 		if (args.length != 1) {
 			System.out.println("Wrong number of Arguments!\nExpected: VoterRegisterApp <voter_id [int]>\nExample: VoterRegisterApp 01");
 			System.exit(0);
-		} else {
+		} 
+		else {
 			try {				
 				voterID = Integer.parseInt(args[0]);
 			} catch (Exception e) {
@@ -28,13 +18,21 @@ public class VoterRegisterApp {
 				e.printStackTrace();
 				System.exit(0);
 			}
-			if(voterID<0 || voterID>=Params.NumberOfVoters)
+			if(voterID<0 || voterID>=Params.NumberOfVoters) {
 				System.out.println("Voter identifier out of range!\nExpected: \n\t 0 <= voter_id < " + Params.NumberOfVoters);
 				System.exit(0);
-			VoterRegisterApp.register(voterID);
+			}
+			
+			String filename = AppParams.PATH_STORAGE + "voter" + voterID + ".info";
+			System.out.printf("Registering server wit id '%d' and saving the keys in %s\n", voterID, filename);
+			try {
+				AppUtils.registerAndSave(voterID, filename);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}			
 		}
 	}	
-
+	/*
 	private static void register(int voterID) {
 		PKI.useRemoteMode();
 		Decryptor voter_decryptor = new Decryptor();
@@ -60,16 +58,14 @@ public class VoterRegisterApp {
 		//byte[] sym_decr_sig = MessageTools.concatenate(symenc.getKey(), decr_sig);
 		//byte[] serialized = MessageTools.concatenate(id, sym_decr_sig);
 		byte[] serialized = MessageTools.concatenate(id, decr_sig);
-		String pathVoter=Params.PATH_STORAGE + "voter" + voterID + ".info";
+		String pathVoter = AppParams.PATH_STORAGE + "voter" + voterID + ".info";
 		try {
-			Utils.storeAsFile(serialized, pathVoter);
+			AppUtils.storeAsFile(serialized, pathVoter);
 			System.out.println("Voter " + voterID + " registered!");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(0);
 		}
 	}
-
-	
-
+    */
 }

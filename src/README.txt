@@ -42,9 +42,10 @@ Run following commands from bin-folder of the compiled project:
 
 1. java -cp ".:../lib/*" de.uni.trier.infsec.functionalities.pki.PKIServerApp
 
-2. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.ServersRegisterApp
+2. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterCollectingServer
+   java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterFinalServer
 
-3. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VoterRegisterApp
+3. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterVoter
 
 
 

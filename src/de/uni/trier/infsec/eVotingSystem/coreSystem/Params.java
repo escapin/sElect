@@ -1,8 +1,5 @@
 package de.uni.trier.infsec.eVotingSystem.coreSystem;
 
-import java.io.File;
-
-
 public class Params {
 	public static final int    SERVER1ID = -1;
 	public static final int    SERVER2ID = -2;
@@ -13,9 +10,6 @@ public class Params {
 	
 	public static byte[] ACCEPTED = {0x00};
 	public static byte[] REJECTED = {0x01};
-	
-	// Storage
-	public static final String PATH_STORAGE = System.getProperty("java.io.tmpdir") + File.separator + "eVotingSystem" + File.separator;
 	
 	public static byte[] VOTE_COLLECTED 		= {0x20};		// the vote has been correctly collected (tag 'ACCEPTED')
 	public static byte[] INVALID_ELECTION_ID 	= {0x21};		// Invalid election identifier

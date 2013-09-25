@@ -1,11 +1,5 @@
 package de.uni.trier.infsec.eVotingSystem.coreSystem;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import de.uni.trier.infsec.utils.MessageTools;
 
 
@@ -73,27 +67,4 @@ public class Utils
 //	 }
 	
 	
-	public static void storeAsFile(byte[] data, String sFile) throws IOException {
-		File f = new File(sFile);
-		File fdir = new File(sFile.substring(0, sFile.lastIndexOf(File.separator)));
-		if (f.exists()) f.delete();
-		fdir.mkdirs();
-		f.createNewFile();
-
-		FileOutputStream file = new FileOutputStream(f);
-		file.write(data);
-		file.flush();
-		file.close();
-	}
-	
-	public static byte[] readFromFile(String path) throws IOException {
-		FileInputStream f = new FileInputStream(path);
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		while (f.available() > 0){			
-			bos.write(f.read());
-		}
-		f.close();
-		byte[] data = bos.toByteArray();
-		return data;
-	}
 }
