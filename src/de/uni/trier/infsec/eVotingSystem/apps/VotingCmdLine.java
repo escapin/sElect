@@ -13,7 +13,6 @@ import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.utils.MessageTools;
 import static de.uni.trier.infsec.utils.Utilities.byteArrayToHexString;
-// import static de.uni.trier.infsec.utils.Utilities.hexStringToByteArray;
 
 public class VotingCmdLine 
 {
@@ -88,26 +87,26 @@ public class VotingCmdLine
 			
 			// Send the ballot:
 			out("Sending the ballot to the server");
-			byte[] response = NetworkClient.sendRequest(ballot, AppParams.SERVER_NAME, AppParams.SERVER_PORT);
+			byte[] response = NetworkClient.sendRequest(ballot, AppParams.SERVER1_NAME, AppParams.SERVER1_PORT);
 			
 			// Validate the server's response:
 			Voter.ResponseTag responseTag = voter.validateResponse(response);
 			out("Response of the server: " + responseTag);
 			
-			// if (responseTag == Voter.ResponseTag.VOTE_COLLECTED)
-			
-			// Output the verification data:
-			Voter.Receipt receipt = voter.getReceipt();
-			out("RECEIPT:");
-			out("    nonce = " + byteArrayToHexString(receipt.nonce));
-			out("    inner ballot = " + byteArrayToHexString(receipt.innerBallot));
-			if (receipt.serverSignature != null)
-				out("    server's signature = " + byteArrayToHexString(receipt.serverSignature));
-			
-			// Store the receipt:
-			String receipt_fname = "./receipt_" + voterID + ".msg"; 
-			// FIXME: storeAsFile does not work if the file name does not have '/' 
-			AppUtils.storeAsFile(receipt.asMessage(), receipt_fname);
+			if (responseTag == Voter.ResponseTag.VOTE_COLLECTED) {
+				// Output the verification data:
+				Voter.Receipt receipt = voter.getReceipt();
+				out("RECEIPT:");
+				out("    nonce = " + byteArrayToHexString(receipt.nonce));
+				out("    inner ballot = " + byteArrayToHexString(receipt.innerBallot));
+				if (receipt.serverSignature != null)
+					out("    server's signature = " + byteArrayToHexString(receipt.serverSignature));
+				
+				// Store the receipt:
+				String receipt_fname = "./receipt_" + voterID + ".msg"; 
+				// FIXME: storeAsFile does not work if the file name does not have '/' 
+				AppUtils.storeAsFile(receipt.asMessage(), receipt_fname);
+			}
 			
 		}
 		catch (Exception e) {

@@ -131,6 +131,9 @@ public class CollectingServer
 		return encapsulateResponse(voterID, concatenate(electionID, accepted_serverSign));
 	}
 
+	public int getNumberOfBallots() {
+		return numberOfCastBallots;
+	}
 
 	/**
 	 * Return the result (content of the input tally), to be publicly posted. 
