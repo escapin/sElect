@@ -46,16 +46,15 @@ public class AppUtils
 	public static void registerAndSave(int id, String filename) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
 		PKI.useRemoteMode();
 		
-		Decryptor server_decr = new Decryptor();
-		Signer server_signer = new Signer();
-		RegisterEnc.registerEncryptor(server_decr.getEncryptor(), id, Params.ENC_DOMAIN);
-		RegisterSig.registerVerifier(server_signer.getVerifier(), id, Params.SIG_DOMAIN);
+		Decryptor decr = new Decryptor();
+		Signer sign = new Signer();
+		RegisterEnc.registerEncryptor(decr.getEncryptor(), id, Params.ENC_DOMAIN);
+		RegisterSig.registerVerifier(sign.getVerifier(), id, Params.SIG_DOMAIN);
 
 		byte[] idmsg = MessageTools.intToByteArray(id);
-		byte[] decryptor = server_decr.toBytes();
-		byte[] signer = server_signer.toBytes();
+		byte[] decryptor = decr.toBytes();
+		byte[] signer = sign.toBytes();
 		byte[] serialized = concatenate(idmsg, concatenate(decryptor, signer));
-		// String pathServer = AppParams.PATH_STORAGE + "server" + id + ".info";
 		AppUtils.storeAsFile(serialized, filename);
 	}
 	

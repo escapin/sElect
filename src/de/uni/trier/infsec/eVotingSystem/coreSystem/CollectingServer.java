@@ -39,7 +39,15 @@ public class CollectingServer
 	 * Exception thrown when the request we received does not conform
 	 * to an expected format (we get, for instance, a trash message). 
 	 */
-	public static class MalformedMessage extends Exception {}
+	public static class MalformedMessage extends Exception {
+		private final String description;
+		public MalformedMessage(String str) {
+			description = str;
+		}
+		public String toString() {
+			return "Malformed message: " + description;
+		}
+	}
 
 
 	// CONSTRUCTORS
@@ -77,16 +85,17 @@ public class CollectingServer
 		byte[] id_payload_sign = decryptor.decrypt(ballot);
 		byte[] voterIDmsg = first(id_payload_sign);
 		if(voterIDmsg.length!=4) // since clientID is supposed to be a integer, its length must be 4 bytes
-			throw new MalformedMessage();
+			throw new MalformedMessage("Client ID expected");
 		int voterID = byteArrayToInt(voterIDmsg);
+		System.out.printf(" [ voterId = %d ]\n", voterID);
 		if( voterID<0 || voterID>=Params.NumberOfVoters ) // only accept requests from eligible voters
-			throw new MalformedMessage();
+			throw new MalformedMessage("Not eligible voter");
 		byte[] payload_sign = second(id_payload_sign);
 		byte[] payload = first(payload_sign);
 		byte[] signVoter = second(payload_sign);
 		Verifier voter_verifier = RegisterSig.getVerifier(voterID, Params.SIG_DOMAIN); // (may throw NetworkError or PKIerror) 
 		if (!voter_verifier.verify(signVoter, payload))  // only accept signed requests (by an eligible voter)
-			throw new MalformedMessage();
+			throw new MalformedMessage("Invalid signature");
 		byte[] elID = first(payload);
 		byte[] innerBallot=second(payload);
 
@@ -184,8 +193,7 @@ public class CollectingServer
 
 		return response;
 	}
-
-
+	
 	// METHODS FOR TESTING //
 	/* FIXME: Should we delete these two methods and change the Test according to it?
 	 * 		These two methods could be somehow misleading for someone using this

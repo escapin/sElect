@@ -32,16 +32,28 @@ public class Voter
 		public final byte[] nonce;
 		public final byte[] innerBallot;
 		public byte[] serverSignature;
+		
+		private static final byte[] emptySig = new byte[] {};
 
 		private Receipt(byte[] electionID, byte[] nonce, byte[] inner_ballot, byte[] serverSignature) {
-			this.electionID=electionID;
-			this.nonce=nonce;
-			this.innerBallot=inner_ballot;	
-			this.serverSignature=serverSignature;
+			this.electionID = electionID;
+			this.nonce = nonce;
+			this.innerBallot = inner_ballot;	
+			this.serverSignature = serverSignature;
 		}
+		
+		public byte[] asMessage() {
+			byte [] signature = serverSignature==null ? emptySig : serverSignature;
+			return	concatenate( electionID, 
+					concatenate( nonce,
+					concatenate( innerBallot,
+							     signature )));
+		}
+		
 		private Receipt getCopy() {
 			return new Receipt(electionID, MessageTools.copyOf(nonce), copyOf(innerBallot), copyOf(serverSignature));
 		}
+		
 	}
 
 	public static enum ResponseTag {
