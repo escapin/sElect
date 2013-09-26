@@ -23,9 +23,6 @@ public class CollectingServerApp {
 		setupServer();
 		System.out.println("Running...");
 		run();
-		System.out.println("Posting result...");
-		postResult();
-		System.out.println("done.");
 	}
 
 	private static void setupServer() {
@@ -63,7 +60,9 @@ public class CollectingServerApp {
 			System.exit(0);
 		}
 		
-		while( !itsOver() ) {
+		boolean posted = false;
+		
+		while( true ) { // run forever
 			try {
 				byte[] request = NetworkServer.nextRequest(AppParams.SERVER1_PORT);
 				if (request != null) {
@@ -78,6 +77,13 @@ public class CollectingServerApp {
 			catch (Exception e) {
 				System.out.println("an error ocurred:");
 				e.printStackTrace();
+			}
+			
+			if (itsOver() && !posted) {
+				System.out.println("Posting result...");
+				postResult();
+				System.out.println("done.");
+				posted = true;
 			}
 		}
 	}
