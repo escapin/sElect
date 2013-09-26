@@ -104,7 +104,6 @@ public class VotingCmdLine
 				
 				// Store the receipt:
 				String receipt_fname = "./receipt_" + voterID + ".msg"; 
-				// FIXME: storeAsFile does not work if the file name does not have '/' 
 				AppUtils.storeAsFile(receipt.asMessage(), receipt_fname);
 			}
 			

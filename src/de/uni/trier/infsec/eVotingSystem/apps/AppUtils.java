@@ -19,6 +19,7 @@ import de.uni.trier.infsec.utils.MessageTools;
 
 public class AppUtils 
 {
+	// FIXME: storeAsFile does not work if the file name does not have '/'
 	public static void storeAsFile(byte[] data, String sFile) throws IOException {
 		File f = new File(sFile);
 		File fdir = new File(sFile.substring(0, sFile.lastIndexOf(File.separator)));
@@ -31,7 +32,7 @@ public class AppUtils
 		file.flush();
 		file.close();
 	}
-	
+
 	public static byte[] readFromFile(String path) throws IOException {
 		FileInputStream f = new FileInputStream(path);
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -42,10 +43,10 @@ public class AppUtils
 		byte[] data = bos.toByteArray();
 		return data;
 	}
-	
+
 	public static void registerAndSave(int id, String filename) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
 		PKI.useRemoteMode();
-		
+
 		Decryptor decr = new Decryptor();
 		Signer sign = new Signer();
 		RegisterEnc.registerEncryptor(decr.getEncryptor(), id, Params.ENC_DOMAIN);
@@ -57,5 +58,4 @@ public class AppUtils
 		byte[] serialized = concatenate(idmsg, concatenate(decryptor, signer));
 		AppUtils.storeAsFile(serialized, filename);
 	}
-	
 }
