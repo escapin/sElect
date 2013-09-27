@@ -19,20 +19,22 @@ public class VotingCmdLine
 	public static void main(String[] args) 
 	{	
 		int voterID = -1;
-		byte[] candidate = null;
+		//byte[] candidate = null;
+		int candidateNumber=0;
 
 		// Parse arguments:
 
 		if (args.length != 2 ) {
 			out("Wrong number of Arguments!");
-			out("Expected: VotingCmdLine <user_id [int]> <candidate [String]>");
-			out("Example: VotingCmdLine 07 Alice");
+			out("Expected: VotingCmdLine <user_id [int]> <candidate_number [int]>");
+			out("Example: VotingCmdLine 07 03");
 			System.exit(-1);
 		} 
 		else {
 			try {				
 				voterID = Integer.parseInt(args[0]);
-				candidate = args[1].getBytes();
+				candidateNumber=Integer.parseInt(args[1]);
+				//candidate = args[1].getBytes();
 			} catch (Exception e) {
 				out("Something is wrong with arguments!");
 				e.printStackTrace();
@@ -82,8 +84,9 @@ public class VotingCmdLine
 			Voter voter = new Voter(voterID, AppParams.electionID, decryptor, signer);
 			
 			// Create a ballot;
-			out("Creating a ballot with candidate " + new String(candidate));
-			byte[] ballot = voter.createBallot(candidate);
+			//out("Creating a ballot with candidate " + new String(candidate));
+			out("Creating a ballot with candidate number " + candidateNumber);
+			byte[] ballot = voter.createBallot(candidateNumber);
 			
 			// Send the ballot:
 			out("Sending the ballot to the server");

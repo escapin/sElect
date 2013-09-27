@@ -24,7 +24,7 @@ public class RegisterVoter {
 			}
 			
 			String filename = AppParams.PATH_STORAGE + "voter" + voterID + ".info";
-			System.out.printf("Registering server wit id '%d' and saving the keys in %s\n", voterID, filename);
+			System.out.printf("Registering server with ID '%d' and saving the keys in %s\n", voterID, filename);
 			try {
 				AppUtils.registerAndSave(voterID, filename);
 			} catch (Exception e) {

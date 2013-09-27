@@ -83,7 +83,7 @@ public class VerifierCmdLine {
 		// Print out (part of) the receipt:
 		out("\nRECEIPT:");
 		out("    election ID  = " + new String(receipt.electionID) );
-		out("    candidate    = " + new String(receipt.vote) );
+		out("    candidate number   = " + receipt.candidateNumber );
 		out("    nonce        = " + Utilities.byteArrayToHexString(receipt.nonce));
 		
 		// Check whether the partial results contains the inner ballot from the receipt:
@@ -120,7 +120,7 @@ public class VerifierCmdLine {
 			return false;
 		}
 		
-		// check if the result containt the inner ballot from the receipt
+		// check if the result contain the inner ballot from the receipt
 		byte[] ballotsAsMessage = MessageTools.first(MessageTools.second(result));
 		if (!Utils.contains(ballotsAsMessage, receipt.innerBallot)) {
 			out("\nPROBLEM: The partial result does not containt your inner ballot!");
@@ -151,24 +151,26 @@ public class VerifierCmdLine {
 		byte[] entriesAsMessage = MessageTools.second(result);
 		
 		// look up for our nonce:
+		int candidateNumber=0;
 		byte[] vote = null;
 		for( MessageSplitIter iter = new MessageSplitIter(entriesAsMessage); vote==null && iter.notEmpty(); iter.next() ) { 
 			if (MessageTools.equal(MessageTools.first(iter.current()), receipt.nonce)) // nonce found
 				vote = MessageTools.second(iter.current());
 		}
+		candidateNumber=MessageTools.byteArrayToInt(vote);
 		if (vote == null) {
 			out("\nPROBLEM: The final result does not containt your nonce!");
 			out(Utilities.byteArrayToHexString(receipt.nonce));
 			return false;
 		}
-		else if (!MessageTools.equal(vote, receipt.vote)) {
-			out("\nPROBLEM: In the final result, the vote next to you nonce is not your vote!");
-			out("Found vote: " + new String(vote));
+		else if (candidateNumber!=receipt.candidateNumber) {
+			out("\nPROBLEM: In the final result, the vote next to your nonce is not your vote!");
+			out("Found candidate number: " + candidateNumber);
 			return false;
 		}
 		else {
-			out("\nYour nonce is in the result along with next to your vote:");
-			out(new String(vote));
+			out("\nYour nonce is in the result along with next the number of the candidate you voted:");
+			out("" + candidateNumber);
 		}
 		
 		return true;

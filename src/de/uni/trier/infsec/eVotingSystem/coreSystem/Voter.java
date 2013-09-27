@@ -29,16 +29,16 @@ public class Voter
 
 	public static class Receipt {
 		public final byte[] electionID;
-		public final byte[] vote;
+		public final int candidateNumber;
 		public final byte[] nonce;
 		public final byte[] innerBallot;
 		public byte[] serverSignature;
 		
 		private static final byte[] emptySig = new byte[] {};
 
-		private Receipt(byte[] electionID, byte[] vote, byte[] nonce, byte[] inner_ballot, byte[] serverSignature) {
+		private Receipt(byte[] electionID, int candidateNumber, byte[] nonce, byte[] inner_ballot, byte[] serverSignature) {
 			this.electionID = electionID;
-			this.vote = vote;
+			this.candidateNumber = candidateNumber;
 			this.nonce = nonce;
 			this.innerBallot = inner_ballot;	
 			this.serverSignature = serverSignature;
@@ -47,7 +47,7 @@ public class Voter
 		public byte[] asMessage() {
 			byte [] signature = serverSignature==null ? emptySig : serverSignature;
 			return	concatenate( electionID,
-					concatenate( vote,
+					concatenate( intToByteArray(candidateNumber),
 					concatenate( nonce,
 					concatenate( innerBallot,
 							     signature ))));
@@ -56,18 +56,18 @@ public class Voter
 		public static Receipt fromMessage(byte[] message) {
 			byte[] electionID = first(message);
 			message = second(message);
-			byte[] vote = first(message);
+			int candidateNumber = byteArrayToInt(first(message));
 			message = second(message);
 			byte[] nonce = first(message);
 			message = second(message);
 			byte[] innerBallot = first(message);
 			byte[] signature = second(message);
 			
-			return new Receipt(electionID, vote, nonce, innerBallot, signature);
+			return new Receipt(electionID, candidateNumber, nonce, innerBallot, signature);
 		}
 		
 		private Receipt getCopy() {
-			return new Receipt(electionID, MessageTools.copyOf(vote), MessageTools.copyOf(nonce), copyOf(innerBallot), copyOf(serverSignature));
+			return new Receipt(electionID, candidateNumber, MessageTools.copyOf(nonce), copyOf(innerBallot), copyOf(serverSignature));
 		}
 		
 	}
@@ -75,7 +75,7 @@ public class Voter
 	public static enum ResponseTag {
 		VOTE_COLLECTED, INVALID_ELECTION_ID,
 		INVALID_VOTER_ID, ELECTION_OVER, ALREADY_VOTED,
-		UNKNOWN_ERROR;			
+		UNKNOWN_ERROR;
 	}
 
 	public class Error extends Exception {
@@ -150,13 +150,14 @@ public class Voter
 	 * generated nonce, and Enc_Si(msg) denotes the message msg encrypted with 
 	 * the public key of the server Si.  
 	 */
-	public byte[] createBallot(byte[] vote) {
+	public byte[] createBallot(int candidateNumber) {
 		if (receipt != null) // a ballot has already been created
 			return null;
 		byte[] nonce = noncegen.newNonce();
+		byte[] vote = intToByteArray(candidateNumber);
 		byte[] nonce_vote = concatenate(nonce, vote);
 		byte[] inner_ballot = server2enc.encrypt(nonce_vote);
-		receipt=new Receipt(electionID, vote, nonce, inner_ballot, null); // no server signature
+		receipt=new Receipt(electionID, candidateNumber, nonce, inner_ballot, null); // no server signature
 		return encapsulate(receipt.innerBallot); // add the election id, sign, end encrypt
 	}
 
@@ -262,9 +263,9 @@ public class Voter
 
 	/// FOR TESTING ONLY ///
 	
-	public byte[] forceCreateBallot(byte[] vote) {
+	public byte[] forceCreateBallot(int candidateNumber) {
 		receipt = null;
-		return createBallot(vote);
+		return createBallot(candidateNumber);
 	}
 
 }

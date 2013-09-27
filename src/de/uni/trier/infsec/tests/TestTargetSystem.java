@@ -35,10 +35,11 @@ public class TestTargetSystem extends TestCase
 	{
 		
 		int voterID=1;
+		int candidateNumber=7;
 		Voter voter = createVoter(voterID, electionID);
 		
 		// create the ballot
-		byte[] ballot = voter.createBallot("C1".getBytes());
+		byte[] ballot = voter.createBallot(candidateNumber);
 		assertNotNull(ballot);
 		// deliver it to the collecting server
 		byte[] response = colServer.collectBallot(ballot);
@@ -47,7 +48,7 @@ public class TestTargetSystem extends TestCase
 		assertTrue(response_tag == Voter.ResponseTag.VOTE_COLLECTED);
 
 		// now this should fail
-		ballot=voter.createBallot("C1".getBytes());
+		ballot=voter.createBallot(candidateNumber);
 		assertTrue(ballot == null);
 				
 		// testing re-voting
@@ -60,7 +61,7 @@ public class TestTargetSystem extends TestCase
 		assertTrue(response_tag == Voter.ResponseTag.VOTE_COLLECTED);
 
 		// testing voting for a different candidate
-		ballot = voter.forceCreateBallot("C9".getBytes());
+		ballot = voter.forceCreateBallot(candidateNumber+1);
 		assertNotNull(ballot);
 		// deliver it to the collecting server
 		response = colServer.collectBallot(ballot);
@@ -84,7 +85,7 @@ public class TestTargetSystem extends TestCase
 		//create a voter with a different electionID
 		Voter voter2=createVoter(voterID+2, electionID2);
 		// create the ballot
-		ballot = voter2.createBallot("C2".getBytes());
+		ballot = voter2.createBallot(candidateNumber);
 		// deliver it to the collecting server
 		response = colServer.collectBallot(ballot);
 		// now the response_tag should say the electionID is incorrect
@@ -95,7 +96,7 @@ public class TestTargetSystem extends TestCase
 		//create a voter with a wrong voterID
 		Voter voter3=createVoter(Params.NumberOfVoters, electionID);
 		// create the ballot
-		ballot = voter3.createBallot("C3".getBytes());
+		ballot = voter3.createBallot(candidateNumber);
 		// deliver it to the collecting server
 		try {
 			colServer.collectBallot(ballot);
@@ -108,7 +109,7 @@ public class TestTargetSystem extends TestCase
 		// create a correct voter
 		Voter voter4=createVoter(voterID+4,electionID);
 		// create the ballot
-		ballot=voter4.createBallot("C4".getBytes());
+		ballot=voter4.createBallot(candidateNumber);
 		// create the ballot
 		response = colServer.collectBallot(ballot);
 		// now the response_tag should say the election is over
@@ -126,13 +127,12 @@ public class TestTargetSystem extends TestCase
 			voters[i] = createVoter(i, electionID);
 		
 		// make them vote
-		byte[] vote = "C2".getBytes();
+		int candidateNumber=31;
 		for (int i=0; i<5; ++i) {
-			byte[] ballot = voters[i].createBallot(vote);
+			byte[] ballot = voters[i].createBallot(candidateNumber+i);
 			byte[] response = colServer.collectBallot(ballot);
 			Voter.ResponseTag response_tag = voters[i].validateResponse(response);
 			assertTrue(response_tag == Voter.ResponseTag.VOTE_COLLECTED);
-
 		}
 		
 		// get the list of voters who voted and check it

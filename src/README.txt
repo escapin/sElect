@@ -43,9 +43,17 @@ Run following commands from bin-folder of the compiled project:
 1. java -cp ".:../lib/*" de.uni.trier.infsec.functionalities.pki.PKIServerApp
 
 2. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterCollectingServer
-   java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterFinalServer
+3. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.CollectingServerApp
 
-3. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterVoter
+4. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterFinalServer
+5. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.FinalServerApp
+
+6. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterVoter
+7. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VotingCmdLine <voter_id [int]> <candidate_number [int]>
+
+When the Election is over:
+
+8. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VerifierCmdLine  <receipt_fname> <partial_result_fname> <final_result_fname>
 
 
 
