@@ -7,15 +7,21 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.JButton;
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.BorderFactory; 
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -24,6 +30,7 @@ import java.awt.event.MouseListener;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+
 
 import javax.swing.SwingConstants;
 import java.awt.Font;
@@ -59,12 +66,15 @@ public class VoterApp extends JFrame {
 	private final static String STORE = "Store";
     private final static String RETRIEVE = "Retrieve";
     private JTextField labelField;
-	private JTextArea msgToStore;
+	private JPanel ballot;
 	private JTextArea textMsgRetrieved;
 	private JLabel lblStoreStatus;
 	private JLabel lblRetrieveStatus;
-	private JComboBox comboBox;
+	
 	private JLabel lblWait;
+	private JLabel lblVoterID;
+	private JLabel lblElectionID;
+	private JLabel lblElectionMsg;
 	/*
 	 * CORE FIELD
 	 */
@@ -75,6 +85,9 @@ public class VoterApp extends JFrame {
 	private ElectionMetadata electionData;
 	//private static final int STORE_ATTEMPTS = 3; 
 	// attempts to store a msg under a label in such a way that server and client counters are aligned
+	
+	// UTILS FIELDS
+	private final String msgBefVoterID = "Your Identifier Number: ";
 	
 	/**
 	 * Launch the application.
@@ -104,10 +117,9 @@ public class VoterApp extends JFrame {
 	 */
 	public VoterApp() {
 		//setIconImage(Toolkit.getDefaultToolkit().getImage(UserGUI.class.getResource("/de/uni/trier/infsec/cloudStorage/cloud.png")));
-		setTitle("Voter - eVotingSystem RS3");
-		//TODO: find a cooler name
+		setTitle(AppParams.APPNAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 489, 334);
+		setBounds(100, 100, 530, 580);
 		
 		
 		CardLayout cl = new CardLayout();
@@ -118,7 +130,7 @@ public class VoterApp extends JFrame {
 		JPanel login = new JPanel();
 		JButton btnLogIn = new JButton("Log In");
 		
-		JLabel lblUserId = new JLabel("User ID:");
+		JLabel lblUserId = new JLabel("Insert your Identifier Number: ");
 		textField = new JTextField();
 		textField.setColumns(10);
 		lblUserNotRegister = new JLabel("");
@@ -130,41 +142,48 @@ public class VoterApp extends JFrame {
 		lblWait.setHorizontalAlignment(SwingConstants.CENTER);
 		GroupLayout gl_login = new GroupLayout(login);
 		gl_login.setHorizontalGroup(
-			gl_login.createParallelGroup(Alignment.TRAILING)
+			gl_login.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_login.createSequentialGroup()
+					.addContainerGap(336, Short.MAX_VALUE)
+					.addComponent(lblUserId, GroupLayout.PREFERRED_SIZE, 261, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(textField, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
+					.addGap(172))
 				.addGroup(gl_login.createSequentialGroup()
-					.addGap(57)
-					.addGroup(gl_login.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_login.createSequentialGroup()
-							.addComponent(lblUserId, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(textField, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE))
-						.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 368, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(64, Short.MAX_VALUE))
+					.addGap(47)
+					.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 368, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(492, Short.MAX_VALUE))
 				.addGroup(gl_login.createSequentialGroup()
-					.addContainerGap(247, Short.MAX_VALUE)
+					.addGap(312)
 					.addComponent(lblWait, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
-					.addGap(32)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnLogIn, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE)
-					.addGap(48))
+					.addContainerGap(421, Short.MAX_VALUE))
 		);
 		gl_login.setVerticalGroup(
 			gl_login.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_login.createSequentialGroup()
-					.addGap(58)
-					.addGroup(gl_login.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblUserId, GroupLayout.DEFAULT_SIZE, 17, Short.MAX_VALUE)
-						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(37)
+					.addContainerGap(93, Short.MAX_VALUE)
+					.addGroup(gl_login.createParallelGroup(Alignment.TRAILING)
+						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblUserId, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
 					.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_login.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnLogIn, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblWait))
-					.addGap(85))
+					.addGroup(gl_login.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_login.createSequentialGroup()
+							.addGap(42)
+							.addComponent(btnLogIn, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_login.createSequentialGroup()
+							.addGap(53)
+							.addComponent(lblWait)))
+					.addGap(279))
 		);
 		login.setLayout(gl_login);
 		
-		btnLogIn.addActionListener(new CORE_Login());
+		/*
+		 * LOGIN!
+		 */
+		btnLogIn.addActionListener(new Login());
 		
 		
 		// main windows panel
@@ -180,34 +199,32 @@ public class VoterApp extends JFrame {
 		// North panel
 		JPanel north = new JPanel();
 		main.add(north, BorderLayout.NORTH);
+		lblVoterID = new JLabel(msgBefVoterID);
 		
-		comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {STORE, RETRIEVE}));
-		JLabel lblLabel = new JLabel("Label:");
-		
-		labelField = new JTextField();
-		labelField.setColumns(10);
+		lblElectionID = new JLabel("");
+		//labelField.setColumns(10);
 		GroupLayout gl_north = new GroupLayout(north);
 		gl_north.setHorizontalGroup(
-			gl_north.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_north.createSequentialGroup()
-					.addGap(23)
-					.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
-					.addGap(68)
-					.addComponent(lblLabel)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(labelField, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(56, Short.MAX_VALUE))
+			gl_north.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_north.createSequentialGroup()
+					.addGap(21)
+					.addComponent(lblVoterID)
+					.addContainerGap(314, Short.MAX_VALUE))
+				.addGroup(Alignment.TRAILING, gl_north.createSequentialGroup()
+					.addContainerGap(348, Short.MAX_VALUE)
+					.addComponent(lblElectionID, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE)
+					.addGap(20))
 		);
 		gl_north.setVerticalGroup(
 			gl_north.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_north.createSequentialGroup()
 					.addContainerGap(29, Short.MAX_VALUE)
-					.addGroup(gl_north.createParallelGroup(Alignment.BASELINE)
-						.addComponent(labelField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblLabel))
+					.addComponent(lblVoterID)
 					.addGap(20))
+				.addGroup(Alignment.LEADING, gl_north.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblElectionID)
+					.addContainerGap(37, Short.MAX_VALUE))
 		);
 		north.setLayout(gl_north);
 		
@@ -218,97 +235,71 @@ public class VoterApp extends JFrame {
 		CardLayout clCenter = new CardLayout(0, 0);
 		center.setLayout(clCenter);
 		
-		JPanel storePanel = new JPanel();
+		JPanel votePannel = new JPanel();
 		
 		
-		JLabel lblInsertTheMessage = new JLabel("Insert the message to store:");
+		lblElectionMsg = new JLabel("Election Message");
+		lblElectionMsg.setFont(new Font("Dialog", Font.BOLD, 16));
 		lblStoreStatus = new JLabel();
 		lblStoreStatus.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblStoreStatus.setFont(new Font("Dialog", Font.PLAIN, 14));
 		
-		msgToStore = new JTextArea();
-		JScrollPane ScrollTextToStore = new JScrollPane(msgToStore);
+		ballot = new JPanel();
+		BoxLayout boxCandidate = new BoxLayout(ballot, BoxLayout.Y_AXIS);
+		ballot.setLayout(boxCandidate);
+		JScrollPane ScrollBallot = new JScrollPane(ballot);
 		
-		JButton btnStore = new JButton("Store");
-		btnStore.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ev) {
-				
-				lblStoreStatus.setForeground(Color.BLACK);
-				if(labelField.getText().length()==0){
-					lblStoreStatus.setText("Label empty!");
-					return;
-				}
-				if(msgToStore.getText().length()==0){
-					lblStoreStatus.setText("Message to store is empty!");
-					return;
-				}
-				
-				lblStoreStatus.setForeground(Color.BLACK);
-				lblStoreStatus.setText("Wait...");
-				JPanel storePanel = (JPanel) ((JButton) ev.getSource()).getParent();
-				storePanel.paintImmediately(storePanel.getVisibleRect()); // it would be better to use a separate Thread 
-				
-/*				boolean correctlyStored=false;
-				boolean outOfDate=true;
-				int i=0;
-				for(;i<STORE_ATTEMPTS && outOfDate && !correctlyStored; i++){
-					outOfDate=false;
-					try{
-						client.store(msgToStore.getText().getBytes(), labelField.getText().getBytes());
-						correctlyStored=true;
-					} catch(CounterOutOfDate e){
-						outOfDate=true;
-					} catch (NetworkError e) {
-						lblStoreStatus.setForeground(Color.RED);
-						lblStoreStatus.setText("<html>Network Error: perhaps the server is not running!</html>");
-					} catch (StorageError e) {
-						lblStoreStatus.setForeground(Color.RED);
-						lblStoreStatus.setText("<html>The message has not been stored due to a Storage Error!</html>");
-					}
-				}
-				if(i>=STORE_ATTEMPTS && !correctlyStored){
-					lblStoreStatus.setForeground(Color.RED);
-					lblStoreStatus.setText("<html>The message has not been stored because the counter was always out of date!</html>");
-					System.out.println("The message has not been stored: during " + STORE_ATTEMPTS + " attempts, the Client's counter has always been out of date!");
-				}
-				if(correctlyStored){
-					msgToStore.setText("");
-					lblStoreStatus.setForeground(Color.BLACK);
-					lblStoreStatus.setText("<html>Message stored!</html>");
-				}*/
-				
-			}
-		});
+        
+		//Border paneEdge = BorderFactory.createEmptyBorder(0,10,10,10);
+		//Border loweredetched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
+		Border blackline = BorderFactory.createLineBorder(Color.black);
+        TitledBorder titledBorder = BorderFactory.createTitledBorder(blackline, "ballot");
+        titledBorder.setTitleJustification(TitledBorder.RIGHT);
+        titledBorder.setTitlePosition(TitledBorder.DEFAULT_POSITION);
+        ScrollBallot.setBorder(titledBorder);
+        
+        
+        
+        JButton btnCandidate = new JButton("Candidate 01");
+        ballot.add(btnCandidate);
+        
+        JButton btnVote = new JButton("Vote");
+		btnVote.setFont(new Font("Dialog", Font.BOLD, 18));
+		
+		/*
+		 * VOTE!
+		 */
+		btnVote.addActionListener(new Vote());
 		
 		
-		GroupLayout gl_storePanel = new GroupLayout(storePanel);
-		gl_storePanel.setHorizontalGroup(
-			gl_storePanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_storePanel.createSequentialGroup()
+		GroupLayout gl_votePannel = new GroupLayout(votePannel);
+		gl_votePannel.setHorizontalGroup(
+			gl_votePannel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_votePannel.createSequentialGroup()
 					.addGap(24)
-					.addGroup(gl_storePanel.createParallelGroup(Alignment.TRAILING, false)
-						.addGroup(gl_storePanel.createSequentialGroup()
+					.addGroup(gl_votePannel.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(lblElectionMsg, GroupLayout.PREFERRED_SIZE, 453, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_votePannel.createSequentialGroup()
 							.addComponent(lblStoreStatus, GroupLayout.PREFERRED_SIZE, 313, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(btnStore))
-						.addComponent(lblInsertTheMessage, Alignment.LEADING)
-						.addComponent(ScrollTextToStore, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 412, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(53, Short.MAX_VALUE))
+							.addComponent(btnVote, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))
+						.addComponent(ScrollBallot, GroupLayout.PREFERRED_SIZE, 475, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap())
 		);
-		gl_storePanel.setVerticalGroup(
-			gl_storePanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_storePanel.createSequentialGroup()
+		gl_votePannel.setVerticalGroup(
+			gl_votePannel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_votePannel.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblInsertTheMessage)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(ScrollTextToStore, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-					.addGroup(gl_storePanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnStore)
-						.addComponent(lblStoreStatus, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
+					.addComponent(lblElectionMsg, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(ScrollBallot, GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_votePannel.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(btnVote, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(lblStoreStatus, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE))
 					.addGap(22))
 		);
-		storePanel.setLayout(gl_storePanel);
+		votePannel.setLayout(gl_votePannel);
 		
 		JPanel retrievePanel = new JPanel();
 		
@@ -322,7 +313,7 @@ public class VoterApp extends JFrame {
 		// FIXME: the button is moving when the 'lblRetrieveStatus' label changes!
 		btnRetrieve.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				lblRetrieveStatus.setForeground(Color.BLACK);
+/*				lblRetrieveStatus.setForeground(Color.BLACK);
 				if(labelField.getText().length()==0){
 					lblRetrieveStatus.setText("Label empty!");
 					return;
@@ -335,7 +326,7 @@ public class VoterApp extends JFrame {
 				JPanel retrievePanel = (JPanel) ((JButton) ev.getSource()).getParent();
 				retrievePanel.paintImmediately(retrievePanel.getVisibleRect()); // it would be better to use a separate Thread 
 				
-				/*byte[] msg=null;
+				byte[] msg=null;
 				boolean msgRetrieved=false;
 				try {
 					msg = client.retrieve(labelField.getText().getBytes());
@@ -407,47 +398,17 @@ public class VoterApp extends JFrame {
 		
 		retrievePanel.setLayout(gl_retrievePanel);
 		
-		center.add(storePanel, STORE);
+		center.add(votePannel, STORE);
 		center.add(retrievePanel, RETRIEVE);
-		comboBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				 JComboBox jcb = (JComboBox) e.getSource();
-				 CardLayout cl = (CardLayout)(center.getLayout());
-				 
-				 lblWait.setText("");
-				 lblStoreStatus.setText("");
-				 lblRetrieveStatus.setText("");
-				 
-				 cl.show(center, jcb.getSelectedItem().toString());
-			}
-		});
 		
 		// South panel
 		JPanel south = new JPanel();
 		main.add(south, BorderLayout.SOUTH);
 		
 		JButton btnLogOut = new JButton("Log Out");
-		btnLogOut.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				destroyClient();
-				
-				lblUserNotRegister.setText("");
-				labelField.setText("");
-				lblStoreStatus.setText("");
-				lblRetrieveStatus.setText("");
-				textMsgRetrieved.setText("");
-				
-				comboBox.setSelectedIndex(0); // set the combo box to Store!
-				
-				CardLayout centerCl = (CardLayout) center.getLayout();
-				centerCl.show(center, STORE);
-				
-				CardLayout cl = (CardLayout) getContentPane().getLayout();
-				cl.show(getContentPane(), "1");
-				
-				setTitle("Voter - eVoting System RS3");
-			}
-		});
+		
+		btnLogOut.addActionListener(new Logout());
+		
 		GroupLayout gl_south = new GroupLayout(south);
 		gl_south.setHorizontalGroup(
 			gl_south.createParallelGroup(Alignment.LEADING)
@@ -468,9 +429,10 @@ public class VoterApp extends JFrame {
 	
 	
 	/*
-	 * CORE CODE
+	 * LISTENERS
 	 */
-	private class CORE_Login implements ActionListener {
+
+	private class Login implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
 			if(textField.getText().length()==0){
 				lblUserNotRegister.setText("<html>User ID field empty!<br>Please insert a valid ID number of a previously registered user.</html>");
@@ -520,29 +482,106 @@ public class VoterApp extends JFrame {
 			}
 			if(userRegistered){
 				textField.setText("");
-				setTitle("User " + voterID + " - Cloud Storage 2013");
+				//setTitle("Voter " + voterID + " - " + AppParams.APPNAME);
 				CardLayout cl = (CardLayout) getContentPane().getLayout();
 				cl.show(getContentPane(), "2");
 			}
+			lblVoterID.setText("<html>" +  msgBefVoterID + "<strong>" + voterID + "</strong></html>");
+			lblElectionID.setText(new String(electionData.id));
+			lblElectionMsg.setText("<html>" +  electionData.introMsg + "</html>");
 		}
 	}
 	
+	private class Logout implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			destroyClient();
+			
+			lblUserNotRegister.setText("");
+			//labelField.setText("");
+			//lblStoreStatus.setText("");
+			//lblRetrieveStatus.setText("");
+			//textMsgRetrieved.setText("");
+			
+			//comboBox.setSelectedIndex(0); // set the combo box to Store!
+			
+			CardLayout centerCl = (CardLayout) center.getLayout();
+			centerCl.show(center, STORE);
+			
+			CardLayout cl = (CardLayout) getContentPane().getLayout();
+			cl.show(getContentPane(), "1");
+			
+			setTitle(AppParams.APPNAME);
+		}
+	}
 	
+	private class Vote implements ActionListener {
+		public void actionPerformed(ActionEvent ev){
+			/*lblStoreStatus.setForeground(Color.BLACK);
+			if(labelField.getText().length()==0){
+				lblStoreStatus.setText("Label empty!");
+				return;
+			}
+			if(msgToStore.getText().length()==0){
+				lblStoreStatus.setText("Message to store is empty!");
+				return;
+			}
+			
+			lblStoreStatus.setForeground(Color.BLACK);
+			lblStoreStatus.setText("Wait...");
+			JPanel storePanel = (JPanel) ((JButton) ev.getSource()).getParent();
+			storePanel.paintImmediately(storePanel.getVisibleRect()); // it would be better to use a separate Thread 
+			
+			boolean correctlyStored=false;
+			boolean outOfDate=true;
+			int i=0;
+			for(;i<STORE_ATTEMPTS && outOfDate && !correctlyStored; i++){
+				outOfDate=false;
+				try{
+					client.store(msgToStore.getText().getBytes(), labelField.getText().getBytes());
+					correctlyStored=true;
+				} catch(CounterOutOfDate e){
+					outOfDate=true;
+				} catch (NetworkError e) {
+					lblStoreStatus.setForeground(Color.RED);
+					lblStoreStatus.setText("<html>Network Error: perhaps the server is not running!</html>");
+				} catch (StorageError e) {
+					lblStoreStatus.setForeground(Color.RED);
+					lblStoreStatus.setText("<html>The message has not been stored due to a Storage Error!</html>");
+				}
+			}
+			if(i>=STORE_ATTEMPTS && !correctlyStored){
+				lblStoreStatus.setForeground(Color.RED);
+				lblStoreStatus.setText("<html>The message has not been stored because the counter was always out of date!</html>");
+				System.out.println("The message has not been stored: during " + STORE_ATTEMPTS + " attempts, the Client's counter has always been out of date!");
+			}
+			if(correctlyStored){
+				msgToStore.setText("");
+				lblStoreStatus.setForeground(Color.BLACK);
+				lblStoreStatus.setText("<html>Message stored!</html>");
+			}*/	
+		}					
+	}
+
 	private class ElectionMetadata{
 		//TODO: add all the other election metadata
 		//TODO: refactor the code according to another entity such as the electionAdministrator
-		public byte[] electionID;
+		public byte[] id;
+		public String introMsg;
 		public String[] candidatesArray;
 		
-		public ElectionMetadata(byte[] electionID, String[] candidatesArray){
-			this.electionID=electionID;
+		public ElectionMetadata (byte[] id, String introMsg, String[] candidatesArray){
+			this.id=id;
+			this.introMsg=introMsg;
 			this.candidatesArray=candidatesArray;
 		}
 	}
 	
+	
+	
 	private ElectionMetadata getElectionData(byte[] electionID){
-		return new ElectionMetadata(electionID, AppParams.CANDIDATESARRAY);
+		return new ElectionMetadata(electionID, AppParams.electionMsg, AppParams.CANDIDATESARRAY);
 	}
+	
 	
 	
 	private void setupClient(int voterID) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
