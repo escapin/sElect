@@ -72,6 +72,7 @@ public class VoterApp extends JFrame {
 	private Decryptor user_decr;
 	private Signer user_sign;
 	private Voter client;
+	private ElectionMetadata electionData;
 	//private static final int STORE_ATTEMPTS = 3; 
 	// attempts to store a msg under a label in such a way that server and client counters are aligned
 	
@@ -163,59 +164,7 @@ public class VoterApp extends JFrame {
 		);
 		login.setLayout(gl_login);
 		
-		btnLogIn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ev) {
-				if(textField.getText().length()==0){
-					lblUserNotRegister.setText("<html>User ID field empty!<br>Please insert a valid ID number of a previously registered user.</html>");
-					return;
-				}
-				
-				try{
-					voterID = Integer.parseInt(textField.getText());
-					if(voterID<0)
-						throw new NumberFormatException();
-				} catch (NumberFormatException e){
-					System.out.println("'" + textField.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
-					lblUserNotRegister.setText("<html>'" + textField.getText() + "' is not a proper userID!<br>Please insert the ID number of a registered user.</html>");
-					return;
-				}
-				
-				
-				lblUserNotRegister.setText("");
-				lblWait.setText("Wait..."); //FIXME: it doesn't work!
-				
-				JPanel loginPanel = (JPanel) ((JButton)ev.getSource()).getParent();
-				//lblWait.paintImmediately(loginPanel.getVisibleRect());
-				loginPanel.paintImmediately(loginPanel.getVisibleRect());
-				
-				boolean userRegistered=false;
-				try {
-					setupClient(voterID);
-					userRegistered=true;
-				} catch (FileNotFoundException e){
-					System.out.println("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
-					lblUserNotRegister.setText("<html>User " + voterID + " not registered!<br>Please register yourself before log in.</html>");
-				} catch (IOException e){
-					System.out.println("IOException occurred while reading the credentials of the user!");
-					lblUserNotRegister.setText("IOException occurred while reading the credentials of the user!");
-				} catch (RegisterSig.PKIError | RegisterEnc.PKIError e){
-					System.out.println("PKI Error occurred: perhaps the PKI server is not running!");
-					lblUserNotRegister.setText("<html>PKI Error:<br> perhaps the PKI server is not running!</html>");
-				} catch (NetworkError e){
-					//FIXME: java.net.ConnectException when the PKIServer is not running!
-					System.out.println("Network Error occurred while connecting with the PKI server: perhaps the PKI server is not running!");
-					lblUserNotRegister.setText("<html>Network Error occurred:<br> perhaps the PKI server is not running!</html>");
-				} finally{
-					lblWait.setText("");
-				}
-				if(userRegistered){
-					textField.setText("");
-					setTitle("User " + voterID + " - Cloud Storage 2013");
-					CardLayout cl = (CardLayout) getContentPane().getLayout();
-					cl.show(getContentPane(), "2");
-				}
-			}
-		});
+		btnLogIn.addActionListener(new CORE_Login());
 		
 		
 		// main windows panel
@@ -521,6 +470,81 @@ public class VoterApp extends JFrame {
 	/*
 	 * CORE CODE
 	 */
+	private class CORE_Login implements ActionListener {
+		public void actionPerformed(ActionEvent ev) {
+			if(textField.getText().length()==0){
+				lblUserNotRegister.setText("<html>User ID field empty!<br>Please insert a valid ID number of a previously registered user.</html>");
+				return;
+			}
+			
+			try{
+				voterID = Integer.parseInt(textField.getText());
+				if(voterID<0)
+					throw new NumberFormatException();
+			} catch (NumberFormatException e){
+				System.out.println("'" + textField.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
+				lblUserNotRegister.setText("<html>'" + textField.getText() + "' is not a proper userID!<br>Please insert the ID number of a registered user.</html>");
+				return;
+			}
+			
+			
+			lblUserNotRegister.setText("");
+			lblWait.setText("Wait..."); //FIXME: it doesn't work!
+			
+			JPanel loginPanel = (JPanel) ((JButton)ev.getSource()).getParent();
+			//lblWait.paintImmediately(loginPanel.getVisibleRect());
+			loginPanel.paintImmediately(loginPanel.getVisibleRect());
+			
+			boolean userRegistered=false;
+			try {
+				setupClient(voterID);
+				userRegistered=true;
+				outl("Getting election metadata...");
+				electionData=getElectionData(AppParams.electionID);
+				out("OK");
+			} catch (FileNotFoundException e){
+				System.out.println("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
+				lblUserNotRegister.setText("<html>User " + voterID + " not registered!<br>Please register yourself before log in.</html>");
+			} catch (IOException e){
+				System.out.println("IOException occurred while reading the credentials of the user!");
+				lblUserNotRegister.setText("IOException occurred while reading the credentials of the user!");
+			} catch (RegisterSig.PKIError | RegisterEnc.PKIError e){
+				System.out.println("PKI Error occurred: perhaps the PKI server is not running!");
+				lblUserNotRegister.setText("<html>PKI Error:<br> perhaps the PKI server is not running!</html>");
+			} catch (NetworkError e){
+				//FIXME: java.net.ConnectException when the PKIServer is not running!
+				System.out.println("Network Error occurred while connecting with the PKI server: perhaps the PKI server is not running!");
+				lblUserNotRegister.setText("<html>Network Error occurred:<br> perhaps the PKI server is not running!</html>");
+			} finally{
+				lblWait.setText("");
+			}
+			if(userRegistered){
+				textField.setText("");
+				setTitle("User " + voterID + " - Cloud Storage 2013");
+				CardLayout cl = (CardLayout) getContentPane().getLayout();
+				cl.show(getContentPane(), "2");
+			}
+		}
+	}
+	
+	
+	private class ElectionMetadata{
+		//TODO: add all the other election metadata
+		//TODO: refactor the code according to another entity such as the electionAdministrator
+		public byte[] electionID;
+		public String[] candidatesArray;
+		
+		public ElectionMetadata(byte[] electionID, String[] candidatesArray){
+			this.electionID=electionID;
+			this.candidatesArray=candidatesArray;
+		}
+	}
+	
+	private ElectionMetadata getElectionData(byte[] electionID){
+		return new ElectionMetadata(electionID, AppParams.CANDIDATESARRAY);
+	}
+	
+	
 	private void setupClient(int voterID) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
 		
 		// De-serialize keys and create cryptographic functionalities:
@@ -554,8 +578,9 @@ public class VoterApp extends JFrame {
 		}
 		
 		// Create the voter:
-		out("Creating a voter object.");
+		outl("Setting up the voter...");
 		Voter voter = new Voter(voterID, AppParams.electionID, user_decr, user_sign);
+		out("OK");
 	}
 	
 	private void destroyClient(){
@@ -563,18 +588,13 @@ public class VoterApp extends JFrame {
 		user_sign=null;
 		client=null;
 	}
+
 	
-	private static byte[] readFromFile(String path) throws IOException {
-		FileInputStream f = new FileInputStream(path);
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		while (f.available() > 0){			
-			bos.write(f.read());
-		}
-		f.close();
-		byte[] data = bos.toByteArray();
-		return data;
+	// UTILS methods
+	
+	private static void outl(String s){
+		System.out.print(s);
 	}
-	
 	private static void out(String s) {
 		System.out.println(s);
 	}
