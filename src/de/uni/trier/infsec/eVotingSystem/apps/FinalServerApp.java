@@ -1,6 +1,8 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import de.uni.trier.infsec.eVotingSystem.coreSystem.FinalServer;
@@ -8,12 +10,14 @@ import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkisig.Signer;
+import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.lib.network.NetworkServer;
 import de.uni.trier.infsec.utils.MessageTools;
 
 public class FinalServerApp {
 	private static FinalServer server = null;
+	private static Verifier serversVerifier = null;
 	
 	public static void main(String[] args)  {	
 		PKI.useRemoteMode();
@@ -45,6 +49,7 @@ public class FinalServerApp {
 		byte[] signerMsg = MessageTools.second(decr_sig);		
 		Decryptor decryptor = Decryptor.fromBytes(decryptorMsg);
 		Signer signer = Signer.fromBytes(signerMsg);
+		serversVerifier = signer.getVerifier();
 		
 		try {
 			server = new FinalServer(AppParams.electionID, decryptor, signer);
@@ -94,7 +99,21 @@ public class FinalServerApp {
 			System.out.println("Problems with writing the result to a file!");
 		}
 		
-		// TODO: post it on the bulletin board
+		// write result to text file (as a readable text)
+		try {
+			Helper.FinalEntry[] fes = Helper.finalResultAsText(result, serversVerifier, AppParams.electionID);
+			try {
+		        BufferedWriter out = new BufferedWriter(new FileWriter("FinalResult.txt"));
+		        for (Helper.FinalEntry e : fes) {
+		            out.write(e.vote + " \t" + e.nonce + "\n");
+		            System.out.println(e.vote);
+		        }
+		        out.close();
+		        } catch (IOException e) {}
+		}
+		catch (Exception e) {
+			System.out.println("Problems with writing the result into a text file!");
+		}
 	}
 
 }
