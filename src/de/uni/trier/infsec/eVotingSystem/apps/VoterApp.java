@@ -274,19 +274,7 @@ public class VoterApp extends JFrame {
         ballot.setLayout(new GridLayout(nCandidates,1));
         btnCandidates = new JButton[nCandidates];
         
-        for(int i=0;i<nCandidates; i++){
-        	btnCandidates[i] = new JButton(electionData.candidatesArray[i]);
-        	btnCandidates[i].setFont(new Font("Dialog", Font.BOLD, 14));
-        	btnCandidates[i].setForeground(Color.BLACK);
-        	//btnCandidates[i].setContentAreaFilled(false);
-        	//btnCandidates[i].setOpaque(true);
-        	/*
-        	 * SELECT A CANDIDATE
-        	 */
-        	btnCandidates[i].addActionListener(new CandidateSelected());
-        	ballot.add(btnCandidates[i]);
-        }
-        
+        // IMPORTANT: this has to be done before creating CandidateButton
         voteButtonAction = new VoteButton("Vote");
         btnVote = new JButton(voteButtonAction);
 		btnVote.setFont(new Font("Dialog", Font.BOLD, 18));
@@ -295,6 +283,23 @@ public class VoterApp extends JFrame {
 		 * VOTE!
 		 */
 		//btnVote.addActionListener(new Vote(selectedCandidate));
+        
+        
+        for(int i=0;i<nCandidates; i++){
+        	btnCandidates[i] = new JButton(new CandidateButton(electionData.candidatesArray[i],i, btnCandidates));
+        	btnCandidates[i].setFont(new Font("Dialog", Font.BOLD, 14));
+        	btnCandidates[i].setForeground(Color.BLACK);
+        	//btnCandidates[i].setContentAreaFilled(false);
+        	//btnCandidates[i].setOpaque(true);
+        	/*
+        	 * SELECT A CANDIDATE
+        	 */
+        	//btnCandidates[i].addActionListener(new CandidateSelected());
+        	ballot.add(btnCandidates[i]);
+        }
+        
+        
+        
 		
 		
 		GroupLayout gl_votePanel = new GroupLayout(votePanel);
@@ -547,7 +552,17 @@ public class VoterApp extends JFrame {
 		voter=null;
 	}
 	
-	private class CandidateSelectedButton implements ActionListener{
+	
+	private class CandidateButton extends AbstractAction {
+		private JButton[] btnCandidates;
+		private int candidateNumber;
+		
+		public CandidateButton(String name, int candidateNumber, JButton[] btnCandidates){
+			super(name);
+			this.candidateNumber=candidateNumber;
+			this.btnCandidates=btnCandidates;
+		}
+		
 		public void actionPerformed(ActionEvent ev){
 			JButton btnSelected= (JButton) ev.getSource();
 			btnSelected.setForeground(Color.RED);
@@ -556,43 +571,40 @@ public class VoterApp extends JFrame {
 			btnSelected.repaint();
 			// btnCandidates[candidateNumber].setBackground(Color.GREEN);
 			for(int i=0;i<btnCandidates.length;i++)
-				if(btnCandidates[i].equals(btnSelected)){
-					selectedCandidate=i;
-				} else{
+				if(!btnCandidates[i].equals(btnSelected)){
+//					selectedCandidate=i;
+//				} else{
 					btnCandidates[i].setForeground(Color.BLACK);
 					//FIXME: it does not work 
 							// btnSelected.setFont(new Font("Dialog", Font.BOLD, 14));
 							//	btnCandidates[i].repaint();
 				}
-			voteButtonAction.setCandidateNumber(selectedCandidate);
+			selectedCandidate=candidateNumber;
+			out("Candidate Selected: " + selectedCandidate);
+			
 			btnVote.setEnabled(true);
 			lblCandidateSelected.setText("<html>Your Candidate:<br>&nbsp;&nbsp;&nbsp;&nbsp;<font face=\"Dialog\" size=10  color=\"red\"><b>" +
-					 electionData.candidatesArray[selectedCandidate] + "</b></font></html>");
+					 electionData.candidatesArray[candidateNumber] + "</b></font></html>");
 			
 		}
 	}
 	
+	
 	private class VoteButton extends AbstractAction {
-		int candidateNumber=-200;
 		public VoteButton(String name){
 			super(name);
 		}
-		// Remember to leave button.setEnable(false) before set the candidate for the first time
-		public void setCandidateNumber(int candiateNumber){
-			this.candidateNumber=candidateNumber;
-			if(candidateNumber<0)
-				throw new NumberFormatException();
-		}
 		public void actionPerformed(ActionEvent ev){
-			
 			// Create a ballot;
 			//TODO: comment this line and uncomment the other after testing
-			outl("Creating a ballot with candidate number " + candidateNumber + "...");
+			outl("Creating a ballot with candidate number " + selectedCandidate + "...");
 			//outl("Creating the ballot...");
-			byte[] ballot = voter.createBallot(candidateNumber);
+			byte[] ballot = voter.createBallot(selectedCandidate);
+			out("OK");
 			
 			// Send the ballot:
-			out("Sending the ballot to the server");
+			outl("Sending the ballot to the server...");
+			//TODO: create another thread
 			try {
 				serverResponse = 
 						NetworkClient.sendRequest(ballot, AppParams.SERVER1_NAME, AppParams.SERVER1_PORT);
@@ -601,43 +613,13 @@ public class VoterApp extends JFrame {
 				System.out.println("Vote(candidate <int>): networkError");
 				e.printStackTrace();
 			}
-			//CardLayout cl = (CardLayout)(center.getLayout());
-			//cl.show(center, RETRIEVE);
-			//JPanel votePanel = (JPanel) ((JButton) ev.getSource()).getParent();
-			//storePanel.paintImmediately(storePanel.getVisibleRect()); //FIXME: it would be better to use a separate Thread 
+			out("OK");
+			CardLayout cl = (CardLayout)(center.getLayout());
+			cl.show(center, RETRIEVE); 
 		}					
 	}
 	
 	
-//	private class Vote implements ActionListener {
-//		int candidateNumber=-200;
-//		public Vote(int candidateNumber){
-//			this.candidateNumber=candidateNumber;
-//		}
-//		public void actionPerformed(ActionEvent ev){
-//			
-//			// Create a ballot;
-//			//TODO: comment this line and uncomment the other after testing
-//			outl("Creating a ballot with candidate number " + candidateNumber + "...");
-//			//outl("Creating the ballot...");
-//			byte[] ballot = voter.createBallot(candidateNumber);
-//			
-//			// Send the ballot:
-//			out("Sending the ballot to the server");
-//			try {
-//				serverResponse = 
-//						NetworkClient.sendRequest(ballot, AppParams.SERVER1_NAME, AppParams.SERVER1_PORT);
-//			} catch (NetworkError e) {
-//				// TODO Auto-generated catch block
-//				System.out.println("Vote(candidate <int>): networkError");
-//				e.printStackTrace();
-//			}
-//			//CardLayout cl = (CardLayout)(center.getLayout());
-//			//cl.show(center, RETRIEVE);
-//			//JPanel votePanel = (JPanel) ((JButton) ev.getSource()).getParent();
-//			//storePanel.paintImmediately(storePanel.getVisibleRect()); //FIXME: it would be better to use a separate Thread 
-//		}					
-//	}
 
 	private class ElectionMetadata{
 		//TODO: add all the other election metadata
@@ -694,7 +676,7 @@ public class VoterApp extends JFrame {
 		
 		// Create the voter:
 		outl("Setting up the voter...");
-		Voter voter = new Voter(voterID, AppParams.ELECTIONID, user_decr, user_sign);
+		voter = new Voter(voterID, AppParams.ELECTIONID, user_decr, user_sign);
 		out("OK");
 	}
 
