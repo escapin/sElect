@@ -68,13 +68,16 @@ public class VoterApp extends JFrame {
     private JTextField labelField;
 	private JPanel ballot;
 	private JTextArea textMsgRetrieved;
-	private JLabel lblStoreStatus;
+	private JLabel lblCanidateSelected;
 	private JLabel lblRetrieveStatus;
 	
 	private JLabel lblWait;
 	private JLabel lblVoterID;
 	private JLabel lblElectionID;
 	private JLabel lblElectionMsg;
+	
+	private JButton[] btnCandidates;
+	private JButton btnVote;
 	/*
 	 * CORE FIELD
 	 */
@@ -82,9 +85,11 @@ public class VoterApp extends JFrame {
 	private Decryptor user_decr;
 	private Signer user_sign;
 	private Voter client;
-	private ElectionMetadata electionData;
+	private static ElectionMetadata electionData;
 	//private static final int STORE_ATTEMPTS = 3; 
 	// attempts to store a msg under a label in such a way that server and client counters are aligned
+
+	private int selectedCandidate = -100;
 	
 	// UTILS FIELDS
 	private final String msgBefVoterID = "Your Identifier Number: ";
@@ -121,6 +126,9 @@ public class VoterApp extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 530, 580);
 		
+		outl("Getting election metadata...");
+		electionData=getElectionData(AppParams.ELECTIONID);
+		out("OK");
 		
 		CardLayout cl = new CardLayout();
 		getContentPane().setLayout(cl);
@@ -240,16 +248,13 @@ public class VoterApp extends JFrame {
 		
 		lblElectionMsg = new JLabel("Election Message");
 		lblElectionMsg.setFont(new Font("Dialog", Font.BOLD, 16));
-		lblStoreStatus = new JLabel();
-		lblStoreStatus.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblStoreStatus.setFont(new Font("Dialog", Font.PLAIN, 14));
+		lblCanidateSelected = new JLabel();
+		lblCanidateSelected.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblCanidateSelected.setFont(new Font("Dialog", Font.PLAIN, 14));
 		
 		ballot = new JPanel();
-		BoxLayout boxCandidate = new BoxLayout(ballot, BoxLayout.Y_AXIS);
-		ballot.setLayout(boxCandidate);
-		JScrollPane ScrollBallot = new JScrollPane(ballot);
 		
-        
+		JScrollPane ScrollBallot = new JScrollPane(ballot);
 		//Border paneEdge = BorderFactory.createEmptyBorder(0,10,10,10);
 		//Border loweredetched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 		Border blackline = BorderFactory.createLineBorder(Color.black);
@@ -259,13 +264,27 @@ public class VoterApp extends JFrame {
         ScrollBallot.setBorder(titledBorder);
         
         
+        // CREATE N BUTTONS AS NUMBER OF CANDIDATES
+        int nCandidates=electionData.candidatesArray.length;
+        ballot.setLayout(new GridLayout(nCandidates,1));
+        btnCandidates = new JButton[nCandidates];
         
-        JButton btnCandidate = new JButton("Candidate 01");
-        ballot.add(btnCandidate);
+        for(int i=0;i<nCandidates; i++){
+        	btnCandidates[i] = new JButton(electionData.candidatesArray[i]);
+        	btnCandidates[i].setFont(new Font("Dialog", Font.BOLD, 14));
+        	btnCandidates[i].setForeground(Color.BLACK);
+        	//btnCandidates[i].setContentAreaFilled(false);
+        	//btnCandidates[i].setOpaque(true);
+        	/*
+        	 * SELECT A CANDIDATE
+        	 */
+        	btnCandidates[i].addActionListener(new CandidateSelected());
+        	ballot.add(btnCandidates[i]);
+        }
         
-        JButton btnVote = new JButton("Vote");
+        btnVote = new JButton("Vote");
 		btnVote.setFont(new Font("Dialog", Font.BOLD, 18));
-		
+		btnVote.setEnabled(false);
 		/*
 		 * VOTE!
 		 */
@@ -280,7 +299,7 @@ public class VoterApp extends JFrame {
 					.addGroup(gl_votePannel.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(lblElectionMsg, GroupLayout.PREFERRED_SIZE, 453, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_votePannel.createSequentialGroup()
-							.addComponent(lblStoreStatus, GroupLayout.PREFERRED_SIZE, 313, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblCanidateSelected, GroupLayout.PREFERRED_SIZE, 313, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 							.addComponent(btnVote, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))
 						.addComponent(ScrollBallot, GroupLayout.PREFERRED_SIZE, 475, GroupLayout.PREFERRED_SIZE))
@@ -296,7 +315,7 @@ public class VoterApp extends JFrame {
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_votePannel.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(btnVote, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblStoreStatus, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE))
+						.addComponent(lblCanidateSelected, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE))
 					.addGap(22))
 		);
 		votePannel.setLayout(gl_votePannel);
@@ -461,9 +480,6 @@ public class VoterApp extends JFrame {
 			try {
 				setupClient(voterID);
 				userRegistered=true;
-				outl("Getting election metadata...");
-				electionData=getElectionData(AppParams.electionID);
-				out("OK");
 			} catch (FileNotFoundException e){
 				System.out.println("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
 				lblUserNotRegister.setText("<html>User " + voterID + " not registered!<br>Please register yourself before log in.</html>");
@@ -511,6 +527,31 @@ public class VoterApp extends JFrame {
 			cl.show(getContentPane(), "1");
 			
 			setTitle(AppParams.APPNAME);
+		}
+	}
+	
+	private class CandidateSelected implements ActionListener{
+		public void actionPerformed(ActionEvent ev){
+			JButton btnSelected= (JButton) ev.getSource();
+			btnSelected.setForeground(Color.RED);
+			//FIXME: it does not work
+					// btnSelected.setFont(new Font("Dialog", Font.BOLD, 30));
+			btnSelected.repaint();
+//			//btnCandidates[candidateNumber].setBackground(Color.GREEN);
+			for(int i=0;i<btnCandidates.length;i++)
+				if(btnCandidates[i].equals(btnSelected)){
+					selectedCandidate=i;
+				}
+				else{
+					btnCandidates[i].setForeground(Color.BLACK);
+					//FIXME: it does not work 
+							// btnSelected.setFont(new Font("Dialog", Font.BOLD, 14));
+							//	btnCandidates[i].repaint();
+				}
+			btnVote.setEnabled(true);
+			lblCanidateSelected.setText("<html>Your Candidate:<br>&nbsp;&nbsp;&nbsp;&nbsp;<font face=\"Dialog\" size=10  color=\"red\"><b>" +
+					 electionData.candidatesArray[selectedCandidate] + "</b></font></html>");
+			
 		}
 	}
 	
@@ -579,7 +620,7 @@ public class VoterApp extends JFrame {
 	
 	
 	private ElectionMetadata getElectionData(byte[] electionID){
-		return new ElectionMetadata(electionID, AppParams.electionMsg, AppParams.CANDIDATESARRAY);
+		return new ElectionMetadata(electionID, AppParams.ELECTIONMSG, AppParams.CANDIDATESARRAY);
 	}
 	
 	
@@ -618,7 +659,7 @@ public class VoterApp extends JFrame {
 		
 		// Create the voter:
 		outl("Setting up the voter...");
-		Voter voter = new Voter(voterID, AppParams.electionID, user_decr, user_sign);
+		Voter voter = new Voter(voterID, AppParams.ELECTIONID, user_decr, user_sign);
 		out("OK");
 	}
 	
@@ -626,6 +667,7 @@ public class VoterApp extends JFrame {
 		user_decr=null;
 		user_sign=null;
 		client=null;
+		selectedCandidate=-100;
 	}
 
 	

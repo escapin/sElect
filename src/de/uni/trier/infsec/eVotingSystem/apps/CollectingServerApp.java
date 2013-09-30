@@ -48,7 +48,7 @@ public class CollectingServerApp {
 		Decryptor decryptor = Decryptor.fromBytes(decryptorMsg);
 		Signer signer = Signer.fromBytes(signerMsg);
 				
-		server = new CollectingServer(AppParams.electionID, decryptor, signer);
+		server = new CollectingServer(AppParams.ELECTIONID, decryptor, signer);
 	}
 
 	private static void run()  {

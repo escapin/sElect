@@ -47,7 +47,7 @@ public class FinalServerApp {
 		Signer signer = Signer.fromBytes(signerMsg);
 		
 		try {
-			server = new FinalServer(AppParams.electionID, decryptor, signer);
+			server = new FinalServer(AppParams.ELECTIONID, decryptor, signer);
 		}
 		catch (Exception e) {
 			System.out.println("Cannot create the server object");

@@ -8,8 +8,8 @@ public class AppParams
 	
 	public static final String APPNAME = "eVoteVerif - RS3 Demo";
 	
-	public static final String electionMsg = "Who is your favourite candidate?";
-	public static final byte[] electionID = "ElectionTest Nr 153".getBytes();
+	public static final String ELECTIONMSG = "Who is your favourite candidate?";
+	public static final byte[] ELECTIONID = "ElectionTest Nr 153".getBytes();
 	public static final String[] CANDIDATESARRAY = {	
 								"Candidate 01",
 								"Candidate 02",
