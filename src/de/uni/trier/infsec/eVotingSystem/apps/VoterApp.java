@@ -3,6 +3,7 @@ package de.uni.trier.infsec.eVotingSystem.apps;
 
 import java.awt.EventQueue;
 
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
@@ -46,6 +47,7 @@ import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pkienc.*;
 import de.uni.trier.infsec.functionalities.pkisig.*;
 import de.uni.trier.infsec.utils.MessageTools;
+import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import javax.swing.JTextArea;
 import java.awt.Component;
@@ -68,23 +70,25 @@ public class VoterApp extends JFrame {
     private JTextField labelField;
 	private JPanel ballot;
 	private JTextArea textMsgRetrieved;
-	private JLabel lblCanidateSelected;
-	private JLabel lblRetrieveStatus;
 	
-	private JLabel lblWait;
-	private JLabel lblVoterID;
-	private JLabel lblElectionID;
-	private JLabel lblElectionMsg;
+	private JLabel lblCandidateSelected = new JLabel("");
+	private JLabel lblRetrieveStatus = new JLabel("");
+	private JLabel lblWait = new JLabel("");
+	private JLabel lblVoterID = new JLabel("");
+	private JLabel lblElectionID = new JLabel("");
+	private JLabel lblElectionMsg = new JLabel("");
 	
-	private JButton[] btnCandidates;
-	private JButton btnVote;
+	private JButton[] btnCandidates = new JButton[1];
+	private JButton btnVote = new JButton();
+	private VoteButton voteButtonAction;
 	/*
 	 * CORE FIELD
 	 */
 	private int voterID;
+	private Voter voter;
 	private Decryptor user_decr;
 	private Signer user_sign;
-	private Voter client;
+	private byte[] serverResponse=null;
 	private static ElectionMetadata electionData;
 	//private static final int STORE_ATTEMPTS = 3; 
 	// attempts to store a msg under a label in such a way that server and client counters are aligned
@@ -124,7 +128,8 @@ public class VoterApp extends JFrame {
 		//setIconImage(Toolkit.getDefaultToolkit().getImage(UserGUI.class.getResource("/de/uni/trier/infsec/cloudStorage/cloud.png")));
 		setTitle(AppParams.APPNAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 530, 580);
+		setBounds(100, 100, 530, 600);
+				// (530,334);
 		
 		outl("Getting election metadata...");
 		electionData=getElectionData(AppParams.ELECTIONID);
@@ -243,14 +248,14 @@ public class VoterApp extends JFrame {
 		CardLayout clCenter = new CardLayout(0, 0);
 		center.setLayout(clCenter);
 		
-		JPanel votePannel = new JPanel();
+		JPanel votePanel = new JPanel();
 		
 		
 		lblElectionMsg = new JLabel("Election Message");
 		lblElectionMsg.setFont(new Font("Dialog", Font.BOLD, 16));
-		lblCanidateSelected = new JLabel();
-		lblCanidateSelected.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblCanidateSelected.setFont(new Font("Dialog", Font.PLAIN, 14));
+		lblCandidateSelected = new JLabel();
+		lblCandidateSelected.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblCandidateSelected.setFont(new Font("Dialog", Font.PLAIN, 14));
 		
 		ballot = new JPanel();
 		
@@ -282,43 +287,44 @@ public class VoterApp extends JFrame {
         	ballot.add(btnCandidates[i]);
         }
         
-        btnVote = new JButton("Vote");
+        voteButtonAction = new VoteButton("Vote");
+        btnVote = new JButton(voteButtonAction);
 		btnVote.setFont(new Font("Dialog", Font.BOLD, 18));
 		btnVote.setEnabled(false);
 		/*
 		 * VOTE!
 		 */
-		btnVote.addActionListener(new Vote());
+		//btnVote.addActionListener(new Vote(selectedCandidate));
 		
 		
-		GroupLayout gl_votePannel = new GroupLayout(votePannel);
-		gl_votePannel.setHorizontalGroup(
-			gl_votePannel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_votePannel.createSequentialGroup()
+		GroupLayout gl_votePanel = new GroupLayout(votePanel);
+		gl_votePanel.setHorizontalGroup(
+			gl_votePanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_votePanel.createSequentialGroup()
 					.addGap(24)
-					.addGroup(gl_votePannel.createParallelGroup(Alignment.LEADING, false)
+					.addGroup(gl_votePanel.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(lblElectionMsg, GroupLayout.PREFERRED_SIZE, 453, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_votePannel.createSequentialGroup()
-							.addComponent(lblCanidateSelected, GroupLayout.PREFERRED_SIZE, 313, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_votePanel.createSequentialGroup()
+							.addComponent(lblCandidateSelected, GroupLayout.PREFERRED_SIZE, 313, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 							.addComponent(btnVote, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))
 						.addComponent(ScrollBallot, GroupLayout.PREFERRED_SIZE, 475, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap())
 		);
-		gl_votePannel.setVerticalGroup(
-			gl_votePannel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_votePannel.createSequentialGroup()
+		gl_votePanel.setVerticalGroup(
+			gl_votePanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_votePanel.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblElectionMsg, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
 					.addComponent(ScrollBallot, GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_votePannel.createParallelGroup(Alignment.LEADING, false)
+					.addGroup(gl_votePanel.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(btnVote, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblCanidateSelected, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE))
+						.addComponent(lblCandidateSelected, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE))
 					.addGap(22))
 		);
-		votePannel.setLayout(gl_votePannel);
+		votePanel.setLayout(gl_votePanel);
 		
 		JPanel retrievePanel = new JPanel();
 		
@@ -417,7 +423,7 @@ public class VoterApp extends JFrame {
 		
 		retrievePanel.setLayout(gl_retrievePanel);
 		
-		center.add(votePannel, STORE);
+		center.add(votePanel, STORE);
 		center.add(retrievePanel, RETRIEVE);
 		
 		// South panel
@@ -510,10 +516,13 @@ public class VoterApp extends JFrame {
 	
 	private class Logout implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			destroyClient();
 			
 			lblUserNotRegister.setText("");
+			lblCandidateSelected.setText("");
 			//labelField.setText("");
+//			assert(btnCandidates!=null);
+			for(int i=0;i<btnCandidates.length;i++)
+				btnCandidates[i].setForeground(Color.BLACK);
 			//lblStoreStatus.setText("");
 			//lblRetrieveStatus.setText("");
 			//textMsgRetrieved.setText("");
@@ -526,82 +535,109 @@ public class VoterApp extends JFrame {
 			CardLayout cl = (CardLayout) getContentPane().getLayout();
 			cl.show(getContentPane(), "1");
 			
+			destroyConfidentialInfo();
 			setTitle(AppParams.APPNAME);
 		}
 	}
+	private void destroyConfidentialInfo(){
+		selectedCandidate=-100;
+		
+		user_decr=null;
+		user_sign=null;
+		voter=null;
+	}
 	
-	private class CandidateSelected implements ActionListener{
+	private class CandidateSelectedButton implements ActionListener{
 		public void actionPerformed(ActionEvent ev){
 			JButton btnSelected= (JButton) ev.getSource();
 			btnSelected.setForeground(Color.RED);
 			//FIXME: it does not work
 					// btnSelected.setFont(new Font("Dialog", Font.BOLD, 30));
 			btnSelected.repaint();
-//			//btnCandidates[candidateNumber].setBackground(Color.GREEN);
+			// btnCandidates[candidateNumber].setBackground(Color.GREEN);
 			for(int i=0;i<btnCandidates.length;i++)
 				if(btnCandidates[i].equals(btnSelected)){
 					selectedCandidate=i;
-				}
-				else{
+				} else{
 					btnCandidates[i].setForeground(Color.BLACK);
 					//FIXME: it does not work 
 							// btnSelected.setFont(new Font("Dialog", Font.BOLD, 14));
 							//	btnCandidates[i].repaint();
 				}
+			voteButtonAction.setCandidateNumber(selectedCandidate);
 			btnVote.setEnabled(true);
-			lblCanidateSelected.setText("<html>Your Candidate:<br>&nbsp;&nbsp;&nbsp;&nbsp;<font face=\"Dialog\" size=10  color=\"red\"><b>" +
+			lblCandidateSelected.setText("<html>Your Candidate:<br>&nbsp;&nbsp;&nbsp;&nbsp;<font face=\"Dialog\" size=10  color=\"red\"><b>" +
 					 electionData.candidatesArray[selectedCandidate] + "</b></font></html>");
 			
 		}
 	}
 	
-	private class Vote implements ActionListener {
+	private class VoteButton extends AbstractAction {
+		int candidateNumber=-200;
+		public VoteButton(String name){
+			super(name);
+		}
+		// Remember to leave button.setEnable(false) before set the candidate for the first time
+		public void setCandidateNumber(int candiateNumber){
+			this.candidateNumber=candidateNumber;
+			if(candidateNumber<0)
+				throw new NumberFormatException();
+		}
 		public void actionPerformed(ActionEvent ev){
-			/*lblStoreStatus.setForeground(Color.BLACK);
-			if(labelField.getText().length()==0){
-				lblStoreStatus.setText("Label empty!");
-				return;
-			}
-			if(msgToStore.getText().length()==0){
-				lblStoreStatus.setText("Message to store is empty!");
-				return;
-			}
 			
-			lblStoreStatus.setForeground(Color.BLACK);
-			lblStoreStatus.setText("Wait...");
-			JPanel storePanel = (JPanel) ((JButton) ev.getSource()).getParent();
-			storePanel.paintImmediately(storePanel.getVisibleRect()); // it would be better to use a separate Thread 
+			// Create a ballot;
+			//TODO: comment this line and uncomment the other after testing
+			outl("Creating a ballot with candidate number " + candidateNumber + "...");
+			//outl("Creating the ballot...");
+			byte[] ballot = voter.createBallot(candidateNumber);
 			
-			boolean correctlyStored=false;
-			boolean outOfDate=true;
-			int i=0;
-			for(;i<STORE_ATTEMPTS && outOfDate && !correctlyStored; i++){
-				outOfDate=false;
-				try{
-					client.store(msgToStore.getText().getBytes(), labelField.getText().getBytes());
-					correctlyStored=true;
-				} catch(CounterOutOfDate e){
-					outOfDate=true;
-				} catch (NetworkError e) {
-					lblStoreStatus.setForeground(Color.RED);
-					lblStoreStatus.setText("<html>Network Error: perhaps the server is not running!</html>");
-				} catch (StorageError e) {
-					lblStoreStatus.setForeground(Color.RED);
-					lblStoreStatus.setText("<html>The message has not been stored due to a Storage Error!</html>");
-				}
+			// Send the ballot:
+			out("Sending the ballot to the server");
+			try {
+				serverResponse = 
+						NetworkClient.sendRequest(ballot, AppParams.SERVER1_NAME, AppParams.SERVER1_PORT);
+			} catch (NetworkError e) {
+				// TODO Auto-generated catch block
+				System.out.println("Vote(candidate <int>): networkError");
+				e.printStackTrace();
 			}
-			if(i>=STORE_ATTEMPTS && !correctlyStored){
-				lblStoreStatus.setForeground(Color.RED);
-				lblStoreStatus.setText("<html>The message has not been stored because the counter was always out of date!</html>");
-				System.out.println("The message has not been stored: during " + STORE_ATTEMPTS + " attempts, the Client's counter has always been out of date!");
-			}
-			if(correctlyStored){
-				msgToStore.setText("");
-				lblStoreStatus.setForeground(Color.BLACK);
-				lblStoreStatus.setText("<html>Message stored!</html>");
-			}*/	
+			//CardLayout cl = (CardLayout)(center.getLayout());
+			//cl.show(center, RETRIEVE);
+			//JPanel votePanel = (JPanel) ((JButton) ev.getSource()).getParent();
+			//storePanel.paintImmediately(storePanel.getVisibleRect()); //FIXME: it would be better to use a separate Thread 
 		}					
 	}
+	
+	
+//	private class Vote implements ActionListener {
+//		int candidateNumber=-200;
+//		public Vote(int candidateNumber){
+//			this.candidateNumber=candidateNumber;
+//		}
+//		public void actionPerformed(ActionEvent ev){
+//			
+//			// Create a ballot;
+//			//TODO: comment this line and uncomment the other after testing
+//			outl("Creating a ballot with candidate number " + candidateNumber + "...");
+//			//outl("Creating the ballot...");
+//			byte[] ballot = voter.createBallot(candidateNumber);
+//			
+//			// Send the ballot:
+//			out("Sending the ballot to the server");
+//			try {
+//				serverResponse = 
+//						NetworkClient.sendRequest(ballot, AppParams.SERVER1_NAME, AppParams.SERVER1_PORT);
+//			} catch (NetworkError e) {
+//				// TODO Auto-generated catch block
+//				System.out.println("Vote(candidate <int>): networkError");
+//				e.printStackTrace();
+//			}
+//			//CardLayout cl = (CardLayout)(center.getLayout());
+//			//cl.show(center, RETRIEVE);
+//			//JPanel votePanel = (JPanel) ((JButton) ev.getSource()).getParent();
+//			//storePanel.paintImmediately(storePanel.getVisibleRect()); //FIXME: it would be better to use a separate Thread 
+//		}					
+//	}
 
 	private class ElectionMetadata{
 		//TODO: add all the other election metadata
@@ -616,7 +652,6 @@ public class VoterApp extends JFrame {
 			this.candidatesArray=candidatesArray;
 		}
 	}
-	
 	
 	
 	private ElectionMetadata getElectionData(byte[] electionID){
@@ -661,13 +696,6 @@ public class VoterApp extends JFrame {
 		outl("Setting up the voter...");
 		Voter voter = new Voter(voterID, AppParams.ELECTIONID, user_decr, user_sign);
 		out("OK");
-	}
-	
-	private void destroyClient(){
-		user_decr=null;
-		user_sign=null;
-		client=null;
-		selectedCandidate=-100;
 	}
 
 	

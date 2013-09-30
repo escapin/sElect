@@ -92,10 +92,10 @@ public class VotingCmdLine
 			
 			// Send the ballot:
 			out("Sending the ballot to the server");
-			byte[] response = NetworkClient.sendRequest(ballot, AppParams.SERVER1_NAME, AppParams.SERVER1_PORT);
+			byte[] serverResponse = NetworkClient.sendRequest(ballot, AppParams.SERVER1_NAME, AppParams.SERVER1_PORT);
 			
 			// Validate the server's response:
-			Voter.ResponseTag responseTag = voter.validateResponse(response);
+			Voter.ResponseTag responseTag = voter.validateResponse(serverResponse);
 			out("Response of the server: " + responseTag);
 			
 			if (responseTag == Voter.ResponseTag.VOTE_COLLECTED) {

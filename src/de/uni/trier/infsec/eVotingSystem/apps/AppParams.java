@@ -6,7 +6,7 @@ public class AppParams
 {
 	public static final String PATH_STORAGE = System.getProperty("java.io.tmpdir") + File.separator + "eVotingSystem" + File.separator;
 	
-	public static final String APPNAME = "eVoteVerif - RS3 Demo";
+	public static final String APPNAME = "eVoteTrust - RS3 Demo";
 	
 	public static final String ELECTIONMSG = "Who is your favourite candidate?";
 	public static final byte[] ELECTIONID = "ElectionTest Nr 153".getBytes();
