@@ -1,6 +1,8 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
 
+import static de.uni.trier.infsec.utils.Utilities.byteArrayToHexString;
+
 import java.awt.EventQueue;
 
 import javax.swing.AbstractAction;
@@ -43,6 +45,7 @@ import java.io.IOException;
 
 import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
 import de.uni.trier.infsec.eVotingSystem.coreSystem.Voter;
+import de.uni.trier.infsec.eVotingSystem.coreSystem.Voter.Error;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pkienc.*;
 import de.uni.trier.infsec.functionalities.pkisig.*;
@@ -54,6 +57,7 @@ import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Toolkit;
+import java.awt.FlowLayout;
 
 
 
@@ -65,18 +69,21 @@ public class VoterApp extends JFrame {
 	private JTextField textField;
 	private JLabel lblUserNotRegister;
 	private JPanel center;
-	private final static String STORE = "Store";
-    private final static String RETRIEVE = "Retrieve";
-    private JTextField labelField;
+	private final static String VOTE = "VOTE";
+	private final static String ACCEPTED="ACCEPTED";
+    private final static String REJECTED = "REJECTED";
+  
 	private JPanel ballot;
-	private JTextArea textMsgRetrieved;
+	private JTextArea textNonce;
+	private JTextArea textSignature;
 	
-	private JLabel lblCandidateSelected = new JLabel("");
-	private JLabel lblRetrieveStatus = new JLabel("");
-	private JLabel lblWait = new JLabel("");
-	private JLabel lblVoterID = new JLabel("");
-	private JLabel lblElectionID = new JLabel("");
-	private JLabel lblElectionMsg = new JLabel("");
+	
+	private JLabel lblRejectedReason = new JLabel("Rejected Reason");
+	private JLabel lblCandidateSelected = new JLabel("Candidate Selected");
+	private JLabel lblWait = new JLabel("Wait...");
+	private JLabel lblVoterID = new JLabel("VoterID");
+	private JLabel lblElectionID = new JLabel("ElectionID");
+	private JLabel lblElectionMsg = new JLabel("Election Message");
 	
 	private JButton[] btnCandidates = new JButton[1];
 	private JButton btnVote = new JButton();
@@ -90,6 +97,8 @@ public class VoterApp extends JFrame {
 	private Signer user_sign;
 	private byte[] serverResponse=null;
 	private static ElectionMetadata electionData;
+	private Voter.ResponseTag responseTag;
+	private Voter.Receipt receipt;
 	//private static final int STORE_ATTEMPTS = 3; 
 	// attempts to store a msg under a label in such a way that server and client counters are aligned
 
@@ -212,9 +221,9 @@ public class VoterApp extends JFrame {
 		// North panel
 		JPanel north = new JPanel();
 		main.add(north, BorderLayout.NORTH);
-		lblVoterID = new JLabel(msgBefVoterID);
+		lblVoterID.setText(msgBefVoterID);
 		
-		lblElectionID = new JLabel("");
+		lblElectionID.setText("");
 		//labelField.setColumns(10);
 		GroupLayout gl_north = new GroupLayout(north);
 		gl_north.setHorizontalGroup(
@@ -269,20 +278,10 @@ public class VoterApp extends JFrame {
         ScrollBallot.setBorder(titledBorder);
         
         
-        // CREATE N BUTTONS AS NUMBER OF CANDIDATES
+        // CREATE n BUTTONS AS NUMBER OF CANDIDATES
         int nCandidates=electionData.candidatesArray.length;
         ballot.setLayout(new GridLayout(nCandidates,1));
         btnCandidates = new JButton[nCandidates];
-        
-        // IMPORTANT: this has to be done before creating CandidateButton
-        voteButtonAction = new VoteButton("Vote");
-        btnVote = new JButton(voteButtonAction);
-		btnVote.setFont(new Font("Dialog", Font.BOLD, 18));
-		btnVote.setEnabled(false);
-		/*
-		 * VOTE!
-		 */
-		//btnVote.addActionListener(new Vote(selectedCandidate));
         
         
         for(int i=0;i<nCandidates; i++){
@@ -297,7 +296,14 @@ public class VoterApp extends JFrame {
         	//btnCandidates[i].addActionListener(new CandidateSelected());
         	ballot.add(btnCandidates[i]);
         }
-        
+        /*
+		 * VOTE!
+		 */
+        voteButtonAction = new VoteButton("Vote");
+        btnVote = new JButton(voteButtonAction);
+		btnVote.setFont(new Font("Dialog", Font.BOLD, 18));
+		btnVote.setEnabled(false);
+		//btnVote.addActionListener(new Vote(selectedCandidate));
         
         
 		
@@ -306,14 +312,15 @@ public class VoterApp extends JFrame {
 		gl_votePanel.setHorizontalGroup(
 			gl_votePanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_votePanel.createSequentialGroup()
-					.addGap(24)
-					.addGroup(gl_votePanel.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(lblElectionMsg, GroupLayout.PREFERRED_SIZE, 453, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_votePanel.createSequentialGroup()
-							.addComponent(lblCandidateSelected, GroupLayout.PREFERRED_SIZE, 313, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(btnVote, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))
-						.addComponent(ScrollBallot, GroupLayout.PREFERRED_SIZE, 475, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap()
+					.addGroup(gl_votePanel.createParallelGroup(Alignment.TRAILING)
+						.addComponent(ScrollBallot, GroupLayout.PREFERRED_SIZE, 475, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_votePanel.createParallelGroup(Alignment.TRAILING)
+							.addComponent(lblElectionMsg, GroupLayout.PREFERRED_SIZE, 453, GroupLayout.PREFERRED_SIZE)
+							.addGroup(gl_votePanel.createSequentialGroup()
+								.addComponent(lblCandidateSelected, GroupLayout.PREFERRED_SIZE, 313, GroupLayout.PREFERRED_SIZE)
+								.addGap(79)
+								.addComponent(btnVote, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))))
 					.addContainerGap())
 		);
 		gl_votePanel.setVerticalGroup(
@@ -321,68 +328,34 @@ public class VoterApp extends JFrame {
 				.addGroup(gl_votePanel.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblElectionMsg, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addComponent(ScrollBallot, GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_votePanel.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(btnVote, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblCandidateSelected, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE))
-					.addGap(22))
+					.addGap(10)
+					.addComponent(ScrollBallot, GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE)
+					.addGroup(gl_votePanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_votePanel.createSequentialGroup()
+							.addGap(18)
+							.addComponent(btnVote, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_votePanel.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblCandidateSelected, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+					.addContainerGap())
 		);
 		votePanel.setLayout(gl_votePanel);
 		
-		JPanel retrievePanel = new JPanel();
+		JPanel acceptedPanel = new JPanel();
 		
-		lblRetrieveStatus = new JLabel();
-		lblRetrieveStatus.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblRetrieveStatus.setFont(new Font("Dialog", Font.PLAIN, 14));
+		JLabel lblVoteCorrect = new JLabel(html("<font align=\"center\" face=\"Dialog\" size=5 color=\"green\"><b>" +
+				"Your vote has been correctly collected!</b></font>"));
+		lblVoteCorrect.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblVoteCorrect.setFont(new Font("Dialog", Font.PLAIN, 14));
 		
-		JLabel lblMessageRetrieved = new JLabel("Message Retrieved:");
-		
-		JButton btnRetrieve = new JButton("Retrieve");
-		// FIXME: the button is moving when the 'lblRetrieveStatus' label changes!
-		btnRetrieve.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ev) {
-/*				lblRetrieveStatus.setForeground(Color.BLACK);
-				if(labelField.getText().length()==0){
-					lblRetrieveStatus.setText("Label empty!");
-					return;
-				}
-				
-				textMsgRetrieved.setText("");
-				lblRetrieveStatus.setForeground(Color.BLACK);
-				lblRetrieveStatus.setText("Wait...");	
-				
-				JPanel retrievePanel = (JPanel) ((JButton) ev.getSource()).getParent();
-				retrievePanel.paintImmediately(retrievePanel.getVisibleRect()); // it would be better to use a separate Thread 
-				
-				byte[] msg=null;
-				boolean msgRetrieved=false;
-				try {
-					msg = client.retrieve(labelField.getText().getBytes());
-					msgRetrieved=true;
-				} catch (NetworkError e) {
-					lblRetrieveStatus.setForeground(Color.RED);
-					lblRetrieveStatus.setText("<html>Network Error: perhaps the server is not running!</html>");
-				} catch (StorageError e) {
-					lblRetrieveStatus.setForeground(Color.RED);
-					lblRetrieveStatus.setText("<html>The message has not been stored due to a Storage Error!</html>");
-				}
-				if(msgRetrieved)
-					if(msg!=null){
-						textMsgRetrieved.setText(new String(msg));
-						lblRetrieveStatus.setText("");
-					}
-					else{
-						lblRetrieveStatus.setForeground(Color.BLACK);
-						lblRetrieveStatus.setText("<html>No message stored under this label!</html>");
-					}*/
-			}
-		});
+		JLabel lblVoteAccepted = new JLabel(html("Your vote's <b>receipt</b> has also been stored on your computer.<br><br>" +
+				"When the election is over, use your <b>Receipt ID</b> to make sure that your vote has been counted properly."));
+		lblVoteAccepted.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblVoteAccepted.setFont(new Font("Dialog", Font.PLAIN, 14));
 		
 		
-		textMsgRetrieved = new JTextArea();
-		textMsgRetrieved.addMouseListener(new MouseAdapter() {
+		textNonce = new JTextArea();
+		textNonce.addMouseListener(new MouseAdapter() {
 			public void mouseEntered(MouseEvent e) {
 				setCursor(new Cursor(Cursor.TEXT_CURSOR));
 			}
@@ -390,46 +363,101 @@ public class VoterApp extends JFrame {
 				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
-		textMsgRetrieved.setEditable(false);
+		textNonce.setEditable(false);
+		textNonce.setWrapStyleWord(true);
+		textNonce.setLineWrap(true);
+		JScrollPane scrollNonce = new JScrollPane(textNonce);
+		JLabel lblNonce = new JLabel(html("<b>Receipt ID:</b>"));
+		scrollNonce.setColumnHeaderView(lblNonce);
+		scrollNonce.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
+		textSignature = new JTextArea();
+		textSignature.addMouseListener(new MouseAdapter() {
+			public void mouseEntered(MouseEvent e) {
+				setCursor(new Cursor(Cursor.TEXT_CURSOR));
+			}
+			public void mouseExited(MouseEvent e) {
+				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+		});
+		textSignature.setEditable(false);
+		textSignature.setWrapStyleWord(true);
+		textSignature.setLineWrap(true);
+		JScrollPane scrollSignature = new JScrollPane(textSignature);
+		scrollSignature.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
-		JScrollPane scrollMsgRetrieved = new JScrollPane(textMsgRetrieved);
+		//JLabel lblSign = new JLabel(html("<b>Signed Acknowledgment:</b>"));
+		JLabel lblSign = new JLabel(html("<b>Encrypted Ballot:</b>"));
+		scrollSignature.setColumnHeaderView(lblSign);
 		
-		
-		
-		GroupLayout gl_retrievePanel = new GroupLayout(retrievePanel);
-		gl_retrievePanel.setHorizontalGroup(
-			gl_retrievePanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_retrievePanel.createSequentialGroup()
+		GroupLayout gl_acceptedPanel = new GroupLayout(acceptedPanel);
+		gl_acceptedPanel.setHorizontalGroup(
+			gl_acceptedPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_acceptedPanel.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_retrievePanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_retrievePanel.createSequentialGroup()
-							.addGroup(gl_retrievePanel.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblRetrieveStatus, GroupLayout.PREFERRED_SIZE, 242, GroupLayout.PREFERRED_SIZE)
-								.addComponent(lblMessageRetrieved))
-							.addGap(86)
-							.addComponent(btnRetrieve))
-						.addComponent(scrollMsgRetrieved, GroupLayout.PREFERRED_SIZE, 421, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(56, Short.MAX_VALUE))
+					.addGroup(gl_acceptedPanel.createParallelGroup(Alignment.TRAILING, false)
+						.addComponent(scrollNonce, Alignment.LEADING)
+						.addGroup(Alignment.LEADING, gl_acceptedPanel.createParallelGroup(Alignment.LEADING, false)
+							.addComponent(lblVoteCorrect, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(lblVoteAccepted, GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE))
+						.addComponent(scrollSignature, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE))
+					.addContainerGap(73, Short.MAX_VALUE))
 		);
-		gl_retrievePanel.setVerticalGroup(
-			gl_retrievePanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_retrievePanel.createSequentialGroup()
-					.addGroup(gl_retrievePanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnRetrieve)
-						.addGroup(gl_retrievePanel.createSequentialGroup()
-							.addComponent(lblRetrieveStatus, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblMessageRetrieved)))
+		gl_acceptedPanel.setVerticalGroup(
+			gl_acceptedPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_acceptedPanel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblVoteCorrect, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollMsgRetrieved, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
+					.addComponent(lblVoteAccepted, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+					.addComponent(scrollNonce, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollSignature, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
 					.addGap(55))
 		);
 		
-		retrievePanel.setLayout(gl_retrievePanel);
 		
-		center.add(votePanel, STORE);
-		center.add(retrievePanel, RETRIEVE);
+		
+		acceptedPanel.setLayout(gl_acceptedPanel);
+		
+		JPanel rejectedPanel = new JPanel();
+		//GroupLayout gl_rejectedPanel = new GroupLayout(acceptedPanel);
+		//rejectedPanel.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblRejected=new JLabel(html("<font align=\"center\" face=\"Dialog\" size=5 color=\"red\"><b>" +
+				"Your Vote has not been collected!</b></font>"));
+		lblRejected.setFont(new Font("Dialog", Font.PLAIN, 14));
+		
+		
+		
+		center.add(votePanel, VOTE);
+		center.add(acceptedPanel, ACCEPTED);
+		center.add(rejectedPanel, REJECTED);
+		GroupLayout gl_rejectedPanel = new GroupLayout(rejectedPanel);
+		gl_rejectedPanel.setHorizontalGroup(
+			gl_rejectedPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_rejectedPanel.createSequentialGroup()
+					.addGroup(gl_rejectedPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_rejectedPanel.createSequentialGroup()
+							.addGap(83)
+							.addComponent(lblRejected, GroupLayout.PREFERRED_SIZE, 356, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_rejectedPanel.createSequentialGroup()
+							.addGap(32)
+							.addComponent(lblRejectedReason, GroupLayout.PREFERRED_SIZE, 436, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(62, Short.MAX_VALUE))
+		);
+		gl_rejectedPanel.setVerticalGroup(
+			gl_rejectedPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_rejectedPanel.createSequentialGroup()
+					.addGap(68)
+					.addComponent(lblRejected)
+					.addGap(77)
+					.addComponent(lblRejectedReason, GroupLayout.PREFERRED_SIZE, 171, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(161, Short.MAX_VALUE))
+		);
+		rejectedPanel.setLayout(gl_rejectedPanel);
+		
 		
 		// South panel
 		JPanel south = new JPanel();
@@ -524,10 +552,12 @@ public class VoterApp extends JFrame {
 			
 			lblUserNotRegister.setText("");
 			lblCandidateSelected.setText("");
-			//labelField.setText("");
-//			assert(btnCandidates!=null);
+			lblRejectedReason.setText("");
+			//	assert(btnCandidates!=null);
 			for(int i=0;i<btnCandidates.length;i++)
 				btnCandidates[i].setForeground(Color.BLACK);
+			textNonce.setText("");
+			textSignature.setText("");
 			//lblStoreStatus.setText("");
 			//lblRetrieveStatus.setText("");
 			//textMsgRetrieved.setText("");
@@ -535,7 +565,7 @@ public class VoterApp extends JFrame {
 			//comboBox.setSelectedIndex(0); // set the combo box to Store!
 			
 			CardLayout centerCl = (CardLayout) center.getLayout();
-			centerCl.show(center, STORE);
+			centerCl.show(center, VOTE);
 			
 			CardLayout cl = (CardLayout) getContentPane().getLayout();
 			cl.show(getContentPane(), "1");
@@ -550,6 +580,8 @@ public class VoterApp extends JFrame {
 		user_decr=null;
 		user_sign=null;
 		voter=null;
+		responseTag=null;
+		receipt=null;
 	}
 	
 	
@@ -565,7 +597,7 @@ public class VoterApp extends JFrame {
 		
 		public void actionPerformed(ActionEvent ev){
 			JButton btnSelected= (JButton) ev.getSource();
-			btnSelected.setForeground(Color.RED);
+			btnSelected.setForeground(Color.BLUE);
 			//FIXME: it does not work
 					// btnSelected.setFont(new Font("Dialog", Font.BOLD, 30));
 			btnSelected.repaint();
@@ -583,8 +615,9 @@ public class VoterApp extends JFrame {
 			out("Candidate Selected: " + selectedCandidate);
 			
 			btnVote.setEnabled(true);
-			lblCandidateSelected.setText("<html>Your Candidate:<br>&nbsp;&nbsp;&nbsp;&nbsp;<font face=\"Dialog\" size=10  color=\"red\"><b>" +
-					 electionData.candidatesArray[candidateNumber] + "</b></font></html>");
+			lblCandidateSelected.setText(html("Your Candidate:<br>&nbsp;&nbsp;&nbsp;&nbsp;<font face=\"Dialog\" size=6 color=\"blue\"><b>" +
+					 electionData.candidatesArray[candidateNumber] + "</b></font>"));
+			
 			
 		}
 	}
@@ -610,12 +643,71 @@ public class VoterApp extends JFrame {
 						NetworkClient.sendRequest(ballot, AppParams.SERVER1_NAME, AppParams.SERVER1_PORT);
 			} catch (NetworkError e) {
 				// TODO Auto-generated catch block
+				// TODO: manage the app so that the vote is not colleted in this case
 				System.out.println("Vote(candidate <int>): networkError");
 				e.printStackTrace();
 			}
 			out("OK");
+			
+			// Validate the server's response:
+			try {
+				responseTag = voter.validateResponse(serverResponse);
+			} catch (Error e) {
+				// TODO Auto-generated catch block
+				System.out.println("Vote(candidate <int>): voteError");
+				e.printStackTrace();
+			}
+			out("Response of the server: " + responseTag);
+			
 			CardLayout cl = (CardLayout)(center.getLayout());
-			cl.show(center, RETRIEVE); 
+			if (responseTag == Voter.ResponseTag.VOTE_COLLECTED) {
+				// Output the verification data:
+				Voter.Receipt receipt = voter.getReceipt();
+				out("RECEIPT:");
+				out("    nonce = " + byteArrayToHexString(receipt.nonce));
+				out("    inner ballot = " + byteArrayToHexString(receipt.innerBallot));
+				if (receipt.serverSignature != null)
+					out("    server's signature = " + byteArrayToHexString(receipt.serverSignature));
+				
+				// Store the receipt:
+				String receipt_fname = "./receipt_" + voterID + ".msg"; 
+				try {
+					AppUtils.storeAsFile(receipt.asMessage(), receipt_fname);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					System.out.println("Vote(candidate <int>): IOException");
+					e.printStackTrace();
+				}
+				textNonce.setText(byteArrayToHexString(receipt.nonce));
+				textSignature.setText(byteArrayToHexString(receipt.innerBallot));
+				//textSignature.setText(byteArrayToHexString(receipt.serverSignature));
+				cl.show(center, ACCEPTED);
+			}
+			else{
+				String rejectedReason="";
+				switch(responseTag){
+				case INVALID_ELECTION_ID:
+					rejectedReason += "Invalid election identifier.";
+					break;
+				case ELECTION_OVER:
+					rejectedReason += "The voting phase is over.";	
+					break;
+				case ALREADY_VOTED:
+					rejectedReason += "You have already voted with a different " +
+							"ballot which has been properly collected.";	
+					break;
+//				case INVALID_VOTER_ID: //FIXME: do we still need this enum?
+//					rejectedReason += "Your identifier number is uncorrect";
+//					break;
+				default:
+					rejectedReason += "I do not know the reason that your vote " +
+							"has not been collected. You should try asking a polling official!";
+				}
+				lblRejectedReason.setText(html(rejectedReason));
+				lblRejectedReason.setFont(new Font("Dialog", Font.PLAIN, 14));
+				cl.show(center, REJECTED);
+			}
+			 
 		}					
 	}
 	
@@ -688,6 +780,9 @@ public class VoterApp extends JFrame {
 	}
 	private static void out(String s) {
 		System.out.println(s);
+	}
+	private static String html(String s){
+		return "<html>" + s + "</html>";
 	}
 }
 

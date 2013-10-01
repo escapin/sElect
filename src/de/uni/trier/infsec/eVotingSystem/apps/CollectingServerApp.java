@@ -119,6 +119,6 @@ public class CollectingServerApp {
 	// TODO: we should come up with better way to determine when the voting phase is over.
 	// Perhaps the system should be triggered by a human operator. Or maybe just a fixed time?
 	private static boolean itsOver() {
-		return server.getNumberOfBallots() >= 3;
+		return server.getNumberOfBallots() >= AppParams.ALLOWEDVOTERS;
 	}
 }

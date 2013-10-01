@@ -83,7 +83,7 @@ public class VotingCmdLine
 			out("Creating a voter object.");
 			Voter voter = new Voter(voterID, AppParams.ELECTIONID, decryptor, signer);
 			
-			//TODO: implement the VoterApp from here to the end of the file
+			
 			
 			// Create a ballot;
 			//out("Creating a ballot with candidate " + new String(candidate));
@@ -93,6 +93,8 @@ public class VotingCmdLine
 			// Send the ballot:
 			out("Sending the ballot to the server");
 			byte[] serverResponse = NetworkClient.sendRequest(ballot, AppParams.SERVER1_NAME, AppParams.SERVER1_PORT);
+			
+			//TODO: implement the VoterApp from here to the end of the file
 			
 			// Validate the server's response:
 			Voter.ResponseTag responseTag = voter.validateResponse(serverResponse);
