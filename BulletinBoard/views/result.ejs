@@ -1,0 +1,25 @@
+<img src="images/Logo.png">
+<h1> Result of the Election </h1>
+
+<p> Welcome to TrustVote. This is the result of the election. </p>
+
+<p> The entries listed below are sorted according to the receipt
+identifiers.</p>
+
+<p> Each entry contains a receipt ID and a candidate number. </p>
+
+<p> At the end of this page you can find the official result of
+the election in binary, digitally signed by the voting authority. 
+</p>
+
+<hr>
+
+<ul>
+<% for(var i=0; i<result.length; i++) { %>
+   <li> Receipt-ID: <%= result[i].nonce %> &mdash; Candidate: <%= result[i].vote %> </li>
+<% } %>
+</ul>
+
+<hr>
+
+<a href="SignedFinalResult.msg">Digitaly signed result</a>
