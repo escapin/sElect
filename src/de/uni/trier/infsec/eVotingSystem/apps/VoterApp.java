@@ -555,7 +555,7 @@ public class VoterApp extends JFrame {
 		
 		// Create the voter:
 		out("Creating a voter object.");
-		Voter voter = new Voter(voterID, AppParams.electionID, user_decr, user_sign);
+		Voter voter = new Voter(voterID, AppParams.ELECTIONID, user_decr, user_sign);
 	}
 	
 	private void destroyClient(){

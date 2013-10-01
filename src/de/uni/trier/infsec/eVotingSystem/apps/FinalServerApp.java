@@ -52,7 +52,7 @@ public class FinalServerApp {
 		serversVerifier = signer.getVerifier();
 		
 		try {
-			server = new FinalServer(AppParams.electionID, decryptor, signer);
+			server = new FinalServer(AppParams.ELECTIONID, decryptor, signer);
 		}
 		catch (Exception e) {
 			System.out.println("Cannot create the server object");
@@ -101,7 +101,7 @@ public class FinalServerApp {
 		
 		// write result to text file (as a readable text)
 		try {
-			Helper.FinalEntry[] fes = Helper.finalResultAsText(result, serversVerifier, AppParams.electionID);
+			Helper.FinalEntry[] fes = Helper.finalResultAsText(result, serversVerifier, AppParams.ELECTIONID);
 			try {
 		        BufferedWriter out = new BufferedWriter(new FileWriter("FinalResult.txt"));
 		        for (Helper.FinalEntry e : fes) {

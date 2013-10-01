@@ -81,7 +81,7 @@ public class VotingCmdLine
 			
 			// Create the voter:
 			out("Creating a voter object.");
-			Voter voter = new Voter(voterID, AppParams.electionID, decryptor, signer);
+			Voter voter = new Voter(voterID, AppParams.ELECTIONID, decryptor, signer);
 			
 			//TODO: implement the VoterApp from here to the end of the file
 			

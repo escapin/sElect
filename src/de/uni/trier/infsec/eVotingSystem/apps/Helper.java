@@ -22,9 +22,9 @@ public class Helper {
 	}
 	
 	public static class FinalEntry {
-		public int vote;
+		public String vote;
 		public String nonce;
-		public FinalEntry(int vote, String nonce) {
+		public FinalEntry(String vote, String nonce) {
 			this.vote = vote;
 			this.nonce = nonce;
 		}
@@ -56,7 +56,9 @@ public class Helper {
 			byte[] nonce_vote = iter.current();
 			byte[] nonce = MessageTools.first(nonce_vote);
 			byte[] vote  = MessageTools.second(nonce_vote);
-			fes[count++] = new FinalEntry(MessageTools.byteArrayToInt(vote), Utilities.byteArrayToHexString(nonce));
+			int candidateNr = MessageTools.byteArrayToInt(vote);
+			String candidateName = AppParams.CANDIDATESARRAY[candidateNr];
+			fes[count++] = new FinalEntry(candidateName, Utilities.byteArrayToHexString(nonce));
 		}
 		
 		return fes;
