@@ -10,26 +10,22 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.JButton;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.BorderFactory; 
 
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.MouseListener;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -38,8 +34,6 @@ import java.awt.Cursor;
 import javax.swing.SwingConstants;
 import java.awt.Font;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -53,11 +47,10 @@ import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import javax.swing.JTextArea;
-import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Toolkit;
-import java.awt.FlowLayout;
+
 
 
 
@@ -69,13 +62,14 @@ public class VoterApp extends JFrame {
 	private JTextField textField;
 	private JLabel lblUserNotRegister;
 	private JPanel center;
+	private final static String LOGIN = "LOGIN";
+	private final static String MAIN = "MAIN";
 	private final static String VOTE = "VOTE";
 	private final static String ACCEPTED="ACCEPTED";
     private final static String REJECTED = "REJECTED";
   
 	private JPanel ballot;
 	private JTextArea textNonce;
-	private JTextArea textSignature;
 	
 	
 	private JLabel lblRejectedReason = new JLabel("Rejected Reason");
@@ -93,8 +87,8 @@ public class VoterApp extends JFrame {
 	 */
 	private int voterID;
 	private Voter voter;
-	private Decryptor user_decr;
-	private Signer user_sign;
+	private Decryptor voter_decr;
+	private Signer voter_sign;
 	private byte[] serverResponse=null;
 	private static ElectionMetadata electionData;
 	private Voter.ResponseTag responseTag;
@@ -135,7 +129,7 @@ public class VoterApp extends JFrame {
 	 */
 	public VoterApp() {
 		//setIconImage(Toolkit.getDefaultToolkit().getImage(UserGUI.class.getResource("/de/uni/trier/infsec/cloudStorage/cloud.png")));
-		setTitle(AppParams.APPNAME);
+		setTitle(AppParams.VOTERAPPNAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 530, 600);
 				// (530,334);
@@ -212,11 +206,11 @@ public class VoterApp extends JFrame {
 		JPanel main = new JPanel();
 		
 		// add the two layout to the main
-		getContentPane().add(login, "1");
-		getContentPane().add(main, "2");
+		getContentPane().add(login, LOGIN);
+		getContentPane().add(main, MAIN);
 		main.setLayout(new BorderLayout(0, 0));
 		// set the default option
-		cl.show(getContentPane(), "1");
+		cl.show(getContentPane(), LOGIN);
 		
 		// North panel
 		JPanel north = new JPanel();
@@ -303,10 +297,9 @@ public class VoterApp extends JFrame {
         btnVote = new JButton(voteButtonAction);
 		btnVote.setFont(new Font("Dialog", Font.BOLD, 18));
 		btnVote.setEnabled(false);
-		//btnVote.addActionListener(new Vote(selectedCandidate));
-        
-        
 		
+        
+        
 		
 		GroupLayout gl_votePanel = new GroupLayout(votePanel);
 		gl_votePanel.setHorizontalGroup(
@@ -343,6 +336,8 @@ public class VoterApp extends JFrame {
 		
 		JPanel acceptedPanel = new JPanel();
 		
+		
+		
 		JLabel lblVoteCorrect = new JLabel(html("<font align=\"center\" face=\"Dialog\" size=5 color=\"green\"><b>" +
 				"Your vote has been correctly collected!</b></font>"));
 		lblVoteCorrect.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -371,7 +366,54 @@ public class VoterApp extends JFrame {
 		scrollNonce.setColumnHeaderView(lblNonce);
 		scrollNonce.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
-		textSignature = new JTextArea();
+		JLabel lblPress = new JLabel("Press");
+		
+		JButton btnCopy = new JButton(new CopyButton("Copy"));
+		
+		JLabel lblEndCopy = new JLabel(html("to copy the <b>Receipt ID</b> on your computer's clipboard"));
+		
+		GroupLayout gl_acceptedPanel = new GroupLayout(acceptedPanel);
+		gl_acceptedPanel.setHorizontalGroup(
+			gl_acceptedPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_acceptedPanel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_acceptedPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_acceptedPanel.createParallelGroup(Alignment.LEADING, false)
+							.addComponent(lblVoteCorrect, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(lblVoteAccepted, GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
+							.addComponent(scrollNonce, GroupLayout.PREFERRED_SIZE, 403, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_acceptedPanel.createSequentialGroup()
+							.addComponent(lblPress)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnCopy)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblEndCopy, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)))
+					.addGap(51))
+		);
+		gl_acceptedPanel.setVerticalGroup(
+			gl_acceptedPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_acceptedPanel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblVoteCorrect, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblVoteAccepted, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
+					.addGap(22)
+					.addComponent(scrollNonce, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
+					.addGap(58)
+					.addGroup(gl_acceptedPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblPress)
+						.addComponent(btnCopy)
+						.addComponent(lblEndCopy))
+					.addContainerGap(81, Short.MAX_VALUE))
+		);
+
+		acceptedPanel.setLayout(gl_acceptedPanel);
+		
+		/*
+		 * If you want to have the signature/innerballot JTextArea comment the code below and uncomment the code above
+		 */
+		
+		/*textSignature = new JTextArea();
 		textSignature.addMouseListener(new MouseAdapter() {
 			public void mouseEntered(MouseEvent e) {
 				setCursor(new Cursor(Cursor.TEXT_CURSOR));
@@ -416,14 +458,12 @@ public class VoterApp extends JFrame {
 					.addComponent(scrollSignature, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
 					.addGap(55))
 		);
+
+		acceptedPanel.setLayout(gl_acceptedPanel);*/
 		
 		
-		
-		acceptedPanel.setLayout(gl_acceptedPanel);
 		
 		JPanel rejectedPanel = new JPanel();
-		//GroupLayout gl_rejectedPanel = new GroupLayout(acceptedPanel);
-		//rejectedPanel.setLayout(new BorderLayout(0, 0));
 		
 		JLabel lblRejected=new JLabel(html("<font align=\"center\" face=\"Dialog\" size=5 color=\"red\"><b>" +
 				"Your Vote has not been collected!</b></font>"));
@@ -433,6 +473,7 @@ public class VoterApp extends JFrame {
 		
 		center.add(votePanel, VOTE);
 		center.add(acceptedPanel, ACCEPTED);
+		
 		center.add(rejectedPanel, REJECTED);
 		GroupLayout gl_rejectedPanel = new GroupLayout(rejectedPanel);
 		gl_rejectedPanel.setHorizontalGroup(
@@ -517,7 +558,7 @@ public class VoterApp extends JFrame {
 			
 			boolean userRegistered=false;
 			try {
-				setupClient(voterID);
+				setupVoter(voterID);
 				userRegistered=true;
 			} catch (FileNotFoundException e){
 				System.out.println("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
@@ -539,7 +580,7 @@ public class VoterApp extends JFrame {
 				textField.setText("");
 				//setTitle("Voter " + voterID + " - " + AppParams.APPNAME);
 				CardLayout cl = (CardLayout) getContentPane().getLayout();
-				cl.show(getContentPane(), "2");
+				cl.show(getContentPane(), MAIN);
 			}
 			lblVoterID.setText("<html>" +  msgBefVoterID + "<strong>" + voterID + "</strong></html>");
 			lblElectionID.setText(new String(electionData.id));
@@ -553,32 +594,26 @@ public class VoterApp extends JFrame {
 			lblUserNotRegister.setText("");
 			lblCandidateSelected.setText("");
 			lblRejectedReason.setText("");
-			//	assert(btnCandidates!=null);
 			for(int i=0;i<btnCandidates.length;i++)
 				btnCandidates[i].setForeground(Color.BLACK);
 			textNonce.setText("");
-			textSignature.setText("");
-			//lblStoreStatus.setText("");
-			//lblRetrieveStatus.setText("");
-			//textMsgRetrieved.setText("");
-			
-			//comboBox.setSelectedIndex(0); // set the combo box to Store!
+			//textSignature.setText("");
 			
 			CardLayout centerCl = (CardLayout) center.getLayout();
 			centerCl.show(center, VOTE);
 			
 			CardLayout cl = (CardLayout) getContentPane().getLayout();
-			cl.show(getContentPane(), "1");
+			cl.show(getContentPane(), LOGIN);
 			
 			destroyConfidentialInfo();
-			setTitle(AppParams.APPNAME);
+			setTitle(AppParams.VOTERAPPNAME);
 		}
 	}
 	private void destroyConfidentialInfo(){
 		selectedCandidate=-100;
 		
-		user_decr=null;
-		user_sign=null;
+		voter_decr=null;
+		voter_sign=null;
 		voter=null;
 		responseTag=null;
 		receipt=null;
@@ -644,7 +679,7 @@ public class VoterApp extends JFrame {
 			} catch (NetworkError e) {
 				// TODO Auto-generated catch block
 				// TODO: manage the app so that the vote is not colleted in this case
-				System.out.println("Vote(candidate <int>): networkError");
+				System.out.println("Vote [candidate <int>]: networkError");
 				e.printStackTrace();
 			}
 			out("OK");
@@ -654,7 +689,7 @@ public class VoterApp extends JFrame {
 				responseTag = voter.validateResponse(serverResponse);
 			} catch (Error e) {
 				// TODO Auto-generated catch block
-				System.out.println("Vote(candidate <int>): voteError");
+				System.out.println("Vote [candidate <int>]: voteError");
 				e.printStackTrace();
 			}
 			out("Response of the server: " + responseTag);
@@ -670,7 +705,7 @@ public class VoterApp extends JFrame {
 					out("    server's signature = " + byteArrayToHexString(receipt.serverSignature));
 				
 				// Store the receipt:
-				String receipt_fname = "./receipt_" + voterID + ".msg"; 
+				String receipt_fname = AppParams.RECEIPT_file + voterID + ".msg"; 
 				try {
 					AppUtils.storeAsFile(receipt.asMessage(), receipt_fname);
 				} catch (IOException e) {
@@ -679,7 +714,7 @@ public class VoterApp extends JFrame {
 					e.printStackTrace();
 				}
 				textNonce.setText(byteArrayToHexString(receipt.nonce));
-				textSignature.setText(byteArrayToHexString(receipt.innerBallot));
+				//textSignature.setText(byteArrayToHexString(receipt.innerBallot));
 				//textSignature.setText(byteArrayToHexString(receipt.serverSignature));
 				cl.show(center, ACCEPTED);
 			}
@@ -697,7 +732,7 @@ public class VoterApp extends JFrame {
 							"ballot which has been properly collected.";	
 					break;
 //				case INVALID_VOTER_ID: //FIXME: do we still need this enum?
-//					rejectedReason += "Your identifier number is uncorrect";
+//					rejectedReason += "Your identifier number is incorrect";
 //					break;
 				default:
 					rejectedReason += "I do not know the reason that your vote " +
@@ -710,6 +745,19 @@ public class VoterApp extends JFrame {
 			 
 		}					
 	}
+	
+	private class CopyButton extends AbstractAction{
+		public CopyButton(String name){
+			super(name);
+		}
+		public void actionPerformed(ActionEvent ev){
+			// copy the unselected text in the JTextArea textNonce to the clipboard
+			StringSelection stringSelection = new StringSelection (textNonce.getText());
+			Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clpbrd.setContents(stringSelection, null);
+		}
+	}
+	
 	
 	
 
@@ -734,7 +782,7 @@ public class VoterApp extends JFrame {
 	
 	
 	
-	private void setupClient(int voterID) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
+	private void setupVoter(int voterID) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
 		
 		// De-serialize keys and create cryptographic functionalities:
 		byte[] serialized=null;
@@ -752,8 +800,8 @@ public class VoterApp extends JFrame {
 		byte[] decr_sig = MessageTools.second(serialized);
 		byte[] decryptorMsg = MessageTools.first(decr_sig);
 		byte[] signerMsg = MessageTools.second(decr_sig);		
-		user_decr = Decryptor.fromBytes(decryptorMsg);
-		user_sign = Signer.fromBytes(signerMsg);
+		voter_decr = Decryptor.fromBytes(decryptorMsg);
+		voter_sign = Signer.fromBytes(signerMsg);
 		
 		// Initialize the interface to the public key infrastructure:
 		System.setProperty("remotemode", Boolean.toString(true));
@@ -761,14 +809,14 @@ public class VoterApp extends JFrame {
 		
 		// Verify that the verifier stored in the file is the same as the one in the PKI:
 		Verifier myVerif = RegisterSig.getVerifier(voterID, Params.SIG_DOMAIN);
-		if ( !MessageTools.equal(myVerif.getVerifKey(), user_sign.getVerifier().getVerifKey()) ) {
+		if ( !MessageTools.equal(myVerif.getVerifKey(), voter_sign.getVerifier().getVerifKey()) ) {
 			out("Something wrong with the keys");
 			System.exit(-1);
 		}
 		
 		// Create the voter:
 		outl("Setting up the voter...");
-		voter = new Voter(voterID, AppParams.ELECTIONID, user_decr, user_sign);
+		voter = new Voter(voterID, AppParams.ELECTIONID, voter_decr, voter_sign);
 		out("OK");
 	}
 
