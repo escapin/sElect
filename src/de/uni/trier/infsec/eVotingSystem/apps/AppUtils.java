@@ -58,4 +58,10 @@ public class AppUtils
 		byte[] serialized = concatenate(idmsg, concatenate(decryptor, signer));
 		AppUtils.storeAsFile(serialized, filename);
 	}
+
+	public static void deleteFile(String filename) {
+		File f = new File(filename);
+		if (f.exists()) f.delete();
+		
+	}
 }

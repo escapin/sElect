@@ -24,6 +24,8 @@ public class FinalServerApp {
 	}
 
 	private static void setupServer() {
+		AppUtils.deleteFile(AppParams.COLL_SERVER_RESULT_file);
+		
 		byte[] serialized=null;
 		try {
 			serialized = AppUtils.readFromFile(AppParams.PATH_STORAGE + "server" + Params.SERVER2ID + ".info");
@@ -36,6 +38,7 @@ public class FinalServerApp {
 			e.printStackTrace();
 			System.exit(0);
 		}
+		
 		
 		byte[] idMsg =  MessageTools.first(serialized);
 		int idFromMsg = MessageTools.byteArrayToInt(idMsg);
@@ -86,7 +89,7 @@ public class FinalServerApp {
 	
 	private static void postResult(byte[] result) {
 		// write result to a file
-		String result_fname = "./SignedFinalResult.msg";
+		String result_fname = AppParams.FIN_SERVER_RESULT_file;
 		try {
 			AppUtils.storeAsFile(result, result_fname);
 		}

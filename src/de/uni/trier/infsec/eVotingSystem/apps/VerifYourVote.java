@@ -107,7 +107,6 @@ public class VerifYourVote extends JFrame {
 		setTitle(AppParams.VERIFYAPPNAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 530,334);
-				// (530, 600);
 		
 		CardLayout cl = new CardLayout();
 		getContentPane().setLayout(cl);
@@ -133,11 +132,14 @@ public class VerifYourVote extends JFrame {
 						.addGroup(gl_login.createSequentialGroup()
 							.addGap(28)
 							.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)))
-					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_login.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnVerify, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
-						.addComponent(textField, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE))
-					.addGap(102))
+						.addGroup(gl_login.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(textField, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_login.createSequentialGroup()
+							.addGap(22)
+							.addComponent(btnVerify)))
+					.addGap(92))
 		);
 		gl_login.setVerticalGroup(
 			gl_login.createParallelGroup(Alignment.TRAILING)
@@ -146,11 +148,14 @@ public class VerifYourVote extends JFrame {
 					.addGroup(gl_login.createParallelGroup(Alignment.TRAILING)
 						.addComponent(lblUserId, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
 						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(83)
-					.addGroup(gl_login.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnVerify, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE))
-					.addGap(276))
+					.addGroup(gl_login.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_login.createSequentialGroup()
+							.addGap(66)
+							.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 78, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_login.createSequentialGroup()
+							.addGap(83)
+							.addComponent(btnVerify, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)))
+					.addGap(293))
 		);
 		login.setLayout(gl_login);
 		
@@ -388,7 +393,7 @@ private class Verify implements ActionListener {
 				if (!signatureInReceiptOK(receipt)) {
 						out("\nPROBLEM: Server's signature in your receipt is not correct!");
 						out("You may not be able to prove that you are cheated on, if you are.");
-					}
+				}
 				
 				// Print out (part of) the receipt:
 				out("\nRECEIPT:");
@@ -437,7 +442,7 @@ private class Verify implements ActionListener {
 		out("");
 		// check the signature
 		if (!server1ver.verify(signature, result)) {
-			err="PROBLEM: Invalid signature on the partial result.";
+			err="PROBLEM: Invalid signature on the " + bold("partial result") + ".";
 			out(err);
 			lblRejectedReason.setText(html(err));
 			return false;
@@ -446,7 +451,7 @@ private class Verify implements ActionListener {
 		// check the election id
 		byte[] elid = MessageTools.first(result);
 		if (!MessageTools.equal(elid, receipt.electionID)) {
-			err="PROBLEM: The election ID in the receipt does not match the one in the partial result";
+			err="PROBLEM: The election ID in the receipt does not match the one in the " + bold("partial result") + ".";
 			out(err);
 			lblRejectedReason.setText(html(err));
 			return false;
@@ -455,7 +460,7 @@ private class Verify implements ActionListener {
 		// check if the result contain the inner ballot from the receipt
 		byte[] ballotsAsMessage = MessageTools.first(MessageTools.second(result));
 		if (!Utils.contains(ballotsAsMessage, receipt.innerBallot)) {
-			err="PROBLEM: The partial result does not containt your inner ballot!";
+			err="PROBLEM: The " + bold("partial result") + " does not containt your inner ballot!";
 			out(err);
 			out(Utilities.byteArrayToHexString(receipt.innerBallot));
 			lblRejectedReason.setText(html(err));
@@ -473,7 +478,7 @@ private class Verify implements ActionListener {
 		out("");
 		// check the signature
 		if (!server2ver.verify(signature, result)) {
-			err="PROBLEM: Invalid signature on the final result.";
+			err="PROBLEM: Invalid signature on the " + bold("final result") + ".";
 			out(err);
 			lblRejectedReason.setText(html(err));
 			return false;
@@ -482,7 +487,7 @@ private class Verify implements ActionListener {
 		// check the election id
 		byte[] elid = MessageTools.first(result);
 		if (!MessageTools.equal(elid, receipt.electionID)) {
-			err="PROBLEM: The election ID in the receipt does not match the one in the final result";
+			err="PROBLEM: The election ID in the receipt does not match the one in the " + bold("final result") + ".";
 			out(err);
 			lblRejectedReason.setText(html(err));
 			return false;
@@ -499,14 +504,14 @@ private class Verify implements ActionListener {
 		}
 		candidateNumber=MessageTools.byteArrayToInt(vote);
 		if (vote == null) {
-			err="PROBLEM: The final result does not containt your nonce!";
+			err="PROBLEM: The " + bold("final result") + " does not containt your nonce!";
 			out(err);
 			out(Utilities.byteArrayToHexString(receipt.nonce));
 			lblRejectedReason.setText(html(err));
 			return false;
 		}
 		else if (candidateNumber!=receipt.candidateNumber) {
-			err="PROBLEM: In the final result, the vote next to your nonce is not your vote!";
+			err="PROBLEM: In the " + bold("final result") + ", the vote next to your nonce is not your vote!";
 			out(err);
 			out("Found candidate number: " + candidateNumber);
 			lblRejectedReason.setText(html(err));
@@ -550,6 +555,9 @@ private class Verify implements ActionListener {
 	}
 	private static String html(String s){
 		return "<html>" + s + "</html>";
+	}
+	private static String bold(String s){
+		return "<b>" + s + "</b>";
 	}
 }
 

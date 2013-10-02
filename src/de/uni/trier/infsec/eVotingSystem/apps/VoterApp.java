@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.JTextField;
@@ -132,7 +133,7 @@ public class VoterApp extends JFrame {
 		setTitle(AppParams.VOTERAPPNAME);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 530, 600);
-				// (530,334);
+				// (530, 334);
 		
 		outl("Getting election metadata...");
 		electionData=getElectionData(AppParams.ELECTIONID);
@@ -299,8 +300,6 @@ public class VoterApp extends JFrame {
 		btnVote.setEnabled(false);
 		
         
-        
-		
 		GroupLayout gl_votePanel = new GroupLayout(votePanel);
 		gl_votePanel.setHorizontalGroup(
 			gl_votePanel.createParallelGroup(Alignment.LEADING)
@@ -579,8 +578,14 @@ public class VoterApp extends JFrame {
 			if(userRegistered){
 				textField.setText("");
 				//setTitle("Voter " + voterID + " - " + AppParams.APPNAME);
+				
+				//FIXME: it does not work
+				//getContentPane().setSize(530,600);
+				
 				CardLayout cl = (CardLayout) getContentPane().getLayout();
 				cl.show(getContentPane(), MAIN);
+				//getContentPane().setVisible(true);
+				
 			}
 			lblVoterID.setText("<html>" +  msgBefVoterID + "<strong>" + voterID + "</strong></html>");
 			lblElectionID.setText(new String(electionData.id));

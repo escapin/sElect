@@ -26,6 +26,8 @@ public class CollectingServerApp {
 	}
 
 	private static void setupServer() {
+		AppUtils.deleteFile(AppParams.FIN_SERVER_RESULT_file);
+		
 		byte[] serialized=null;
 		try {
 			serialized = AppUtils.readFromFile(AppParams.PATH_STORAGE + "server" + Params.SERVER1ID + ".info");
@@ -93,7 +95,7 @@ public class CollectingServerApp {
 		byte[] result = server.getResult();
 					
 		// write result to a file:
-		String result_fname = "./SignedPartialResult.msg";
+		String result_fname = AppParams.COLL_SERVER_RESULT_file;
 		try {
 			AppUtils.storeAsFile(result, result_fname);
 		}
