@@ -51,14 +51,17 @@ Run following commands from bin-folder of the compiled project:
 6. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterVoter
 
 GUI:
-	7a. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VoterApp
-	
+7a. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VoterApp
 Command Line:
-	7b. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VotingCmdLine <voter_id [int]> <candidate_number [int]>
+7b. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VotingCmdLine <voter_id [int]> <candidate_number [int]>
+
 
 When the Election is over:
 
-8. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VerifierCmdLine  <receipt_fname> <partial_result_fname> <final_result_fname>
+GUI:
+8a. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VerifYourVote
+Command Line:
+8b. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VerifierCmdLine  <receipt_fname> <partial_result_fname> <final_result_fname>
 
 
 

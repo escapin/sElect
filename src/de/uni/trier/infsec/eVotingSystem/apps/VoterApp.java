@@ -382,11 +382,11 @@ public class VoterApp extends JFrame {
 							.addComponent(lblVoteAccepted, GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
 							.addComponent(scrollNonce, GroupLayout.PREFERRED_SIZE, 403, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_acceptedPanel.createSequentialGroup()
-							.addComponent(lblPress)
+							.addComponent(lblPress, GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnCopy)
+							.addComponent(btnCopy, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblEndCopy, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)))
+							.addComponent(lblEndCopy, GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)))
 					.addGap(51))
 		);
 		gl_acceptedPanel.setVerticalGroup(
@@ -400,10 +400,10 @@ public class VoterApp extends JFrame {
 					.addComponent(scrollNonce, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
 					.addGap(58)
 					.addGroup(gl_acceptedPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblPress)
+						.addComponent(lblEndCopy, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnCopy)
-						.addComponent(lblEndCopy))
-					.addContainerGap(81, Short.MAX_VALUE))
+						.addComponent(lblPress))
+					.addContainerGap(35, Short.MAX_VALUE))
 		);
 
 		acceptedPanel.setLayout(gl_acceptedPanel);
@@ -668,6 +668,8 @@ public class VoterApp extends JFrame {
 			super(name);
 		}
 		public void actionPerformed(ActionEvent ev){
+			if(selectedCandidate<0 || selectedCandidate>=electionData.candidatesArray.length)
+				return; // no valid candidate has been selected
 			// Create a ballot;
 			//TODO: comment this line and uncomment the other after testing
 			outl("Creating a ballot with candidate number " + selectedCandidate + "...");
