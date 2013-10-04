@@ -60,7 +60,7 @@ public class VerifierCmdLine {
 			System.exit(-1);
 		}
 		
-		// Read the final result result:
+		// Read the final result:
 		byte[] signedFinalResult = null;
 		try {
 			signedFinalResult = AppUtils.readFromFile(finalResultFileName);
