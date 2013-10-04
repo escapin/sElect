@@ -191,41 +191,49 @@ public class VoterApp extends JFrame {
 		lblWait = new JLabel();
 		lblWait.setHorizontalAlignment(SwingConstants.CENTER);
 		
+		JLabel lblTvote = new JLabel(AppParams.VOTERAPPNAME);
+		lblTvote.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
+		lblTvote.setHorizontalAlignment(SwingConstants.CENTER);
+		
 		GroupLayout gl_login = new GroupLayout(login);
 		gl_login.setHorizontalGroup(
-			gl_login.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_login.createSequentialGroup()
+			gl_login.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_login.createSequentialGroup()
 					.addGap(143)
 					.addGroup(gl_login.createParallelGroup(Alignment.LEADING, false)
-						.addGroup(gl_login.createSequentialGroup()
-							.addComponent(lblPassword)
-							.addPreferredGap(ComponentPlacement.RELATED))
-						.addGroup(gl_login.createSequentialGroup()
-							.addComponent(lblVoterId, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 19, Short.MAX_VALUE)))
+						.addComponent(lblPassword)
+						.addComponent(lblVoterId, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(gl_login.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(fldVoterID, 0, 0, Short.MAX_VALUE)
 						.addComponent(fldPassword, GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE))
 					.addGap(142))
+				.addGroup(gl_login.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblTvote, GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
+					.addContainerGap())
 				.addGroup(gl_login.createSequentialGroup()
 					.addGap(50)
 					.addGroup(gl_login.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_login.createSequentialGroup()
 							.addGap(262)
 							.addComponent(lblWait, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE))
-						.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 368, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_login.createSequentialGroup()
 							.addComponent(lblCredentials, GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
 							.addGap(260))))
 				.addGroup(gl_login.createSequentialGroup()
-					.addContainerGap(394, Short.MAX_VALUE)
+					.addGap(62)
+					.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(btnLogIn, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE)
-					.addGap(55))
+					.addContainerGap(69, Short.MAX_VALUE))
 		);
 		gl_login.setVerticalGroup(
 			gl_login.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_login.createSequentialGroup()
-					.addGap(124)
+					.addGap(43)
+					.addComponent(lblTvote, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
 					.addComponent(lblCredentials, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
 					.addGap(52)
 					.addGroup(gl_login.createParallelGroup(Alignment.BASELINE)
@@ -241,11 +249,13 @@ public class VoterApp extends JFrame {
 						.addComponent(fldPassword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(53)
 					.addComponent(lblWait)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addGap(41)
-					.addComponent(btnLogIn, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
-					.addGap(203))
+					.addGap(18)
+					.addGroup(gl_login.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_login.createSequentialGroup()
+							.addGap(31)
+							.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnLogIn, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE))
+					.addGap(236))
 		);
 		login.setLayout(gl_login);
 		

@@ -38,6 +38,7 @@ import de.uni.trier.infsec.functionalities.pkisig.*;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.utils.Utilities;
 import de.uni.trier.infsec.lib.network.NetworkError;
+import javax.swing.JPasswordField;
 
 
 
@@ -47,7 +48,8 @@ public class VerifYourVote extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private JTextField textField;
+	private JTextField fldVoterID;
+	private JPasswordField fldPassword;
 	private JPanel center;
 	private final static String LOGIN = "LOGIN";
 	private final static String MAIN = "MAIN";
@@ -60,6 +62,10 @@ public class VerifYourVote extends JFrame {
 	private JLabel lblWait = new JLabel("Wait...");
 	private JLabel lblVoterID = new JLabel("VoterID");
 	private JLabel lblElectionID = new JLabel("ElectionID");
+	
+	private JLabel lblTheVote=new JLabel("The Vote");;
+	private JLabel lblTheReceipt =new JLabel("The Receipt");;
+	
 	
 
 	/*
@@ -74,7 +80,16 @@ public class VerifYourVote extends JFrame {
 	
 	
 	// UTILS FIELDS
-	private final String msgBefVoterID = "Your Identifier Number: ";
+		// login
+	private final String lblCREDENTIALS = "Please enter";
+	private final String lblVOTERID = "Your Voter ID: ";
+	private final String lblPASSWORD = "Your Password: ";
+	private final String lblLOGIN = "Verify your Vote";
+		// main
+	private final String lblACCEPTED = "<font color=\"green\"> Your vote has been counted correctly!</font>";
+	private final String lblREJECTED = "<font color=\"red\"> Your Vote has not been counted correctly!</font>";
+	private final String lblRECEIPTID = "Your Receipt ID: ";
+	private final String lblYOURVOTE = "Your Vote: ";
 	
 	/**
 	 * Launch the application.
@@ -114,48 +129,66 @@ public class VerifYourVote extends JFrame {
 		
 		// login Panel
 		JPanel login = new JPanel();
-		JButton btnVerify = new JButton("Verify your vote");
+		JButton btnVerify = new JButton(lblLOGIN);
 		
-		JLabel lblUserId = new JLabel("Insert your Identifier Number: ");
-		textField = new JTextField();
-		textField.setColumns(10);
+		JLabel lblVoterId = new JLabel(lblVOTERID);
+		fldVoterID = new JTextField();
+		fldVoterID.setColumns(10);
+		lblUserNotRegister.setVerticalAlignment(SwingConstants.TOP);
+		lblUserNotRegister.setHorizontalAlignment(SwingConstants.LEFT);
 		
 		lblUserNotRegister.setText("");
+		
+		JLabel lblCredentials = new JLabel(lblCREDENTIALS);
+		
+		JLabel lblPassword = new JLabel(lblPASSWORD);
+		
+		fldPassword = new JPasswordField();
 		GroupLayout gl_login = new GroupLayout(login);
 		gl_login.setHorizontalGroup(
-			gl_login.createParallelGroup(Alignment.TRAILING)
+			gl_login.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_login.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblCredentials)
+					.addContainerGap(427, Short.MAX_VALUE))
+				.addGroup(gl_login.createSequentialGroup()
+					.addGap(30)
+					.addGroup(gl_login.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_login.createParallelGroup(Alignment.LEADING)
+							.addComponent(lblPassword)
+							.addComponent(lblVoterId, GroupLayout.PREFERRED_SIZE, 147, GroupLayout.PREFERRED_SIZE))
+						.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE))
 					.addGroup(gl_login.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_login.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(lblUserId, GroupLayout.PREFERRED_SIZE, 261, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_login.createSequentialGroup()
-							.addGap(28)
-							.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)))
-					.addGroup(gl_login.createParallelGroup(Alignment.LEADING)
+							.addPreferredGap(ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+							.addComponent(btnVerify)
+							.addGap(77))
 						.addGroup(gl_login.createSequentialGroup()
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(textField, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_login.createSequentialGroup()
-							.addGap(22)
-							.addComponent(btnVerify)))
-					.addGap(92))
+							.addGroup(gl_login.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(fldPassword, Alignment.LEADING)
+								.addComponent(fldVoterID, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE))
+							.addGap(171))))
 		);
 		gl_login.setVerticalGroup(
 			gl_login.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_login.createSequentialGroup()
-					.addGap(88)
+					.addGap(58)
 					.addGroup(gl_login.createParallelGroup(Alignment.TRAILING)
-						.addComponent(lblUserId, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_login.createSequentialGroup()
+							.addComponent(lblCredentials)
+							.addGap(18)
+							.addComponent(lblVoterId, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
+						.addComponent(fldVoterID, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(30)
+					.addGroup(gl_login.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblPassword)
+						.addComponent(fldPassword, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(60)
 					.addGroup(gl_login.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_login.createSequentialGroup()
-							.addGap(66)
-							.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 78, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_login.createSequentialGroup()
-							.addGap(83)
-							.addComponent(btnVerify, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)))
-					.addGap(293))
+						.addComponent(btnVerify, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 78, GroupLayout.PREFERRED_SIZE))
+					.addGap(238))
 		);
 		login.setLayout(gl_login);
 		
@@ -178,7 +211,7 @@ public class VerifYourVote extends JFrame {
 		// North panel
 		JPanel north = new JPanel();
 		main.add(north, BorderLayout.NORTH);
-		lblVoterID.setText(msgBefVoterID);
+		lblVoterID.setText(lblVOTERID);
 		
 		lblElectionID.setText("");
 		//labelField.setColumns(10);
@@ -217,43 +250,68 @@ public class VerifYourVote extends JFrame {
 		
 		JPanel verifOkPanel = new JPanel();
 		
-		JLabel lblVoteCorrect = new JLabel(html("<font align=\"center\" face=\"Dialog\" size=5 color=\"green\"><b>" +
-				"Your vote has been correctly counted!</b></font>"));
-		lblVoteCorrect.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblVoteCorrect.setFont(new Font("Dialog", Font.PLAIN, 14));
+		JLabel lblVoteCorrect = new JLabel(html(lblACCEPTED));
+		lblVoteCorrect.setHorizontalAlignment(SwingConstants.CENTER);
+		lblVoteCorrect.setFont(new Font("Dialog", Font.BOLD, 18));
 		
-		JLabel lblVoteAccepted = new JLabel(html("You can also have a look at one Bulletin Board: your vote is next to your <b>Receipt ID</b>."));
-		lblVoteAccepted.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblVoteAccepted.setFont(new Font("Dialog", Font.PLAIN, 14));
+		JLabel lblYourVote = new JLabel(lblYOURVOTE);
+		lblYourVote.setHorizontalAlignment(SwingConstants.LEFT);
+		lblYourVote.setFont(new Font("Dialog", Font.PLAIN, 14));
+		
+		JLabel lblYourReceiptID = new JLabel(lblRECEIPTID);
+		lblYourReceiptID.setHorizontalAlignment(SwingConstants.LEFT);
+		lblYourReceiptID.setFont(new Font("Dialog", Font.PLAIN, 14));
+		
+		lblTheVote.setText("");
+		lblTheVote.setVerticalAlignment(SwingConstants.TOP);
+		lblTheVote.setHorizontalAlignment(SwingConstants.LEFT);
+		
+		lblTheReceipt.setText(""); 
+		lblTheReceipt.setVerticalAlignment(SwingConstants.TOP);
+		lblTheReceipt.setHorizontalAlignment(SwingConstants.LEFT);
 		
 		GroupLayout gl_verifOkPanel = new GroupLayout(verifOkPanel);
 		gl_verifOkPanel.setHorizontalGroup(
-			gl_verifOkPanel.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_verifOkPanel.createSequentialGroup()
-					.addGap(56)
-					.addComponent(lblVoteCorrect, GroupLayout.PREFERRED_SIZE, 401, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(73, Short.MAX_VALUE))
+			gl_verifOkPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_verifOkPanel.createSequentialGroup()
-					.addContainerGap(48, Short.MAX_VALUE)
-					.addComponent(lblVoteAccepted, GroupLayout.PREFERRED_SIZE, 470, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
+					.addGroup(gl_verifOkPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_verifOkPanel.createSequentialGroup()
+							.addGap(72)
+							.addGroup(gl_verifOkPanel.createParallelGroup(Alignment.LEADING, false)
+								.addGroup(gl_verifOkPanel.createSequentialGroup()
+									.addComponent(lblYourReceiptID, GroupLayout.PREFERRED_SIZE, 131, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(lblTheReceipt, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+								.addGroup(gl_verifOkPanel.createSequentialGroup()
+									.addComponent(lblYourVote, GroupLayout.PREFERRED_SIZE, 131, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(lblTheVote, GroupLayout.PREFERRED_SIZE, 256, GroupLayout.PREFERRED_SIZE))))
+						.addGroup(gl_verifOkPanel.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lblVoteCorrect, GroupLayout.PREFERRED_SIZE, 518, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_verifOkPanel.setVerticalGroup(
 			gl_verifOkPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_verifOkPanel.createSequentialGroup()
-					.addGap(24)
+					.addGap(40)
+					.addGroup(gl_verifOkPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblYourVote)
+						.addComponent(lblTheVote, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(gl_verifOkPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblYourReceiptID, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblTheReceipt, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblVoteCorrect, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
-					.addGap(52)
-					.addComponent(lblVoteAccepted)
-					.addContainerGap(74, Short.MAX_VALUE))
+					.addGap(103))
 		);
 		
 		verifOkPanel.setLayout(gl_verifOkPanel);
 		
 		JPanel verifFailPanel = new JPanel();
 		
-		JLabel lblRejected=new JLabel(html("<font alig=\"center\" face=\"Dialog\" size=5 color=\"red\"><b>" +
-				"Your Vote has not been properly counted!</b></font></html>"));
+		JLabel lblRejected=new JLabel(html(lblREJECTED));
 		lblRejected.setFont(new Font("Dialog", Font.PLAIN, 14));
 		
 		
@@ -315,21 +373,21 @@ public class VerifYourVote extends JFrame {
 	/*
 	 * LISTENERS
 	 */
-private class Verify implements ActionListener {
+	private class Verify implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
 			lblUserNotRegister.setForeground(Color.RED);
 			// fetch the verifiers of the servers
-			if(textField.getText().length()==0){
+			if(fldVoterID.getText().length()==0){
 				lblUserNotRegister.setText("<html>User ID field empty!<br>Please insert a valid ID number of a previously registered user.</html>");
 				return;
 			}
 			try{
-				voterID = Integer.parseInt(textField.getText());
+				voterID = Integer.parseInt(fldVoterID.getText());
 				if(voterID<0)
 					throw new NumberFormatException();
 			} catch (NumberFormatException e){
-				System.out.println("'" + textField.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
-				lblUserNotRegister.setText("<html>'" + textField.getText() + "' is not a proper userID!<br>Please insert the ID number of a registered user.</html>");
+				System.out.println("'" + fldVoterID.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
+				lblUserNotRegister.setText("<html>'" + fldVoterID.getText() + "' is not a proper userID!<br>Please insert the ID number of a registered user.</html>");
 				return;
 			}
 			PKI.useRemoteMode();
@@ -385,7 +443,7 @@ private class Verify implements ActionListener {
 			
 			lblUserNotRegister.setText("");
 			if(fileLoaded){
-				textField.setText("");
+				fldVoterID.setText("");
 				
 				receipt = Voter.Receipt.fromMessage(receiptMsg);
 				
@@ -411,6 +469,9 @@ private class Verify implements ActionListener {
 					ok = false;
 				
 				if (ok){ 
+					lblTheVote.setText(html(AppParams.CANDIDATESARRAY[receipt.candidateNumber]));
+					lblTheReceipt.setText(html(Utilities.byteArrayToHexString(receipt.nonce)));
+					
 					CardLayout centerCl = (CardLayout) center.getLayout();
 					centerCl.show(center, VERIF_ok);
 					out("\nEverything seems ok.");
@@ -423,7 +484,7 @@ private class Verify implements ActionListener {
 				cl.show(getContentPane(), MAIN);
 						
 			}
-			lblVoterID.setText("<html>" +  msgBefVoterID + "<strong>" + voterID + "</strong></html>");
+			lblVoterID.setText("<html>" +  lblVOTERID + "<strong>" + voterID + "</strong></html>");
 			lblElectionID.setText(new String(receipt.electionID));
 		}
 	}
@@ -531,6 +592,8 @@ private class Verify implements ActionListener {
 			
 			lblUserNotRegister.setText("");
 			lblRejectedReason.setText("");
+			lblTheVote.setText("");
+			lblTheReceipt.setText("");
 			
 			CardLayout centerCl = (CardLayout) center.getLayout();
 			centerCl.show(center, VERIF_ok);
