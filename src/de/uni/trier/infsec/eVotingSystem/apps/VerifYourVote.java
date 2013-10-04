@@ -474,6 +474,7 @@ public class VerifYourVote extends JFrame {
 					ok = false;
 				
 				if (ok){ 
+					//FIXME: perhaps we could set these two labels when just when we do the comparison with the server's result
 					lblTheVote.setText(html(AppParams.CANDIDATESARRAY[receipt.candidateNumber]));
 					lblTheReceipt.setText(html(Utilities.byteArrayToHexString(receipt.nonce)));
 					
