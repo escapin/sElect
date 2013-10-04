@@ -28,8 +28,10 @@ public class AppParams
 	public static final int ALLOWEDVOTERS=3;
 	
 	public static final String RECEIPT_file = PATH_STORAGE + "receipt_"; // + voterID + ".msg";
-	public static final String COLL_SERVER_RESULT_file =  PATH_STORAGE + "SignedPartialResult.msg";
-	public static final String FIN_SERVER_RESULT_file = PATH_STORAGE + "SignedFinalResult.msg";
+	public static final String COLL_SERVER_RESULT_file =  "./SignedPartialResult.msg";
+	//public static final String COLL_SERVER_RESULT_file =  PATH_STORAGE + "SignedPartialResult.msg";
+	public static final String FIN_SERVER_RESULT_file = "./SignedFinalResult.msg";
+	//public static final String FIN_SERVER_RESULT_file = PATH_STORAGE + "SignedFinalResult.msg";
 
 	public static String SERVER1_NAME = "localhost";
 	public static int SERVER1_PORT= 7075;
