@@ -26,6 +26,10 @@ import static de.uni.trier.infsec.utils.MessageTools.copyOf;
 public class Voter 
 {
 	/// CLASSES ///
+	/*
+	 * CORE CODE
+	 */	
+	
 
 	public static class Receipt {
 		public final byte[] electionID;

@@ -2,6 +2,7 @@ package de.uni.trier.infsec.eVotingSystem.coreSystem;
 
 import java.util.Arrays;
 
+import de.uni.trier.infsec.eVotingSystem.apps.AppParams;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkienc.Encryptor;
 import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
