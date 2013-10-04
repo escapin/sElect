@@ -3,6 +3,7 @@ var fs = require('fs');
 // where to find files with the result
 var FINAL_RESULT = 'FinalResult.txt';
 var SIGNED_RESULT = 'public/SignedFinalResult.msg'
+var ELECTION_NAME = 'Fafourite RS3 Project'
 
 exports.index = function(req, res) {
     // check if file with the result exists
@@ -22,10 +23,10 @@ exports.index = function(req, res) {
                           return {vote:t[0], nonce:t[1]};
                   })
             // render the response
-            res.render('result', { title: 'TrustVote Result', result : tt });
+            res.render('result', { title: 'TrustVote Result', electionName: ELECTION_NAME, result: tt });
         })
     }
     else { // there is no file with result
-        res.render('no_result', { title: 'TrustVote: No result' }); 
+        res.render('no_result', { title: 'TrustVote: No result', electionName: ELECTION_NAME }); 
     }
 };
