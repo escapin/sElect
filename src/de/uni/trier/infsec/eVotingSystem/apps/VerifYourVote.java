@@ -91,6 +91,10 @@ public class VerifYourVote extends JFrame {
 	private final String lblRECEIPTID = "Your Receipt ID: ";
 	private final String lblYOURVOTE = "Your Vote: ";
 	
+	private final String lblLOGOUT = "Finish";
+	
+	private static VerifYourVote frame;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -103,7 +107,7 @@ public class VerifYourVote extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					VerifYourVote frame = new VerifYourVote();
+					frame = new VerifYourVote();
 					frame.setVisible(true);
 					frame.setResizable(false);
 				} catch (Exception e) {
@@ -120,7 +124,7 @@ public class VerifYourVote extends JFrame {
 	public VerifYourVote() {
 		//setIconImage(Toolkit.getDefaultToolkit().getImage(UserGUI.class.getResource("/de/uni/trier/infsec/cloudStorage/cloud.png")));
 		setTitle(AppParams.VERIFYAPPNAME);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE | JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 530,334);
 		
 		CardLayout cl = new CardLayout();
@@ -347,9 +351,10 @@ public class VerifYourVote extends JFrame {
 		JPanel south = new JPanel();
 		main.add(south, BorderLayout.SOUTH);
 		
-		JButton btnLogOut = new JButton("Log Out");
+		JButton btnLogOut = new JButton(lblLOGOUT);
 		
-		btnLogOut.addActionListener(new Logout());
+		//btnLogOut.addActionListener(new Logout());
+		btnLogOut.addActionListener(new CloseTheApp());
 		
 		GroupLayout gl_south = new GroupLayout(south);
 		gl_south.setHorizontalGroup(
@@ -605,7 +610,11 @@ public class VerifYourVote extends JFrame {
 		}
 	}
 	
-	
+	private class CloseTheApp implements ActionListener{
+		public void actionPerformed(ActionEvent e) {
+			frame.dispose();
+		}
+	}
 		
 	
 	// UTILS methods

@@ -431,11 +431,13 @@ public class VoterApp extends JFrame {
 		scrollNonce.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		JLabel lblPress = new JLabel("Press");
+		lblPress.setFont(new Font("Dialog", Font.PLAIN, 14));
 		
 		JButton btnCopy = new JButton(new CopyButton("Copy"));
 		btnCopy.setText("Copy\n");
 		
 		JLabel lblEndCopy = new JLabel(html(lblENDCOPY));
+		lblEndCopy.setFont(new Font("Dialog", Font.PLAIN, 14));
 		
 		GroupLayout gl_acceptedPanel = new GroupLayout(acceptedPanel);
 		gl_acceptedPanel.setHorizontalGroup(
@@ -666,6 +668,7 @@ public class VoterApp extends JFrame {
 	
 	private class CloseTheApp implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
+			destroyConfidentialInfo();
 			frame.dispose();
 		}
 	}
