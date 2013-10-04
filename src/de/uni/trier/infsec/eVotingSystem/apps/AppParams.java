@@ -9,19 +9,21 @@ public class AppParams
 	public static final String VOTERAPPNAME = "TrustVote - RS3 Demo";
 	public static final String VERIFYAPPNAME = "VerifYourVote - RS3 Demo";
 	
-	public static final String ELECTIONMSG = "Who is your favourite candidate?";
-	public static final byte[] ELECTIONID = "ElectionTest Nr 153".getBytes();
+	public static final String ELECTIONMSG = "Please, make your choice:";
+	public static final byte[] ELECTIONID = "Favourite RS3 project".getBytes();
 	public static final String[] CANDIDATESARRAY = {	
-								"Candidate 00",
-								"Candidate 01",
-								"Candidate 02",
-								"Candidate 03",
-								"Candidate 04",
-								"Candidate 05",
-								"Candidate 06",
-								"Candidate 07",
-								"Candidate 08",
-								"Candidate 09",
+								"DeduSec",
+								"IFlow",
+								"ALBIA",
+								"E-Voting",
+								"Information Flow Control for JavaScript",
+								"IFC for Mobile Components",
+								"MORES",
+								"MoVeSPAcI",
+								"RSCP",
+								"Secure Type Systems and Deduction",
+								"SpAGAT",
+								"Usage Control",
 								};
 	
 	// to set when the election is over
