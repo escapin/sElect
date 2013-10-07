@@ -12,18 +12,18 @@ public class AppParams
 	public static final String ELECTIONMSG = "Please make your choice.";
 	public static final byte[] ELECTIONID = "Favourite RS3 project".getBytes();
 	public static final String[] CANDIDATESARRAY = {	
-								"DeduSec",
-								"IFlow",
-								"ALBIA",
-								"E-Voting",
-								"Information Flow Control for JavaScript",
+								"DeduSec (Verication of Security Properties)",
+								"IFlow (Developing Systems with Secure IFlow)",
+								"ALBIA (Logic-Based Information Flow Analysis)",
+								"Analysis of E-Voting Systems",
+								"IFC for JavaScript",
 								"IFC for Mobile Components",
-								"MORES",
-								"MoVeSPAcI",
-								"RSCP",
-								"Secure Type Systems and Deduction",
-								"SpAGAT",
-								"Usage Control",
+								"MORES (Data & Processes Security Requirements)",
+								"MoVeSPAcI (Verication of Security Properties)",
+								"RSCP (Security for Concurrent Programs)",
+								"SecDed (Secure Type Systems and Deduction)",
+								"SpAGAT (IFlow in Shared Document Bases)",
+								"SADAN (Data-driven Usage Control)",
 								};
 	
 	// to set when the election is over
