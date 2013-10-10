@@ -14,17 +14,23 @@ import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
+
 import java.awt.BorderLayout;
-
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.AWTEvent;
 import java.awt.CardLayout;
 import java.awt.Color;
 
 
 
+
+
+
 import javax.swing.SwingConstants;
+
 import java.awt.Font;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,6 +44,7 @@ import de.uni.trier.infsec.functionalities.pkisig.*;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.utils.Utilities;
 import de.uni.trier.infsec.lib.network.NetworkError;
+
 import javax.swing.JPasswordField;
 
 
@@ -67,7 +74,10 @@ public class VerifYourVote extends JFrame {
 	private JLabel lblTheReceipt =new JLabel("The Receipt");;
 	
 	
-
+	//FIXME: Think whether a "More Info" button could be reasonable 
+			//	from the point of view of the user experience 
+			// If you want to know why everything went ok, press the "More Info" button
+				//	Data from your private receipt match the data from the two servers
 	/*
 	 * CORE FIELD
 	 */
@@ -200,7 +210,7 @@ public class VerifYourVote extends JFrame {
 		 * LOGIN!
 		 */
 		btnVerify.addActionListener(new Verify());
-		
+		btnVerify.addKeyListener(new VerifyPressed());
 		
 		// main windows panel
 		JPanel main = new JPanel();
@@ -380,121 +390,132 @@ public class VerifYourVote extends JFrame {
 	 */
 	private class Verify implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
-			lblUserNotRegister.setForeground(Color.RED);
-			// fetch the verifiers of the servers
-			if(fldVoterID.getText().length()==0){
-				lblUserNotRegister.setText("<html>User ID field empty!<br>Please insert a valid ID number of a previously registered user.</html>");
-				return;
-			}
-			try{
-				voterID = Integer.parseInt(fldVoterID.getText());
-				if(voterID<0)
-					throw new NumberFormatException();
-			} catch (NumberFormatException e){
-				System.out.println("'" + fldVoterID.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
-				lblUserNotRegister.setText("<html>'" + fldVoterID.getText() + "' is not a proper userID!<br>Please insert the ID number of a registered user.</html>");
-				return;
-			}
-			PKI.useRemoteMode();
-			try {
-				server1ver = RegisterSig.getVerifier(Params.SERVER1ID, Params.SIG_DOMAIN);
-				server2ver = RegisterSig.getVerifier(Params.SERVER2ID, Params.SIG_DOMAIN);
-			} catch (RegisterSig.PKIError e){
-				System.out.println("PKI Error occurred: perhaps the PKI server is not running!");
-				lblUserNotRegister.setText(html("PKI Error:<br> perhaps the PKI server is not running!"));
-				return;
-			} catch (NetworkError e){
-				//FIXME: java.net.ConnectException when the PKIServer is not running!
-				System.out.println("Network Error occurred while connecting with the PKI server: perhaps the PKI server is not running!");
-				lblUserNotRegister.setText(html("Network Error occurred:<br> perhaps the PKI server is not running!"));
-				return;
-			}
-			
-			
-			lblWait.setText("Wait..."); //FIXME: it doesn't work!
-			
-			JPanel loginPanel = (JPanel) ((JButton)ev.getSource()).getParent();
-			//lblWait.paintImmediately(loginPanel.getVisibleRect());
-			loginPanel.paintImmediately(loginPanel.getVisibleRect());
-			
-			boolean fileLoaded=false;
-			byte[] receiptMsg=null;
-			try {
-				try{
-					receiptMsg=AppUtils.readFromFile(AppParams.RECEIPT_file +  voterID + ".msg");
-				} catch (FileNotFoundException e){
-					out("Voter " + voterID + " have not voted. No receipt found: \n\t" + e.getMessage());
-					// out("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
-					lblUserNotRegister.setText(html("You have not voted for this election."));
-					return;
-				}
-				try{
-					signedPartialResult=AppUtils.readFromFile(AppParams.COLL_SERVER_RESULT_file);
-					signedFinalResult=AppUtils.readFromFile(AppParams.FIN_SERVER_RESULT_file);
-				} catch (FileNotFoundException e){
-					out("Can not read one of the files:\n\t" + e.getMessage());
-					// out("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
-					lblUserNotRegister.setText(html("You can not verify your vote until the election phase is over."));
-					return;
-				}
-				fileLoaded=true;
-			} catch (IOException e){
-				out("IOException occurred while reading the credentials of the user!");
-				lblUserNotRegister.setText("IOException occurred while reading the credentials of the user!");
-				return;
-			} finally{
-				lblWait.setText("");
-			}
-			
-			lblUserNotRegister.setText("");
-			if(fileLoaded){
-				fldVoterID.setText("");
-				
-				receipt = Voter.Receipt.fromMessage(receiptMsg);
-				
-				// TODO: verify the signature in the receipt
-				if (!signatureInReceiptOK(receipt)) {
-						out("\nPROBLEM: Server's signature in your receipt is not correct!");
-						out("You may not be able to prove that you are cheated on, if you are.");
-				}
-				
-				// Print out (part of) the receipt:
-				out("\nRECEIPT:");
-				out("    election ID  = " + new String(receipt.electionID) );
-				out("    candidate number   = " + receipt.candidateNumber );
-				out("    nonce        = " + Utilities.byteArrayToHexString(receipt.nonce));
-				
-				boolean ok = true;
-				// Check whether the partial results contains the inner ballot from the receipt:
-				if (!partialResultOK(receipt, signedPartialResult))
-					ok = false;
-				
-				// Check whether the final result contains your nonce and print out the vote:
-				if (ok && !finalResultOK(receipt, signedFinalResult))
-					ok = false;
-				
-				if (ok){ 
-					//FIXME: perhaps we could set these two labels when just when we do the comparison with the server's result
-					lblTheVote.setText(html(AppParams.CANDIDATESARRAY[receipt.candidateNumber]));
-					lblTheReceipt.setText(html(Utilities.byteArrayToHexString(receipt.nonce)));
-					
-					CardLayout centerCl = (CardLayout) center.getLayout();
-					centerCl.show(center, VERIF_ok);
-					out("\nEverything seems ok.");
-				}
-				else{
-					CardLayout centerCl = (CardLayout) center.getLayout();
-					centerCl.show(center, VERIF_fail);
-				}
-				CardLayout cl = (CardLayout) getContentPane().getLayout();
-				cl.show(getContentPane(), MAIN);
-						
-			}
-			lblVoterID.setText("<html>" +  lblVOTERID + "<strong>" + voterID + "</strong></html>");
-			lblElectionID.setText(new String(receipt.electionID));
+			onVerifyPress(ev);
 		}
 	}
 	
+	private class VerifyPressed extends KeyAdapter{
+		public void keyPressed(KeyEvent e) {
+	         if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+	              onVerifyPress(e);
+	         }
+	    }
+	}
+	
+	private void onVerifyPress(AWTEvent ev){
+		lblUserNotRegister.setForeground(Color.RED);
+		// fetch the verifiers of the servers
+		if(fldVoterID.getText().length()==0){
+			lblUserNotRegister.setText("<html>User ID field empty!<br>Please insert a valid ID number of a previously registered user.</html>");
+			return;
+		}
+		try{
+			voterID = Integer.parseInt(fldVoterID.getText());
+			if(voterID<0)
+				throw new NumberFormatException();
+		} catch (NumberFormatException e){
+			System.out.println("'" + fldVoterID.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
+			lblUserNotRegister.setText("<html>'" + fldVoterID.getText() + "' is not a proper userID!<br>Please insert the ID number of a registered user.</html>");
+			return;
+		}
+		PKI.useRemoteMode();
+		try {
+			server1ver = RegisterSig.getVerifier(Params.SERVER1ID, Params.SIG_DOMAIN);
+			server2ver = RegisterSig.getVerifier(Params.SERVER2ID, Params.SIG_DOMAIN);
+		} catch (RegisterSig.PKIError e){
+			System.out.println("PKI Error occurred: perhaps the PKI server is not running!");
+			lblUserNotRegister.setText(html("PKI Error:<br> perhaps the PKI server is not running!"));
+			return;
+		} catch (NetworkError e){
+			//FIXME: java.net.ConnectException when the PKIServer is not running!
+			System.out.println("Network Error occurred while connecting with the PKI server: perhaps the PKI server is not running!");
+			lblUserNotRegister.setText(html("Network Error occurred:<br> perhaps the PKI server is not running!"));
+			return;
+		}
+		
+		
+		lblWait.setText("Wait..."); //FIXME: it doesn't work!
+		
+		JPanel loginPanel = (JPanel) ((JButton)ev.getSource()).getParent();
+		//lblWait.paintImmediately(loginPanel.getVisibleRect());
+		loginPanel.paintImmediately(loginPanel.getVisibleRect());
+		
+		boolean fileLoaded=false;
+		byte[] receiptMsg=null;
+		try {
+			try{
+				receiptMsg=AppUtils.readFromFile(AppParams.RECEIPT_file +  voterID + ".msg");
+			} catch (FileNotFoundException e){
+				out("Voter " + voterID + " have not voted. No receipt found: \n\t" + e.getMessage());
+				// out("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
+				lblUserNotRegister.setText(html("You have not voted for this election."));
+				return;
+			}
+			try{
+				signedPartialResult=AppUtils.readFromFile(AppParams.COLL_SERVER_RESULT_msg);
+				signedFinalResult=AppUtils.readFromFile(AppParams.FIN_SERVER_RESULT_msg);
+			} catch (FileNotFoundException e){
+				out("Can not read one of the files:\n\t" + e.getMessage());
+				// out("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
+				lblUserNotRegister.setText(html("You can not verify your vote until the election phase is over."));
+				return;
+			}
+			fileLoaded=true;
+		} catch (IOException e){
+			out("IOException occurred while reading the credentials of the user!");
+			lblUserNotRegister.setText("IOException occurred while reading the credentials of the user!");
+			return;
+		} finally{
+			lblWait.setText("");
+		}
+		
+		lblUserNotRegister.setText("");
+		if(fileLoaded){
+			fldVoterID.setText("");
+			
+			receipt = Voter.Receipt.fromMessage(receiptMsg);
+			
+			// TODO: verify the signature in the receipt
+			if (!signatureInReceiptOK(receipt)) {
+					out("\nPROBLEM: Server's signature in your receipt is not correct!");
+					out("You may not be able to prove that you are cheated on, if you are.");
+			}
+			
+			// Print out (part of) the receipt:
+			out("\nRECEIPT:");
+			out("    election ID  = " + new String(receipt.electionID) );
+			out("    candidate number   = " + receipt.candidateNumber );
+			out("    nonce        = " + Utilities.byteArrayToHexString(receipt.nonce));
+			
+			boolean ok = true;
+			// Check whether the partial results contains the inner ballot from the receipt:
+			if (!partialResultOK(receipt, signedPartialResult))
+				ok = false;
+			
+			// Check whether the final result contains your nonce and print out the vote:
+			if (ok && !finalResultOK(receipt, signedFinalResult))
+				ok = false;
+			
+			if (ok){ 
+				//FIXME: perhaps we could set these two labels when just when we do the comparison with the server's result
+				lblTheVote.setText(html(AppParams.CANDIDATESARRAY[receipt.candidateNumber]));
+				lblTheReceipt.setText(html(Utilities.byteArrayToHexString(receipt.nonce)));
+				
+				CardLayout centerCl = (CardLayout) center.getLayout();
+				centerCl.show(center, VERIF_ok);
+				out("\nEverything seems ok.");
+			}
+			else{
+				CardLayout centerCl = (CardLayout) center.getLayout();
+				centerCl.show(center, VERIF_fail);
+			}
+			CardLayout cl = (CardLayout) getContentPane().getLayout();
+			cl.show(getContentPane(), MAIN);
+					
+		}
+		lblVoterID.setText("<html>" +  lblVOTERID + "<strong>" + voterID + "</strong></html>");
+		lblElectionID.setText(new String(receipt.electionID));
+	}
 	
 	private boolean signatureInReceiptOK(Voter.Receipt receipt){
 		byte[] expected_signed_msg = concatenate(Params.ACCEPTED, concatenate(receipt.electionID, receipt.innerBallot));

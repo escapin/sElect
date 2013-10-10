@@ -28,7 +28,7 @@ public class FinalServerApp {
 	}
 
 	private static void setupServer() {
-		AppUtils.deleteFile(AppParams.COLL_SERVER_RESULT_file);
+		AppUtils.deleteFile(AppParams.COLL_SERVER_RESULT_msg);
 		
 		byte[] serialized=null;
 		try {
@@ -94,7 +94,7 @@ public class FinalServerApp {
 	
 	private static void postResult(byte[] result) {
 		// write result to a file
-		String result_fname = AppParams.FIN_SERVER_RESULT_file;
+		String result_fname = AppParams.FIN_SERVER_RESULT_msg;
 		try {
 			AppUtils.storeAsFile(result, result_fname);
 		}
@@ -106,7 +106,7 @@ public class FinalServerApp {
 		try {
 			Helper.FinalEntry[] fes = Helper.finalResultAsText(result, serversVerifier, AppParams.ELECTIONID);
 			try {
-		        BufferedWriter out = new BufferedWriter(new FileWriter("FinalResult.txt"));
+		        BufferedWriter out = new BufferedWriter(new FileWriter(AppParams.FINAL_RESULT_file));
 		        for (Helper.FinalEntry e : fes) {
 		            out.write(e.vote + " \t" + e.nonce + "\n");
 		            System.out.println(e.vote);

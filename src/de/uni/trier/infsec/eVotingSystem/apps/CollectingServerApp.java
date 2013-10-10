@@ -26,7 +26,7 @@ public class CollectingServerApp {
 	}
 
 	private static void setupServer() {
-		AppUtils.deleteFile(AppParams.FIN_SERVER_RESULT_file);
+		AppUtils.deleteFile(AppParams.FIN_SERVER_RESULT_msg);
 		
 		byte[] serialized=null;
 		try {
@@ -95,7 +95,7 @@ public class CollectingServerApp {
 		byte[] result = server.getResult();
 					
 		// write result to a file:
-		String result_fname = AppParams.COLL_SERVER_RESULT_file;
+		String result_fname = AppParams.COLL_SERVER_RESULT_msg;
 		try {
 			AppUtils.storeAsFile(result, result_fname);
 		}

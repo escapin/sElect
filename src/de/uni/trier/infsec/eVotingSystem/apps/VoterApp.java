@@ -19,22 +19,26 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.JButton;
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+
 import javax.swing.BorderFactory; 
 
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.AWTEvent;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 
-
 import javax.swing.SwingConstants;
-import java.awt.Font;
 
+import java.awt.Font;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -47,7 +51,9 @@ import de.uni.trier.infsec.functionalities.pkisig.*;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
+
 import javax.swing.JTextArea;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Toolkit;
@@ -108,8 +114,9 @@ public class VoterApp extends JFrame {
 	private final String lblLOGIN = "Submit";
 		// vote phase
 	private final String lblYOURCHOICE = "Your Choice:";
-	private final String lblACCEPTED = "<font color=\"green\">Your Vote has been collected properly!</font>";
-	private final String lblREJECTED = "<font color=\"red\">Your Vote has not been collected!</font>";
+	//FIXME: rephrase the messages 
+	private final String lblACCEPTED = "<font color=\"green\">Your Vote has been collected properly!</font>";	// Vote Sent!
+	private final String lblREJECTED = "<font color=\"red\">Your Vote has not been collected!</font>";			// Your Vote was not sent!
 	private final String lblVOTEACCEPTED="Your <b>receipt</b> has been stored on your computer.<br><br>" +
 	"After the election, please use your <b>Receipt ID</b> to make sure that your vote has been counted correctly.";
 	private final String lblENDCOPY  = "to copy the <b>Receipt ID</b> to your computer's clipboard";
@@ -176,12 +183,13 @@ public class VoterApp extends JFrame {
 		fldPassword = new JPasswordField();
 		fldPassword.setColumns(11);
 		
-		JButton btnLogIn = new JButton(lblLOGIN);
-		btnLogIn.setFont(new Font("Dialog", Font.BOLD, 14));
+		JButton btnLogin = new JButton(lblLOGIN);
+		btnLogin.setFont(new Font("Dialog", Font.BOLD, 14));
 		/*
 		 * LOGIN!
 		 */
-		btnLogIn.addActionListener(new Login());
+		btnLogin.addActionListener(new Login());
+		btnLogin.addKeyListener(new LoginPressed());
 		
 		lblUserNotRegister = new JLabel("");
 		lblUserNotRegister.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -225,7 +233,7 @@ public class VoterApp extends JFrame {
 					.addGap(62)
 					.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(btnLogIn, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE)
+					.addComponent(btnLogin, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(69, Short.MAX_VALUE))
 		);
 		gl_login.setVerticalGroup(
@@ -254,7 +262,7 @@ public class VoterApp extends JFrame {
 						.addGroup(gl_login.createSequentialGroup()
 							.addGap(31)
 							.addComponent(lblUserNotRegister, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE))
-						.addComponent(btnLogIn, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnLogin, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE))
 					.addGap(236))
 		);
 		login.setLayout(gl_login);
@@ -598,72 +606,82 @@ public class VoterApp extends JFrame {
 	}
 	
 	
-	
 	/*
 	 * LISTENERS
 	 */
-
+	private class LoginPressed extends KeyAdapter{
+		public void keyPressed(KeyEvent e) {
+	         if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+	              onLoginPress(e);
+	         }
+	    }
+	}
+	
 	private class Login implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
-			if(fldVoterID.getText().length()==0){
-				lblUserNotRegister.setText("<html>User ID field empty!<br>Please insert a valid ID number of a previously registered user.</html>");
-				return;
-			}
-			
-			try{
-				voterID = Integer.parseInt(fldVoterID.getText());
-				if(voterID<0)
-					throw new NumberFormatException();
-			} catch (NumberFormatException e){
-				System.out.println("'" + fldVoterID.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
-				lblUserNotRegister.setText("<html>'" + fldVoterID.getText() + "' is not a proper userID!<br>Please insert the ID number of a registered user.</html>");
-				return;
-			}
-			
-			
-			lblUserNotRegister.setText("");
-			lblWait.setText("Wait..."); //FIXME: it doesn't work!
-			
-			JPanel loginPanel = (JPanel) ((JButton)ev.getSource()).getParent();
-			//lblWait.paintImmediately(loginPanel.getVisibleRect());
-			loginPanel.paintImmediately(loginPanel.getVisibleRect());
-			
-			boolean voterRegistered=false;
-			try {
-				setupVoter(voterID);
-				voterRegistered=true;
-			} catch (FileNotFoundException e){
-				System.out.println("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
-				lblUserNotRegister.setText("<html>User " + voterID + " not registered!<br>Please register yourself before log in.</html>");
-			} catch (IOException e){
-				System.out.println("IOException occurred while reading the credentials of the user!");
-				lblUserNotRegister.setText("IOException occurred while reading the credentials of the user!");
-			} catch (RegisterSig.PKIError | RegisterEnc.PKIError e){
-				System.out.println("PKI Error occurred: perhaps the PKI server is not running!");
-				lblUserNotRegister.setText("<html>PKI Error:<br> perhaps the PKI server is not running!</html>");
-			} catch (NetworkError e){
-				//FIXME: java.net.ConnectException when the PKIServer is not running!
-				System.out.println("Network Error occurred while connecting with the PKI server: perhaps the PKI server is not running!");
-				lblUserNotRegister.setText("<html>Network Error occurred:<br> perhaps the PKI server is not running!</html>");
-			} finally{
-				lblWait.setText("");
-			}
-			if(voterRegistered){
-				fldVoterID.setText("");
-				//setTitle("Voter " + voterID + " - " + AppParams.APPNAME);
-				
-				//FIXME: it does not work
-				//getContentPane().setSize(530,600);
-				
-				CardLayout cl = (CardLayout) getContentPane().getLayout();
-				cl.show(getContentPane(), MAIN);
-				//getContentPane().setVisible(true);
-				
-			}
-			lblVoterID.setText("<html>" +  lblVOTERID + "<strong>" + voterID + "</strong></html>");
-			lblElectionID.setText(new String(electionData.id));
-			lblElectionMsg.setText("<html>" +  electionData.introMsg + "</html>");
+			onLoginPress(ev);
 		}
+	}
+	
+	private void onLoginPress(AWTEvent ev){
+		if(fldVoterID.getText().length()==0){
+			lblUserNotRegister.setText("<html>User ID field empty!<br>Please insert a valid ID number of a previously registered user.</html>");
+			return;
+		}
+		
+		try{
+			voterID = Integer.parseInt(fldVoterID.getText());
+			if(voterID<0)
+				throw new NumberFormatException();
+		} catch (NumberFormatException e){
+			System.out.println("'" + fldVoterID.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
+			lblUserNotRegister.setText("<html>'" + fldVoterID.getText() + "' is not a proper userID!<br>Please insert the ID number of a registered user.</html>");
+			return;
+		}
+		
+		
+		lblUserNotRegister.setText("");
+		lblWait.setText("Wait..."); //FIXME: it doesn't work!
+		
+		JPanel loginPanel = (JPanel) ((JButton)ev.getSource()).getParent();
+		//lblWait.paintImmediately(loginPanel.getVisibleRect());
+		loginPanel.paintImmediately(loginPanel.getVisibleRect());
+		
+		boolean voterRegistered=false;
+		try {
+			setupVoter(voterID);
+			voterRegistered=true;
+		} catch (FileNotFoundException e){
+			System.out.println("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
+			lblUserNotRegister.setText("<html>User " + voterID + " not registered!<br>Please register yourself before log in.</html>");
+		} catch (IOException e){
+			System.out.println("IOException occurred while reading the credentials of the user!");
+			lblUserNotRegister.setText("IOException occurred while reading the credentials of the user!");
+		} catch (RegisterSig.PKIError | RegisterEnc.PKIError e){
+			System.out.println("PKI Error occurred: perhaps the PKI server is not running!");
+			lblUserNotRegister.setText("<html>PKI Error:<br> perhaps the PKI server is not running!</html>");
+		} catch (NetworkError e){
+			//FIXME: java.net.ConnectException when the PKIServer is not running!
+			System.out.println("Network Error occurred while connecting with the PKI server: perhaps the PKI server is not running!");
+			lblUserNotRegister.setText("<html>Network Error occurred:<br> perhaps the PKI server is not running!</html>");
+		} finally{
+			lblWait.setText("");
+		}
+		if(voterRegistered){
+			fldVoterID.setText("");
+			//setTitle("Voter " + voterID + " - " + AppParams.APPNAME);
+			
+			//FIXME: it does not work
+			//getContentPane().setSize(530,600);
+			
+			CardLayout cl = (CardLayout) getContentPane().getLayout();
+			cl.show(getContentPane(), MAIN);
+			//getContentPane().setVisible(true);
+			
+		}
+		lblVoterID.setText("<html>" +  lblVOTERID + "<strong>" + voterID + "</strong></html>");
+		lblElectionID.setText(new String(electionData.id));
+		lblElectionMsg.setText("<html>" +  electionData.introMsg + "</html>");
 	}
 	
 	private class CloseTheApp implements ActionListener{

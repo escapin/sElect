@@ -34,6 +34,10 @@ How-To run the E-voting System process:
     	we require that the voterID is a number between 1 and Params.NumberOfVoters:
     				0 <= voterID < Params.NumberOfVoters
 
+9.  Run class de.uni.trier.infsec.cloudStorage.DeleteLocalFiles
+    In order to delete local files created (e.g. the databases) which are stored
+    in your %TEMP%/PKIServer.db, %TEMP%/eVotingSystem and both the Collecting and Final servers' output. 
+
 
 EXAMPLE:
 ========
@@ -63,5 +67,5 @@ GUI:
 Command Line:
 8b. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VerifierCmdLine  <receipt_fname> <partial_result_fname> <final_result_fname>
 
-
+9. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.DeleteLocalFiles
 

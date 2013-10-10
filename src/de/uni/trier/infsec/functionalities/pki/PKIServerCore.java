@@ -86,7 +86,9 @@ public class PKIServerCore implements PKIServer {
 		try {
 			File dbFile = new File(DEFAULT_DATABASE);
 			if (!dbFile.exists()) {
-				if(db!=null)
+				if(db!=null)	// if the dbFile does not exist but the variable db is not null, 
+								// this variable points to a inconsistent file and 
+								// hence it has to be closed.
 					db.close();
 				// We need to initialize a completely new Database
 				db = SqlJetDb.open(dbFile, true);
