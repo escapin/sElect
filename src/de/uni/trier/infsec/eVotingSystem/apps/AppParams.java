@@ -17,6 +17,17 @@ public class AppParams
 	//public static final String FIN_SERVER_RESULT_file = PATH_STORAGE + "SignedFinalResult.msg";
 	public static final String FINAL_RESULT_file = "../BulletinBoard/FinalResult.txt";
 	
+	/*
+	 * In case we store local file in memory, remember to add the path also here
+	 * in such a way that we keep track of them it in unique array.
+	 * (For instance, it is useful for deleting them).
+	 */
+	public static final String[] PATH_LOCALFILES = 	{	PKI_DATABASE, 
+														COLL_SERVER_RESULT_msg,
+														FIN_SERVER_RESULT_msg,
+														FINAL_RESULT_file
+													};
+	
 	public static final String VOTERAPPNAME = "TVote";
 	public static final String VERIFYAPPNAME = "VerifYourVote";
 	

@@ -1,6 +1,7 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
 import static de.uni.trier.infsec.utils.MessageTools.concatenate;
+import static de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.outl;
 import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
 import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils;
 import de.uni.trier.infsec.eVotingSystem.coreSystem.Voter;
@@ -29,8 +30,8 @@ public class VerifierCmdLine {
 
 		// Parse arguments:
 		if (args.length != 3 ) {
-			out("Wrong number of Arguments!");
-			out("Expected: VerifierCmdLine <receipt_fname> <partial_result_fname> <final_result_fname>");
+			outl("Wrong number of Arguments!");
+			outl("Expected: VerifierCmdLine <receipt_fname> <partial_result_fname> <final_result_fname>");
 			System.exit(-1);
 		} 
 		String receiptFileName = args[0];
@@ -43,7 +44,7 @@ public class VerifierCmdLine {
 			receiptMsg = AppUtils.readFromFile(receiptFileName);
 		}
 		catch (Exception e) {
-			out("Cannot read the receipt file.");
+			outl("Cannot read the receipt file.");
 			e.printStackTrace();
 			System.exit(-1);
 		}
@@ -55,7 +56,7 @@ public class VerifierCmdLine {
 			signedPartialResult = AppUtils.readFromFile(partialResultFileName);
 		}
 		catch (Exception e) {
-			out("Cannot read the file with the partial result.");
+			outl("Cannot read the file with the partial result.");
 			e.printStackTrace();
 			System.exit(-1);
 		}
@@ -66,7 +67,7 @@ public class VerifierCmdLine {
 			signedFinalResult = AppUtils.readFromFile(finalResultFileName);
 		}
 		catch (Exception e) {
-			out("Cannot read the file with the final result.");
+			outl("Cannot read the file with the final result.");
 			e.printStackTrace();
 			System.exit(-1);
 		}
@@ -74,17 +75,17 @@ public class VerifierCmdLine {
 		
 		// TODO: verify the signature in the receipt
 		if (!signatureInReceiptOK(receipt)) {
-			out("\nPROBLEM: Server's signature in your recipt is not correct!");
-			out("You may not be able to prove that you are cheated on, if you are.");
+			outl("\nPROBLEM: Server's signature in your recipt is not correct!");
+			outl("You may not be able to prove that you are cheated on, if you are.");
 		}
 		
 		boolean ok = true;
 		
 		// Print out (part of) the receipt:
-		out("\nRECEIPT:");
-		out("    election ID  = " + new String(receipt.electionID) );
-		out("    candidate number   = " + receipt.candidateNumber );
-		out("    nonce        = " + Utilities.byteArrayToHexString(receipt.nonce));
+		outl("\nRECEIPT:");
+		outl("    election ID  = " + new String(receipt.electionID) );
+		outl("    candidate number   = " + receipt.candidateNumber );
+		outl("    nonce        = " + Utilities.byteArrayToHexString(receipt.nonce));
 		
 		// Check whether the partial results contains the inner ballot from the receipt:
 		if (!partialResultOK(receipt, signedPartialResult))
@@ -95,7 +96,7 @@ public class VerifierCmdLine {
 			ok = false;
 		
 		if (ok) 
-			out("\nEverything seems ok.");
+			outl("\nEverything seems ok.");
 	}
 
 	private static boolean signatureInReceiptOK(Voter.Receipt receipt) throws Exception {
@@ -109,22 +110,22 @@ public class VerifierCmdLine {
 		
 		// check the signature
 		if (!server1ver.verify(signature, result)) {
-			out("PROBLEM: Invalid signature on the partial result.");
+			outl("PROBLEM: Invalid signature on the partial result.");
 			return false;
 		}
 		
 		// check the election id
 		byte[] elid = MessageTools.first(result);
 		if (!MessageTools.equal(elid, receipt.electionID)) {
-			out("PROBLEM: The election ID in the receipt does not match the one in the partial result");
+			outl("PROBLEM: The election ID in the receipt does not match the one in the partial result");
 			return false;
 		}
 		
 		// check if the result contain the inner ballot from the receipt
 		byte[] ballotsAsMessage = MessageTools.first(MessageTools.second(result));
 		if (!Utils.contains(ballotsAsMessage, receipt.innerBallot)) {
-			out("\nPROBLEM: The partial result does not containt your inner ballot!");
-			out(Utilities.byteArrayToHexString(receipt.innerBallot));
+			outl("\nPROBLEM: The partial result does not containt your inner ballot!");
+			outl(Utilities.byteArrayToHexString(receipt.innerBallot));
 			return false;
 		}
 		
@@ -137,14 +138,14 @@ public class VerifierCmdLine {
 		
 		// check the signature
 		if (!server2ver.verify(signature, result)) {
-			out("PROBLEM: Invalid signature on the final result.");
+			outl("PROBLEM: Invalid signature on the final result.");
 			return false;
 		}
 		
 		// check the election id
 		byte[] elid = MessageTools.first(result);
 		if (!MessageTools.equal(elid, receipt.electionID)) {
-			out("PROBLEM: The election ID in the receipt does not match the one in the final result");
+			outl("PROBLEM: The election ID in the receipt does not match the one in the final result");
 			return false;
 		}
 		
@@ -159,25 +160,23 @@ public class VerifierCmdLine {
 		}
 		candidateNumber=MessageTools.byteArrayToInt(vote);
 		if (vote == null) {
-			out("\nPROBLEM: The final result does not containt your nonce!");
-			out(Utilities.byteArrayToHexString(receipt.nonce));
+			outl("\nPROBLEM: The final result does not containt your nonce!");
+			outl(Utilities.byteArrayToHexString(receipt.nonce));
 			return false;
 		}
 		else if (candidateNumber!=receipt.candidateNumber) {
-			out("\nPROBLEM: In the final result, the vote next to your nonce is not your vote!");
-			out("Found candidate number: " + candidateNumber);
+			outl("\nPROBLEM: In the final result, the vote next to your nonce is not your vote!");
+			outl("Found candidate number: " + candidateNumber);
 			return false;
 		}
 		else {
-			out("\nYour nonce is in the result along with next the number of the candidate you voted:");
-			out("" + candidateNumber);
+			outl("\nYour nonce is in the result along with next the number of the candidate you voted:");
+			outl("" + candidateNumber);
 		}
 		
 		return true;
 	}
 	
-	private static void out(String s) {
-		System.out.println(s);
-	}
+
 
 }

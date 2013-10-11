@@ -2,6 +2,9 @@ package de.uni.trier.infsec.eVotingSystem.apps;
 
 
 import static de.uni.trier.infsec.utils.Utilities.byteArrayToHexString;
+import static de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.outl;
+import static de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.out;
+
 
 import java.awt.EventQueue;
 
@@ -927,13 +930,6 @@ public class VoterApp extends JFrame {
 
 	
 	// UTILS methods
-	
-	private static void outl(String s){
-		System.out.print(s);
-	}
-	private static void out(String s) {
-		System.out.println(s);
-	}
 	private static String html(String s){
 		return "<html>" + s + "</html>";
 	}

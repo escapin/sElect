@@ -9,16 +9,13 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+
 public class DeleteLocalFiles {
 	public static void main(String[] args) throws IOException{
 		
-		String[] pathToDelete = {	AppParams.PKI_DATABASE, 
-									AppParams.COLL_SERVER_RESULT_msg,
-									AppParams.FIN_SERVER_RESULT_msg,
-									AppParams.FINAL_RESULT_file
-								};
+		
 		Path dir;
-		for(String path: pathToDelete){
+		for(String path: AppParams.PATH_LOCALFILES){
 			dir = FileSystems.getDefault().getPath(path);
 			try{
 				Files.delete(dir);
@@ -62,9 +59,5 @@ public class DeleteLocalFiles {
 	                return FileVisitResult.CONTINUE;
 	            }
 	        });
-	}
-	
-	public static void out(String s){
-		System.out.println(s);
 	}
 }

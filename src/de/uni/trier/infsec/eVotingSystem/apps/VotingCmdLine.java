@@ -13,6 +13,7 @@ import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.utils.MessageTools;
 import static de.uni.trier.infsec.utils.Utilities.byteArrayToHexString;
+import static de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.out;
 
 public class VotingCmdLine 
 {
@@ -120,9 +121,4 @@ public class VotingCmdLine
 			System.exit(-1);
 		}
 	}	
-	
-	
-	private static void out(String s) {
-		System.out.println(s);
-	}
 }

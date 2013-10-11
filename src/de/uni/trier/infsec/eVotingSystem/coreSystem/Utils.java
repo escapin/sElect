@@ -59,6 +59,14 @@ public class Utils
         return n1 - n2;
     }
 	
+	public static void out(String s){
+		System.out.print(s);
+	}
+	public static void outl(String s){
+		System.out.println(s);
+	}
+	
+	
 //	 public static byte[][] copyOf(byte[][] original, int newLength) {
 //		 byte[][] copy = new byte[newLength][];
 //		 System.arraycopy(original, 0, copy, 0,
