@@ -3,7 +3,7 @@ package de.uni.trier.infsec.tests;
 import junit.framework.TestCase;
 import org.junit.Test;
 
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils;
+import de.uni.trier.infsec.eVotingSystem.core.Utils;
 import de.uni.trier.infsec.utils.MessageTools;
 
 

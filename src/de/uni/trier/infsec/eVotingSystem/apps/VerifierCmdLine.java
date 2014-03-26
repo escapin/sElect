@@ -1,11 +1,11 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
 import static de.uni.trier.infsec.utils.MessageTools.concatenate;
-import static de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.outl;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Voter;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.MessageSplitIter;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.outl;
+import de.uni.trier.infsec.eVotingSystem.core.Params;
+import de.uni.trier.infsec.eVotingSystem.core.Utils;
+import de.uni.trier.infsec.eVotingSystem.core.Voter;
+import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
 import de.uni.trier.infsec.functionalities.pkisig.Verifier;
@@ -84,7 +84,7 @@ public class VerifierCmdLine {
 		// Print out (part of) the receipt:
 		outl("\nRECEIPT:");
 		outl("    election ID  = " + new String(receipt.electionID) );
-		outl("    candidate number   = " + receipt.candidateNumber );
+		outl("    candidate number   = " + receipt.voterChoice );
 		outl("    nonce        = " + Utilities.byteArrayToHexString(receipt.nonce));
 		
 		// Check whether the partial results contains the inner ballot from the receipt:
@@ -124,7 +124,7 @@ public class VerifierCmdLine {
 		// check if the result contain the inner ballot from the receipt
 		byte[] ballotsAsMessage = MessageTools.first(MessageTools.second(result));
 		if (!Utils.contains(ballotsAsMessage, receipt.innerBallot)) {
-			outl("\nPROBLEM: The partial result does not containt your inner ballot!");
+			outl("\nPROBLEM: The partial result does not contain your inner ballot!");
 			outl(Utilities.byteArrayToHexString(receipt.innerBallot));
 			return false;
 		}
@@ -160,11 +160,11 @@ public class VerifierCmdLine {
 		}
 		candidateNumber=MessageTools.byteArrayToInt(vote);
 		if (vote == null) {
-			outl("\nPROBLEM: The final result does not containt your nonce!");
+			outl("\nPROBLEM: The final result does not contain your nonce!");
 			outl(Utilities.byteArrayToHexString(receipt.nonce));
 			return false;
 		}
-		else if (candidateNumber!=receipt.candidateNumber) {
+		else if (candidateNumber!=receipt.voterChoice) {
 			outl("\nPROBLEM: In the final result, the vote next to your nonce is not your vote!");
 			outl("Found candidate number: " + candidateNumber);
 			return false;

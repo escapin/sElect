@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.eVotingSystem.coreSystem;
+package de.uni.trier.infsec.eVotingSystem.core;
 
 import de.uni.trier.infsec.utils.MessageTools;
 

@@ -2,8 +2,8 @@ package de.uni.trier.infsec.eVotingSystem.apps;
 
 
 import static de.uni.trier.infsec.utils.Utilities.byteArrayToHexString;
-import static de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.outl;
-import static de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.out;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.out;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.outl;
 
 
 import java.awt.EventQueue;
@@ -45,9 +45,9 @@ import java.awt.Font;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Voter;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Voter.Error;
+import de.uni.trier.infsec.eVotingSystem.core.Params;
+import de.uni.trier.infsec.eVotingSystem.core.Voter;
+import de.uni.trier.infsec.eVotingSystem.core.Voter.Error;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pkienc.*;
 import de.uni.trier.infsec.functionalities.pkisig.*;

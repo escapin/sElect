@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.eVotingSystem.coreSystem;
+package de.uni.trier.infsec.eVotingSystem.core;
 
 import java.util.Arrays;
 
@@ -33,16 +33,16 @@ public class Voter
 
 	public static class Receipt {
 		public final byte[] electionID;
-		public final int candidateNumber;
+		public final int voterChoice;
 		public final byte[] nonce;
 		public final byte[] innerBallot;
 		public byte[] serverSignature;
 		
 		private static final byte[] emptySig = new byte[] {};
 
-		private Receipt(byte[] electionID, int candidateNumber, byte[] nonce, byte[] inner_ballot, byte[] serverSignature) {
+		private Receipt(byte[] electionID, int voterChoice, byte[] nonce, byte[] inner_ballot, byte[] serverSignature) {
 			this.electionID = electionID;
-			this.candidateNumber = candidateNumber;
+			this.voterChoice = voterChoice;
 			this.nonce = nonce;
 			this.innerBallot = inner_ballot;	
 			this.serverSignature = serverSignature;
@@ -51,7 +51,7 @@ public class Voter
 		public byte[] asMessage() {
 			byte [] signature = serverSignature==null ? emptySig : serverSignature;
 			return	concatenate( electionID,
-					concatenate( intToByteArray(candidateNumber),
+					concatenate( intToByteArray(voterChoice),
 					concatenate( nonce,
 					concatenate( innerBallot,
 							     signature ))));
@@ -71,7 +71,7 @@ public class Voter
 		}
 		
 		private Receipt getCopy() {
-			return new Receipt(electionID, candidateNumber, MessageTools.copyOf(nonce), copyOf(innerBallot), copyOf(serverSignature));
+			return new Receipt(electionID, voterChoice, MessageTools.copyOf(nonce), copyOf(innerBallot), copyOf(serverSignature));
 		}
 		
 	}
@@ -154,14 +154,14 @@ public class Voter
 	 * generated nonce, and Enc_Si(msg) denotes the message msg encrypted with 
 	 * the public key of the server Si.  
 	 */
-	public byte[] createBallot(int candidateNumber) {
+	public byte[] createBallot(int voterChoice) {
 		if (receipt != null) // a ballot has already been created
 			return null;
 		byte[] nonce = noncegen.newNonce();
-		byte[] vote = intToByteArray(candidateNumber);
+		byte[] vote = intToByteArray(voterChoice);
 		byte[] nonce_vote = concatenate(nonce, vote);
 		byte[] inner_ballot = server2enc.encrypt(nonce_vote);
-		receipt=new Receipt(electionID, candidateNumber, nonce, inner_ballot, null); // no server signature
+		receipt=new Receipt(electionID, voterChoice, nonce, inner_ballot, null); // no server signature
 		return encapsulate(receipt.innerBallot); // add the election id, sign, end encrypt
 	}
 

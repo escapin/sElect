@@ -2,7 +2,7 @@ package de.uni.trier.infsec.eVotingSystem.apps;
 
 
 import static de.uni.trier.infsec.utils.MessageTools.concatenate;
-import static de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.out;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.out;
 
 
 import java.awt.EventQueue;
@@ -37,10 +37,10 @@ import java.awt.Font;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Voter;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.MessageSplitIter;
+import de.uni.trier.infsec.eVotingSystem.core.Params;
+import de.uni.trier.infsec.eVotingSystem.core.Utils;
+import de.uni.trier.infsec.eVotingSystem.core.Voter;
+import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pkisig.*;
 import de.uni.trier.infsec.utils.MessageTools;
@@ -477,7 +477,6 @@ public class VerifYourVote extends JFrame {
 			
 			receipt = Voter.Receipt.fromMessage(receiptMsg);
 			
-			// TODO: verify the signature in the receipt
 			if (!signatureInReceiptOK(receipt)) {
 					out("\nPROBLEM: Server's signature in your receipt is not correct!");
 					out("You may not be able to prove that you are cheated on, if you are.");
@@ -486,7 +485,7 @@ public class VerifYourVote extends JFrame {
 			// Print out (part of) the receipt:
 			out("\nRECEIPT:");
 			out("    election ID  = " + new String(receipt.electionID) );
-			out("    candidate number   = " + receipt.candidateNumber );
+			out("    candidate number   = " + receipt.voterChoice );
 			out("    nonce        = " + Utilities.byteArrayToHexString(receipt.nonce));
 			
 			boolean ok = true;
@@ -500,7 +499,7 @@ public class VerifYourVote extends JFrame {
 			
 			if (ok){ 
 				//FIXME: perhaps we could set these two labels when just when we do the comparison with the server's result
-				lblTheVote.setText(html(AppParams.CANDIDATESARRAY[receipt.candidateNumber]));
+				lblTheVote.setText(html(AppParams.CANDIDATESARRAY[receipt.voterChoice]));
 				lblTheReceipt.setText(html(Utilities.byteArrayToHexString(receipt.nonce)));
 				
 				CardLayout centerCl = (CardLayout) center.getLayout();
@@ -600,7 +599,7 @@ public class VerifYourVote extends JFrame {
 			lblRejectedReason.setText(html(err));
 			return false;
 		}
-		else if (candidateNumber!=receipt.candidateNumber) {
+		else if (candidateNumber!=receipt.voterChoice) {
 			err="PROBLEM: In the " + bold("final result") + ", the vote next to your nonce is not your vote!";
 			out(err);
 			out("Found candidate number: " + candidateNumber);

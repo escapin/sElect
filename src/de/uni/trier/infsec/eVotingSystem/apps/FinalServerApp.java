@@ -5,8 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import de.uni.trier.infsec.eVotingSystem.coreSystem.FinalServer;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
+import de.uni.trier.infsec.eVotingSystem.core.FinalServer;
+import de.uni.trier.infsec.eVotingSystem.core.Params;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkisig.Signer;

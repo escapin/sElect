@@ -3,8 +3,9 @@ package de.uni.trier.infsec.eVotingSystem.apps;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import de.uni.trier.infsec.eVotingSystem.coreSystem.CollectingServer;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
+import de.uni.trier.infsec.eVotingSystem.core.CollectingServer;
+import de.uni.trier.infsec.eVotingSystem.core.CollectingServer.MalformedMessage;
+import de.uni.trier.infsec.eVotingSystem.core.Params;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkisig.Signer;
@@ -69,7 +70,12 @@ public class CollectingServerApp {
 				byte[] request = NetworkServer.nextRequest(AppParams.SERVER1_PORT);
 				if (request != null) {
 					System.out.println("reqeuest coming");
-					byte[] response = server.collectBallot(request);
+					byte[] response=null;
+					try {
+						response = server.collectBallot(request);
+					} catch (MalformedMessage e) {
+						System.out.println("Ballot malformed!");
+					}
 					NetworkServer.response(response);
 					System.out.println("responce sent");
 				} else {				

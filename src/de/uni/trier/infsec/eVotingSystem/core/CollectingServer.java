@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.eVotingSystem.coreSystem;
+package de.uni.trier.infsec.eVotingSystem.core;
 
 import java.util.Arrays;
 
@@ -137,7 +137,7 @@ public class CollectingServer
 	}
 
 	/**
-	 * Return the result (content of the input tally), to be publicly posted. 
+	 * Return the result (content of the input tally), to be publicly posted.
 	 */
 	public byte[] getResult() 
 	{
@@ -182,10 +182,11 @@ public class CollectingServer
 
 	/**
 	 * Add voterID, sign, then encrypt with the voter's public key  
-	 * @throws NetworkError 
+	 * @throws NetworkError
 	 * @throws RegisterEnc.PKIError 
 	 */
-	private byte[] encapsulateResponse(int voterID, byte[] payload) throws NetworkError, RegisterEnc.PKIError {
+	private byte[] encapsulateResponse(int voterID, byte[] payload) throws NetworkError, RegisterEnc.PKIError
+	{
 		// add voterID
 		byte[] id_payload = concatenate(intToByteArray(voterID), payload);
 		// add server signature

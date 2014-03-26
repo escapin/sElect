@@ -1,6 +1,6 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
+import de.uni.trier.infsec.eVotingSystem.core.Params;
 
 public class RegisterVoter {
 

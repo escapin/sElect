@@ -6,12 +6,12 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 
-import de.uni.trier.infsec.eVotingSystem.coreSystem.CollectingServer;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.FinalServer;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Params;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Voter;
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.MessageSplitIter;
+import de.uni.trier.infsec.eVotingSystem.core.CollectingServer;
+import de.uni.trier.infsec.eVotingSystem.core.FinalServer;
+import de.uni.trier.infsec.eVotingSystem.core.Params;
+import de.uni.trier.infsec.eVotingSystem.core.Utils;
+import de.uni.trier.infsec.eVotingSystem.core.Voter;
+import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
 import de.uni.trier.infsec.functionalities.nonce.NonceGen;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pki.PKIServerCore;

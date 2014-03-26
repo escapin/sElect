@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.eVotingSystem.coreSystem;
+package de.uni.trier.infsec.eVotingSystem.core;
 
 public class Params {
 	public static final int    SERVER1ID = -1;

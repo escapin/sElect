@@ -1,8 +1,8 @@
-package de.uni.trier.infsec.eVotingSystem.coreSystem;
+package de.uni.trier.infsec.eVotingSystem.core;
 
 import java.util.Arrays;
 
-import de.uni.trier.infsec.eVotingSystem.coreSystem.Utils.MessageSplitIter;
+import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
 import de.uni.trier.infsec.functionalities.pkisig.RegisterSig.PKIError;
@@ -67,7 +67,8 @@ public class FinalServer
 			throw new MalformedData("Wrong election ID");
 		
 		// retrieve and process ballots (store decrypted entries in 'entries')
-		byte[] ballotsAsAMessage = MessageTools.first(MessageTools.second(payload)); // ignore the list of voters		
+		byte[] ballotsAsAMessage = MessageTools.first(MessageTools.second(payload)); 
+		//FIXME: why do we include the list of voters if we ignore them?		
 		byte[][] entries = new byte[Params.NumberOfVoters][];
 		int numberOfEntries = 0;
 		for( MessageSplitIter iter = new MessageSplitIter(ballotsAsAMessage); iter.notEmpty(); iter.next() ) {

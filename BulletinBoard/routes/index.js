@@ -3,7 +3,7 @@ var fs = require('fs');
 // where to find files with the result
 var FINAL_RESULT = 'FinalResult.txt';
 var SIGNED_RESULT = 'public/SignedFinalResult.msg'
-var ELECTION_NAME = 'Fafourite RS3 Project'
+var ELECTION_NAME = 'Favourite RS3 Project'
 
 exports.index = function(req, res) {
     // check if file with the result exists
