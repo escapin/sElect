@@ -2,7 +2,7 @@ package de.uni.trier.infsec.eVotingSystem.apps;
 
 
 import static de.uni.trier.infsec.utils.MessageTools.concatenate;
-import static de.uni.trier.infsec.eVotingSystem.core.Utils.out;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.outl;
 
 
 import java.awt.EventQueue;
@@ -448,7 +448,7 @@ public class VerifYourVote extends JFrame {
 			try{
 				receiptMsg=AppUtils.readFromFile(AppParams.RECEIPT_file +  voterID + ".msg");
 			} catch (FileNotFoundException e){
-				out("Voter " + voterID + " have not voted. No receipt found: \n\t" + e.getMessage());
+				outl("Voter " + voterID + " have not voted. No receipt found: \n\t" + e.getMessage());
 				// out("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
 				lblUserNotRegister.setText(html("You have not voted for this election."));
 				return;
@@ -457,14 +457,14 @@ public class VerifYourVote extends JFrame {
 				signedPartialResult=AppUtils.readFromFile(AppParams.COLL_SERVER_RESULT_msg);
 				signedFinalResult=AppUtils.readFromFile(AppParams.FIN_SERVER_RESULT_msg);
 			} catch (FileNotFoundException e){
-				out("Can not read one of the files:\n\t" + e.getMessage());
+				outl("Can not read one of the files:\n\t" + e.getMessage());
 				// out("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
 				lblUserNotRegister.setText(html("You can not verify your vote until the election phase is over."));
 				return;
 			}
 			fileLoaded=true;
 		} catch (IOException e){
-			out("IOException occurred while reading the credentials of the user!");
+			outl("IOException occurred while reading the credentials of the user!");
 			lblUserNotRegister.setText("IOException occurred while reading the credentials of the user!");
 			return;
 		} finally{
@@ -478,15 +478,15 @@ public class VerifYourVote extends JFrame {
 			receipt = Voter.Receipt.fromMessage(receiptMsg);
 			
 			if (!signatureInReceiptOK(receipt)) {
-					out("\nPROBLEM: Server's signature in your receipt is not correct!");
-					out("You may not be able to prove that you are cheated on, if you are.");
+					outl("\nPROBLEM: Server's signature in your receipt is not correct!");
+					outl("You may not be able to prove that you are cheated on, if you are.");
 			}
 			
 			// Print out (part of) the receipt:
-			out("\nRECEIPT:");
-			out("    election ID  = " + new String(receipt.electionID) );
-			out("    candidate number   = " + receipt.voterChoice );
-			out("    nonce        = " + Utilities.byteArrayToHexString(receipt.nonce));
+			outl("\nRECEIPT:");
+			outl("    election ID  = " + new String(receipt.electionID) );
+			outl("    candidate number   = " + receipt.voterChoice );
+			outl("    nonce        = " + Utilities.byteArrayToHexString(receipt.nonce));
 			
 			boolean ok = true;
 			// Check whether the partial results contains the inner ballot from the receipt:
@@ -504,7 +504,7 @@ public class VerifYourVote extends JFrame {
 				
 				CardLayout centerCl = (CardLayout) center.getLayout();
 				centerCl.show(center, VERIF_ok);
-				out("\nEverything seems ok.");
+				outl("\nEverything seems ok.");
 			}
 			else{
 				CardLayout centerCl = (CardLayout) center.getLayout();
@@ -528,11 +528,11 @@ public class VerifYourVote extends JFrame {
 		byte[] signature = MessageTools.second(signedPartialResult);
 		
 		String err="";
-		out("");
+		outl("");
 		// check the signature
 		if (!server1ver.verify(signature, result)) {
 			err="PROBLEM: Invalid signature on the " + bold("partial result") + ".";
-			out(err);
+			outl(err);
 			lblRejectedReason.setText(html(err));
 			return false;
 		}
@@ -541,7 +541,7 @@ public class VerifYourVote extends JFrame {
 		byte[] elid = MessageTools.first(result);
 		if (!MessageTools.equal(elid, receipt.electionID)) {
 			err="PROBLEM: The election ID in the receipt does not match the one in the " + bold("partial result") + ".";
-			out(err);
+			outl(err);
 			lblRejectedReason.setText(html(err));
 			return false;
 		}
@@ -550,8 +550,8 @@ public class VerifYourVote extends JFrame {
 		byte[] ballotsAsMessage = MessageTools.first(MessageTools.second(result));
 		if (!Utils.contains(ballotsAsMessage, receipt.innerBallot)) {
 			err="PROBLEM: The " + bold("partial result") + " does not containt your inner ballot!";
-			out(err);
-			out(Utilities.byteArrayToHexString(receipt.innerBallot));
+			outl(err);
+			outl(Utilities.byteArrayToHexString(receipt.innerBallot));
 			lblRejectedReason.setText(html(err));
 			return false;
 		}
@@ -564,11 +564,11 @@ public class VerifYourVote extends JFrame {
 		byte[] signature = MessageTools.second(signedFinalResult);
 		
 		String err="";
-		out("");
+		outl("");
 		// check the signature
 		if (!server2ver.verify(signature, result)) {
 			err="PROBLEM: Invalid signature on the " + bold("final result") + ".";
-			out(err);
+			outl(err);
 			lblRejectedReason.setText(html(err));
 			return false;
 		}
@@ -577,7 +577,7 @@ public class VerifYourVote extends JFrame {
 		byte[] elid = MessageTools.first(result);
 		if (!MessageTools.equal(elid, receipt.electionID)) {
 			err="PROBLEM: The election ID in the receipt does not match the one in the " + bold("final result") + ".";
-			out(err);
+			outl(err);
 			lblRejectedReason.setText(html(err));
 			return false;
 		}
@@ -594,21 +594,21 @@ public class VerifYourVote extends JFrame {
 		candidateNumber=MessageTools.byteArrayToInt(vote);
 		if (vote == null) {
 			err="PROBLEM: The " + bold("final result") + " does not containt your nonce!";
-			out(err);
-			out(Utilities.byteArrayToHexString(receipt.nonce));
+			outl(err);
+			outl(Utilities.byteArrayToHexString(receipt.nonce));
 			lblRejectedReason.setText(html(err));
 			return false;
 		}
 		else if (candidateNumber!=receipt.voterChoice) {
 			err="PROBLEM: In the " + bold("final result") + ", the vote next to your nonce is not your vote!";
-			out(err);
-			out("Found candidate number: " + candidateNumber);
+			outl(err);
+			outl("Found candidate number: " + candidateNumber);
 			lblRejectedReason.setText(html(err));
 			return false;
 		}
 		else {
-			out("Your nonce is in the result along with next the number of the candidate you voted:");
-			out("" + AppParams.CANDIDATESARRAY[candidateNumber]);
+			outl("Your nonce is in the result along with next the number of the candidate you voted:");
+			outl("" + AppParams.CANDIDATESARRAY[candidateNumber]);
 		}
 		
 		return true;

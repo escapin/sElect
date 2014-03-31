@@ -162,9 +162,9 @@ public class VoterApp extends JFrame {
 		setBounds(100, 100, 530, 700);
 				// (530, 334);
 		
-		outl("Getting election metadata...");
+		out("Getting election metadata...");
 		electionData=getElectionData(AppParams.ELECTIONID);
-		out("OK");
+		outl("OK");
 		
 		CardLayout cl = new CardLayout();
 		getContentPane().setLayout(cl);
@@ -637,7 +637,7 @@ public class VoterApp extends JFrame {
 			if(voterID<0)
 				throw new NumberFormatException();
 		} catch (NumberFormatException e){
-			System.out.println("'" + fldVoterID.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
+			outl("'" + fldVoterID.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
 			lblUserNotRegister.setText("<html>'" + fldVoterID.getText() + "' is not a proper userID!<br>Please insert the ID number of a registered user.</html>");
 			return;
 		}
@@ -655,17 +655,17 @@ public class VoterApp extends JFrame {
 			setupVoter(voterID);
 			voterRegistered=true;
 		} catch (FileNotFoundException e){
-			System.out.println("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
+			outl("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
 			lblUserNotRegister.setText("<html>User " + voterID + " not registered!<br>Please register yourself before log in.</html>");
 		} catch (IOException e){
-			System.out.println("IOException occurred while reading the credentials of the user!");
+			outl("IOException occurred while reading the credentials of the user!");
 			lblUserNotRegister.setText("IOException occurred while reading the credentials of the user!");
 		} catch (RegisterSig.PKIError | RegisterEnc.PKIError e){
-			System.out.println("PKI Error occurred: perhaps the PKI server is not running!");
+			outl("PKI Error occurred: perhaps the PKI server is not running!");
 			lblUserNotRegister.setText("<html>PKI Error:<br> perhaps the PKI server is not running!</html>");
 		} catch (NetworkError e){
 			//FIXME: java.net.ConnectException when the PKIServer is not running!
-			System.out.println("Network Error occurred while connecting with the PKI server: perhaps the PKI server is not running!");
+			outl("Network Error occurred while connecting with the PKI server: perhaps the PKI server is not running!");
 			lblUserNotRegister.setText("<html>Network Error occurred:<br> perhaps the PKI server is not running!</html>");
 		} finally{
 			lblWait.setText("");
@@ -753,7 +753,7 @@ public class VoterApp extends JFrame {
 							//	btnCandidates[i].repaint();
 				}
 			selectedCandidate=candidateNumber;
-			out("Candidate Selected: " + selectedCandidate);
+			outl("Candidate Selected: " + selectedCandidate);
 			
 			btnVote.setEnabled(true);
 			lblCandidateSelected.setText(html(electionData.candidatesArray[candidateNumber]));
@@ -773,13 +773,13 @@ public class VoterApp extends JFrame {
 				return; // no valid candidate has been selected
 			// Create a ballot;
 			//TODO: comment this line and uncomment the other after testing
-			outl("Creating a ballot with candidate number " + selectedCandidate + "...");
+			out("Creating a ballot with candidate number " + selectedCandidate + "...");
 			//outl("Creating the ballot...");
 			byte[] ballot = voter.createBallot(selectedCandidate);
-			out("OK");
+			outl("OK");
 			
 			// Send the ballot:
-			outl("Sending the ballot to the server...");
+			out("Sending the ballot to the server...");
 			//TODO: create another thread
 			try {
 				serverResponse = 
@@ -787,38 +787,37 @@ public class VoterApp extends JFrame {
 			} catch (NetworkError e) {
 				// TODO Auto-generated catch block
 				// TODO: manage the app so that the vote is not colleted in this case
-				System.out.println("Vote [candidate <int>]: networkError");
+				outl("Vote [candidate <int>]: networkError");
 				e.printStackTrace();
 			}
-			out("OK");
+			outl("OK");
 			
 			// Validate the server's response:
 			try {
 				responseTag = voter.validateResponse(serverResponse);
 			} catch (Error e) {
 				// TODO Auto-generated catch block
-				System.out.println("Vote [candidate <int>]: voteError");
+				outl("Vote [candidate <int>]: voteError");
 				e.printStackTrace();
 			}
-			out("Response of the server: " + responseTag);
+			outl("Response of the server: " + responseTag);
 			
 			CardLayout cl = (CardLayout)(center.getLayout());
 			if (responseTag == Voter.ResponseTag.VOTE_COLLECTED) {
 				// Output the verification data:
 				Voter.Receipt receipt = voter.getReceipt();
-				out("RECEIPT:");
-				out("    nonce = " + byteArrayToHexString(receipt.nonce));
-				out("    inner ballot = " + byteArrayToHexString(receipt.innerBallot));
+				outl("RECEIPT:");
+				outl("    nonce = " + byteArrayToHexString(receipt.nonce));
+				outl("    inner ballot = " + byteArrayToHexString(receipt.innerBallot));
 				if (receipt.serverSignature != null)
-					out("    server's signature = " + byteArrayToHexString(receipt.serverSignature));
+					outl("    server's signature = " + byteArrayToHexString(receipt.serverSignature));
 				
 				// Store the receipt:
 				String receipt_fname = AppParams.RECEIPT_file + voterID + ".msg"; 
 				try {
 					AppUtils.storeAsFile(receipt.asMessage(), receipt_fname);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					System.out.println("Vote(candidate <int>): IOException");
+					outl("Vote(candidate <int>): IOException");
 					e.printStackTrace();
 				}
 				textNonce.setText(byteArrayToHexString(receipt.nonce));
@@ -896,13 +895,13 @@ public class VoterApp extends JFrame {
 		byte[] serialized=null;
 		
 		String filename = AppParams.PATH_STORAGE + "voter" + voterID + ".info";
-		out("private keys filename = " + filename);
+		outl("private keys filename = " + filename);
 		serialized = AppUtils.readFromFile(filename);
 		
 		byte[] idMsg =  MessageTools.first(serialized);
 		int idFromMsg = MessageTools.byteArrayToInt(idMsg);
 		if ( idFromMsg != voterID ) {
-			out("Something wrong with identifiers");
+			outl("Something wrong with identifiers");
 			System.exit(-1);
 		}
 		byte[] decr_sig = MessageTools.second(serialized);
@@ -918,14 +917,14 @@ public class VoterApp extends JFrame {
 		// Verify that the verifier stored in the file is the same as the one in the PKI:
 		Verifier myVerif = RegisterSig.getVerifier(voterID, Params.SIG_DOMAIN);
 		if ( !MessageTools.equal(myVerif.getVerifKey(), voter_sign.getVerifier().getVerifKey()) ) {
-			out("Something wrong with the keys");
+			outl("Something wrong with the keys");
 			System.exit(-1);
 		}
 		
 		// Create the voter:
-		outl("Setting up the voter...");
+		out("Setting up the voter...");
 		voter = new Voter(voterID, AppParams.ELECTIONID, voter_decr, voter_sign);
-		out("OK");
+		outl("OK");
 	}
 
 	

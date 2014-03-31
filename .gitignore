@@ -1,4 +1,5 @@
 bin
-/lib/
+lib
+BulletinBoard/node_modules
 .classpath
 .project

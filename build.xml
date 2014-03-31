@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="build" default="build" basedir=".">
+  <description>
+    This build file builds the eVoting system in such a 	
+    way that it can be runnable.
+
+    Feel free to contact us for further information about usage,
+    bug reports and research related issues.
+
+    Enrico Scapin &lt;scapin@uni-trier.de&gt;
+  </description>
+
+  <!-- set global properties for the system -->
+  <property name="src.dir" location="./src"/>
+  <property name="bin.dir" location="./bin"/>
+  <property name="lib.dir" location="./lib"/>
+  <property name="bulletin.dir" location="./BulletinBoard"/>
+  <property name="modules.dir" location="${bulletin.dir}/node_modules" />
+	
+    
+  <path id="include.lib">
+    <fileset dir="${lib.dir}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+    
+  <target name="build" description="build the sourcecode of the system">
+    <echo>Building the repository.</echo>
+    <mkdir dir="${bin.dir}" />
+    <javac
+	srcdir="${src.dir}"
+        destdir="${bin.dir}"
+        includeantruntime="false"
+        nowarn="true"
+        source="1.7"
+        target="1.7">
+      <classpath refid="include.lib"/>
+    </javac>	
+    <exec executable="npm" dir="${bulletin.dir}">
+      <arg value="install"/>
+    </exec>
+  </target>
+	
+  <target name="clean" description="clean up the binary files" >
+    <echo>Cleaning up the repository.</echo>
+    <delete dir="${bin.dir}" quiet="true" />
+    <delete dir="${modules.dir}" quiet="true" />
+  </target>
+</project>

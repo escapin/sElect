@@ -13,7 +13,7 @@ import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.utils.MessageTools;
 import static de.uni.trier.infsec.utils.Utilities.byteArrayToHexString;
-import static de.uni.trier.infsec.eVotingSystem.core.Utils.out;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.outl;
 
 public class VotingCmdLine 
 {
@@ -26,9 +26,9 @@ public class VotingCmdLine
 		// Parse arguments:
 
 		if (args.length != 2 ) {
-			out("Wrong number of Arguments!");
-			out("Expected: VotingCmdLine <user_id [int]> <candidate_number [int]>");
-			out("Example: VotingCmdLine 07 03");
+			outl("Wrong number of Arguments!");
+			outl("Expected: VotingCmdLine <user_id [int]> <candidate_number [int]>");
+			outl("Example: VotingCmdLine 07 03");
 			System.exit(-1);
 		} 
 		else {
@@ -37,7 +37,7 @@ public class VotingCmdLine
 				candidateNumber=Integer.parseInt(args[1]);
 				//candidate = args[1].getBytes();
 			} catch (Exception e) {
-				out("Something is wrong with arguments!");
+				outl("Something is wrong with arguments!");
 				e.printStackTrace();
 				System.exit(-1);
 			}
@@ -48,7 +48,7 @@ public class VotingCmdLine
 			byte[] serialized=null;
 			try {
 				String filename = AppParams.PATH_STORAGE + "voter" + voterID + ".info";
-				out("private keys filename = " + filename);
+				outl("private keys filename = " + filename);
 				serialized = AppUtils.readFromFile(filename);
 			} 
 			catch (FileNotFoundException e){
@@ -61,7 +61,7 @@ public class VotingCmdLine
 			byte[] idMsg =  MessageTools.first(serialized);
 			int idFromMsg = MessageTools.byteArrayToInt(idMsg);
 			if ( idFromMsg != voterID ) {
-				out("Something wrong with identifiers");
+				outl("Something wrong with identifiers");
 				System.exit(-1);
 			}
 			byte[] decr_sig = MessageTools.second(serialized);
@@ -76,42 +76,42 @@ public class VotingCmdLine
 			// Verify that the verifier stored in the file is the same as the one in the PKI:
 			Verifier myVerif = RegisterSig.getVerifier(voterID, Params.SIG_DOMAIN);
 			if ( !MessageTools.equal(myVerif.getVerifKey(), signer.getVerifier().getVerifKey()) ) {
-				out("Something wrong with the keys");
+				outl("Something wrong with the keys");
 				System.exit(-1);
 			}
 			
 			// Create the voter:
-			out("Creating a voter object.");
+			outl("Creating a voter object.");
 			Voter voter = new Voter(voterID, AppParams.ELECTIONID, decryptor, signer);
 			
 			
 			
 			// Create a ballot;
 			//out("Creating a ballot with candidate " + new String(candidate));
-			out("Creating a ballot with candidate number " + candidateNumber);
+			outl("Creating a ballot with candidate number " + candidateNumber);
 			byte[] ballot = voter.createBallot(candidateNumber);
 			
 			// Send the ballot:
-			out("Sending the ballot to the server");
+			outl("Sending the ballot to the server");
 			byte[] serverResponse = NetworkClient.sendRequest(ballot, AppParams.SERVER1_NAME, AppParams.SERVER1_PORT);
 			
 			//TODO: implement the VoterApp from here to the end of the file
 			
 			// Validate the server's response:
 			Voter.ResponseTag responseTag = voter.validateResponse(serverResponse);
-			out("Response of the server: " + responseTag);
+			outl("Response of the server: " + responseTag);
 			
 			if (responseTag == Voter.ResponseTag.VOTE_COLLECTED) {
 				// Output the verification data:
 				Voter.Receipt receipt = voter.getReceipt();
-				out("RECEIPT:");
-				out("    nonce = " + byteArrayToHexString(receipt.nonce));
-				out("    inner ballot = " + byteArrayToHexString(receipt.innerBallot));
+				outl("RECEIPT:");
+				outl("    nonce = " + byteArrayToHexString(receipt.nonce));
+				outl("    inner ballot = " + byteArrayToHexString(receipt.innerBallot));
 				if (receipt.serverSignature != null)
-					out("    server's signature = " + byteArrayToHexString(receipt.serverSignature));
+					outl("    server's signature = " + byteArrayToHexString(receipt.serverSignature));
 				
 				// Store the receipt:
-				String receipt_fname = "./receipt_" + voterID + ".msg"; 
+				String receipt_fname = AppParams.RECEIPT_file + voterID + ".msg"; 
 				AppUtils.storeAsFile(receipt.asMessage(), receipt_fname);
 			}
 			
