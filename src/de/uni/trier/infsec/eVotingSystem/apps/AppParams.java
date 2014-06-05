@@ -28,7 +28,7 @@ public class AppParams
 														FINAL_RESULT_file
 													};
 	
-	public static final String VOTERAPPNAME = "TVote";
+	public static final String VOTERAPPNAME = "sElect";
 	public static final String VERIFYAPPNAME = "VerifYourVote";
 	
 	public static String SERVER1_NAME = "localhost";
