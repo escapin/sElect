@@ -112,7 +112,7 @@ When the election is over, it is possible to inspect the election outcome at the
 	http://localhost:3000/ 
 by running the following command from the BulletinBoard-folder
 
-8. 	node app.js
+8. 	nodejs app.js
 
 In order to verify whether the vote has been properly counted, run the following 
 command from bin-folder of the compiled project:
