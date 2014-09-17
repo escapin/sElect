@@ -1,6 +1,8 @@
 package de.uni.trier.infsec.eVotingSystem.core;
 
-import static de.uni.trier.infsec.eVotingSystem.core.UtilsCore.arrayEqual;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.arrayEqual;
+import de.uni.trier.infsec.functionalities.pkienc.Encryptor;
+import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.utils.Utilities;	// arrayEqual between arrays of byte
 
 public class ElectionManifest
@@ -25,13 +27,13 @@ public class ElectionManifest
 		// FIXME: perhaps we should have a 'uniqueID' of type String instead of int.
 		
 		// perhaps TODO: add the OAuth/OpenID (public) credentials
-		public final byte[] encryption_key;
-		public final byte[] verification_key;
+		public final Encryptor encryptor;
+		public final Verifier verifier;
 		
-		public VoterID(int uniqueID, byte[] encryption_key, byte[] verifier_key){
+		public VoterID(int uniqueID, Encryptor encryption_key, Verifier verifier_key){
 			this.uniqueID=uniqueID;
-			this.encryption_key=encryption_key;
-			this.verification_key=verifier_key;
+			this.encryptor=encryption_key;
+			this.verifier=verifier_key;
 		}
 		
 		public boolean equals(Object o)
@@ -39,12 +41,11 @@ public class ElectionManifest
 			if(o instanceof VoterID){
 				VoterID vID=(VoterID) o;
 				return	this.uniqueID==vID.uniqueID &&
-						Utilities.arrayEqual(encryption_key, vID.encryption_key) &&
-						Utilities.arrayEqual(verification_key, vID.verification_key);
+						Utilities.arrayEqual(encryptor.getPublicKey(), vID.encryptor.getPublicKey()) &&
+						Utilities.arrayEqual(verifier.getVerifKey(), vID.verifier.getVerifKey());
 			}
 			return false;
 		}
-		
 	}
 	
 	/**
@@ -85,15 +86,15 @@ public class ElectionManifest
 		public final URI uri;
 		
 		//perhaps TODO: add the OAuth/OpenID (public) credentials
-		public final byte[] encryption_key;
-		public final byte[] verification_key;
+		public final Encryptor encryptor;
+		public final Verifier verifier;
 		
 		public ServerID(URI uri, 
-				byte[] encryption_key, byte[] verification_key)
+				Encryptor encryptor, Verifier verifier)
 		{
 			this.uri=uri;
-			this.encryption_key=encryption_key;
-			this.verification_key=verification_key;
+			this.encryptor=encryptor;
+			this.verifier=verifier;
 		}
 		
 		public boolean equals(Object o)
@@ -101,8 +102,8 @@ public class ElectionManifest
 			if(o instanceof ServerID){
 				ServerID sID=(ServerID) o;
 				return	this.uri.equals(sID.uri) &&
-						Utilities.arrayEqual(this.encryption_key, sID.encryption_key) &&
-						Utilities.arrayEqual(this.verification_key, sID.verification_key);
+						Utilities.arrayEqual(this.encryptor.getPublicKey(), sID.encryptor.getPublicKey()) &&
+						Utilities.arrayEqual(this.verifier.getVerifKey(), sID.verifier.getVerifKey());
 			}
 			return false;
 		}
@@ -111,17 +112,17 @@ public class ElectionManifest
 	public static class CollectingServerID extends ServerID
 	{
 		public CollectingServerID(URI uri, 
-				byte[] encyption_key, byte[] verification_key) 
+				Encryptor encryptor, Verifier verifier) 
 		{
-			super(uri, encyption_key, verification_key);
+			super(uri, encryptor, verifier);
 		}
 		public boolean equals(Object o)
 		{
 			if(o instanceof CollectingServerID){
 				CollectingServerID sID=(CollectingServerID) o;
 				return	this.uri.equals(sID.uri) &&
-						Utilities.arrayEqual(this.encryption_key, sID.encryption_key) &&
-						Utilities.arrayEqual(this.verification_key, sID.verification_key);
+						Utilities.arrayEqual(this.encryptor.getPublicKey(), sID.encryptor.getPublicKey()) &&
+						Utilities.arrayEqual(this.verifier.getVerifKey(), sID.verifier.getVerifKey());
 			}
 			return false;			
 		}
@@ -129,9 +130,9 @@ public class ElectionManifest
 	public static class FinalServerID extends ServerID
 	{
 		public FinalServerID(URI uri, 
-				byte[] encryption_key, byte[] verification_key)
+				Encryptor encryptor, Verifier verifier)
 		{
-			super(uri, encryption_key, verification_key);
+			super(uri, encryptor, verifier);
 			
 		}
 		public boolean equals(Object o)
@@ -139,8 +140,8 @@ public class ElectionManifest
 			if(o instanceof FinalServerID){
 				FinalServerID sID=(FinalServerID) o;
 				return	this.uri.equals(sID.uri) &&
-						Utilities.arrayEqual(this.encryption_key, sID.encryption_key) &&
-						Utilities.arrayEqual(this.verification_key, sID.verification_key);
+						Utilities.arrayEqual(this.encryptor.getPublicKey(), sID.encryptor.getPublicKey()) &&
+						Utilities.arrayEqual(this.verifier.getVerifKey(), sID.verifier.getVerifKey());
 			}
 			return false;			
 		}
