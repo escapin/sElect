@@ -45,6 +45,16 @@ public class Utils
 				return true;
 		return false;
 	}
+
+	public static boolean arrayEqual(Object[] a1, Object[] a2)
+	{
+                if (a1.length != a2.length) return false;
+                for (int i = 0; i < a1.length; i++) {
+                        if (!a1[i].equals(a2[i])) 
+                                return false;
+                }
+                return true;
+    }
 	
 	public static int compare(byte[] a1, byte[] a2) {
         int n1 = a1.length;

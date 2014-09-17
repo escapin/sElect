@@ -1,6 +1,6 @@
 package de.uni.trier.infsec.eVotingSystem.core;
 
-import static de.uni.trier.infsec.eVotingSystem.core.UtilsCore.arrayEqual;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.arrayEqual;
 import de.uni.trier.infsec.utils.Utilities;	// arrayEqual between arrays of byte
 
 public class ElectionManifest
