@@ -7,7 +7,7 @@ import de.uni.trier.infsec.eVotingSystem.core.Params;
  */
 public class RegisterFinalServer 
 {
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
 		int id = Params.SERVER2ID;
 		String filename = AppParams.PATH_STORAGE + "server" + id + ".info";
 		System.out.printf("Registering server with ID '%d' and saving the keys in %s\n", id, filename);		

@@ -66,8 +66,8 @@ public class ElectionManifestParser
 		for(VoterID vID: elBoard.getVotersList()){
 			jVoter = new JSONObject();
 			jVoter.put(sUniqueID, vID.uniqueID);
-			jVoter.put(sEncryptionKey, byteArrayToHexString(vID.encryptor));
-			jVoter.put(sVerificationKey, byteArrayToHexString(vID.verifier));
+			jVoter.put(sEncryptionKey, byteArrayToHexString(vID.encryption_key));
+			jVoter.put(sVerificationKey, byteArrayToHexString(vID.verification_key));
 			votersList.put(jVoter);
 		}
 		jMain.put(sVoterList, votersList);
@@ -84,8 +84,8 @@ public class ElectionManifestParser
 			jURI.put(sHostname, server.uri.hostname);
 			jURI.put(sPort, server.uri.port);
 			jServer.put(sURI, jURI);
-			jServer.put(sEncryptionKey, byteArrayToHexString(server.encryptor));
-			jServer.put(sVerificationKey, byteArrayToHexString(server.verifier));		
+			jServer.put(sEncryptionKey, byteArrayToHexString(server.encryption_key));
+			jServer.put(sVerificationKey, byteArrayToHexString(server.verification_key));		
 			if(server instanceof CollectingServerID)
 				jMain.put(sCollectingServer, jServer);
 			else if(server instanceof FinalServerID)
