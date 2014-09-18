@@ -12,14 +12,14 @@ import de.uni.trier.infsec.eVotingSystem.core.Params;
 import de.uni.trier.infsec.eVotingSystem.core.Utils;
 import de.uni.trier.infsec.eVotingSystem.core.Voter;
 import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
+import de.uni.trier.infsec.functionalities.digsig.RegisterSig;
+import de.uni.trier.infsec.functionalities.digsig.Signer;
+import de.uni.trier.infsec.functionalities.digsig.Verifier;
 import de.uni.trier.infsec.functionalities.nonce.NonceGen;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pki.PKIServerCore;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
-import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
-import de.uni.trier.infsec.functionalities.pkisig.Signer;
-import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.utils.MessageTools;
 
 

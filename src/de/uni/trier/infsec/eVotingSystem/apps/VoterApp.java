@@ -48,9 +48,9 @@ import java.io.IOException;
 import de.uni.trier.infsec.eVotingSystem.core.Params;
 import de.uni.trier.infsec.eVotingSystem.core.Voter;
 import de.uni.trier.infsec.eVotingSystem.core.Voter.Error;
+import de.uni.trier.infsec.functionalities.digsig.*;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pkienc.*;
-import de.uni.trier.infsec.functionalities.pkisig.*;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
@@ -916,7 +916,7 @@ public class VoterApp extends JFrame {
 		
 		// Verify that the verifier stored in the file is the same as the one in the PKI:
 		Verifier myVerif = RegisterSig.getVerifier(voterID, Params.SIG_DOMAIN);
-		if ( !MessageTools.equal(myVerif.getVerifKey(), voter_sign.getVerifier().getVerifKey()) ) {
+		if ( !MessageTools.equal(myVerif.getVerificationKey(), voter_sign.getVerifier().getVerificationKey()) ) {
 			outl("Something wrong with the keys");
 			System.exit(-1);
 		}

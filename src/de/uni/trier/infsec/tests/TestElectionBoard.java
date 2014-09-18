@@ -11,18 +11,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.CollectingServerID;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.FinalServerID;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.VoterID;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.CapacityOverflowError;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.ElectionAlreadyArranged;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.ElectionBoardError;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.NotInElectionArranged;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.URI;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifestParser;
-import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
-import de.uni.trier.infsec.functionalities.pkisig.Signer;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.CapacityOverflowError;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.CollectingServerID;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.ElectionAlreadyArranged;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.ElectionBoardError;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.FinalServerID;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.NotInElectionArranged;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.URI;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.VoterID;
+import de.uni.trier.infsec.functionalities.digsig.Signer;
+import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 
 /**
  * @author scapin
@@ -69,27 +69,27 @@ public class TestElectionBoard extends TestCase
 		
 		int voterUniqueID = 0;
 		byte[] encryption_key = new Decryptor().getEncryptor().getPublicKey();
-		byte[] verification_key = new Signer().getVerifier().getVerifKey();
+		byte[] verification_key = new Signer().getVerifier().getVerificationKey();
 		votersList[0]=new VoterID(voterUniqueID, encryption_key, verification_key);
 		
 		voterUniqueID = 1;
 		encryption_key = new Decryptor().getEncryptor().getPublicKey();
-		verification_key = new Signer().getVerifier().getVerifKey();
+		verification_key = new Signer().getVerifier().getVerificationKey();
 		votersList[1]=new VoterID(voterUniqueID, encryption_key, verification_key);
 		
 		voterUniqueID = 2;
 		encryption_key = new Decryptor().getEncryptor().getPublicKey();
-		verification_key = new Signer().getVerifier().getVerifKey();
+		verification_key = new Signer().getVerifier().getVerificationKey();
 		votersList[2]=new VoterID(voterUniqueID, encryption_key, verification_key);
 		
 		URI uriCollectingServer = new URI("localhost", 2000);
 		encryption_key = new Decryptor().getEncryptor().getPublicKey();
-		verification_key = new Signer().getVerifier().getVerifKey();
+		verification_key = new Signer().getVerifier().getVerificationKey();
 		CollectingServerID colServer = new CollectingServerID(uriCollectingServer, encryption_key, verification_key);
 		
 		URI uriFinalServer = new URI("localhost", 3000);
 		encryption_key = new Decryptor().getEncryptor().getPublicKey();
-		verification_key = new Signer().getVerifier().getVerifKey();
+		verification_key = new Signer().getVerifier().getVerificationKey();
 		FinalServerID finServer = new FinalServerID(uriFinalServer, encryption_key, verification_key);
 		
 		URI[] bulletinBoard = new URI[2];

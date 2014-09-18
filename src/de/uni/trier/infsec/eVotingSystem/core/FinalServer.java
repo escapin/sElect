@@ -3,11 +3,11 @@ package de.uni.trier.infsec.eVotingSystem.core;
 import java.util.Arrays;
 
 import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
+import de.uni.trier.infsec.functionalities.digsig.RegisterSig;
+import de.uni.trier.infsec.functionalities.digsig.Signer;
+import de.uni.trier.infsec.functionalities.digsig.Verifier;
+import de.uni.trier.infsec.functionalities.digsig.RegisterSig.PKIError;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
-import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
-import de.uni.trier.infsec.functionalities.pkisig.RegisterSig.PKIError;
-import de.uni.trier.infsec.functionalities.pkisig.Signer;
-import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.utils.MessageTools;
 

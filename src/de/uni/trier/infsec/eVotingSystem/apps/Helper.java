@@ -1,7 +1,7 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
 import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
-import de.uni.trier.infsec.functionalities.pkisig.Verifier;
+import de.uni.trier.infsec.functionalities.digsig.Verifier;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.utils.Utilities;
 

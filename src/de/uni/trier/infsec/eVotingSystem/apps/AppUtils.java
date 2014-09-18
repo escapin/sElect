@@ -9,11 +9,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import de.uni.trier.infsec.eVotingSystem.core.Params;
+import de.uni.trier.infsec.functionalities.digsig.RegisterSig;
+import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
-import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
-import de.uni.trier.infsec.functionalities.pkisig.Signer;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.utils.MessageTools;
 
@@ -44,15 +44,14 @@ public class AppUtils
 		return data;
 	}
 
-	public static void registerAndSave(int id, String filename) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
+	public static void setupServer(String filename) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
 		PKI.useRemoteMode();
 
 		Decryptor decr = new Decryptor();
 		Signer sign = new Signer();
-		RegisterEnc.registerEncryptor(decr.getEncryptor(), id, Params.ENC_DOMAIN);
-		RegisterSig.registerVerifier(sign.getVerifier(), id, Params.SIG_DOMAIN);
+		
 
-		byte[] idmsg = MessageTools.intToByteArray(id);
+		
 		byte[] decryptor = decr.toBytes();
 		byte[] signer = sign.toBytes();
 		byte[] serialized = concatenate(idmsg, concatenate(decryptor, signer));

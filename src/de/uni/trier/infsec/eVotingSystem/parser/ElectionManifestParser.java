@@ -7,14 +7,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.CollectingServerID;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.ElectionBoardError;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.FinalServerID;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.NotInElectionArranged;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.ServerID;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.URI;
-import de.uni.trier.infsec.eVotingSystem.core.ElectionManifest.VoterID;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.CollectingServerID;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.ElectionBoardError;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.FinalServerID;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.NotInElectionArranged;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.ServerID;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.URI;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.VoterID;
 
 public class ElectionManifestParser 
 {

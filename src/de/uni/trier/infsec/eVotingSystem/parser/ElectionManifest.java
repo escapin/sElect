@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.eVotingSystem.core;
+package de.uni.trier.infsec.eVotingSystem.parser;
 
 import static de.uni.trier.infsec.eVotingSystem.core.Utils.arrayEqual;
 import de.uni.trier.infsec.utils.Utilities;	// arrayEqual between arrays of byte
