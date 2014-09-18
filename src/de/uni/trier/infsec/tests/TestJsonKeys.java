@@ -21,7 +21,7 @@ import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
  * @author scapin
  *
  */
-public class TestPrivateKeys extends TestCase
+public class TestJsonKeys extends TestCase
 {
 	/**
 	 * @throws java.lang.Exception

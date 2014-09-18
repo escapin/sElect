@@ -1,19 +1,26 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
+import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.storeAsFile;
 import static de.uni.trier.infsec.utils.MessageTools.concatenate;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import de.uni.trier.infsec.eVotingSystem.core.Params;
-import de.uni.trier.infsec.functionalities.digsig.RegisterSig;
+import de.uni.trier.infsec.eVotingSystem.parser.PrivateKeys;
+import de.uni.trier.infsec.eVotingSystem.parser.PrivateKeysParser;
+import de.uni.trier.infsec.eVotingSystem.parser.PublicKeys;
+import de.uni.trier.infsec.eVotingSystem.parser.PublicKeysParser;
+//import de.uni.trier.infsec.functionalities.digsig.RegisterSig;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
-import de.uni.trier.infsec.functionalities.pki.PKI;
-import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
-import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
+//import de.uni.trier.infsec.functionalities.pki.PKI;
+import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
+//import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.utils.MessageTools;
 
@@ -33,6 +40,20 @@ public class AppUtils
 		file.close();
 	}
 
+	public static void storeAsFile(String data, String sFile) throws IOException {
+		File f = new File(sFile);
+		File fdir = new File(sFile.substring(0, sFile.lastIndexOf(File.separator)));
+		if (f.exists()) f.delete();
+		fdir.mkdirs();
+		f.createNewFile();
+
+		FileWriter fw = new FileWriter(f.getAbsoluteFile());
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write(data);
+		bw.flush();
+		bw.close();
+	}
+	
 	public static byte[] readFromFile(String path) throws IOException {
 		FileInputStream f = new FileInputStream(path);
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -44,7 +65,33 @@ public class AppUtils
 		return data;
 	}
 
-	public static void setupServer(String filename) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
+	public static void setupServer(String name)
+	{
+		Decryptor decr = new Decryptor();
+		Signer sign = new Signer();
+		
+		String file_pr = AppParams.PATH_STORAGE + name + "_PR.json";
+		PrivateKeys prKeys = new PrivateKeys(decr.getDecryptionKey(),sign.getSignatureKey());
+		String prKeysJSON = PrivateKeysParser.generateJSON(prKeys);
+		try {
+			storeAsFile(prKeysJSON, file_pr);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		String file_pu = AppParams.PATH_STORAGE + name + "_PU.json";
+		PublicKeys puKeys = new PublicKeys(decr.getEncryptionKey(), sign.getVerificationKey());
+		String puKeysJSON = PublicKeysParser.generateJSON(puKeys);
+		System.out.println(name + "'s public keys:");
+		System.out.println(puKeysJSON);
+		try {
+			storeAsFile(puKeysJSON, file_pu);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("The public keys has been saved in: \n" + file_pu);
+	}
+/*	public static void setupServer(String filename) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
 		PKI.useRemoteMode();
 
 		Decryptor decr = new Decryptor();
@@ -62,5 +109,5 @@ public class AppUtils
 		File f = new File(filename);
 		if (f.exists()) f.delete();
 		
-	}
+	}*/
 }
