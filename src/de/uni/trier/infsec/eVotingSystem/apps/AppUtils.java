@@ -12,10 +12,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import de.uni.trier.infsec.eVotingSystem.core.Params;
+import de.uni.trier.infsec.eVotingSystem.parser.KeyPair;
+import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
 import de.uni.trier.infsec.eVotingSystem.parser.PrivateKeys;
-import de.uni.trier.infsec.eVotingSystem.parser.PrivateKeysParser;
 import de.uni.trier.infsec.eVotingSystem.parser.PublicKeys;
-import de.uni.trier.infsec.eVotingSystem.parser.PublicKeysParser;
 //import de.uni.trier.infsec.functionalities.digsig.RegisterSig;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 //import de.uni.trier.infsec.functionalities.pki.PKI;
@@ -65,31 +65,15 @@ public class AppUtils
 		return data;
 	}
 
-	public static void setupServer(String name)
+	public static String setupKeys(KeyPair k, String filename)
 	{
-		Decryptor decr = new Decryptor();
-		Signer sign = new Signer();
-		
-		String file_pr = AppParams.PATH_STORAGE + name + "_PR.json";
-		PrivateKeys prKeys = new PrivateKeys(decr.getDecryptionKey(),sign.getSignatureKey());
-		String prKeysJSON = PrivateKeysParser.generateJSON(prKeys);
+		String prKeysJSON = KeysParser.generateJSON(k);
 		try {
-			storeAsFile(prKeysJSON, file_pr);
+			storeAsFile(prKeysJSON, filename);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		String file_pu = AppParams.PATH_STORAGE + name + "_PU.json";
-		PublicKeys puKeys = new PublicKeys(decr.getEncryptionKey(), sign.getVerificationKey());
-		String puKeysJSON = PublicKeysParser.generateJSON(puKeys);
-		System.out.println(name + "'s public keys:");
-		System.out.println(puKeysJSON);
-		try {
-			storeAsFile(puKeysJSON, file_pu);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		System.out.println("The public keys has been saved in: \n" + file_pu);
+		return prKeysJSON;
 	}
 /*	public static void setupServer(String filename) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
 		PKI.useRemoteMode();

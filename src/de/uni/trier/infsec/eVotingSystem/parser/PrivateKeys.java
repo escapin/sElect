@@ -2,24 +2,21 @@ package de.uni.trier.infsec.eVotingSystem.parser;
 
 import static de.uni.trier.infsec.utils.Utilities.arrayEqual;
 
-public class PrivateKeys
+public class PrivateKeys extends KeyPair
 {
-	public byte[] decryptionKey;
-	public byte[] signatureKey;
-	
 	public PrivateKeys(byte[] decryptionKey, byte[] signatureKey)
 	{
-		this.decryptionKey=decryptionKey;
-		this.signatureKey=signatureKey;
+		pkencKey=decryptionKey;
+		digsigKey=signatureKey;
 	}
 	
 	public boolean equals(Object o)
 	{
 		if(o instanceof PrivateKeys)
 		{
-			PrivateKeys prKeys=(PrivateKeys) o;
-			return arrayEqual(this.decryptionKey, prKeys.decryptionKey) &&
-					arrayEqual(this.signatureKey, prKeys.signatureKey);
+			PrivateKeys othKeys=(PrivateKeys) o;
+			return arrayEqual(this.pkencKey, othKeys.pkencKey) &&
+					arrayEqual(this.digsigKey, othKeys.digsigKey);
 		}
 		return false;
 	}

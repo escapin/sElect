@@ -40,6 +40,8 @@ public class Utilities {
 	 *	Checks two Arrays for equality 
 	 */
 	public static boolean arrayEqual(byte[] a1, byte[] a2) {
+		if(a1==null && a2==null) return true;
+		if(a1==null || a2==null) return false;
 		if (a1.length != a2.length) return false;
 		for (int i = 0; i < a1.length; i++) {
 			if (a1[i] != a2[i]) return false;
