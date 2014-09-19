@@ -41,7 +41,7 @@ public class VerifierCmdLine {
 		// Read the receipt:
 		byte[] receiptMsg = null;
 		try {
-			receiptMsg = AppUtils.readFromFile(receiptFileName);
+			receiptMsg = AppUtils.readBytesFromFile(receiptFileName);
 		}
 		catch (Exception e) {
 			outl("Cannot read the receipt file.");
@@ -53,7 +53,7 @@ public class VerifierCmdLine {
 		// Read the partial result:
 		byte[] signedPartialResult = null;
 		try {
-			signedPartialResult = AppUtils.readFromFile(partialResultFileName);
+			signedPartialResult = AppUtils.readBytesFromFile(partialResultFileName);
 		}
 		catch (Exception e) {
 			outl("Cannot read the file with the partial result.");
@@ -64,7 +64,7 @@ public class VerifierCmdLine {
 		// Read the final result:
 		byte[] signedFinalResult = null;
 		try {
-			signedFinalResult = AppUtils.readFromFile(finalResultFileName);
+			signedFinalResult = AppUtils.readBytesFromFile(finalResultFileName);
 		}
 		catch (Exception e) {
 			outl("Cannot read the file with the final result.");

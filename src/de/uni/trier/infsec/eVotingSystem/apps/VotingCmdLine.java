@@ -49,7 +49,7 @@ public class VotingCmdLine
 			try {
 				String filename = AppParams.PATH_STORAGE + "voter" + voterID + ".info";
 				outl("private keys filename = " + filename);
-				serialized = AppUtils.readFromFile(filename);
+				serialized = AppUtils.readBytesFromFile(filename);
 			} 
 			catch (FileNotFoundException e){
 				System.out.println("Voter " + voterID + " not registered!");

@@ -896,7 +896,7 @@ public class VoterApp extends JFrame {
 		
 		String filename = AppParams.PATH_STORAGE + "voter" + voterID + ".info";
 		outl("private keys filename = " + filename);
-		serialized = AppUtils.readFromFile(filename);
+		serialized = AppUtils.readBytesFromFile(filename);
 		
 		byte[] idMsg =  MessageTools.first(serialized);
 		int idFromMsg = MessageTools.byteArrayToInt(idMsg);

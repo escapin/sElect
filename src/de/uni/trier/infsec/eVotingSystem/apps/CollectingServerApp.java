@@ -7,8 +7,7 @@ import de.uni.trier.infsec.eVotingSystem.core.CollectingServer;
 import de.uni.trier.infsec.eVotingSystem.core.CollectingServer.MalformedMessage;
 import de.uni.trier.infsec.eVotingSystem.core.Params;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
-import de.uni.trier.infsec.functionalities.pki.PKI;
-import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
+import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.lib.network.NetworkServer;
@@ -19,19 +18,22 @@ public class CollectingServerApp {
 	private static CollectingServer server = null;
 	
 	public static void main(String[] args)  {	
-		PKI.useRemoteMode();
 		System.out.println("Creating the server...");
+		
 		setupServer();
 		System.out.println("Running...");
 		run();
 	}
 
 	private static void setupServer() {
+		
+		
+		
 		AppUtils.deleteFile(AppParams.FIN_SERVER_RESULT_msg);
 		
 		byte[] serialized=null;
 		try {
-			serialized = AppUtils.readFromFile(AppParams.PATH_STORAGE + "server" + Params.SERVER1ID + ".info");
+			serialized = AppUtils.readBytesFromFile(AppParams.PATH_STORAGE + "server" + Params.SERVER1ID + ".info");
 		} 
 		catch (FileNotFoundException e){
 			System.out.println("Server not registered yet!");

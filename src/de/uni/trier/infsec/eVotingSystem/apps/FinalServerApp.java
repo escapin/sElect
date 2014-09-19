@@ -32,7 +32,7 @@ public class FinalServerApp {
 		
 		byte[] serialized=null;
 		try {
-			serialized = AppUtils.readFromFile(AppParams.PATH_STORAGE + "server" + Params.SERVER2ID + ".info");
+			serialized = AppUtils.readBytesFromFile(AppParams.PATH_STORAGE + "server" + Params.SERVER2ID + ".info");
 		} 
 		catch (FileNotFoundException e){
 			System.out.println("Server not registered yet!");

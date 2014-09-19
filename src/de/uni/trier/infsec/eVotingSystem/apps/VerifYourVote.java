@@ -446,7 +446,7 @@ public class VerifYourVote extends JFrame {
 		byte[] receiptMsg=null;
 		try {
 			try{
-				receiptMsg=AppUtils.readFromFile(AppParams.RECEIPT_file +  voterID + ".msg");
+				receiptMsg=AppUtils.readBytesFromFile(AppParams.RECEIPT_file +  voterID + ".msg");
 			} catch (FileNotFoundException e){
 				outl("Voter " + voterID + " have not voted. No receipt found: \n\t" + e.getMessage());
 				// out("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
@@ -454,8 +454,8 @@ public class VerifYourVote extends JFrame {
 				return;
 			}
 			try{
-				signedPartialResult=AppUtils.readFromFile(AppParams.COLL_SERVER_RESULT_msg);
-				signedFinalResult=AppUtils.readFromFile(AppParams.FIN_SERVER_RESULT_msg);
+				signedPartialResult=AppUtils.readBytesFromFile(AppParams.COLL_SERVER_RESULT_msg);
+				signedFinalResult=AppUtils.readBytesFromFile(AppParams.FIN_SERVER_RESULT_msg);
 			} catch (FileNotFoundException e){
 				outl("Can not read one of the files:\n\t" + e.getMessage());
 				// out("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");

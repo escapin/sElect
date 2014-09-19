@@ -54,7 +54,12 @@ public class AppUtils
 		bw.close();
 	}
 	
-	public static byte[] readFromFile(String path) throws IOException {
+	public static String readCharsFromFile(String path) throws IOException {
+		
+		return null;
+	}
+	
+	public static byte[] readBytesFromFile(String path) throws IOException {
 		FileInputStream f = new FileInputStream(path);
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		while (f.available() > 0){			
@@ -65,8 +70,7 @@ public class AppUtils
 		return data;
 	}
 
-	public static String setupKeys(KeyPair k, String filename)
-	{
+	public static String setupKeys(KeyPair k, String filename) {
 		String prKeysJSON = KeysParser.generateJSON(k);
 		try {
 			storeAsFile(prKeysJSON, filename);
@@ -75,23 +79,22 @@ public class AppUtils
 		}
 		return prKeysJSON;
 	}
-/*	public static void setupServer(String filename) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
-		PKI.useRemoteMode();
-
-		Decryptor decr = new Decryptor();
-		Signer sign = new Signer();
-		
-
-		
-		byte[] decryptor = decr.toBytes();
-		byte[] signer = sign.toBytes();
-		byte[] serialized = concatenate(idmsg, concatenate(decryptor, signer));
-		AppUtils.storeAsFile(serialized, filename);
-	}
-
+	
 	public static void deleteFile(String filename) {
 		File f = new File(filename);
-		if (f.exists()) f.delete();
-		
-	}*/
+		if (f.exists()) f.delete();	
+	}
 }
+/*	public static void setupServer(String filename) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
+	PKI.useRemoteMode();
+
+	Decryptor decr = new Decryptor();
+	Signer sign = new Signer();
+	
+
+	
+	byte[] decryptor = decr.toBytes();
+	byte[] signer = sign.toBytes();
+	byte[] serialized = concatenate(idmsg, concatenate(decryptor, signer));
+	AppUtils.storeAsFile(serialized, filename);
+	}*/
