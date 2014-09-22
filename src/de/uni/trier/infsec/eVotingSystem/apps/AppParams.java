@@ -7,6 +7,9 @@ public class AppParams
 	public static final String PATH_STORAGE = System.getProperty("java.io.tmpdir") + File.separator + "eVotingSystem" + File.separator;
 	public static final String RECEIPT_file = PATH_STORAGE + "receipt_"; // + voterID + ".msg";
 	
+	public static final String PUBLIC_KEY_dir = PATH_STORAGE + "PublicKeys" + File.separator;
+	public static final String PRIVATE_KEY_dir = PATH_STORAGE + "PrivateKeys" + File.separator;
+	
 	public static final String PKI_DATABASE = System.getProperty("java.io.tmpdir") + File.separator + "PKI_server.db";
 	// = de.uni.trier.infsec.functionalities.pki.PKIServerCore.DEFAULT_DATABASE;
 	

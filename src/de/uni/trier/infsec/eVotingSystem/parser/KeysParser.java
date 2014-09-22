@@ -8,60 +8,54 @@ import org.json.JSONObject;
 
 public class KeysParser 
 {
-	public static String generateJSON(KeyPair k) 
+	public static String generateJSON(Keys k) 
 	{
 		JSONObject jObj = generateJSONObject(k);
 		return jObj.toString(1);	
 	}
 	
-	public static KeyPair parseJSONString(String stringJSON) throws JSONException 
+	public static Keys parseJSONString(String stringJSON) throws JSONException 
 	{
 		JSONObject jMain=new JSONObject(stringJSON);
 		return parseKeyJSON(jMain);
 	}
-	private static final String 	sEncryptionKey="encryptionKey",
-									sDecryptionKey="decryptionKey",
-									sVerificationKey="verificationKey",
-									sSignatureKey="signatureKey";
+	private static final String 	sEncrKey="encryptionKey",
+									sDecrKey="decryptionKey",
+									sSignKey="signatureKey",
+									sVerifKey="verificationKey";									
 	
-	private static JSONObject generateJSONObject(KeyPair k)
+	private static JSONObject generateJSONObject(Keys k)
 	{
-		String sPkencKey =
-				(k instanceof PublicKeys)? sEncryptionKey: sDecryptionKey;
-		String sDigsigKey = 
-				(k instanceof PublicKeys)? sVerificationKey: sSignatureKey;
-		
 		JSONObject jMain=new JSONObject();
-		if(k.pkencKey!=null)
-			jMain.put(sPkencKey, byteArrayToHexString(k.pkencKey));
-		if(k.digsigKey!=null)
-			jMain.put(sDigsigKey, byteArrayToHexString(k.digsigKey));
+		if(k.encrKey!=null)
+			jMain.put(sEncrKey, byteArrayToHexString(k.encrKey));
+		if(k.decrKey!=null)
+			jMain.put(sDecrKey, byteArrayToHexString(k.decrKey));
+		if(k.signKey!=null)		
+			jMain.put(sSignKey, byteArrayToHexString(k.signKey));
+		if(k.verifKey!=null)
+			jMain.put(sVerifKey, byteArrayToHexString(k.verifKey));
 		return jMain;
 	}
 	
 	
-	private static KeyPair parseKeyJSON(JSONObject jMain) throws JSONException
+	private static Keys parseKeyJSON(JSONObject jMain) throws JSONException
 	{
-		byte[]	pkencKey=null,
-				digsigKey=null;
+		Keys k = new Keys();
 		
 		try{
-			pkencKey = hexStringToByteArray(jMain.getString(sEncryptionKey));
+			k.encrKey = hexStringToByteArray(jMain.getString(sEncrKey));
 		} catch (JSONException e){}
 		try{
-			digsigKey = hexStringToByteArray(jMain.getString(sVerificationKey));
+			k.decrKey = hexStringToByteArray(jMain.getString(sDecrKey));
+		} catch (JSONException e){}
+		try{
+			k.signKey = hexStringToByteArray(jMain.getString(sSignKey));
+		} catch (JSONException e){}
+		try{
+			k.verifKey = hexStringToByteArray(jMain.getString(sVerifKey));
 		} catch (JSONException e){}
 		
-		if(pkencKey!=null || digsigKey!=null)
-			return new PublicKeys(pkencKey, digsigKey);
-		else{
-			try{
-				pkencKey = hexStringToByteArray(jMain.getString(sDecryptionKey));
-			} catch (JSONException e){}
-			try{
-				digsigKey = hexStringToByteArray(jMain.getString(sSignatureKey));
-			} catch (JSONException e){}
-			return new PrivateKeys(pkencKey, digsigKey);
-		}
+		return k;
 	}
 }

@@ -1,76 +1,98 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
-import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.storeAsFile;
-import static de.uni.trier.infsec.utils.MessageTools.concatenate;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.IOException;
-
-import de.uni.trier.infsec.eVotingSystem.core.Params;
-import de.uni.trier.infsec.eVotingSystem.parser.KeyPair;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import de.uni.trier.infsec.eVotingSystem.parser.Keys;
 import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
-import de.uni.trier.infsec.eVotingSystem.parser.PrivateKeys;
-import de.uni.trier.infsec.eVotingSystem.parser.PublicKeys;
-//import de.uni.trier.infsec.functionalities.digsig.RegisterSig;
-import de.uni.trier.infsec.functionalities.digsig.Signer;
-//import de.uni.trier.infsec.functionalities.pki.PKI;
-import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
-//import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
-import de.uni.trier.infsec.lib.network.NetworkError;
-import de.uni.trier.infsec.utils.MessageTools;
+
 
 public class AppUtils 
 {
-	// FIXME: storeAsFile does not work if the file name does not have '/'
-	public static void storeAsFile(byte[] data, String sFile) throws IOException {
-		File f = new File(sFile);
-		File fdir = new File(sFile.substring(0, sFile.lastIndexOf(File.separator)));
-		if (f.exists()) f.delete();
-		fdir.mkdirs();
-		f.createNewFile();
-
-		FileOutputStream file = new FileOutputStream(f);
-		file.write(data);
-		file.flush();
-		file.close();
-	}
-
 	public static void storeAsFile(String data, String sFile) throws IOException {
-		File f = new File(sFile);
-		File fdir = new File(sFile.substring(0, sFile.lastIndexOf(File.separator)));
-		if (f.exists()) f.delete();
-		fdir.mkdirs();
-		f.createNewFile();
-
-		FileWriter fw = new FileWriter(f.getAbsoluteFile());
-		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write(data);
-		bw.flush();
-		bw.close();
-	}
-	
-	public static String readCharsFromFile(String path) throws IOException {
+		Path pFile = Paths.get(sFile);
 		
-		return null;
+		Path pDir = pFile.getParent();
+		if(pDir!=null && !Files.isDirectory(pDir, LinkOption.NOFOLLOW_LINKS))
+			Files.createDirectory(pDir);
+		else
+			Files.deleteIfExists(pFile);
+		
+		Path file=Files.createFile(pFile);
+		BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8);
+		writer.write(data);
+		writer.flush();
+		writer.close();
 	}
 	
-	public static byte[] readBytesFromFile(String path) throws IOException {
-		FileInputStream f = new FileInputStream(path);
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		while (f.available() > 0){			
-			bos.write(f.read());
-		}
-		f.close();
-		byte[] data = bos.toByteArray();
-		return data;
+	public static String readCharsFromFile(String sFile) throws IOException {
+		Path pFile = Paths.get(sFile);
+		
+		BufferedReader reader = Files.newBufferedReader(pFile, StandardCharsets.UTF_8);
+		StringBuffer out = new StringBuffer();
+		int c;
+		while((c =  reader.read()) != -1) 
+			out.append((char) c);
+		return out.toString();
+	}
+	
+	public static void storeAsFile(byte[] data, String sFile) throws IOException {
+		Path pFile = Paths.get(sFile);
+		
+		Path pDir = pFile.getParent();
+		if(pDir!=null && !Files.isDirectory(pDir, LinkOption.NOFOLLOW_LINKS))
+			Files.createDirectory(pDir);
+		else
+			Files.deleteIfExists(pFile);
+		
+		Path file=Files.createFile(pFile);
+		OutputStream writer =  Files.newOutputStream(file);
+		writer.write(data);
+		writer.flush();
+		writer.close();
 	}
 
-	public static String setupKeys(KeyPair k, String filename) {
+	public static byte[] readBytesFromFile(String sFile) throws IOException {
+		Path pFile = Paths.get(sFile);
+		
+		InputStream reader= Files.newInputStream(pFile);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		int b;
+		while((b =  reader.read()) != -1) 
+			out.write((byte) b);
+		return out.toByteArray();
+	}
+	
+	public static void deleteFile(String filename) {
+		File f = new File(filename);
+		if (f.exists()) f.delete();	
+	}
+	
+	protected static void setupPrivateKeys(Keys k, String filename) 
+	{
+		setupKeys(k,filename);
+	}
+	
+	protected static String setupPublicKeys(Keys k, String filename)
+	{
+		Keys pu = new Keys();
+		pu.encrKey=k.encrKey;
+		pu.verifKey=k.verifKey;
+		return setupKeys(pu,filename);
+	}
+	
+	private static String setupKeys(Keys k, String filename)
+	{
 		String prKeysJSON = KeysParser.generateJSON(k);
 		try {
 			storeAsFile(prKeysJSON, filename);
@@ -79,12 +101,9 @@ public class AppUtils
 		}
 		return prKeysJSON;
 	}
-	
-	public static void deleteFile(String filename) {
-		File f = new File(filename);
-		if (f.exists()) f.delete();	
-	}
 }
+
+
 /*	public static void setupServer(String filename) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
 	PKI.useRemoteMode();
 

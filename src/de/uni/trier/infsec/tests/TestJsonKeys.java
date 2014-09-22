@@ -10,10 +10,8 @@ import org.json.XML;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.uni.trier.infsec.eVotingSystem.parser.KeyPair;
+import de.uni.trier.infsec.eVotingSystem.parser.Keys;
 import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
-import de.uni.trier.infsec.eVotingSystem.parser.PrivateKeys;
-import de.uni.trier.infsec.eVotingSystem.parser.PublicKeys;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 
@@ -36,38 +34,33 @@ public class TestJsonKeys extends TestCase
 		Signer sign = new Signer();
 		
 		// PRIVATE KEYS
-		PrivateKeys prKeys = new PrivateKeys(decr.getDecryptionKey(),sign.getSignatureKey());
+		Keys k = new Keys();
+		k.decrKey = decr.getDecryptionKey();
+		k.encrKey = decr.getEncryptionKey();
+		k.signKey = sign.getSignatureKey();
+		k.verifKey = sign.getVerificationKey();
 		
-		String stringJSON = KeysParser.generateJSON(prKeys);
+		
+		String stringJSON = KeysParser.generateJSON(k);
 		// PRINT the JSON
 		System.out.println(stringJSON);
-		PrivateKeys new_prKeys = (PrivateKeys) KeysParser.parseJSONString(stringJSON);
 		
-		assertTrue(prKeys.equals(new_prKeys));
+		Keys new_keys = KeysParser.parseJSONString(stringJSON);
+		
+		assertTrue(k.equals(new_keys));
 		
 		System.out.println();
 		// PUBLIC KEYS
-		PublicKeys puKeys = new PublicKeys(decr.getEncryptionKey(), sign.getVerificationKey());
+		Keys puKeys = new Keys();
+		puKeys.encrKey = decr.getEncryptionKey();
+		puKeys.verifKey = sign.getVerificationKey();
 		
 		stringJSON = KeysParser.generateJSON(puKeys);
 		System.out.println(stringJSON);
-		PublicKeys new_puKeys = (PublicKeys) KeysParser.parseJSONString(stringJSON);
 		
+		Keys new_puKeys = KeysParser.parseJSONString(stringJSON);
 		assertTrue(puKeys.equals(new_puKeys));
-		
-		prKeys = new PrivateKeys(null, sign.getSignatureKey());
-		//prKeys = new PrivateKeys(decr.getDecryptionKey(), null);
-		stringJSON = KeysParser.generateJSON(prKeys);
-		System.out.println(stringJSON);
-		new_prKeys = (PrivateKeys) KeysParser.parseJSONString(stringJSON);
-		assertTrue(prKeys.equals(new_prKeys));
 
-		puKeys = new PublicKeys(null, sign.getVerificationKey());
-		//puKeys = new PublicKeys(decr.getEncryptionKey(), null);
-		stringJSON = KeysParser.generateJSON(puKeys);
-		System.out.println(stringJSON);
-		new_puKeys = (PublicKeys) KeysParser.parseJSONString(stringJSON);
-		assertTrue(puKeys.equals(new_puKeys));
 	}
 
 }
