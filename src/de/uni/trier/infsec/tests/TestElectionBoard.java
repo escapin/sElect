@@ -10,17 +10,16 @@ import org.json.XML;
 import org.junit.Before;
 import org.junit.Test;
 
-
+import de.uni.trier.infsec.eVotingSystem.bean.CollectingServerID;
+import de.uni.trier.infsec.eVotingSystem.bean.FinalServerID;
+import de.uni.trier.infsec.eVotingSystem.bean.URI;
+import de.uni.trier.infsec.eVotingSystem.bean.VoterID;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifestParser;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.CapacityOverflowError;
-import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.CollectingServerID;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.ElectionAlreadyArranged;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.ElectionBoardError;
-import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.FinalServerID;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.NotInElectionArranged;
-import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.URI;
-import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.VoterID;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 

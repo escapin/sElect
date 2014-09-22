@@ -1,7 +1,10 @@
 package de.uni.trier.infsec.eVotingSystem.parser;
 
 import static de.uni.trier.infsec.eVotingSystem.core.Utils.arrayEqual;
-import de.uni.trier.infsec.utils.Utilities;	// arrayEqual between arrays of byte
+import de.uni.trier.infsec.eVotingSystem.bean.CollectingServerID;
+import de.uni.trier.infsec.eVotingSystem.bean.FinalServerID;
+import de.uni.trier.infsec.eVotingSystem.bean.URI;
+import de.uni.trier.infsec.eVotingSystem.bean.VoterID;
 
 public class ElectionManifest
 {
@@ -13,138 +16,6 @@ public class ElectionManifest
 	public static class NotInElectionArranged extends ElectionBoardError{} // used by eVotingSystem.parser.ElectionManifest
 	@SuppressWarnings("serial")
 	public static class CapacityOverflowError extends ElectionBoardError{}
-	
-	/**
-	 * Record to store voters' attributes.
-	 * @author scapin
-	 *
-	 */
-	public static class VoterID
-	{
-		public final int uniqueID; 
-		// FIXME: perhaps we should have a 'uniqueID' of type String instead of int.
-		
-		// perhaps TODO: add the OAuth/OpenID (public) credentials
-		public final byte[] encryption_key;
-		public final byte[] verification_key;
-		
-		public VoterID(int uniqueID, byte[] encryption_key, byte[] verifier_key){
-			this.uniqueID=uniqueID;
-			this.encryption_key=encryption_key;
-			this.verification_key=verifier_key;
-		}
-		
-		public boolean equals(Object o)
-		{
-			if(o instanceof VoterID){
-				VoterID vID=(VoterID) o;
-				return	this.uniqueID==vID.uniqueID &&
-						Utilities.arrayEqual(encryption_key, vID.encryption_key) &&
-						Utilities.arrayEqual(verification_key, vID.verification_key);
-			}
-			return false;
-		}
-		
-	}
-	
-	/**
-	 * Record to store Uniform Resource Locator(s)
-	 * 
-	 * @author scapin
-	 */
-	public static class URI
-	{
-		// URL
-		public String hostname;
-		public int port; 
-		//according to the URI definition, maybe TODO: URN (Uniform resource name) 
-		
-		public URI(String hostname, int port){
-			this.hostname=hostname;
-			this.port=port;
-		}
-		
-		public boolean equals(Object o)
-		{
-			if(o instanceof URI){
-				URI u=(URI) o;
-				return this.hostname.equals(u.hostname) && 
-						this.port==u.port;
-			}
-			return false;
-		}
-	}
-	
-	/**
-	 * Record to store servers' attributes.
-	 * @author scapin
-	 *
-	 */
-	public static class ServerID
-	{		
-		public final URI uri;
-		
-		//perhaps TODO: add the OAuth/OpenID (public) credentials
-		public final byte[] encryption_key;
-		public final byte[] verification_key;
-		
-		public ServerID(URI uri, 
-				byte[] encryption_key, byte[] verification_key)
-		{
-			this.uri=uri;
-			this.encryption_key=encryption_key;
-			this.verification_key=verification_key;
-		}
-		
-		public boolean equals(Object o)
-		{
-			if(o instanceof ServerID){
-				ServerID sID=(ServerID) o;
-				return	this.uri.equals(sID.uri) &&
-						Utilities.arrayEqual(this.encryption_key, sID.encryption_key) &&
-						Utilities.arrayEqual(this.verification_key, sID.verification_key);
-			}
-			return false;
-		}
-	}
-	
-	public static class CollectingServerID extends ServerID
-	{
-		public CollectingServerID(URI uri, 
-				byte[] encyption_key, byte[] verification_key) 
-		{
-			super(uri, encyption_key, verification_key);
-		}
-		public boolean equals(Object o)
-		{
-			if(o instanceof CollectingServerID){
-				CollectingServerID sID=(CollectingServerID) o;
-				return	this.uri.equals(sID.uri) &&
-						Utilities.arrayEqual(this.encryption_key, sID.encryption_key) &&
-						Utilities.arrayEqual(this.verification_key, sID.verification_key);
-			}
-			return false;			
-		}
-	}
-	public static class FinalServerID extends ServerID
-	{
-		public FinalServerID(URI uri, 
-				byte[] encryption_key, byte[] verification_key)
-		{
-			super(uri, encryption_key, verification_key);
-			
-		}
-		public boolean equals(Object o)
-		{
-			if(o instanceof FinalServerID){
-				FinalServerID sID=(FinalServerID) o;
-				return	this.uri.equals(sID.uri) &&
-						Utilities.arrayEqual(this.encryption_key, sID.encryption_key) &&
-						Utilities.arrayEqual(this.verification_key, sID.verification_key);
-			}
-			return false;			
-		}
-	}
 	
 	/*
 	 * ATTRIBUTES WHICH DEFINE AN ELECTION BOARD:

@@ -2,6 +2,8 @@ package de.uni.trier.infsec.eVotingSystem.apps;
 
 import java.io.File;
 
+import de.uni.trier.infsec.eVotingSystem.bean.URI;
+
 public class AppParams 
 {
 	public static final String PATH_STORAGE = System.getProperty("java.io.tmpdir") + File.separator + "eVotingSystem" + File.separator;
@@ -34,17 +36,12 @@ public class AppParams
 	public static final String VOTERAPPNAME = "sElect";
 	public static final String VERIFYAPPNAME = "VerifYourVote";
 	
-	public static String SERVER1_NAME = "localhost";
-	public static int SERVER1_PORT= 7075;
-	public static String SERVER2_NAME = "localhost";
-	public static int SERVER2_PORT= 7076;
-	
 	// to set when the election is over
 	public static final int ALLOWEDVOTERS=3;
 	
-	public static final String ELECTIONMSG = "Please make your choice.";
-	public static final byte[] ELECTIONID = "Favourite RS3 project".getBytes();
-	public static final String[] CANDIDATESARRAY = {	
+	public static final String HEADLINE = "Please make your choice.";
+	public static final String ELECTIONID = "Favourite RS3 project";
+	public static final String[] CHOICESLIST = {	
 								"DeduSec (Verication of Security Properties)",
 								"IFlow (Developing Systems with Secure IFlow)",
 								"ALBIA (Logic-Based Information Flow Analysis)",
@@ -58,4 +55,9 @@ public class AppParams
 								"SpAGAT (IFlow in Shared Document Bases)",
 								"SADAN (Data-driven Usage Control)",
 								};
+	
+	public static URI colServURI = new URI("localhost", 7075);
+	public static URI finServURI = new URI("localhost", 7076);
+	public static URI bb01_URI = new URI("localhost", 7077);
+
 }

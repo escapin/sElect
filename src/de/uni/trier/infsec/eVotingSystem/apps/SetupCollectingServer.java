@@ -17,8 +17,6 @@ public class SetupCollectingServer
 		Decryptor decr = new Decryptor();
 		Signer sign = new Signer();
 		
-		String filename;
-		
 		Keys k = new Keys();
 		k.encrKey=decr.getEncryptionKey();
 		k.decrKey=decr.getDecryptionKey();
@@ -26,7 +24,7 @@ public class SetupCollectingServer
 		k.verifKey=sign.getVerificationKey();
 		
 		
-		filename =  AppParams.PRIVATE_KEY_dir + name + "_PR.json";
+		String filename =  AppParams.PRIVATE_KEY_dir + name + "_PR.json";
 		setupPrivateKeys(k, filename);
 		
 		filename =  AppParams.PUBLIC_KEY_dir + name + "_PU.json";

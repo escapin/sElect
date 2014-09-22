@@ -1,8 +1,13 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
+import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.setupPrivateKeys;
+import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.setupPublicKeys;
 import de.uni.trier.infsec.eVotingSystem.core.Params;
+import de.uni.trier.infsec.eVotingSystem.parser.Keys;
+import de.uni.trier.infsec.functionalities.digsig.Signer;
+import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 
-public class RegisterVoter {
+public class SetupVoter {
 
 	public static void main(String[] args) {
 		int voterID=0;
@@ -22,14 +27,26 @@ public class RegisterVoter {
 				System.out.println("Voter identifier out of range!\nExpected: \n\t 0 <= voter_id < " + Params.NumberOfVoters);
 				System.exit(0);
 			}
+			String name="voter" + (voterID<10? "0":"") + voterID;
 			
-			String filename = AppParams.PATH_STORAGE + "voter" + voterID + ".info";
-			System.out.printf("Registering server with ID '%d' and saving the keys in %s\n", voterID, filename);
-			try {
-				AppUtils.registerAndSave(voterID, filename);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}			
+			Decryptor decr = new Decryptor();
+			Signer sign = new Signer();
+			
+			Keys k = new Keys();
+			k.encrKey=decr.getEncryptionKey();
+			k.decrKey=decr.getDecryptionKey();
+			k.signKey=sign.getSignatureKey();
+			k.verifKey=sign.getVerificationKey();
+			
+			String filename =  AppParams.PRIVATE_KEY_dir + name + "_PR.json";
+			setupPrivateKeys(k, filename);
+			
+			filename =  AppParams.PUBLIC_KEY_dir + name + "_PU.json";
+			String publicKeys=setupPublicKeys(k, filename);
+			
+			System.out.println(name + "'s public keys:");
+			System.out.println(publicKeys);
+			System.out.println("The public keys have been saved in: \n" + filename);
 		}
 	}	
 	/*
