@@ -29,7 +29,7 @@ public class Signer {
 	
 	
 	// methods not present in the ideal functionality:
-	Signer(byte[] verificationKey, byte[] signatureKey ) {
+	public Signer(byte[] verificationKey, byte[] signatureKey ) {
 		this.verificationKey = verificationKey;
 		this.signatureKey = signatureKey;
 	}

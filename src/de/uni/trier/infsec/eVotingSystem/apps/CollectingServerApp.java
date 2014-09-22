@@ -6,6 +6,8 @@ import java.io.IOException;
 import de.uni.trier.infsec.eVotingSystem.core.CollectingServer;
 import de.uni.trier.infsec.eVotingSystem.core.CollectingServer.MalformedMessage;
 import de.uni.trier.infsec.eVotingSystem.core.Params;
+import de.uni.trier.infsec.eVotingSystem.parser.Keys;
+import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 import de.uni.trier.infsec.lib.network.NetworkClient;
@@ -27,13 +29,12 @@ public class CollectingServerApp {
 
 	private static void setupServer() {
 		
-		
-		
 		AppUtils.deleteFile(AppParams.FIN_SERVER_RESULT_msg);
 		
-		byte[] serialized=null;
+		String keyJSON=null;
+		String servername = "CollectingServer";
 		try {
-			serialized = AppUtils.readBytesFromFile(AppParams.PATH_STORAGE + "server" + Params.SERVER1ID + ".info");
+			keyJSON = AppUtils.readCharsFromFile(AppParams.PRIVATE_KEY_dir + servername + "_PR.json"); 
 		} 
 		catch (FileNotFoundException e){
 			System.out.println("Server not registered yet!");
@@ -43,15 +44,10 @@ public class CollectingServerApp {
 			e.printStackTrace();
 			System.exit(0);
 		}
+		Keys k = KeysParser.parseJSONString(keyJSON);
 		
-		byte[] idMsg =  MessageTools.first(serialized);
-		int idFromMsg = MessageTools.byteArrayToInt(idMsg);
-		assert( idFromMsg == Params.SERVER1ID );
-		byte[] decr_sig = MessageTools.second(serialized);
-		byte[] decryptorMsg = MessageTools.first(decr_sig);
-		byte[] signerMsg = MessageTools.second(decr_sig);		
-		Decryptor decryptor = Decryptor.fromBytes(decryptorMsg);
-		Signer signer = Signer.fromBytes(signerMsg);
+		Decryptor decryptor = new Decryptor(k.encrKey, k.decrKey);
+		Signer signer = new Signer(k.verifKey, k.signKey);
 				
 		server = new CollectingServer(AppParams.ELECTIONID, decryptor, signer);
 	}

@@ -3,12 +3,10 @@ package de.uni.trier.infsec.eVotingSystem.core;
 import java.util.Arrays;
 
 import de.uni.trier.infsec.eVotingSystem.apps.AppParams;
-import de.uni.trier.infsec.functionalities.digsig.RegisterSig;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
-import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
-import de.uni.trier.infsec.functionalities.pkienc.Encryptor;
-import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
+import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
+import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.utils.Utilities;
@@ -78,7 +76,7 @@ public class CollectingServer
 	 *	that a voterID is a number between 0 and NumberOfVoters-1.
 	 *
 	 */
-	public byte[] collectBallot(byte[] ballot) throws MalformedMessage, NetworkError, RegisterSig.PKIError, RegisterEnc.PKIError {
+	public byte[] collectBallot(byte[] ballot) throws MalformedMessage, NetworkError {
 
 		// Decrypt, check the signature, and deconstruct the input ballot.
 		// If this step fails, an exception is thrown (there is no response to be send back):

@@ -29,7 +29,7 @@ public final class Decryptor {
 
 	
 	// methods not present in the ideal functionality:
-    Decryptor(byte[] encryptionKey, byte[] decryptionKey) {
+    public Decryptor(byte[] encryptionKey, byte[] decryptionKey) {
     	this.encryptionKey = encryptionKey;
     	this.decryptionKey = decryptionKey;
     }
