@@ -3,6 +3,7 @@ package de.uni.trier.infsec.eVotingSystem.core;
 import java.util.Arrays;
 
 import de.uni.trier.infsec.eVotingSystem.apps.AppParams;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
 import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
@@ -22,12 +23,11 @@ public class CollectingServer
 
 	private final Decryptor decryptor;
 	private final Signer signer;
-
+	private final ElectionManifest elManifest;
 
 	// STATE
 
 	private boolean inVotingPhase; // indicates if the system is still in the voting phase
-	private final byte[] electionID;
 	private final byte[][] ballots = new byte[Params.NumberOfVoters][]; // (inner ballots which have been cast) 
 	private int numberOfCastBallots = 0;
 
@@ -51,10 +51,10 @@ public class CollectingServer
 
 	// CONSTRUCTORS
 
-	public CollectingServer(byte[] electionID, Decryptor decryptor, Signer signer) {
+	public CollectingServer(ElectionManifest elManifest, Decryptor decryptor, Signer signer) {
 		this.signer = signer;
 		this.decryptor = decryptor;
-		this.electionID=electionID;
+		this.elManifest=elManifest;
 		inVotingPhase=true;
 		// initially no voter has cast their ballot:
 		for(int i=0; i<Params.NumberOfVoters; ++i)
@@ -92,7 +92,9 @@ public class CollectingServer
 		byte[] payload_sign = second(id_payload_sign);
 		byte[] payload = first(payload_sign);
 		byte[] signVoter = second(payload_sign);
-		Verifier voter_verifier = RegisterSig.getVerifier(voterID, Params.SIG_DOMAIN); // (may throw NetworkError or PKIerror) 
+		Verifier voter_verifier = Utils.getVerifier(voterID, elManifest); // (may throw NetworkError or PKIerror) 
+		if (voter_verifier==null)
+			throw new Error("Voter " + voterID + " not found!");
 		if (!voter_verifier.verify(signVoter, payload))  // only accept signed requests (by an eligible voter)
 			throw new MalformedMessage("Invalid signature");
 		byte[] elID = first(payload);
@@ -101,7 +103,7 @@ public class CollectingServer
 		// Check if the ballot is to be rejected (with an error response).
 		//
 		byte[] problem = null;  // null means that everything is ok 
-		if( !MessageTools.equal(elID, electionID) )
+		if( !MessageTools.equal(elID, elManifest.getElectionID()) )
 			problem =  Params.INVALID_ELECTION_ID;
 		else if( !inVotingPhase )
 			problem = Params.ELECTION_OVER;
@@ -121,13 +123,13 @@ public class CollectingServer
 			ballots[voterID] = innerBallot; 
 		}
 		// create receipt for the voter
-		byte[] elID_innerBallot = concatenate(electionID, innerBallot);
+		byte[] elID_innerBallot = concatenate(elManifest.getElectionID(), innerBallot);
 		byte[] accepted_elID_innerBallot = concatenate(Params.ACCEPTED, elID_innerBallot);
 		byte[] receipt = signer.sign(accepted_elID_innerBallot);
 		// TODO: perhaps the server should store voters' signatures
 
 		byte[] accepted_serverSign=concatenate(Params.ACCEPTED, receipt);
-		return encapsulateResponse(voterID, concatenate(electionID, accepted_serverSign));
+		return encapsulateResponse(voterID, concatenate(elManifest.getElectionID(), accepted_serverSign));
 	}
 
 	public int getNumberOfBallots() {
@@ -166,7 +168,7 @@ public class CollectingServer
 		byte[] votersAsAMessage = Utils.concatenateMessageArray(vv);
 
 		// put together the election ID, inner ballots, and list of voters
-		byte[] result = concatenate(electionID, concatenate(ballotsAsAMessage, votersAsAMessage));
+		byte[] result = concatenate(elManifest.getElectionID(), concatenate(ballotsAsAMessage, votersAsAMessage));
 		
 		// sign the result
 		byte[] signature = signer.sign(result);
@@ -183,7 +185,7 @@ public class CollectingServer
 	 * @throws NetworkError
 	 * @throws RegisterEnc.PKIError 
 	 */
-	private byte[] encapsulateResponse(int voterID, byte[] payload) throws NetworkError, RegisterEnc.PKIError
+	private byte[] encapsulateResponse(int voterID, byte[] payload) throws NetworkError
 	{
 		// add voterID
 		byte[] id_payload = concatenate(intToByteArray(voterID), payload);
@@ -191,7 +193,9 @@ public class CollectingServer
 		byte[] signServer = signer.sign(id_payload);
 		byte[] id_payload_signature = concatenate(id_payload, signServer);
 		// encryption with the voter public key
-		Encryptor voter_encryptor = RegisterEnc.getEncryptor(voterID, Params.ENC_DOMAIN);
+		Encryptor voter_encryptor = Utils.getEncryptor(voterID, elManifest);
+		if (voter_encryptor==null)
+			throw new Error("Voter " + voterID + " not found!");
 		byte[] response=voter_encryptor.encrypt(id_payload_signature);
 
 		return response;

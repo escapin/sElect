@@ -2,13 +2,14 @@ package de.uni.trier.infsec.eVotingSystem.core;
 
 import java.util.Arrays;
 
-import de.uni.trier.infsec.functionalities.digsig.RegisterSig;
+import de.uni.trier.infsec.eVotingSystem.bean.CollectingServerID;
+import de.uni.trier.infsec.eVotingSystem.bean.FinalServerID;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
 import de.uni.trier.infsec.functionalities.nonce.NonceGen;
-import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
-import de.uni.trier.infsec.functionalities.pkienc.Encryptor;
-import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
+import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
+import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.utils.Utilities;
@@ -111,26 +112,28 @@ public class Voter
 	
 	/// STATE ///
 
-	private final int voterID;          // PKI identifier of a voter (we assume that a voter is already registered)
-	private final byte[] electionID;	// election identifier
-	private final Decryptor decryptor;	// decrytpror of the voter (containing her private decryption key)
-	private final Signer signer;        // signer of a voter (containing her private signing key)
-	private final Encryptor server1enc; // encryptor of the first server (ballots collecting server)
-	private final Verifier server1ver;  // verifier of the first server
-	private final Encryptor server2enc; // encryptor of the second server (the final server)
-	private final NonceGen noncegen;    // nonce generation functionality	
-	private Receipt receipt;            // receipt containing information for response validation and verification procedure
+	private final int voterID;					// PKI identifier of a voter (we assume that a voter is already registered)
+	private final ElectionManifest elManifest;	// election identifier
+	private final Decryptor decryptor;			// decrytpror of the voter (containing her private decryption key)
+	private final Signer signer;				// signer of a voter (containing her private signing key)
+	private final Encryptor server1enc;			// encryptor of the first server (ballots collecting server)
+	private final Verifier server1ver;			// verifier of the first server
+	private final Encryptor server2enc;			// encryptor of the second server (the final server)
+	private final NonceGen noncegen;			// nonce generation functionality	
+	private Receipt receipt;					// receipt containing information for response validation and verification procedure
 
 	/// CONTRUCTOR(S) ///
 
-	public Voter(int voterID, byte[] electionID, Decryptor decryptor, Signer signer) throws NetworkError, RegisterEnc.PKIError, RegisterSig.PKIError {
+	public Voter(int voterID, ElectionManifest elManifest, Decryptor decryptor, Signer signer) throws NetworkError {
 		this.voterID = voterID;
-		this.electionID=electionID;
 		this.decryptor = decryptor;
 		this.signer = signer;
-		this.server1enc = RegisterEnc.getEncryptor(Params.SERVER1ID, Params.ENC_DOMAIN);
-		this.server1ver = RegisterSig.getVerifier(Params.SERVER1ID, Params.SIG_DOMAIN);
-		this.server2enc = RegisterEnc.getEncryptor(Params.SERVER2ID, Params.ENC_DOMAIN);
+		this.elManifest=elManifest;
+		CollectingServerID colSer = elManifest.getCollectingServer();
+		FinalServerID finSer = elManifest.getFinalServer();
+		this.server1enc = new Encryptor(colSer.encryption_key);
+		this.server1ver = new Verifier(colSer.verification_key);
+		this.server2enc = new Encryptor(finSer.encryption_key);
 		this.noncegen = new NonceGen();
 		this.receipt = null;
 	}
@@ -161,7 +164,7 @@ public class Voter
 		byte[] vote = intToByteArray(voterChoice);
 		byte[] nonce_vote = concatenate(nonce, vote);
 		byte[] inner_ballot = server2enc.encrypt(nonce_vote);
-		receipt=new Receipt(electionID, voterChoice, nonce, inner_ballot, null); // no server signature
+		receipt=new Receipt(elManifest.getElectionID(), voterChoice, nonce, inner_ballot, null); // no server signature
 		return encapsulate(receipt.innerBallot); // add the election id, sign, end encrypt
 	}
 
@@ -207,7 +210,7 @@ public class Voter
 		byte[] elID_tag_payload = second(serverResp);
 
 		byte[] elID = first(elID_tag_payload);
-		if (!MessageTools.equal(elID, electionID))
+		if (!MessageTools.equal(elID, elManifest.getElectionID()))
 			throw new MalformedMessage("The server's reply is not for the current election"); 
 
 		byte[] tag_payload = second(elID_tag_payload);
@@ -228,7 +231,7 @@ public class Voter
 		}
 		else if(Arrays.equals(tag, Params.ACCEPTED)){
 			byte[] server_signature = second(tag_payload);
-			byte[] expected_signed_msg = concatenate(Params.ACCEPTED, concatenate(electionID, receipt.innerBallot));
+			byte[] expected_signed_msg = concatenate(Params.ACCEPTED, concatenate(elManifest.getElectionID(), receipt.innerBallot));
 			if (!server1ver.verify(server_signature, expected_signed_msg))
 				throw new MalformedMessage("Wrong server's signature"); 
 
@@ -258,7 +261,7 @@ public class Voter
 	//     Enc_server1( voterID,  Sig_Voter[elID, innerBallot] )
 	private byte[] encapsulate(byte[] innerBallot) {
 		byte[] voterIDMsg = intToByteArray(voterID);
-		byte[] elID_innerBallot = concatenate(electionID, innerBallot);
+		byte[] elID_innerBallot = concatenate(elManifest.getElectionID(), innerBallot);
 		byte[] signature_on_elID_innerBallot = signer.sign(elID_innerBallot);
 		byte[] elID_innerBallot_with_signature = concatenate(elID_innerBallot, signature_on_elID_innerBallot); 
 		byte[] payload = concatenate(voterIDMsg, elID_innerBallot_with_signature);

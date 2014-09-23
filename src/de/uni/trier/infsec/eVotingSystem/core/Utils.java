@@ -1,5 +1,9 @@
 package de.uni.trier.infsec.eVotingSystem.core;
 
+import de.uni.trier.infsec.eVotingSystem.bean.VoterID;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
+import de.uni.trier.infsec.functionalities.digsig.Verifier;
+import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
 import de.uni.trier.infsec.utils.MessageTools;
 
 
@@ -75,6 +79,30 @@ public class Utils
 	public static void outl(String s){
 		System.out.println(s);
 	}
+	
+	public static void errln(String s){
+		System.err.println(s);
+		System.exit(-1);
+	}
+
+	public static Verifier getVerifier(int voterID, ElectionManifest elManifest)
+	{
+		VoterID[] voterList = elManifest.getVotersList();
+		for(VoterID voter: voterList)
+			if(voter.uniqueID==voterID)
+				return new Verifier(voter.verification_key);
+		return null;
+	}
+
+	public static Encryptor getEncryptor(int voterID, ElectionManifest elManifest)
+	{
+		VoterID[] voterList = elManifest.getVotersList();
+		for(VoterID voter: voterList)
+			if(voter.uniqueID==voterID)
+				return new Encryptor(voter.encryption_key);
+		return null;
+	}
+	
 	
 	
 //	 public static byte[][] copyOf(byte[][] original, int newLength) {

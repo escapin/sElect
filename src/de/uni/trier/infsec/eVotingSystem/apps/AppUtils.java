@@ -1,6 +1,10 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
 
+import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readBytesFromFile;
+import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readCharsFromFile;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.errln;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -13,8 +17,12 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifestParser;
 import de.uni.trier.infsec.eVotingSystem.parser.Keys;
 import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
+import de.uni.trier.infsec.functionalities.digsig.Verifier;
 
 
 public class AppUtils 
@@ -24,7 +32,7 @@ public class AppUtils
 		
 		Path pDir = pFile.getParent();
 		if(pDir!=null && !Files.isDirectory(pDir, LinkOption.NOFOLLOW_LINKS))
-			Files.createDirectory(pDir);
+			Files.createDirectories(pDir);
 		else
 			Files.deleteIfExists(pFile);
 		
@@ -51,7 +59,7 @@ public class AppUtils
 		
 		Path pDir = pFile.getParent();
 		if(pDir!=null && !Files.isDirectory(pDir, LinkOption.NOFOLLOW_LINKS))
-			Files.createDirectory(pDir);
+			Files.createDirectories(pDir);
 		else
 			Files.deleteIfExists(pFile);
 		
@@ -78,12 +86,12 @@ public class AppUtils
 		if (f.exists()) f.delete();	
 	}
 	
-	protected static void setupPrivateKeys(Keys k, String filename) 
+	protected static void setupPrivateKeys(Keys k, String filename) throws IOException 
 	{
 		setupKeys(k,filename);
 	}
 	
-	protected static String setupPublicKeys(Keys k, String filename)
+	protected static String setupPublicKeys(Keys k, String filename) throws IOException
 	{
 		Keys pu = new Keys();
 		pu.encrKey=k.encrKey;
@@ -91,15 +99,48 @@ public class AppUtils
 		return setupKeys(pu,filename);
 	}
 	
-	private static String setupKeys(Keys k, String filename)
+	private static String setupKeys(Keys k, String filename) throws IOException
 	{
 		String prKeysJSON = KeysParser.generateJSON(k);
-		try {
-			storeAsFile(prKeysJSON, filename);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		storeAsFile(prKeysJSON, filename);
 		return prKeysJSON;
+	}
+
+	public static ElectionManifest retrieveElectionManifest()
+	{
+		String manifestJSON=null;
+		String filename = AppParams.EL_MANIFEST_path + "ElectionManifest.json";
+		try {
+			manifestJSON = readCharsFromFile(filename);
+		} catch (IOException e) {
+			errln("Unable to access: " + filename);
+		}
+		byte[] manifestSignature=null;
+		filename = AppParams.EL_MANIFEST_path + "ElectionManifest.sig";
+		try {
+			manifestSignature = readBytesFromFile(filename);
+		} catch (IOException e) {
+			errln("Unable to access: " + filename);
+		}
+		
+		String keyJSON=null;
+		filename = AppParams.PUBLIC_KEY_path + "ElectionAuthority_PU.json";
+		try {
+			keyJSON = readCharsFromFile(filename);
+		} catch (IOException e) {
+			errln("Unable to access: " + filename);
+		}
+		Keys k = KeysParser.parseJSONString(keyJSON);
+		
+		Verifier elManifestVerifier = new Verifier(k.verifKey);
+		
+
+		if(!elManifestVerifier.verify(manifestSignature, manifestJSON.getBytes()))
+			errln("Invalid Signature of the Manifest File");
+		
+		ElectionManifest elManifest = ElectionManifestParser.parseJSONString(manifestJSON);
+		
+		return elManifest;
 	}
 }
 

@@ -3,11 +3,10 @@ package de.uni.trier.infsec.eVotingSystem.core;
 import java.util.Arrays;
 
 import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
-import de.uni.trier.infsec.functionalities.digsig.RegisterSig;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
-import de.uni.trier.infsec.functionalities.digsig.RegisterSig.PKIError;
-import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
+import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.utils.MessageTools;
 
@@ -16,10 +15,8 @@ public class FinalServer
 	// Cryptographic functionalities
 	private final Signer signer;
 	private final Decryptor decryptor;
+	private final ElectionManifest elManifest;
 	private final Verifier collectingServerVerif;
-	// Other private parameters
-	private final byte[] electionID;
-	
 	
 	// CLASSES
 	/**
@@ -39,12 +36,13 @@ public class FinalServer
 	
 	// CONSTRUCTORS
 	
-	public FinalServer(byte[] electionID, Decryptor decryptor, Signer signer) throws PKIError, NetworkError {
+	public FinalServer(ElectionManifest elManifest, Decryptor decryptor, Signer signer) {
 		this.signer = signer;
 		this.decryptor = decryptor;
-		this.electionID = electionID;
+		this.elManifest = elManifest;
 		// fetch the functionalities of the collecting server
-		this.collectingServerVerif = RegisterSig.getVerifier(Params.SERVER1ID, Params.SIG_DOMAIN);
+		byte[] colServVerifier = elManifest.getCollectingServer().verification_key;
+		this.collectingServerVerif = new Verifier(colServVerifier); 
 	}
 	
 	// PUBLIC METHODS
@@ -63,7 +61,7 @@ public class FinalServer
 		
 		// check that election id in the processed data
 		byte[] el_id = MessageTools.first(payload);
-		if (!MessageTools.equal(el_id, electionID))
+		if (!MessageTools.equal(el_id, elManifest.getElectionID()))
 			throw new MalformedData("Wrong election ID");
 		
 		// retrieve and process ballots (store decrypted entries in 'entries')
@@ -90,7 +88,7 @@ public class FinalServer
 		byte[] entriesAsAMessage = Utils.concatenateMessageArray(entries, numberOfEntries);
 		
 		// add election id and sign them
-		byte[] result = MessageTools.concatenate(electionID, entriesAsAMessage);
+		byte[] result = MessageTools.concatenate(elManifest.getElectionID(), entriesAsAMessage);
 		byte[] signatureOnResult = signer.sign(result);
 		byte[] signedResult = MessageTools.concatenate(result, signatureOnResult);
 		return signedResult;

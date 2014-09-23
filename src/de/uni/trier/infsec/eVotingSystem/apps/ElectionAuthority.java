@@ -13,45 +13,121 @@ import java.util.LinkedList;
 
 import de.uni.trier.infsec.eVotingSystem.bean.CollectingServerID;
 import de.uni.trier.infsec.eVotingSystem.bean.FinalServerID;
+import de.uni.trier.infsec.eVotingSystem.bean.VoterID;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifestParser;
 import de.uni.trier.infsec.eVotingSystem.parser.Keys;
 import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
+import de.uni.trier.infsec.functionalities.digsig.Signer;
+import de.uni.trier.infsec.functionalities.nonce.NonceGen;
 import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readCharsFromFile;
-	
+import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.storeAsFile;
+import static de.uni.trier.infsec.utils.Utilities.byteArrayToHexString;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.errln;
+
 public class ElectionAuthority {
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args){
 		
 		// retrieve the public keys of Collecting Server
-		String filename = AppParams.PUBLIC_KEY_dir + "CollectingServer_PU.json";
-		String stringJSON = readCharsFromFile(filename);
+		String filename = AppParams.PUBLIC_KEY_path + "CollectingServer_PU.json";
+		String stringJSON=null;
+		try {
+			stringJSON = readCharsFromFile(filename);
+		} catch (IOException e) {
+			errln("Unable to access: " + filename);
+		}
 		Keys k=KeysParser.parseJSONString(stringJSON);
 		CollectingServerID colServID = new CollectingServerID(AppParams.colServURI, k.encrKey, k.verifKey);
 		
 		// retrieve the public keys of Final Server
-		filename = AppParams.PUBLIC_KEY_dir + "FinalServer_PU.json";
-		stringJSON = readCharsFromFile(filename);
+		filename = AppParams.PUBLIC_KEY_path + "FinalServer_PU.json";
+		try {
+			stringJSON = readCharsFromFile(filename);
+		} catch (IOException e) {
+			errln("Unable to access: " + filename);
+		}
 		k=KeysParser.parseJSONString(stringJSON);
 		FinalServerID finServID = new FinalServerID(AppParams.finServURI, k.encrKey, k.verifKey);
 		
 		// retrieve the public keys of voters
 		String pattern="voter*";
-		Path dir=Paths.get(AppParams.PUBLIC_KEY_dir);
-		Finder finder = new Finder(pattern);
-		Files.walkFileTree(dir, finder);
-		for(Path p: finder.getMatches()){
-			System.out.println(p);
+		Path dir=Paths.get(AppParams.PUBLIC_KEY_path);
+		MatchFinder finder = new MatchFinder(pattern);
+		try {
+			Files.walkFileTree(dir, finder);
+		} catch (IOException e) {
+			errln("Unable to access: " + filename);
 		}
+		LinkedList<Path> fileMatched = finder.getMatches();
+		VoterID[] voterList = new VoterID[fileMatched.size()];
+		String digits, fName; int uniqueID;
+		for(int i=0;i<voterList.length;i++){
+			fName=fileMatched.get(i).toString();
+			digits=fName.replaceAll("[^0-9]", "");
+			uniqueID=Integer.parseInt(digits);
+			filename = AppParams.PUBLIC_KEY_path + fileMatched.get(i).toString();
+			try {
+				stringJSON =  readCharsFromFile(filename);
+			} catch (IOException e) {
+				errln("Unable to access: " + filename);
+			}
+			k = KeysParser.parseJSONString(stringJSON);
+			voterList[i]=new VoterID(uniqueID, k.encrKey, k.verifKey);
+		}
+		
+		// get an electionID
+		byte[] electionID = new NonceGen().newNonce();
+		
+		// creates an election manifest
+		ElectionManifest elManifest = new ElectionManifest(electionID,
+			AppParams.STARTTIME, AppParams.STARTTIME+AppParams.DURATION,
+			AppParams.HEADLINE, AppParams.CHOICESLIST, voterList, colServID,
+			finServID, AppParams.bulletinBoardList);
+		elManifest.setTitle(AppParams.EL_TITLE);
+		elManifest.setDescription(AppParams.EL_DESCRIPTION);
+		
+		String sManifestJSON = ElectionManifestParser.generateJSON(elManifest);
+		
+		// retrieve the signature key of the Election Authority
+		filename = AppParams.PRIVATE_KEY_path + "ElectionAuthority_PR.json";
+		try {
+			stringJSON = readCharsFromFile(filename);
+		} catch (IOException e) {
+			errln("Unable to access: " + filename);
+		}
+		k=KeysParser.parseJSONString(stringJSON);
+		
+		Signer sign = new Signer(k.verifKey, k.signKey);
+		byte[] manifestSignature=sign.sign(sManifestJSON.getBytes());
+		
+		// generate the JSON file
+		filename=AppParams.EL_MANIFEST_path + "ElectionManifest.json";
+		try {
+			storeAsFile(sManifestJSON, filename);
+		} catch (IOException e) {
+			errln("Unable to access: " + filename);
+		}
+		
+		// generate the Signature file
+		filename=AppParams.EL_MANIFEST_path + "ElectionManifest.sig";
+		try {
+			storeAsFile(manifestSignature, filename);
+		} catch (IOException e) {
+			errln("Unable to access: " + filename);
+		}
+		
+		
 	}
 	
 	
-	 public static class Finder extends SimpleFileVisitor<Path> {
+	public static class MatchFinder extends SimpleFileVisitor<Path> {
 
      private final PathMatcher matcher;
      private int numMatches = 0;
      private LinkedList<Path> fMatched = new LinkedList<Path>();
 
-     Finder(String pattern) {
-         matcher = FileSystems.getDefault()
-                 .getPathMatcher("glob:" + pattern);
+     MatchFinder(String pattern) {
+         matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
      }
 
      // Compares the glob pattern against

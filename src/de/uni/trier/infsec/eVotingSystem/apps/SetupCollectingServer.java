@@ -2,6 +2,9 @@ package de.uni.trier.infsec.eVotingSystem.apps;
 
 import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.setupPrivateKeys;
 import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.setupPublicKeys;
+
+import java.io.IOException;
+
 import de.uni.trier.infsec.eVotingSystem.parser.Keys;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
@@ -24,11 +27,22 @@ public class SetupCollectingServer
 		k.verifKey=sign.getVerificationKey();
 		
 		
-		String filename =  AppParams.PRIVATE_KEY_dir + name + "_PR.json";
-		setupPrivateKeys(k, filename);
+		String filename =  AppParams.PRIVATE_KEY_path + name + "_PR.json";
+		try {
+			setupPrivateKeys(k, filename);
+		} catch (IOException e) {
+			System.err.println("Unable to access: " + filename);
+			System.exit(-1);
+		}
 		
-		filename =  AppParams.PUBLIC_KEY_dir + name + "_PU.json";
-		String publicKeys=setupPublicKeys(k, filename);
+		filename =  AppParams.PUBLIC_KEY_path + name + "_PU.json";
+		String publicKeys=null;
+		try {
+			publicKeys = setupPublicKeys(k, filename);
+		} catch (IOException e) {
+			System.err.println("Unable to access: " + filename);
+			System.exit(-1);
+		}
 		
 		System.out.println(name + "'s public keys:");
 		System.out.println(publicKeys);

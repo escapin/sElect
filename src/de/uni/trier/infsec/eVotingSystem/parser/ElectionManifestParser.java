@@ -12,18 +12,16 @@ import de.uni.trier.infsec.eVotingSystem.bean.FinalServerID;
 import de.uni.trier.infsec.eVotingSystem.bean.ServerID;
 import de.uni.trier.infsec.eVotingSystem.bean.URI;
 import de.uni.trier.infsec.eVotingSystem.bean.VoterID;
-import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.ElectionBoardError;
-import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest.NotInElectionArranged;
 
 public class ElectionManifestParser 
 {
-	public static String generateJSON(ElectionManifest elBoard) throws NotInElectionArranged
+	public static String generateJSON(ElectionManifest elBoard)
 	{
 		JSONObject jObj = generateJSONObject(elBoard);
 		return jObj.toString(1);	
 	}
 	
-	public static ElectionManifest parseJSONString(String stringJSON) throws JSONException, ElectionBoardError{
+	public static ElectionManifest parseJSONString(String stringJSON) throws JSONException {
 		JSONObject manifest=new JSONObject(stringJSON);
 		return parseManifest(manifest);
 	}
@@ -50,7 +48,7 @@ public class ElectionManifestParser
 	private static JSONObject generateJSONObject(ElectionManifest elBoard)
 	{
 		JSONObject jMain=new JSONObject();
-		jMain.put(sElectionID, elBoard.getElectionID());
+		jMain.put(sElectionID, byteArrayToHexString(elBoard.getElectionID()));
 		jMain.put(sTitle, elBoard.getTitle());
 		jMain.put(sDescription, elBoard.getDescription());
 		jMain.put(sHeadline, elBoard.getHeadline());
@@ -89,7 +87,7 @@ public class ElectionManifestParser
 				jMain.put(sCollectingServer, jServer);
 			else if(server instanceof FinalServerID)
 				jMain.put(sFinalServer, jServer);
-			}
+		}
 		
 		JSONArray bulletinBoardsList=new JSONArray();
 		for(URI uri : elBoard.getBulletinBoardsList()){
@@ -107,10 +105,10 @@ public class ElectionManifestParser
 	}
 	
 	
-	private static ElectionManifest parseManifest(JSONObject manifest) throws JSONException, ElectionBoardError
+	private static ElectionManifest parseManifest(JSONObject manifest) throws JSONException
 	{
-		String 	electionID = manifest.getString(sElectionID),
-				headline = manifest.getString(sHeadline);
+		byte[] 	electionID = hexStringToByteArray(manifest.getString(sElectionID));
+		String	headline = manifest.getString(sHeadline);
 		
 		JSONArray aChoicesList = manifest.getJSONArray(sChoicesList);
 		String[] choicesList=new String[aChoicesList.length()];

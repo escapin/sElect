@@ -1,11 +1,10 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import de.uni.trier.infsec.eVotingSystem.core.CollectingServer;
 import de.uni.trier.infsec.eVotingSystem.core.CollectingServer.MalformedMessage;
-import de.uni.trier.infsec.eVotingSystem.core.Params;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.eVotingSystem.parser.Keys;
 import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
@@ -13,11 +12,14 @@ import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.lib.network.NetworkServer;
-import de.uni.trier.infsec.utils.MessageTools;
+import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.deleteFile;
+import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readCharsFromFile;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.errln;
 
 public class CollectingServerApp {
 
 	private static CollectingServer server = null;
+	private static ElectionManifest elManifest = null;
 	
 	public static void main(String[] args)  {	
 		System.out.println("Creating the server...");
@@ -29,32 +31,39 @@ public class CollectingServerApp {
 
 	private static void setupServer() {
 		
-		AppUtils.deleteFile(AppParams.FIN_SERVER_RESULT_msg);
+		deleteFile(AppParams.FIN_SERVER_RESULT_msg);
 		
-		String keyJSON=null;
-		String servername = "CollectingServer";
+		//		try {} catch (FileNotFoundException e){
+		//		System.out.println("Server not registered yet!");
+		//		System.exit(-1);
+		//	} catch (IOException e) {
+		//		e.printStackTrace();
+		//		System.exit(-1);
+		//	}
+		
+		elManifest=AppUtils.retrieveElectionManifest();
+		
+		// retrieve the CollectingServer private keys
+		String filename=AppParams.PRIVATE_KEY_path + "CollectingServer_PR.json";
+		String keyJSON = null;
 		try {
-			keyJSON = AppUtils.readCharsFromFile(AppParams.PRIVATE_KEY_dir + servername + "_PR.json"); 
-		} 
-		catch (FileNotFoundException e){
-			System.out.println("Server not registered yet!");
-			System.exit(0);
-		} 
-		catch (IOException e) {
-			e.printStackTrace();
-			System.exit(0);
+			keyJSON = readCharsFromFile(filename);
+		} catch (IOException e) {
+			errln("Unable to access: " + filename);
 		}
 		Keys k = KeysParser.parseJSONString(keyJSON);
+		if(k.encrKey==null || k.decrKey==null || k.signKey==null || k.verifKey==null)
+			errln("Invalid Collecting Server's keys.");
+			
+		Decryptor decr = new Decryptor(k.encrKey, k.decrKey);
+		Signer sign = new Signer(k.verifKey, k.signKey);
 		
-		Decryptor decryptor = new Decryptor(k.encrKey, k.decrKey);
-		Signer signer = new Signer(k.verifKey, k.signKey);
-				
-		server = new CollectingServer(AppParams.ELECTIONID, decryptor, signer);
+		server = new CollectingServer(elManifest, decr, sign);
 	}
 
 	private static void run()  {
 		try {
-			NetworkServer.listenForRequests(AppParams.SERVER1_PORT);
+			NetworkServer.listenForRequests(AppParams.colServURI.port);
 		}
 		catch(NetworkError e) {
 			e.printStackTrace();
@@ -65,7 +74,7 @@ public class CollectingServerApp {
 		
 		while( true ) { // run forever
 			try {
-				byte[] request = NetworkServer.nextRequest(AppParams.SERVER1_PORT);
+				byte[] request = NetworkServer.nextRequest(AppParams.colServURI.port);
 				if (request != null) {
 					System.out.println("reqeuest coming");
 					byte[] response=null;
@@ -109,7 +118,7 @@ public class CollectingServerApp {
 	
 		// send result to the final server:
 		try {
-			NetworkClient.send(result, AppParams.SERVER2_NAME, AppParams.SERVER2_PORT);
+			NetworkClient.send(result, AppParams.finServURI.hostname, AppParams.finServURI.port);
 		}
 		catch (NetworkError e) {
 			System.out.println("Problems with sending the result to the final server!");
@@ -122,9 +131,8 @@ public class CollectingServerApp {
 	/**
 	 * Determines whether the voting phase is over
 	 */
-	// TODO: we should come up with better way to determine when the voting phase is over.
-	// Perhaps the system should be triggered by a human operator. Or maybe just a fixed time?
 	private static boolean itsOver() {
-		return server.getNumberOfBallots() >= AppParams.ALLOWEDVOTERS;
+		//return server.getNumberOfBallots() >= AppParams.ALLOWEDVOTERS;
+		return System.currentTimeMillis()>elManifest.getEndTime();
 	}
 }

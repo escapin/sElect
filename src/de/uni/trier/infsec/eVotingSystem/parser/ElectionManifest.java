@@ -13,14 +13,12 @@ public class ElectionManifest
 	@SuppressWarnings("serial")
 	public static class ElectionAlreadyArranged extends ElectionBoardError{}
 	@SuppressWarnings("serial")
-	public static class NotInElectionArranged extends ElectionBoardError{} // used by eVotingSystem.parser.ElectionManifest
-	@SuppressWarnings("serial")
 	public static class CapacityOverflowError extends ElectionBoardError{}
 	
 	/*
 	 * ATTRIBUTES WHICH DEFINE AN ELECTION BOARD:
 	 */
-	private final String electionID;
+	private final byte[] electionID;
 	private final String headline;			// the question to submit
 	private final String[] choicesList;		// e.g. list of candidates
 	
@@ -47,7 +45,7 @@ public class ElectionManifest
 	 * @param choicesList array of candidate/choices which can be selected by the voters	 
 	 *  
 	 */
-	public ElectionManifest(String electionID,
+	public ElectionManifest(byte[] electionID,
 							long startTime, long endTime,
 							String headline, 
 							String[] choicesList,
@@ -159,7 +157,7 @@ public class ElectionManifest
 	}
 
 
-	public String getElectionID()
+	public byte[] getElectionID()
 	{
 		return electionID;
 	}

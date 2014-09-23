@@ -1,16 +1,22 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
+import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readCharsFromFile;
+import static de.uni.trier.infsec.eVotingSystem.core.Utils.errln;
+
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import de.uni.trier.infsec.eVotingSystem.core.CollectingServer;
 import de.uni.trier.infsec.eVotingSystem.core.FinalServer;
 import de.uni.trier.infsec.eVotingSystem.core.Params;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
+import de.uni.trier.infsec.eVotingSystem.parser.Keys;
+import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
-import de.uni.trier.infsec.functionalities.pki.PKI;
-import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
+import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.lib.network.NetworkServer;
 import de.uni.trier.infsec.utils.MessageTools;
@@ -18,9 +24,9 @@ import de.uni.trier.infsec.utils.MessageTools;
 public class FinalServerApp {
 	private static FinalServer server = null;
 	private static Verifier serversVerifier = null;
+	private static ElectionManifest elManifest = null;
 	
 	public static void main(String[] args)  {	
-		PKI.useRemoteMode();
 		System.out.println("Creating the server...");
 		setupServer();
 		System.out.println("Waiting for the partial results...");
@@ -30,42 +36,44 @@ public class FinalServerApp {
 	private static void setupServer() {
 		AppUtils.deleteFile(AppParams.COLL_SERVER_RESULT_msg);
 		
-		byte[] serialized=null;
+		elManifest=AppUtils.retrieveElectionManifest();
+		
+		// retrieve the CollectingServer private keys
+		String filename=AppParams.PRIVATE_KEY_path + "FinalServer_PR.json";
+		String keyJSON = null;
 		try {
-			serialized = AppUtils.readBytesFromFile(AppParams.PATH_STORAGE + "server" + Params.SERVER2ID + ".info");
-		} 
-		catch (FileNotFoundException e){
-			System.out.println("Server not registered yet!");
-			System.exit(0);
-		} 
-		catch (IOException e) {
-			e.printStackTrace();
-			System.exit(0);
+			keyJSON = readCharsFromFile(filename);
+		} catch (IOException e) {
+			errln("Unable to access: " + filename);
 		}
-		
-		
-		byte[] idMsg =  MessageTools.first(serialized);
-		int idFromMsg = MessageTools.byteArrayToInt(idMsg);
-		assert( idFromMsg == Params.SERVER2ID );
-		byte[] decr_sig = MessageTools.second(serialized);
-		byte[] decryptorMsg = MessageTools.first(decr_sig);
-		byte[] signerMsg = MessageTools.second(decr_sig);		
-		Decryptor decryptor = Decryptor.fromBytes(decryptorMsg);
-		Signer signer = Signer.fromBytes(signerMsg);
-		serversVerifier = signer.getVerifier();
-		
-		try {
-			server = new FinalServer(AppParams.ELECTIONID, decryptor, signer);
-		}
-		catch (Exception e) {
-			System.out.println("Cannot create the server object");
-			System.exit(-1);
-		}
+		//		catch (FileNotFoundException e){
+		//		System.out.println("Server not registered yet!");
+		//		System.exit(0);
+		//	} 
+		//	catch (IOException e) {
+		//		e.printStackTrace();
+		//		System.exit(0);
+		//	}
+		Keys k = KeysParser.parseJSONString(keyJSON);
+		if(k.encrKey==null || k.decrKey==null || k.signKey==null || k.verifKey==null)
+				errln("Invalid Collecting Server's keys.");
+					
+		Decryptor decr = new Decryptor(k.encrKey, k.decrKey);
+		Signer sign = new Signer(k.verifKey, k.signKey);
+		serversVerifier = sign.getVerifier();		
+		server = new FinalServer(elManifest, decr, sign);
+//		try {
+//			server = new FinalServer(AppParams.ELECTIONID, decryptor, signer);
+//		}
+//		catch (Exception e) {
+//			System.out.println("Cannot create the server object");
+//			System.exit(-1);
+//		}
 	}
 
 	private static void run()  {
 		try {
-			NetworkServer.listenForRequests(AppParams.SERVER2_PORT);
+			NetworkServer.listenForRequests(AppParams.finServURI.port);
 		}
 		catch(NetworkError e) {
 			e.printStackTrace();
@@ -74,7 +82,7 @@ public class FinalServerApp {
 		
 		while( true ) {
 			try {
-				byte[] request = NetworkServer.read(AppParams.SERVER2_PORT);
+				byte[] request = NetworkServer.read(AppParams.finServURI.port);
 				if (request != null) {
 					System.out.println("reqeuest coming");
 					byte[] result = server.processTally(request);
@@ -104,7 +112,7 @@ public class FinalServerApp {
 		
 		// write result to text file (as a readable text)
 		try {
-			Helper.FinalEntry[] fes = Helper.finalResultAsText(result, serversVerifier, AppParams.ELECTIONID);
+			Helper.FinalEntry[] fes = Helper.finalResultAsText(result, serversVerifier, elManifest.getElectionID());
 			try {
 		        BufferedWriter out = new BufferedWriter(new FileWriter(AppParams.FINAL_RESULT_file));
 		        for (Helper.FinalEntry e : fes) {

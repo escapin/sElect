@@ -57,7 +57,7 @@ public class Helper {
 			byte[] nonce = MessageTools.first(nonce_vote);
 			byte[] vote  = MessageTools.second(nonce_vote);
 			int candidateNr = MessageTools.byteArrayToInt(vote);
-			String candidateName = AppParams.CANDIDATESARRAY[candidateNr];
+			String candidateName = AppParams.CHOICESLIST[candidateNr];
 			fes[count++] = new FinalEntry(candidateName, Utilities.byteArrayToHexString(nonce));
 		}
 		

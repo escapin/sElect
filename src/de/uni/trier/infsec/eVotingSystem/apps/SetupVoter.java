@@ -2,6 +2,9 @@ package de.uni.trier.infsec.eVotingSystem.apps;
 
 import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.setupPrivateKeys;
 import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.setupPublicKeys;
+
+import java.io.IOException;
+
 import de.uni.trier.infsec.eVotingSystem.core.Params;
 import de.uni.trier.infsec.eVotingSystem.parser.Keys;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
@@ -12,14 +15,14 @@ public class SetupVoter {
 	public static void main(String[] args) {
 		int voterID=0;
 		if (args.length != 1) {
-			System.out.println("Wrong number of Arguments!\nExpected: VoterRegisterApp <voter_id [int]>\nExample: VoterRegisterApp 01");
+			System.out.println("Wrong number of Arguments!\nExpected: SetupVoter <voter_id [int]>\nExample: SetupVoter 01");
 			System.exit(0);
 		} 
 		else {
 			try {				
 				voterID = Integer.parseInt(args[0]);
 			} catch (Exception e) {
-				System.out.println("Something is wrong with arguments!\nExpected: VoterRegisterApp <voter_id [int]>\nExample: VoterRegisterApp 01");
+				System.out.println("Something is wrong with arguments!\nExpected: SetupVoter <voter_id [int]>\nExample: SetupVoter 01");
 				e.printStackTrace();
 				System.exit(0);
 			}
@@ -38,11 +41,22 @@ public class SetupVoter {
 			k.signKey=sign.getSignatureKey();
 			k.verifKey=sign.getVerificationKey();
 			
-			String filename =  AppParams.PRIVATE_KEY_dir + name + "_PR.json";
-			setupPrivateKeys(k, filename);
+			String filename =  AppParams.PRIVATE_KEY_path + name + "_PR.json";
+			try {
+				setupPrivateKeys(k, filename);
+			} catch (IOException e) {
+				System.err.println("Unable to access: " + filename);
+				System.exit(-1);
+			}
 			
-			filename =  AppParams.PUBLIC_KEY_dir + name + "_PU.json";
-			String publicKeys=setupPublicKeys(k, filename);
+			filename =  AppParams.PUBLIC_KEY_path + name + "_PU.json";
+			String publicKeys=null;
+			try {
+				publicKeys = setupPublicKeys(k, filename);
+			} catch (IOException e) {
+				System.err.println("Unable to access: " + filename);
+				System.exit(-1);
+			}
 			
 			System.out.println(name + "'s public keys:");
 			System.out.println(publicKeys);
