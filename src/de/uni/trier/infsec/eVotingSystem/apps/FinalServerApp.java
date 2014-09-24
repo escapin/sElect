@@ -94,7 +94,7 @@ public class FinalServerApp {
 				}
 			}
 			catch (Exception e) {
-				System.out.println("an error ocurred:");
+				System.err.println("an error ocurred:");
 				e.printStackTrace();
 			}
 		}

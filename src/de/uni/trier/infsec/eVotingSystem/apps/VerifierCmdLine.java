@@ -6,9 +6,8 @@ import de.uni.trier.infsec.eVotingSystem.core.Params;
 import de.uni.trier.infsec.eVotingSystem.core.Utils;
 import de.uni.trier.infsec.eVotingSystem.core.Voter;
 import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
-import de.uni.trier.infsec.functionalities.digsig.RegisterSig;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
-import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.utils.Utilities;
 
@@ -16,15 +15,16 @@ public class VerifierCmdLine {
 	
 	private static Verifier server1ver = null;
 	private static Verifier server2ver = null;
-
+	private static ElectionManifest elManifest = null;
 	
 	public static void main(String[] args) throws Exception
 	{	
 		// fetch the verifiers of the servers
-		PKI.useRemoteMode();
-		server1ver = RegisterSig.getVerifier(Params.SERVER1ID, Params.SIG_DOMAIN);
-		server2ver = RegisterSig.getVerifier(Params.SERVER2ID, Params.SIG_DOMAIN);
-		
+		elManifest=AppUtils.retrieveElectionManifest();
+		byte[] verif1key = elManifest.getCollectingServer().verification_key;
+		byte[] verif2key = elManifest.getFinalServer().verification_key;
+		server1ver = new Verifier(verif1key);
+		server2ver = new Verifier(verif2key);
 		
 		int voterID = -1;
 
@@ -83,7 +83,7 @@ public class VerifierCmdLine {
 		
 		// Print out (part of) the receipt:
 		outl("\nRECEIPT:");
-		outl("    election ID  = " + new String(receipt.electionID) );
+		outl("    election ID  = " + Utilities.byteArrayToHexString(receipt.electionID) );
 		outl("    candidate number   = " + receipt.voterChoice );
 		outl("    nonce        = " + Utilities.byteArrayToHexString(receipt.nonce));
 		

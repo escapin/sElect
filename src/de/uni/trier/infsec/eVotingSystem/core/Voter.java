@@ -80,7 +80,7 @@ public class Voter
 	public static enum ResponseTag {
 		VOTE_COLLECTED, INVALID_ELECTION_ID,
 		INVALID_VOTER_ID, ELECTION_OVER, ALREADY_VOTED,
-		UNKNOWN_ERROR;
+		UNKNOWN_ERROR, ELECTION_NOT_STARTED;
 	}
 
 	public class Error extends Exception {
@@ -224,6 +224,8 @@ public class Voter
 			//	return ResponseTag.INVALID_VOTER_ID;
 			else if (Utilities.arrayEqual(reason, Params.ELECTION_OVER))
 				return ResponseTag.ELECTION_OVER;
+			else if (Utilities.arrayEqual(reason, Params.ELECTION_NOT_STARTED))
+				return ResponseTag.ELECTION_NOT_STARTED;
 			else if (Utilities.arrayEqual(reason, Params.ALREADY_VOTED))
 				return ResponseTag.ALREADY_VOTED;
 			else return ResponseTag.UNKNOWN_ERROR;

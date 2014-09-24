@@ -105,11 +105,14 @@ public class CollectingServer
 		byte[] problem = null;  // null means that everything is ok 
 		if( !MessageTools.equal(elID, elManifest.getElectionID()) )
 			problem =  Params.INVALID_ELECTION_ID;
-		else if( !inVotingPhase )
+		else if(System.currentTimeMillis()<elManifest.getStartTime())
+			problem = Params.ELECTION_NOT_STARTED;
+		else if(System.currentTimeMillis()>elManifest.getEndTime() )
 			problem = Params.ELECTION_OVER;
 		else if( ballots[voterID]!=null && !Utilities.arrayEqual(innerBallot, ballots[voterID]) )	// check whether the vote has already voted
 			problem = Params.ALREADY_VOTED;
-
+		
+		
 		if (problem != null) { // there is a problem; create an error response of the form [electionID, REJECTED, rejectedReason]
 			return encapsulateResponse(voterID, concatenate(elID, concatenate(Params.REJECTED, problem)));
 			// note that we reply with the election identifier as provided in the voter's request

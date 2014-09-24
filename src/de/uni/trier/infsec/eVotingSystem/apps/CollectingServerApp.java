@@ -54,7 +54,7 @@ public class CollectingServerApp {
 		Keys k = KeysParser.parseJSONString(keyJSON);
 		if(k.encrKey==null || k.decrKey==null || k.signKey==null || k.verifKey==null)
 			errln("Invalid Collecting Server's keys.");
-			
+		
 		Decryptor decr = new Decryptor(k.encrKey, k.decrKey);
 		Signer sign = new Signer(k.verifKey, k.signKey);
 		
@@ -71,8 +71,23 @@ public class CollectingServerApp {
 		}
 		
 		boolean posted = false;
-		
+		boolean electionStatus = false;
 		while( true ) { // run forever
+			if(System.currentTimeMillis()>elManifest.getEndTime() && !electionStatus){
+				electionStatus=posted=true;
+				System.out.println("\tElection Already Closed!");
+			}
+			else if(System.currentTimeMillis()>elManifest.getStartTime() && !electionStatus){
+				electionStatus=true;
+				System.out.println("\tElection Opened!");
+				long millis=elManifest.getEndTime()-elManifest.getStartTime();
+				long second = (millis / 1000) % 60;
+				long minute = (millis / (1000 * 60)) % 60;
+				long hour = (millis / (1000 * 60 * 60)) % 24;
+				System.out.println("\tDuration:  " + String.format("%02dh:%02dm:%02ds", hour, minute, second)); 
+			}
+				
+				
 			try {
 				byte[] request = NetworkServer.nextRequest(AppParams.colServURI.port);
 				if (request != null) {
@@ -97,7 +112,7 @@ public class CollectingServerApp {
 			if (itsOver() && !posted) {
 				System.out.println("Posting result...");
 				postResult();
-				System.out.println("done.");
+				System.out.println("\tElection Closed!");
 				posted = true;
 			}
 		}
@@ -121,7 +136,7 @@ public class CollectingServerApp {
 			NetworkClient.send(result, AppParams.finServURI.hostname, AppParams.finServURI.port);
 		}
 		catch (NetworkError e) {
-			System.out.println("Problems with sending the result to the final server!");
+			System.err.println("Problems with sending the result to the final server!");
 		}
 		
 		// TODO: send the official result along with formatted result to the bulletin board

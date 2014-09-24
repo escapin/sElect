@@ -41,9 +41,9 @@ public class AppParams
 	public static final String VOTERAPPNAME = "sElect";
 	public static final String VERIFYAPPNAME = "VerifYourVote";
 	
-	// STARTS IN 10 minutes
-	public static final long STARTTIME = System.currentTimeMillis() + (60*10^3)*10;
-	public static final long DURATION = (60*10^3)*10; // 10 minutes
+	
+	public static final long STARTTIME = System.currentTimeMillis() + (60000); //*10;
+	public static final long DURATION = (60000)*3; 
 	
 	public static final String EL_TITLE = "Favourite RS3 project";
 	public static final String EL_DESCRIPTION = "Election for the best RS3 project";
