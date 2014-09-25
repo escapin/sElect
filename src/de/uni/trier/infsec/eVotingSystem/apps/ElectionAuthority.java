@@ -13,6 +13,7 @@ import java.util.LinkedList;
 
 import de.uni.trier.infsec.eVotingSystem.bean.CollectingServerID;
 import de.uni.trier.infsec.eVotingSystem.bean.FinalServerID;
+import de.uni.trier.infsec.eVotingSystem.bean.URI;
 import de.uni.trier.infsec.eVotingSystem.bean.VoterID;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifestParser;
@@ -22,12 +23,12 @@ import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.nonce.NonceGen;
 import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readCharsFromFile;
 import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.storeAsFile;
-import static de.uni.trier.infsec.utils.Utilities.byteArrayToHexString;
 import static de.uni.trier.infsec.eVotingSystem.core.Utils.errln;
 
 public class ElectionAuthority {
 	public static void main(String[] args){
-		
+		URI unknownURI = new URI("???", -1);
+
 		// retrieve the public keys of Collecting Server
 		String filename = AppParams.PUBLIC_KEY_path + "CollectingServer_PU.json";
 		String stringJSON=null;
@@ -37,7 +38,7 @@ public class ElectionAuthority {
 			errln("Unable to access: " + filename);
 		}
 		Keys k=KeysParser.parseJSONString(stringJSON);
-		CollectingServerID colServID = new CollectingServerID(AppParams.colServURI, k.encrKey, k.verifKey);
+		CollectingServerID colServID = new CollectingServerID(unknownURI, k.encrKey, k.verifKey);
 		
 		// retrieve the public keys of Final Server
 		filename = AppParams.PUBLIC_KEY_path + "FinalServer_PU.json";
@@ -47,7 +48,7 @@ public class ElectionAuthority {
 			errln("Unable to access: " + filename);
 		}
 		k=KeysParser.parseJSONString(stringJSON);
-		FinalServerID finServID = new FinalServerID(AppParams.finServURI, k.encrKey, k.verifKey);
+		FinalServerID finServID = new FinalServerID(unknownURI, k.encrKey, k.verifKey);
 		
 		// retrieve the public keys of voters
 		String pattern="voter*";

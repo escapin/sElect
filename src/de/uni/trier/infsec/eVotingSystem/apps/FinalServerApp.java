@@ -73,7 +73,7 @@ public class FinalServerApp {
 
 	private static void run()  {
 		try {
-			NetworkServer.listenForRequests(AppParams.finServURI.port);
+			NetworkServer.listenForRequests(AppParams.finServPort);
 		}
 		catch(NetworkError e) {
 			e.printStackTrace();
@@ -82,7 +82,7 @@ public class FinalServerApp {
 		
 		while( true ) {
 			try {
-				byte[] request = NetworkServer.read(AppParams.finServURI.port);
+				byte[] request = NetworkServer.read(AppParams.finServPort);
 				if (request != null) {
 					System.out.println("reqeuest coming");
 					byte[] result = server.processTally(request);

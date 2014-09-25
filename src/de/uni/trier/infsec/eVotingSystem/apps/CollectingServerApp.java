@@ -63,7 +63,7 @@ public class CollectingServerApp {
 
 	private static void run()  {
 		try {
-			NetworkServer.listenForRequests(AppParams.colServURI.port);
+			NetworkServer.listenForRequests(AppParams.colServPort);
 		}
 		catch(NetworkError e) {
 			e.printStackTrace();
@@ -89,7 +89,7 @@ public class CollectingServerApp {
 				
 				
 			try {
-				byte[] request = NetworkServer.nextRequest(AppParams.colServURI.port);
+				byte[] request = NetworkServer.nextRequest(AppParams.colServPort);
 				if (request != null) {
 					System.out.println("reqeuest coming");
 					byte[] response=null;
@@ -133,7 +133,7 @@ public class CollectingServerApp {
 	
 		// send result to the final server:
 		try {
-			NetworkClient.send(result, AppParams.finServURI.hostname, AppParams.finServURI.port);
+			NetworkClient.send(result, elManifest.getCollectingServer().uri.hostname, elManifest.getCollectingServer().uri.port);
 		}
 		catch (NetworkError e) {
 			System.err.println("Problems with sending the result to the final server!");

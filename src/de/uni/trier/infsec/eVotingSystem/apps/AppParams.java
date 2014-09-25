@@ -67,8 +67,10 @@ public class AppParams
 								"SADAN (Data-driven Usage Control)",
 								};
 	
-	public static URI colServURI = new URI("localhost", 7075);
-	public static URI finServURI = new URI("localhost", 7076);
+	public static int colServPort = 7075;
+	// public static URI colServURI = new URI("localhost", 7075);
+	public static int finServPort = 7076;
+	// public static URI finServURI = new URI("localhost", 7076);
 	public static URI[] bulletinBoardList = 	{ new URI("localhost", 7077)
 												};
 
