@@ -1,10 +1,12 @@
 package de.uni.trier.infsec.eVotingSystem.parser;
 
-import static de.uni.trier.infsec.eVotingSystem.core.Utils.arrayEqual;
+import java.util.Date;
+
 import de.uni.trier.infsec.eVotingSystem.bean.CollectingServerID;
 import de.uni.trier.infsec.eVotingSystem.bean.FinalServerID;
 import de.uni.trier.infsec.eVotingSystem.bean.URI;
 import de.uni.trier.infsec.eVotingSystem.bean.VoterID;
+import de.uni.trier.infsec.utils.Utilities;
 
 public class ElectionManifest
 {
@@ -18,20 +20,20 @@ public class ElectionManifest
 	/*
 	 * ATTRIBUTES WHICH DEFINE AN ELECTION BOARD:
 	 */
-	private final byte[] electionID;
-	private final String headline;			// the question to submit
-	private final String[] choicesList;		// e.g. list of candidates
+	public final byte[] electionID;
+	public String headline;			// the question to submit
+	public String[] choicesList;		// e.g. list of candidates
 	
-	private String title;	// of the election
-	private String description;	// of the election
+	public String title;	// of the election
+	public String description;	// of the election
 	
-	private final long startTime, endTime;	// milliseconds time value since January 1, 1970, 00:00:00 GMT
-	//TODO: just for the Collecting Server
+	public 	Date startTime, endTime;	
 	
-	private final VoterID[] votersList;		
-	private final CollectingServerID collectingServer;
-	private final FinalServerID finalServer;
-	private final URI[] bulletinBoardsList;
+	
+	public VoterID[] votersList;		
+	public CollectingServerID collectingServer;
+	public FinalServerID finalServer;
+	public URI[] bulletinBoardsList;
 
 	
 	/**
@@ -45,30 +47,23 @@ public class ElectionManifest
 	 * @param choicesList array of candidate/choices which can be selected by the voters	 
 	 *  
 	 */
-	public ElectionManifest(byte[] electionID,
-							long startTime, long endTime,
-							String headline, 
-							String[] choicesList,
-							VoterID[] votersList, 
-							CollectingServerID collectingServer,
-							FinalServerID finalServer,
-							URI[] bulletinBoardList)
+	public ElectionManifest(byte[] electionID)
 	{
-		if(startTime>=endTime)
-			throw new IllegalArgumentException("Wrong Election Period");
+//		if(startTime>=endTime)
+//			throw new IllegalArgumentException("Wrong Election Period");
 		
 		this.electionID=electionID;
-		this.headline=headline;
-		
-		this.startTime=startTime;
-		this.endTime=endTime;
-		
-		this.choicesList=choicesList;
-		
-		this.votersList=votersList;
-		this.collectingServer=collectingServer;
-		this.finalServer=finalServer;
-		this.bulletinBoardsList=bulletinBoardList;
+//		this.headline=headline;
+//		
+//		this.startTime=startTime;
+//		this.endTime=endTime;
+//		
+//		this.choicesList=choicesList;
+//		
+//		this.votersList=votersList;
+//		this.collectingServer=collectingServer;
+//		this.finalServer=finalServer;
+//		this.bulletinBoardsList=bulletinBoardList;
 	}
 	
 	/**
@@ -83,16 +78,16 @@ public class ElectionManifest
 	public boolean equals(Object obj)
 	{
 		if(obj instanceof ElectionManifest){
-;			ElectionManifest otherElBoard=(ElectionManifest) obj;
-			return 	this.getElectionID().equals(otherElBoard.getElectionID()) &&
-					this.getHeadline().equals(otherElBoard.getHeadline()) &&
-					this.getStartTime()==otherElBoard.getStartTime() &&
-					this.getStartTime()==otherElBoard.getStartTime() && 
-					arrayEqual(this.getChoicesList(), otherElBoard.getChoicesList()) &&
-					arrayEqual(this.getVotersList(), otherElBoard.getVotersList()) &&
-					this.getCollectingServer().equals(otherElBoard.getCollectingServer()) &&
-					this.getFinalServer().equals(otherElBoard.getFinalServer()) &&
-					arrayEqual(this.getBulletinBoardsList(), otherElBoard.getBulletinBoardsList());
+			ElectionManifest otherElBoard=(ElectionManifest) obj;
+			return 	Utilities.arrayEqual(this.electionID, otherElBoard.electionID);
+//					this.getHeadline().equals(otherElBoard.getHeadline()) &&
+//					this.getStartTime().equals(otherElBoard.getStartTime()) &&
+//					this.getEndTime().equals(otherElBoard.getEndTime()) && 
+//					arrayEqual(this.getChoicesList(), otherElBoard.getChoicesList()) &&
+//					arrayEqual(this.getVotersList(), otherElBoard.getVotersList()) &&
+//					this.getCollectingServer().equals(otherElBoard.getCollectingServer()) &&
+//					this.getFinalServer().equals(otherElBoard.getFinalServer()) &&
+//					arrayEqual(this.getBulletinBoardsList(), otherElBoard.getBulletinBoardsList());
 			/* 
 			 * Note that, since they are not declared 'final', 
 			 * the fields 'title' and 'description' are not used to assert equality.
@@ -100,83 +95,6 @@ public class ElectionManifest
 		}
 		return false;
 		
-	}
-
-	/* 
-	 * GETTER(s) and SETTER(s)
-	 */
-	public VoterID[] getVotersList()
-	{
-		return votersList;
-	}
-	
-	public CollectingServerID getCollectingServer()
-	{
-		return collectingServer;
-	}
-
-	public FinalServerID getFinalServer()
-	{
-		return finalServer;
-	}
-
-
-	public URI[] getBulletinBoardsList() 
-	{
-		return bulletinBoardsList;
-	}
-		
-	
-	public String getTitle()
-	{
-		return title;
-	}
-
-
-	public void setTitle(String title)
-	{
-		this.title = title;
-	}
-
-
-	public String getDescription()
-	{
-		return description;
-	}
-
-
-	public void setDescription(String description)
-	{
-		this.description = description;
-	}
-
-
-	public String getHeadline()
-	{
-		return headline;
-	}
-
-
-	public byte[] getElectionID()
-	{
-		return electionID;
-	}
-
-
-	public String[] getChoicesList()
-	{
-		return choicesList;
-	}
-
-	public long getStartTime()
-	{
-		return startTime;
-	}
-
-
-	public long getEndTime()
-	{
-		return endTime;
 	}
 }
 

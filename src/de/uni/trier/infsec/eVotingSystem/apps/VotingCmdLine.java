@@ -78,7 +78,7 @@ public class VotingCmdLine
 				
 			// Send the ballot:
 			outl("Sending the ballot to the server");
-			byte[] serverResponse = NetworkClient.sendRequest(ballot, AppParams.colServURI.hostname, AppParams.colServURI.port);
+			byte[] serverResponse = NetworkClient.sendRequest(ballot, elManifest.collectingServer.uri.hostname, elManifest.collectingServer.uri.port);
 				
 			//TODO: implement the VoterApp from here to the end of the file
 				

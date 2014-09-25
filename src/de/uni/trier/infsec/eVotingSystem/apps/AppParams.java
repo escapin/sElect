@@ -38,6 +38,9 @@ public class AppParams
 														FIN_SERVER_RESULT_msg,
 														FINAL_RESULT_file
 													};
+	
+	public static final String DATE_FORMAT="yyyy.MM.dd 'at' HH:mm";
+	
 	/******************************************/
 	/********** ELECTION PARAMETERS ***********/
 	/******************************************/

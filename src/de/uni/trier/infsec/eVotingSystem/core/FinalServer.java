@@ -41,7 +41,7 @@ public class FinalServer
 		this.decryptor = decryptor;
 		this.elManifest = elManifest;
 		// fetch the functionalities of the collecting server
-		byte[] colServVerifier = elManifest.getCollectingServer().verification_key;
+		byte[] colServVerifier = elManifest.collectingServer.verification_key;
 		this.collectingServerVerif = new Verifier(colServVerifier); 
 	}
 	
@@ -61,7 +61,7 @@ public class FinalServer
 		
 		// check that election id in the processed data
 		byte[] el_id = MessageTools.first(payload);
-		if (!MessageTools.equal(el_id, elManifest.getElectionID()))
+		if (!MessageTools.equal(el_id, elManifest.electionID))
 			throw new MalformedData("Wrong election ID");
 		
 		// retrieve and process ballots (store decrypted entries in 'entries')
@@ -88,7 +88,7 @@ public class FinalServer
 		byte[] entriesAsAMessage = Utils.concatenateMessageArray(entries, numberOfEntries);
 		
 		// add election id and sign them
-		byte[] result = MessageTools.concatenate(elManifest.getElectionID(), entriesAsAMessage);
+		byte[] result = MessageTools.concatenate(elManifest.electionID, entriesAsAMessage);
 		byte[] signatureOnResult = signer.sign(result);
 		byte[] signedResult = MessageTools.concatenate(result, signatureOnResult);
 		return signedResult;

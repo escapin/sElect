@@ -129,8 +129,8 @@ public class Voter
 		this.decryptor = decryptor;
 		this.signer = signer;
 		this.elManifest=elManifest;
-		CollectingServerID colSer = elManifest.getCollectingServer();
-		FinalServerID finSer = elManifest.getFinalServer();
+		CollectingServerID colSer = elManifest.collectingServer;
+		FinalServerID finSer = elManifest.finalServer;
 		this.server1enc = new Encryptor(colSer.encryption_key);
 		this.server1ver = new Verifier(colSer.verification_key);
 		this.server2enc = new Encryptor(finSer.encryption_key);
@@ -164,7 +164,7 @@ public class Voter
 		byte[] vote = intToByteArray(voterChoice);
 		byte[] nonce_vote = concatenate(nonce, vote);
 		byte[] inner_ballot = server2enc.encrypt(nonce_vote);
-		receipt=new Receipt(elManifest.getElectionID(), voterChoice, nonce, inner_ballot, null); // no server signature
+		receipt=new Receipt(elManifest.electionID, voterChoice, nonce, inner_ballot, null); // no server signature
 		return encapsulate(receipt.innerBallot); // add the election id, sign, end encrypt
 	}
 
@@ -210,7 +210,7 @@ public class Voter
 		byte[] elID_tag_payload = second(serverResp);
 
 		byte[] elID = first(elID_tag_payload);
-		if (!MessageTools.equal(elID, elManifest.getElectionID()))
+		if (!MessageTools.equal(elID, elManifest.electionID))
 			throw new MalformedMessage("The server's reply is not for the current election"); 
 
 		byte[] tag_payload = second(elID_tag_payload);
@@ -233,7 +233,7 @@ public class Voter
 		}
 		else if(Arrays.equals(tag, Params.ACCEPTED)){
 			byte[] server_signature = second(tag_payload);
-			byte[] expected_signed_msg = concatenate(Params.ACCEPTED, concatenate(elManifest.getElectionID(), receipt.innerBallot));
+			byte[] expected_signed_msg = concatenate(Params.ACCEPTED, concatenate(elManifest.electionID, receipt.innerBallot));
 			if (!server1ver.verify(server_signature, expected_signed_msg))
 				throw new MalformedMessage("Wrong server's signature"); 
 
@@ -263,7 +263,7 @@ public class Voter
 	//     Enc_server1( voterID,  Sig_Voter[elID, innerBallot] )
 	private byte[] encapsulate(byte[] innerBallot) {
 		byte[] voterIDMsg = intToByteArray(voterID);
-		byte[] elID_innerBallot = concatenate(elManifest.getElectionID(), innerBallot);
+		byte[] elID_innerBallot = concatenate(elManifest.electionID, innerBallot);
 		byte[] signature_on_elID_innerBallot = signer.sign(elID_innerBallot);
 		byte[] elID_innerBallot_with_signature = concatenate(elID_innerBallot, signature_on_elID_innerBallot); 
 		byte[] payload = concatenate(voterIDMsg, elID_innerBallot_with_signature);

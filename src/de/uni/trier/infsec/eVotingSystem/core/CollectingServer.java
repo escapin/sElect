@@ -103,11 +103,11 @@ public class CollectingServer
 		// Check if the ballot is to be rejected (with an error response).
 		//
 		byte[] problem = null;  // null means that everything is ok 
-		if( !MessageTools.equal(elID, elManifest.getElectionID()) )
+		if( !MessageTools.equal(elID, elManifest.electionID) )
 			problem =  Params.INVALID_ELECTION_ID;
-		else if(System.currentTimeMillis()<elManifest.getStartTime())
+		else if(System.currentTimeMillis()<elManifest.startTime.getTime())
 			problem = Params.ELECTION_NOT_STARTED;
-		else if(System.currentTimeMillis()>elManifest.getEndTime() )
+		else if(System.currentTimeMillis()>elManifest.endTime.getTime() )
 			problem = Params.ELECTION_OVER;
 		else if( ballots[voterID]!=null && !Utilities.arrayEqual(innerBallot, ballots[voterID]) )	// check whether the vote has already voted
 			problem = Params.ALREADY_VOTED;
@@ -126,13 +126,13 @@ public class CollectingServer
 			ballots[voterID] = innerBallot; 
 		}
 		// create receipt for the voter
-		byte[] elID_innerBallot = concatenate(elManifest.getElectionID(), innerBallot);
+		byte[] elID_innerBallot = concatenate(elManifest.electionID, innerBallot);
 		byte[] accepted_elID_innerBallot = concatenate(Params.ACCEPTED, elID_innerBallot);
 		byte[] receipt = signer.sign(accepted_elID_innerBallot);
 		// TODO: perhaps the server should store voters' signatures
 
 		byte[] accepted_serverSign=concatenate(Params.ACCEPTED, receipt);
-		return encapsulateResponse(voterID, concatenate(elManifest.getElectionID(), accepted_serverSign));
+		return encapsulateResponse(voterID, concatenate(elManifest.electionID, accepted_serverSign));
 	}
 
 	public int getNumberOfBallots() {
@@ -171,7 +171,7 @@ public class CollectingServer
 		byte[] votersAsAMessage = Utils.concatenateMessageArray(vv);
 
 		// put together the election ID, inner ballots, and list of voters
-		byte[] result = concatenate(elManifest.getElectionID(), concatenate(ballotsAsAMessage, votersAsAMessage));
+		byte[] result = concatenate(elManifest.electionID, concatenate(ballotsAsAMessage, votersAsAMessage));
 		
 		// sign the result
 		byte[] signature = signer.sign(result);

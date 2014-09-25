@@ -3,10 +3,14 @@ package de.uni.trier.infsec.eVotingSystem.parser;
 import static de.uni.trier.infsec.utils.Utilities.byteArrayToHexString;
 import static de.uni.trier.infsec.utils.Utilities.hexStringToByteArray;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.uni.trier.infsec.eVotingSystem.apps.AppParams;
 import de.uni.trier.infsec.eVotingSystem.bean.CollectingServerID;
 import de.uni.trier.infsec.eVotingSystem.bean.FinalServerID;
 import de.uni.trier.infsec.eVotingSystem.bean.ServerID;
@@ -48,19 +52,19 @@ public class ElectionManifestParser
 	private static JSONObject generateJSONObject(ElectionManifest elBoard)
 	{
 		JSONObject jMain=new JSONObject();
-		jMain.put(sElectionID, byteArrayToHexString(elBoard.getElectionID()));
-		jMain.put(sTitle, elBoard.getTitle());
-		jMain.put(sDescription, elBoard.getDescription());
-		jMain.put(sHeadline, elBoard.getHeadline());
+		jMain.put(sElectionID, byteArrayToHexString(elBoard.electionID));
+		jMain.put(sTitle, elBoard.title);
+		jMain.put(sDescription, elBoard.description);
+		jMain.put(sHeadline, elBoard.headline);
 		
 		JSONArray choicesList = new JSONArray();
-		for(String choice: elBoard.getChoicesList())
+		for(String choice: elBoard.choicesList)
 			choicesList.put(choice);
 		jMain.put(sChoicesList, choicesList);
 		
 		JSONArray votersList = new JSONArray();
 		JSONObject jVoter;
-		for(VoterID vID: elBoard.getVotersList()){
+		for(VoterID vID: elBoard.votersList){
 			jVoter = new JSONObject();
 			jVoter.put(sUniqueID, vID.uniqueID);
 			jVoter.put(sEncryptionKey, byteArrayToHexString(vID.encryption_key));
@@ -70,8 +74,8 @@ public class ElectionManifestParser
 		jMain.put(sVoterList, votersList);
 		
 		
-		ServerID[] servers=new ServerID[]{	elBoard.getCollectingServer(),
-											elBoard.getFinalServer()};
+		ServerID[] servers=new ServerID[]{	elBoard.collectingServer,
+											elBoard.finalServer};
 		
 		
 		JSONObject jServer, jURI;
@@ -90,7 +94,7 @@ public class ElectionManifestParser
 		}
 		
 		JSONArray bulletinBoardsList=new JSONArray();
-		for(URI uri : elBoard.getBulletinBoardsList()){
+		for(URI uri : elBoard.bulletinBoardsList){
 			jURI = new JSONObject();
 			jURI.put(sHostname, uri.hostname);
 			jURI.put(sPort, uri.port);
@@ -98,8 +102,15 @@ public class ElectionManifestParser
 		}
 		jMain.put(sBulletinBoards, bulletinBoardsList);
 		
-		jMain.put(sStartTime, elBoard.getStartTime());
-		jMain.put(sEndTime, elBoard.getEndTime());
+		
+		
+		SimpleDateFormat formatter = new SimpleDateFormat(AppParams.DATE_FORMAT);
+		
+		String start = elBoard.startTime==null? AppParams.DATE_FORMAT: formatter.format(elBoard.startTime);
+		String end = elBoard.endTime==null? AppParams.DATE_FORMAT : formatter.format(elBoard.endTime);
+		
+		jMain.put(sStartTime, start);
+		jMain.put(sEndTime, end);
 		
 		return jMain;
 	}
@@ -108,46 +119,54 @@ public class ElectionManifestParser
 	private static ElectionManifest parseManifest(JSONObject manifest) throws JSONException
 	{
 		byte[] 	electionID = hexStringToByteArray(manifest.getString(sElectionID));
-		String	headline = manifest.getString(sHeadline);
+		
+		ElectionManifest newElBoard=new ElectionManifest(electionID);
+		
+		newElBoard.headline = manifest.getString(sHeadline);
+		
 		
 		JSONArray aChoicesList = manifest.getJSONArray(sChoicesList);
-		String[] choicesList=new String[aChoicesList.length()];
+		newElBoard.choicesList=new String[aChoicesList.length()];
 		for(int i=0;i<aChoicesList.length();i++)
-			choicesList[i]=aChoicesList.getString(i);
+			newElBoard.choicesList[i]=aChoicesList.getString(i);
 		
-		long	startTime=manifest.getLong(sStartTime), 
-				endTime=manifest.getLong(sEndTime);	
+		String		start=manifest.getString(sStartTime); 
+		String		end=manifest.getString(sEndTime);	
 		
-	
+		SimpleDateFormat formatter = new SimpleDateFormat(AppParams.DATE_FORMAT);
+		try {
+			newElBoard.startTime = formatter.parse(start);
+			newElBoard.endTime = formatter.parse(end);
+		} catch (ParseException e) {
+			// keep null
+		}
+		
 		// VOTERS
 		JSONArray aVotersList = manifest.getJSONArray(sVoterList);
-		VoterID[] votersList = new VoterID[aVotersList.length()];
-		for(int i=0;i<votersList.length;i++){
-			votersList[i]=createVoterID(aVotersList.getJSONObject(i));
+		newElBoard.votersList = new VoterID[aVotersList.length()];
+		for(int i=0;i<newElBoard.votersList.length;i++){
+			newElBoard.votersList[i]=createVoterID(aVotersList.getJSONObject(i));
 		}
 		// SERVERS
 		JSONObject aColServer = manifest.getJSONObject(sCollectingServer);
-		CollectingServerID colServerID = createCollectingServerID(aColServer);
+		newElBoard.collectingServer = createCollectingServerID(aColServer);
 		
 		JSONObject aFinServer = manifest.getJSONObject(sFinalServer);
-		FinalServerID finServerID = createFinalServerID(aFinServer);
+		newElBoard.finalServer = createFinalServerID(aFinServer);
 
 		// BULLETIN BOARDS
 		JSONArray aBulletinBoards = manifest.getJSONArray(sBulletinBoards);
-		URI[] bulletinBoards = new URI[aBulletinBoards.length()];   
-		for(int i=0;i<bulletinBoards.length;i++){
-			bulletinBoards[i] = createURI(aBulletinBoards.getJSONObject(i));
+		newElBoard.bulletinBoardsList = new URI[aBulletinBoards.length()];   
+		for(int i=0;i<newElBoard.bulletinBoardsList.length;i++){
+			newElBoard.bulletinBoardsList[i] = createURI(aBulletinBoards.getJSONObject(i));
 		}
 			
-		ElectionManifest newElBoard=new ElectionManifest(electionID, 
-				startTime, endTime, 
-				headline, choicesList, 
-				votersList, colServerID, 
-				finServerID, bulletinBoards);
+		
 		String 	title=manifest.getString(sTitle),
 				description=manifest.getString(sDescription);
-		newElBoard.setTitle(title);
-		newElBoard.setDescription(description);
+		
+		newElBoard.title=title;
+		newElBoard.description=description;
 		
 		return newElBoard;
 	}
