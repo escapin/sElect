@@ -1,3 +1,9 @@
+// PARAMETERS
+
+var PORT = 3111;
+var MANIFEST_FILE = process.env.HOME + '/.eVotingSystem/Public/Manifest/ElectionManifest.json';
+
+
 // LIBRARIES 
 
 var express = require('express');
@@ -9,9 +15,6 @@ var morgan = require('morgan')
 
 var routes = require('./routes');
 
-// PARAMETERS
-
-var MANIFEST_FILE = process.env.HOME + '/.eVotingSystem/Public/Manifest/ElectionManifest.json';
 
 // INITIALIZATION (read the manifest file)
 
@@ -27,24 +30,25 @@ else { // Initialization failed
 
 var index = routes.index(manifest);
 
-// CREATE THE APP
+
+// CREATE AND CONFIGURE THE APP
 
 var app = express();
 
-
-// CONFIGURATION
-
+// view engine and location of the views
 app.set('views', './views');
 app.set('view engine', 'ejs');
 
+// body parser (important for POST request)
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('./public')); // was: __dirname + '/public'
-// app.use(express.static(__dirname + './public'));
 
-// Error handling (not for production)
+// static content
+app.use(express.static('./public')); // was: __dirname + '/public'
+
+// error handling (not for production)
 app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 
-// Logging
+// logging (onto console)
 app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
 
 
@@ -56,7 +60,7 @@ app.get('/index.html', index);
 
 // STARGING THE SERVER
 
-var server = app.listen(3000, function() {
+var server = app.listen(PORT, function() {
     console.log('Listening on %s, port %d', server.address().address, server.address().port);
 });
 
