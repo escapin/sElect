@@ -112,7 +112,7 @@ public class FinalServerApp {
 		
 		// write result to text file (as a readable text)
 		try {
-			Helper.FinalEntry[] fes = Helper.finalResultAsText(result, serversVerifier, elManifest.getElectionID());
+			Helper.FinalEntry[] fes = Helper.finalResultAsText(result, serversVerifier, elManifest.electionID);
 			try {
 		        BufferedWriter out = new BufferedWriter(new FileWriter(AppParams.FINAL_RESULT_file));
 		        for (Helper.FinalEntry e : fes) {

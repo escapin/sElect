@@ -87,7 +87,7 @@ public class Utils
 
 	public static Verifier getVerifier(int voterID, ElectionManifest elManifest)
 	{
-		VoterID[] voterList = elManifest.getVotersList();
+		VoterID[] voterList = elManifest.votersList;
 		for(VoterID voter: voterList)
 			if(voter.uniqueID==voterID)
 				return new Verifier(voter.verification_key);
@@ -96,7 +96,7 @@ public class Utils
 
 	public static Encryptor getEncryptor(int voterID, ElectionManifest elManifest)
 	{
-		VoterID[] voterList = elManifest.getVotersList();
+		VoterID[] voterList = elManifest.votersList;
 		for(VoterID voter: voterList)
 			if(voter.uniqueID==voterID)
 				return new Encryptor(voter.encryption_key);

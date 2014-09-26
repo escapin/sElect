@@ -25,7 +25,7 @@ import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readCharsFromFile;
 import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.storeAsFile;
 import static de.uni.trier.infsec.eVotingSystem.core.Utils.errln;
 
-public class ElectionAuthority {
+public class CreateManifestTemplate {
 	public static void main(String[] args){
 		URI unknownURI = new URI("???", -1);
 

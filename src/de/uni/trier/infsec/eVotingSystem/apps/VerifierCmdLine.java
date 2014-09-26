@@ -21,8 +21,8 @@ public class VerifierCmdLine {
 	{	
 		// fetch the verifiers of the servers
 		elManifest=AppUtils.retrieveElectionManifest();
-		byte[] verif1key = elManifest.getCollectingServer().verification_key;
-		byte[] verif2key = elManifest.getFinalServer().verification_key;
+		byte[] verif1key = elManifest.collectingServer.verification_key;
+		byte[] verif2key = elManifest.finalServer.verification_key;
 		server1ver = new Verifier(verif1key);
 		server2ver = new Verifier(verif2key);
 		

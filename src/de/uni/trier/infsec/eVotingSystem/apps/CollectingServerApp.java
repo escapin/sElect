@@ -73,14 +73,14 @@ public class CollectingServerApp {
 		boolean posted = false;
 		boolean electionStatus = false;
 		while( true ) { // run forever
-			if(System.currentTimeMillis()>elManifest.getEndTime() && !electionStatus){
+			if(System.currentTimeMillis()>elManifest.endTime.getTime() && !electionStatus){
 				electionStatus=posted=true;
 				System.out.println("\tElection Already Closed!");
 			}
-			else if(System.currentTimeMillis()>elManifest.getStartTime() && !electionStatus){
+			else if(System.currentTimeMillis()>elManifest.startTime.getTime() && !electionStatus){
 				electionStatus=true;
 				System.out.println("\tElection Opened!");
-				long millis=elManifest.getEndTime()-elManifest.getStartTime();
+				long millis=elManifest.startTime.getTime()-elManifest.endTime.getTime();
 				long second = (millis / 1000) % 60;
 				long minute = (millis / (1000 * 60)) % 60;
 				long hour = (millis / (1000 * 60 * 60)) % 24;
@@ -133,7 +133,7 @@ public class CollectingServerApp {
 	
 		// send result to the final server:
 		try {
-			NetworkClient.send(result, elManifest.getCollectingServer().uri.hostname, elManifest.getCollectingServer().uri.port);
+			NetworkClient.send(result, elManifest.collectingServer.uri.hostname, elManifest.collectingServer.uri.port);
 		}
 		catch (NetworkError e) {
 			System.err.println("Problems with sending the result to the final server!");
@@ -148,6 +148,6 @@ public class CollectingServerApp {
 	 */
 	private static boolean itsOver() {
 		//return server.getNumberOfBallots() >= AppParams.ALLOWEDVOTERS;
-		return System.currentTimeMillis()>elManifest.getEndTime();
+		return System.currentTimeMillis()>elManifest.endTime.getTime();
 	}
 }
