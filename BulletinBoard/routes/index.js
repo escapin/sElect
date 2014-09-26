@@ -1,17 +1,18 @@
 var fs = require('fs');
 
 // where to find files with the result
-var FINAL_RESULT = 'FinalResult.txt';
-var SIGNED_RESULT = 'public/SignedFinalResult.msg';
 
-exports.index = function(manifest) {
+exports.index = function(manifest, RESULT_DIR) {
+    var FINAL_RESULT  = RESULT_DIR + 'FinalResult.txt';
+    var SIGNED_RESULT = RESULT_DIR + 'SignedFinalResult.msg';
+    var PARTIAL_RESULT= RESULT_DIR + 'SignedPartialResult.msg';
     return function(req, res) {
         var electionName = manifest.title;
 
         // check if file with the result exists
         if (fs.existsSync(FINAL_RESULT) && fs.existsSync(SIGNED_RESULT)) {
             // read the file:
-            fs.readFile('FinalResult.txt', {encoding:'utf8'}, function(err,data) {
+            fs.readFile(FINAL_RESULT, {encoding:'utf8'}, function(err,data) {
                 if (err) throw err;
                 // split it into lines
                 lines = data.split('\n')
@@ -25,7 +26,12 @@ exports.index = function(manifest) {
                               return {vote:t[0], nonce:t[1]};
                       })
                 // render the response
-                res.render('result', { title: 'TrustVote Result', electionName: electionName, result: tt });
+                res.render('result', {  title: 'TrustVote Result', 
+                                        electionName: electionName,
+                                        finalResult: SIGNED_RESULT,
+                                        partialResult: PARTIAL_RESULT,
+                                        result: tt 
+                                     });
             })
         }
         else { // there is no file with result

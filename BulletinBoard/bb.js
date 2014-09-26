@@ -2,6 +2,7 @@
 
 var PORT = 3111;
 var MANIFEST_FILE = process.env.HOME + '/.eVotingSystem/Public/Manifest/ElectionManifest.json';
+var RESULT_DIR = process.env.HOME + '/.eVotingSystem/Public/Results/';
 
 
 // LIBRARIES 
@@ -28,7 +29,7 @@ else { // Initialization failed
     process.exit(1);
 }
 
-var index = routes.index(manifest);
+var index = routes.index(manifest, RESULT_DIR);
 
 
 // CREATE AND CONFIGURE THE APP
@@ -44,6 +45,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // static content
 app.use(express.static('./public')); // was: __dirname + '/public'
+app.use(express.static(RESULT_DIR)); 
 
 // error handling (not for production)
 app.use(errorHandler({ dumpExceptions: true, showStack: true }));
