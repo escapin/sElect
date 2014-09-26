@@ -23,6 +23,7 @@ import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifestParser;
 import de.uni.trier.infsec.eVotingSystem.parser.Keys;
 import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
+import de.uni.trier.infsec.utils.Utilities;
 
 
 public class AppUtils 
@@ -134,11 +135,18 @@ public class AppUtils
 		
 		Verifier elManifestVerifier = new Verifier(k.verifKey);
 		
-
-		if(!elManifestVerifier.verify(manifestSignature, manifestJSON.getBytes()))
-			errln("Invalid Signature of the Manifest File");
+		if(!elManifestVerifier.verify(manifestSignature, manifestJSON.getBytes())){
+			errln("Invalid Manifest's Signature.");
+		}
 		
 		ElectionManifest elManifest = ElectionManifestParser.parseJSONString(manifestJSON);
+		
+		if(	elManifest.bulletinBoardsList==null || elManifest.choicesList==null ||
+			elManifest.collectingServer==null || elManifest.description==null ||
+			elManifest.endTime==null || elManifest.finalServer==null ||
+			elManifest.headline==null || elManifest.startTime==null ||  
+			elManifest.title==null || elManifest.votersList==null)
+			errln("Manifest incomplete.");
 		
 		return elManifest;
 	}

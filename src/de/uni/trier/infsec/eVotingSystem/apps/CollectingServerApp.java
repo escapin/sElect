@@ -80,7 +80,7 @@ public class CollectingServerApp {
 			else if(System.currentTimeMillis()>elManifest.startTime.getTime() && !electionStatus){
 				electionStatus=true;
 				System.out.println("\tElection Opened!");
-				long millis=elManifest.startTime.getTime()-elManifest.endTime.getTime();
+				long millis=elManifest.endTime.getTime()-elManifest.startTime.getTime();
 				long second = (millis / 1000) % 60;
 				long minute = (millis / (1000 * 60)) % 60;
 				long hour = (millis / (1000 * 60 * 60)) % 24;

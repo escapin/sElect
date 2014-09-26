@@ -106,8 +106,8 @@ public class ElectionManifestParser
 		
 		SimpleDateFormat formatter = new SimpleDateFormat(AppParams.DATE_FORMAT);
 		
-		String start = elBoard.startTime==null? AppParams.DATE_FORMAT: formatter.format(elBoard.startTime);
-		String end = elBoard.endTime==null? AppParams.DATE_FORMAT : formatter.format(elBoard.endTime);
+		String start = elBoard.startTime==null? AppParams.DATE_FORMAT.replace("'", ""): formatter.format(elBoard.startTime);
+		String end = elBoard.endTime==null? AppParams.DATE_FORMAT.replace("'", "") : formatter.format(elBoard.endTime);
 		
 		jMain.put(sStartTime, start);
 		jMain.put(sEndTime, end);
@@ -138,7 +138,7 @@ public class ElectionManifestParser
 			newElBoard.startTime = formatter.parse(start);
 			newElBoard.endTime = formatter.parse(end);
 		} catch (ParseException e) {
-			// keep null
+			
 		}
 		
 		// VOTERS

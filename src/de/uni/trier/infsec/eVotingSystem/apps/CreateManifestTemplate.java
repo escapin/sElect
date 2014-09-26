@@ -28,7 +28,14 @@ import static de.uni.trier.infsec.eVotingSystem.core.Utils.errln;
 public class CreateManifestTemplate {
 	public static void main(String[] args){
 		URI unknownURI = new URI("???", -1);
-
+		
+		// get an electionID
+		byte[] electionID = new NonceGen().newNonce();
+				
+		// creates an election manifest
+		ElectionManifest elManifest=new ElectionManifest(electionID); 
+		
+		
 		// retrieve the public keys of Collecting Server
 		String filename = AppParams.PUBLIC_KEY_path + "CollectingServer_PU.json";
 		String stringJSON=null;
@@ -38,7 +45,7 @@ public class CreateManifestTemplate {
 			errln("Unable to access: " + filename);
 		}
 		Keys k=KeysParser.parseJSONString(stringJSON);
-		CollectingServerID colServID = new CollectingServerID(unknownURI, k.encrKey, k.verifKey);
+		elManifest.collectingServer = new CollectingServerID(unknownURI, k.encrKey, k.verifKey);
 		
 		// retrieve the public keys of Final Server
 		filename = AppParams.PUBLIC_KEY_path + "FinalServer_PU.json";
@@ -48,7 +55,7 @@ public class CreateManifestTemplate {
 			errln("Unable to access: " + filename);
 		}
 		k=KeysParser.parseJSONString(stringJSON);
-		FinalServerID finServID = new FinalServerID(unknownURI, k.encrKey, k.verifKey);
+		elManifest.finalServer = new FinalServerID(unknownURI, k.encrKey, k.verifKey);
 		
 		// retrieve the public keys of voters
 		String pattern="voter*";
@@ -60,9 +67,9 @@ public class CreateManifestTemplate {
 			errln("Unable to access: " + filename);
 		}
 		LinkedList<Path> fileMatched = finder.getMatches();
-		VoterID[] voterList = new VoterID[fileMatched.size()];
+		elManifest.votersList = new VoterID[fileMatched.size()];
 		String digits, fName; int uniqueID;
-		for(int i=0;i<voterList.length;i++){
+		for(int i=0;i<elManifest.votersList.length;i++){
 			fName=fileMatched.get(i).toString();
 			digits=fName.replaceAll("[^0-9]", "");
 			uniqueID=Integer.parseInt(digits);
@@ -73,33 +80,18 @@ public class CreateManifestTemplate {
 				errln("Unable to access: " + filename);
 			}
 			k = KeysParser.parseJSONString(stringJSON);
-			voterList[i]=new VoterID(uniqueID, k.encrKey, k.verifKey);
+			elManifest.votersList[i]=new VoterID(uniqueID, k.encrKey, k.verifKey);
 		}
 		
-		// get an electionID
-		byte[] electionID = new NonceGen().newNonce();
+		elManifest.headline="???";
+		elManifest.title="???";
+		elManifest.choicesList= new String[]{"???","???"};
+		elManifest.description="???";
+		elManifest.bulletinBoardsList=new URI[]{unknownURI};
 		
-		// creates an election manifest
-		ElectionManifest elManifest = new ElectionManifest(electionID,
-			AppParams.STARTTIME, AppParams.STARTTIME+AppParams.DURATION,
-			AppParams.HEADLINE, AppParams.CHOICESLIST, voterList, colServID,
-			finServID, AppParams.bulletinBoardList);
-		elManifest.setTitle(AppParams.EL_TITLE);
-		elManifest.setDescription(AppParams.EL_DESCRIPTION);
 		
 		String sManifestJSON = ElectionManifestParser.generateJSON(elManifest);
-		
-		// retrieve the signature key of the Election Authority
-		filename = AppParams.PRIVATE_KEY_path + "ElectionAuthority_PR.json";
-		try {
-			stringJSON = readCharsFromFile(filename);
-		} catch (IOException e) {
-			errln("Unable to access: " + filename);
-		}
-		k=KeysParser.parseJSONString(stringJSON);
-		
-		Signer sign = new Signer(k.verifKey, k.signKey);
-		byte[] manifestSignature=sign.sign(sManifestJSON.getBytes());
+		System.out.println(sManifestJSON);
 		
 		// generate the JSON file
 		filename=AppParams.EL_MANIFEST_path + "ElectionManifest.json";
@@ -108,16 +100,6 @@ public class CreateManifestTemplate {
 		} catch (IOException e) {
 			errln("Unable to access: " + filename);
 		}
-		
-		// generate the Signature file
-		filename=AppParams.EL_MANIFEST_path + "ElectionManifest.sig";
-		try {
-			storeAsFile(manifestSignature, filename);
-		} catch (IOException e) {
-			errln("Unable to access: " + filename);
-		}
-		
-		
 	}
 	
 	
