@@ -133,7 +133,7 @@ public class CollectingServerApp {
 	
 		// send result to the final server:
 		try {
-			NetworkClient.send(result, elManifest.collectingServer.uri.hostname, elManifest.collectingServer.uri.port);
+			NetworkClient.send(result, elManifest.finalServer.uri.hostname, elManifest.finalServer.uri.port);
 		}
 		catch (NetworkError e) {
 			System.err.println("Problems with sending the result to the final server!");
