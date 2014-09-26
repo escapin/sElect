@@ -3,8 +3,25 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var util = require('util');
 var errorHandler = require('errorhandler')
+var fs = require('fs');
 var routes = require('./routes');
 
+// PARAMETERS
+var MANIFEST_FILE = 'public/ElectionManifest.json';
+
+// INITIALIZATION (read the manifest file)
+
+var manifset = null;
+if (fs.existsSync(MANIFEST_FILE)) {
+    manifest = JSON.parse(fs.readFileSync(MANIFEST_FILE));
+}
+else { // Initialization failed
+    console.log('Cannot find an election manifest file.');
+    console.log('Server not started.');
+    process.exit(1);
+}
+
+var index = routes.index(manifest);
 
 // CREATE THE APP
 
@@ -26,8 +43,8 @@ app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 
 // ROUTES
 
-app.get('', routes.index);
-app.get('/index.html', routes.index);
+app.get('', index);
+app.get('/index.html', index);
 
 
 // STARGING THE SERVER
