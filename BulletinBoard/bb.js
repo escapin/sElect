@@ -7,7 +7,8 @@ var fs = require('fs');
 var routes = require('./routes');
 
 // PARAMETERS
-var MANIFEST_FILE = 'public/ElectionManifest.json';
+// var MANIFEST_FILE = 'public/ElectionManifest.json';
+var MANIFEST_FILE = process.env.HOME + '/.eVotingSystem/Public/Manifest/ElectionManifest.json';
 
 // INITIALIZATION (read the manifest file)
 
