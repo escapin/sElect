@@ -3,4 +3,4 @@ lib
 BulletinBoard/node_modules
 .classpath
 .project
-.swp
+*.swp
