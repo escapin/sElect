@@ -19,12 +19,13 @@ public class AppParams
 	//public static final String PKI_DATABASE = System.getProperty("java.io.tmpdir") + File.separator + "PKI_server.db";
 	// = de.uni.trier.infsec.functionalities.pki.PKIServerCore.DEFAULT_DATABASE;
 	
+	public static final String RESULTS = PUBLIC + File.separator + "Results" + File.separator;
 	// RESULT PATH (by assuming that the execution of the servers is from the bin/ directory 
-	public static final String COLL_SERVER_RESULT_msg =  "../BulletinBoard/public/SignedPartialResult.msg";
+	public static final String COLL_SERVER_RESULT_msg =  RESULTS + "SignedPartialResult.msg";
 	//public static final String COLL_SERVER_RESULT_file =  PATH_STORAGE + "SignedPartialResult.msg";
-	public static final String FIN_SERVER_RESULT_msg = "../BulletinBoard/public/SignedFinalResult.msg";
+	public static final String FIN_SERVER_RESULT_msg = RESULTS + "SignedFinalResult.msg";
 	//public static final String FIN_SERVER_RESULT_file = PATH_STORAGE + "SignedFinalResult.msg";
-	public static final String FINAL_RESULT_file = "../BulletinBoard/FinalResult.txt";
+	public static final String FINAL_RESULT_file = RESULTS + "Results/FinalResult.txt";
 	
 	
 	
