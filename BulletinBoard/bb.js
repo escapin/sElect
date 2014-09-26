@@ -1,13 +1,16 @@
 // LIBRARIES 
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var util = require('util');
 var errorHandler = require('errorhandler')
 var fs = require('fs');
+var morgan = require('morgan')
+
 var routes = require('./routes');
 
 // PARAMETERS
-// var MANIFEST_FILE = 'public/ElectionManifest.json';
+
 var MANIFEST_FILE = process.env.HOME + '/.eVotingSystem/Public/Manifest/ElectionManifest.json';
 
 // INITIALIZATION (read the manifest file)
@@ -40,6 +43,9 @@ app.use(express.static('./public')); // was: __dirname + '/public'
 
 // Error handling (not for production)
 app.use(errorHandler({ dumpExceptions: true, showStack: true }));
+
+// Logging
+app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
 
 
 // ROUTES
