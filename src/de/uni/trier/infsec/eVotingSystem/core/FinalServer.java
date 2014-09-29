@@ -18,6 +18,8 @@ public class FinalServer
 	private final ElectionManifest elManifest;
 	private final Verifier collectingServerVerif;
 	
+	private final int numberOfVoters;
+	
 	// CLASSES
 	/**
 	 * Error thrown if the input data is ill-formed.
@@ -40,6 +42,7 @@ public class FinalServer
 		this.signer = signer;
 		this.decryptor = decryptor;
 		this.elManifest = elManifest;
+		numberOfVoters=elManifest.votersList.length;
 		// fetch the functionalities of the collecting server
 		byte[] colServVerifier = elManifest.collectingServer.verification_key;
 		this.collectingServerVerif = new Verifier(colServVerifier); 
@@ -67,7 +70,7 @@ public class FinalServer
 		// retrieve and process ballots (store decrypted entries in 'entries')
 		byte[] ballotsAsAMessage = MessageTools.first(MessageTools.second(payload)); 
 		//FIXME: why do we include the list of voters if we ignore them?		
-		byte[][] entries = new byte[Params.NumberOfVoters][];
+		byte[][] entries = new byte[numberOfVoters][];
 		int numberOfEntries = 0;
 		for( MessageSplitIter iter = new MessageSplitIter(ballotsAsAMessage); iter.notEmpty(); iter.next() ) {
 			byte[] nonce_vote = decryptor.decrypt(iter.current());

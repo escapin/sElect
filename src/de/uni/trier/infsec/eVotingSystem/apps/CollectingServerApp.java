@@ -25,7 +25,7 @@ public class CollectingServerApp {
 		System.out.println("Creating the server...");
 		
 		setupServer();
-		System.out.println("Running...");
+		System.out.println("Running..."); // at: " + elManifest.collectingServer.uri.hostname + ":" + elManifest.collectingServer.uri.port);
 		run();
 	}
 
@@ -96,7 +96,7 @@ public class CollectingServerApp {
 					try {
 						response = server.collectBallot(request);
 					} catch (MalformedMessage e) {
-						System.out.println("Ballot malformed!");
+						System.out.println("Ballot malformed: " + e.toString());
 					}
 					NetworkServer.response(response);
 					System.out.println("responce sent");

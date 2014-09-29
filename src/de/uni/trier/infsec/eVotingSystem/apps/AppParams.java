@@ -25,7 +25,7 @@ public class AppParams
 	//public static final String COLL_SERVER_RESULT_file =  PATH_STORAGE + "SignedPartialResult.msg";
 	public static final String FIN_SERVER_RESULT_msg = RESULTS + "SignedFinalResult.msg";
 	//public static final String FIN_SERVER_RESULT_file = PATH_STORAGE + "SignedFinalResult.msg";
-	public static final String FINAL_RESULT_file = RESULTS + "Results/FinalResult.txt";
+	public static final String FINAL_RESULT_file = RESULTS + "FinalResult.txt";
 	
 	
 	
@@ -56,20 +56,6 @@ public class AppParams
 	public static final String EL_TITLE = "Favourite RS3 project";
 	public static final String EL_DESCRIPTION = "Election for the best RS3 project";
 	public static final String HEADLINE = "Please make your choice.";
-	public static final String[] CHOICESLIST = {	
-								"DeduSec (Verication of Security Properties)",
-								"IFlow (Developing Systems with Secure IFlow)",
-								"ALBIA (Logic-Based Information Flow Analysis)",
-								"Analysis of E-Voting Systems",
-								"IFC for JavaScript",
-								"IFC for Mobile Components",
-								"MORES (Data & Processes Security Requirements)",
-								"MoVeSPAcI (Verication of Security Properties)",
-								"RSCP (Security for Concurrent Programs)",
-								"SecDed (Secure Type Systems and Deduction)",
-								"SpAGAT (IFlow in Shared Document Bases)",
-								"SADAN (Data-driven Usage Control)",
-								};
 	
 	public static int colServPort = 7075;
 	// public static URI colServURI = new URI("localhost", 7075);
@@ -77,5 +63,18 @@ public class AppParams
 	// public static URI finServURI = new URI("localhost", 7076);
 	public static URI[] bulletinBoardList = 	{ new URI("localhost", 7077)
 												};
-
+//	public static final String[] CHOICESLIST = {	
+//	"DeduSec (Verication of Security Properties)",
+//	"IFlow (Developing Systems with Secure IFlow)",
+//	"ALBIA (Logic-Based Information Flow Analysis)",
+//	"Analysis of E-Voting Systems",
+//	"IFC for JavaScript",
+//	"IFC for Mobile Components",
+//	"MORES (Data & Processes Security Requirements)",
+//	"MoVeSPAcI (Verication of Security Properties)",
+//	"RSCP (Security for Concurrent Programs)",
+//	"SecDed (Secure Type Systems and Deduction)",
+//	"SpAGAT (IFlow in Shared Document Bases)",
+//	"SADAN (Data-driven Usage Control)",
+//	};
 }

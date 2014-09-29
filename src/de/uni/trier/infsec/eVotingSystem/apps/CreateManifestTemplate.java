@@ -45,6 +45,7 @@ public class CreateManifestTemplate {
 			errln("Unable to access: " + filename);
 		}
 		Keys k=KeysParser.parseJSONString(stringJSON);
+		System.out.println("Collecting Server's public keys retrieved.");
 		elManifest.collectingServer = new CollectingServerID(unknownURI, k.encrKey, k.verifKey);
 		
 		// retrieve the public keys of Final Server
@@ -55,6 +56,7 @@ public class CreateManifestTemplate {
 			errln("Unable to access: " + filename);
 		}
 		k=KeysParser.parseJSONString(stringJSON);
+		System.out.println("Final Server's public keys retrieved.");
 		elManifest.finalServer = new FinalServerID(unknownURI, k.encrKey, k.verifKey);
 		
 		// retrieve the public keys of voters
@@ -82,6 +84,7 @@ public class CreateManifestTemplate {
 			k = KeysParser.parseJSONString(stringJSON);
 			elManifest.votersList[i]=new VoterID(uniqueID, k.encrKey, k.verifKey);
 		}
+		System.out.println("Voters' public keys retrieved.");
 		
 		elManifest.headline="???";
 		elManifest.title="???";
@@ -91,7 +94,7 @@ public class CreateManifestTemplate {
 		
 		
 		String sManifestJSON = ElectionManifestParser.generateJSON(elManifest);
-		System.out.println(sManifestJSON);
+		//System.out.println(sManifestJSON);
 		
 		// generate the JSON file
 		filename=AppParams.EL_MANIFEST_path + "ElectionManifest.json";
@@ -100,6 +103,7 @@ public class CreateManifestTemplate {
 		} catch (IOException e) {
 			errln("Unable to access: " + filename);
 		}
+		System.out.println("\nManifest template stored in " + filename);
 	}
 	
 	

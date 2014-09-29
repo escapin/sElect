@@ -2,7 +2,6 @@ package de.uni.trier.infsec.eVotingSystem.core;
 
 import java.util.Arrays;
 
-import de.uni.trier.infsec.eVotingSystem.apps.AppParams;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
@@ -28,7 +27,8 @@ public class CollectingServer
 	// STATE
 
 	private boolean inVotingPhase; // indicates if the system is still in the voting phase
-	private final byte[][] ballots = new byte[Params.NumberOfVoters][]; // (inner ballots which have been cast) 
+	private final byte[][] ballots; 
+	private int numberOfVoters;
 	private int numberOfCastBallots = 0;
 
 
@@ -56,8 +56,10 @@ public class CollectingServer
 		this.decryptor = decryptor;
 		this.elManifest=elManifest;
 		inVotingPhase=true;
+		this.numberOfVoters=elManifest.votersList.length+1; //FIXME: voters ID could start from 1 instead of from 0
+		this.ballots = new byte[numberOfVoters][]; // (inner ballots which have been cast)
 		// initially no voter has cast their ballot:
-		for(int i=0; i<Params.NumberOfVoters; ++i)
+		for(int i=0; i<numberOfVoters; ++i)
 			ballots[i]=null;
 	}
 
@@ -87,7 +89,7 @@ public class CollectingServer
 			throw new MalformedMessage("Client ID expected");
 		int voterID = byteArrayToInt(voterIDmsg);
 		System.out.printf(" [ voterId = %d ]\n", voterID);
-		if( voterID<0 || voterID>=Params.NumberOfVoters ) // only accept requests from eligible voters
+		if( voterID<0 || voterID>=numberOfVoters ) // only accept requests from eligible voters
 			throw new MalformedMessage("Not eligible voter");
 		byte[] payload_sign = second(id_payload_sign);
 		byte[] payload = first(payload_sign);
@@ -101,17 +103,16 @@ public class CollectingServer
 		byte[] innerBallot=second(payload);
 
 		// Check if the ballot is to be rejected (with an error response).
-		//
 		byte[] problem = null;  // null means that everything is ok 
 		if( !MessageTools.equal(elID, elManifest.electionID) )
 			problem =  Params.INVALID_ELECTION_ID;
+		//TODO: maybe we should deal with the time only in the App
 		else if(System.currentTimeMillis()<elManifest.startTime.getTime())
 			problem = Params.ELECTION_NOT_STARTED;
 		else if(System.currentTimeMillis()>elManifest.endTime.getTime() )
 			problem = Params.ELECTION_OVER;
 		else if( ballots[voterID]!=null && !Utilities.arrayEqual(innerBallot, ballots[voterID]) )	// check whether the vote has already voted
 			problem = Params.ALREADY_VOTED;
-		
 		
 		if (problem != null) { // there is a problem; create an error response of the form [electionID, REJECTED, rejectedReason]
 			return encapsulateResponse(voterID, concatenate(elID, concatenate(Params.REJECTED, problem)));
@@ -149,7 +150,7 @@ public class CollectingServer
 
 		// sort the ballots
 		byte[][] bb = new byte[numberOfCastBallots][];
-		for (int id=0,ind=0; id<Params.NumberOfVoters; ++id) {
+		for (int id=0,ind=0; id<numberOfVoters; ++id) {
 			if (ballots[id]!=null)
 				bb[ind++] = ballots[id];
 		}
@@ -164,7 +165,7 @@ public class CollectingServer
 
 		// concatenate identifiers of the voters who voted (they are already "sorted")
 		byte[][] vv = new byte[numberOfCastBallots][];
-		for (int id=0,ind=0; id<Params.NumberOfVoters; ++id) {
+		for (int id=0,ind=0; id<numberOfVoters; ++id) {
 			if (ballots[id]!=null)
 				vv[ind++] = intToByteArray(id);
 		}
@@ -229,12 +230,11 @@ public class CollectingServer
 	{
 		int[] l = new int[numberOfCastBallots];
 		int ind = 0;
-		for (int id=0; id<Params.NumberOfVoters; ++id) {
+		for (int id=0; id<numberOfVoters; ++id) {
 			if (ballots[id]!=null)
 				l[ind++] = id;
 		}
 		assert(ind == numberOfCastBallots-1);
 		return l;
 	}
-
 }
