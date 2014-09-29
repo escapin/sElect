@@ -35,7 +35,7 @@ public class ElectionManifestParser
 								sTitle="title",
 								sDescription="description",
 								sHeadline="headline",
-								sChoicesList="choichesList",
+								sChoicesList="choicesList",
 								sVoterList="votersList",
 								sUniqueID="uniqueID",
 								sEncryptionKey="encryption_key",

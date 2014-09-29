@@ -34,40 +34,27 @@ How-To Compile the System (supported by build.xml):
 HOW-TO run the E-voting System process:
 ======
 
- a) Run class de.uni.trier.infsec.functionalities.pki.PKIServerApp
+ a) Run classes		de.uni.trier.infsec.eVotingSystem.apps.SetupCollectingServer
+ 					de.uni.trier.infsec.eVotingSystem.apps.SetupFinalServer
+ 					de.uni.trier.infsec.eVotingSystem.apps.SetupElectionAuthority
+ 	
+ 	This creates and stores the Public and Private keys of the 
+ 	Collecting Server, Final Server, and Election Authority, respectively.
 
-    This starts the public key environment which is needed for
-    registration and lookup of public and verification keys.  
-    The PKIServer stores the registered keys at %TEMP%PKI_server.db -
-    if you want to delete registered keys, you will have to delete this
-    file.
+ b) Run class		de.uni.trier.infsec.eVotingSystem.apps.CreateManifestTemplate
 
- b) Run classes	de.uni.trier.infsec.eVotingSystem.apps.RegisterCollectingServer
-    and		de.uni.trier.infsec.eVotingSystem.apps.RegisterFinalServer
+    This creates the template with the manifest of the election.
+    The template must be filled in.
+   
+ c) Run class 		de.uni.trier.infsec.eVotingSystem.apps.SignTheManifest
+ 	
+ 	This signs the manifest which will be parsed by the other applications.
     
-    This runs the registration process for the collecting server and the
-    final server, respectively. 
-    Servers will register their keys at the PKI environment and store the
-    serialized keys to folder %TEMP%/eVotingSystem/server1.info
-    and %TEMP%/eVotingSystem/server2.info, respectively.
-    
- c) Run classes de.uni.trier.infsec.eVotingSystem.apps.CollectingServerApp
-    and 	de.uni.trier.infsec.eVotingSystem.apps.FinalServerApp
+ c) Run classes		de.uni.trier.infsec.eVotingSystem.apps.CollectingServerApp
+    and 			de.uni.trier.infsec.eVotingSystem.apps.FinalServerApp
     
     This run respectively the collecting and the final server.
 
- d) Run class de.uni.trier.infsec.eVotingSystem.apps.VoterRegisterApp
-    	with parameter <voter_id [int]> 
-    
-    This runs the registration process for the voter with that voter_ID.
-    It registers its keys at the PKI environment and store the serialized 
-    keys to the file %TEMP%/eVotingSystem/voter$(voter_id).info.
-    This will run registration process for the voter with that voter_id. It will
-    register its keys at the PKI environment and store the serialized
-    keys to folder %TEMP%/eVotingSystem/voter$(voter_id).info
-    NOTE:
-    	we require that the voterID is a number between 1 and Params.NumberOfVoters:
-    				0 <= voterID < Params.NumberOfVoters
 
  e) Run classes	de.uni.trier.infsec.eVotingSystem.apps.VoterApp 
     or		de.uni.trier.infsec.eVotingSystem.apps.VotingCmdLine
@@ -83,36 +70,40 @@ HOW-TO run the E-voting System process:
  g) Run class de.uni.trier.infsec.eVotingSystem.apps.DeleteLocalFiles
     
     In order to delete local files created (e.g. the databases) which are stored
-    in your %TEMP%/PKIServer.db, %TEMP%/eVotingSystem and both the Collecting and 
+    in your , ~/.eVotingSystem and both the Collecting and 
     Final servers' output. 
 
 
-EXAMPLE:
-========
+1. Setup phase (Creation of Public and Private keys):
+	1.1. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.SetupCollectingServer
+	1.2. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.SetupFinalServer
+	1.3. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.SetupElectionAuthority
 
+2. Setup phase of each voter (creation of Public and Private keys):
+	java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.SetupVoter <voter_id [int]>
+
+3. Creation of the Manifest template:
+	java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.CreateManifestTemplate
+	
+4. Creation of the Manifest signature:
+	java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.SignTheManifest
+	
 Run the following commands from bin-folder of the compiled project:
 
-1. java -cp ".:../lib/*" de.uni.trier.infsec.functionalities.pki.PKIServerApp
+5. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.CollectingServerApp
 
-2. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterCollectingServer
-3. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.CollectingServerApp
+6. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.FinalServerApp
 
-4. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterFinalServer
-5. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.FinalServerApp
-
-6. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.RegisterVoter
+7. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VotingCmdLine <voter_id [int]> <candidate_number [int]>
 
 GUI:
 7a. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VoterApp
-Command Line:
-7b. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VotingCmdLine <voter_id [int]> <candidate_number [int]>
-
 
 When the election is over, it is possible to inspect the election outcome at the web address 
-	http://localhost:3000/ 
+	http://localhost:3111/ 
 by running the following command from the BulletinBoard-folder
 
-8. 	nodejs app.js
+8. 	nodejs bb.js
 
 In order to verify whether the vote has been properly counted, run the following 
 command from bin-folder of the compiled project:
