@@ -63,6 +63,7 @@ app.get('/index.html', index);
 // STARGING THE SERVER
 
 var server = app.listen(PORT, function() {
+    console.log('Bulleting Board running for election "%s" [%s]', manifest.title, manifest.electionID);
     console.log('Listening on %s, port %d', server.address().address, server.address().port);
 });
 

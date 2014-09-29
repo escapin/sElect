@@ -6,8 +6,10 @@ exports.index = function(manifest, RESULT_DIR) {
     var FINAL_RESULT  = RESULT_DIR + 'FinalResult.txt';
     var SIGNED_RESULT = RESULT_DIR + 'SignedFinalResult.msg';
     var PARTIAL_RESULT= RESULT_DIR + 'SignedPartialResult.msg';
+    var candidates = manifest.choicesList;
+    console.log(candidates);
+
     return function(req, res) {
-        var electionName = manifest.title;
 
         // check if file with the result exists
         if (fs.existsSync(FINAL_RESULT) && fs.existsSync(SIGNED_RESULT)) {
@@ -23,11 +25,12 @@ exports.index = function(manifest, RESULT_DIR) {
                      })
                      .map( function (line) {
                               t = line.split(/ \t+/);
-                              return {vote:t[0], nonce:t[1]};
+                              var vote = candidates[t[0]];
+                              return {vote:vote, nonce:t[1]};
                       })
                 // render the response
-                res.render('result', {  title: 'TrustVote Result', 
-                                        electionName: electionName,
+                res.render('result', {  manifest: manifest,
+                                        title: 'TrustVote Result', 
                                         finalResult: SIGNED_RESULT,
                                         partialResult: PARTIAL_RESULT,
                                         result: tt 

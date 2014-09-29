@@ -1,6 +1,7 @@
 <% include header -%>
 
-<h2> Election: <%= electionName %> </h2>
+<h2> Election Title: <%= manifest.title %> </h2>
+<h2> Description: <%= manifest.description %> </h2>
 <h1> Result of the Election </h1>
 
 <p> The entries listed below are sorted according to the receipt
@@ -16,7 +17,7 @@ the election in binary, digitally signed by the voting authority.
 
 <ul>
 <% for(var i=0; i<result.length; i++) { %>
-   <li> Receipt-ID: <%= result[i].nonce %> &mdash; Candidate: <%= result[i].vote %> </li>
+   <li> Receipt-ID: <%= result[i].nonce %> &mdash; Choice: <%= result[i].vote %> </li>
 <% } %>
 </ul>
 
