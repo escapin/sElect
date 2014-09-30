@@ -67,24 +67,20 @@ public class TestElectionBoard extends TestCase
 		// ADD VOTERS
 		VoterID[] votersList= new VoterID[3];
 		
-		int voterUniqueID = 0;
-		byte[] encryption_key = new Decryptor().getEncryptor().getPublicKey();
-		byte[] verification_key = new Signer().getVerifier().getVerificationKey();
-		votersList[0]=new VoterID(voterUniqueID, encryption_key, verification_key);
+		String voterEmail = "test1@test.edu";
 		
-		voterUniqueID = 1;
-		encryption_key = new Decryptor().getEncryptor().getPublicKey();
-		verification_key = new Signer().getVerifier().getVerificationKey();
-		votersList[1]=new VoterID(voterUniqueID, encryption_key, verification_key);
+		votersList[0]=new VoterID(voterEmail);
 		
-		voterUniqueID = 2;
-		encryption_key = new Decryptor().getEncryptor().getPublicKey();
-		verification_key = new Signer().getVerifier().getVerificationKey();
-		votersList[2]=new VoterID(voterUniqueID, encryption_key, verification_key);
+		voterEmail = "test2@test.edu";
+		
+		votersList[1]=new VoterID(voterEmail);
+		
+		voterEmail = "test3@test.edu";
+		votersList[2]=new VoterID(voterEmail);
 		
 		URI uriCollectingServer = new URI("localhost", 2000);
-		encryption_key = new Decryptor().getEncryptor().getPublicKey();
-		verification_key = new Signer().getVerifier().getVerificationKey();
+		byte[] encryption_key = new Decryptor().getEncryptor().getPublicKey();
+		byte[] verification_key = new Signer().getVerifier().getVerificationKey();
 		CollectingServerID colServer = new CollectingServerID(uriCollectingServer, encryption_key, verification_key);
 		
 		URI uriFinalServer = new URI("localhost", 3000);

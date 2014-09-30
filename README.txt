@@ -79,22 +79,19 @@ HOW-TO run the E-voting System process:
 	1.2. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.SetupFinalServer
 	1.3. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.SetupElectionAuthority
 
-2. Setup phase of each voter (creation of Public and Private keys):
-	java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.SetupVoter <voter_id [int]>
-
-3. Creation of the Manifest template:
+2. Creation of the Manifest template:
 	java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.CreateManifestTemplate
 	
-4. Creation of the Manifest signature:
+3. Creation of the Manifest signature:
 	java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.SignTheManifest
 	
 Run the following commands from bin-folder of the compiled project:
 
-5. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.CollectingServerApp
+4. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.CollectingServerApp
 
-6. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.FinalServerApp
+5. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.FinalServerApp
 
-7. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VotingCmdLine <voter_id [int]> <candidate_number [int]>
+6. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VotingCmdLine <voter_id [int]> <candidate_number [int]>
 
 GUI:
 7a. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingSystem.apps.VoterApp

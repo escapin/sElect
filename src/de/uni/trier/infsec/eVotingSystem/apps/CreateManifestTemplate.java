@@ -60,32 +60,10 @@ public class CreateManifestTemplate {
 		elManifest.finalServer = new FinalServerID(unknownURI, k.encrKey, k.verifKey);
 		
 		// retrieve the public keys of voters
-		String pattern="voter*";
-		Path dir=Paths.get(AppParams.PUBLIC_KEY_path);
-		MatchFinder finder = new MatchFinder(pattern);
-		try {
-			Files.walkFileTree(dir, finder);
-		} catch (IOException e) {
-			errln("Unable to access: " + filename);
-		}
-		LinkedList<Path> fileMatched = finder.getMatches();
-		elManifest.votersList = new VoterID[fileMatched.size()];
-		String digits, fName; int uniqueID;
+		elManifest.votersList = new VoterID[3];
 		for(int i=0;i<elManifest.votersList.length;i++){
-			fName=fileMatched.get(i).toString();
-			digits=fName.replaceAll("[^0-9]", "");
-			uniqueID=Integer.parseInt(digits);
-			filename = AppParams.PUBLIC_KEY_path + fileMatched.get(i).toString();
-			try {
-				stringJSON =  readCharsFromFile(filename);
-			} catch (IOException e) {
-				errln("Unable to access: " + filename);
-			}
-			k = KeysParser.parseJSONString(stringJSON);
-			elManifest.votersList[i]=new VoterID(uniqueID, k.encrKey, k.verifKey);
+			elManifest.votersList[i]=new VoterID("???");
 		}
-		System.out.println("Voters' public keys retrieved.");
-		
 		elManifest.headline="???";
 		elManifest.title="???";
 		elManifest.choicesList= new String[]{"???","???"};

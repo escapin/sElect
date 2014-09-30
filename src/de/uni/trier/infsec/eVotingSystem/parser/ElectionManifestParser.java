@@ -37,7 +37,7 @@ public class ElectionManifestParser
 								sHeadline="headline",
 								sChoicesList="choicesList",
 								sVoterList="votersList",
-								sUniqueID="uniqueID",
+								sMail="email",
 								sEncryptionKey="encryption_key",
 								sVerificationKey="verification_key",
 								sURI="URI",
@@ -66,9 +66,7 @@ public class ElectionManifestParser
 		JSONObject jVoter;
 		for(VoterID vID: elBoard.votersList){
 			jVoter = new JSONObject();
-			jVoter.put(sUniqueID, vID.uniqueID);
-			jVoter.put(sEncryptionKey, byteArrayToHexString(vID.encryption_key));
-			jVoter.put(sVerificationKey, byteArrayToHexString(vID.verification_key));
+			jVoter.put(sMail, vID.email);
 			votersList.put(jVoter);
 		}
 		jMain.put(sVoterList, votersList);
@@ -173,10 +171,7 @@ public class ElectionManifestParser
 	
 	private static VoterID createVoterID(JSONObject jVoter)
 	{
-		byte[] encryption_key = hexStringToByteArray(jVoter.getString(sEncryptionKey));
-		byte[] verification_key = hexStringToByteArray(jVoter.getString(sVerificationKey));
-		return new VoterID(jVoter.getInt(sUniqueID), encryption_key, verification_key);
-		
+		return new VoterID(jVoter.getString(sMail));
 	}
 	private static CollectingServerID createCollectingServerID(JSONObject jServer)
 	{

@@ -5,6 +5,7 @@ import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.setupPublicKeys;
 
 import java.io.IOException;
 
+import de.uni.trier.infsec.eVotingSystem.core.Params;
 import de.uni.trier.infsec.eVotingSystem.parser.Keys;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
@@ -25,8 +26,8 @@ public class SetupVoter {
 				e.printStackTrace();
 				System.exit(0);
 			}
-			if(voterID<0) {
-				System.out.println("Voter identifier out of range!\nExpected: \n\t voter_id >=0 ");
+			if(voterID<0 || voterID>=Params.NumberOfVoters) {
+				System.out.println("Voter identifier out of range!\nExpected: \n\t 0 <= voter_id < " + Params.NumberOfVoters);
 				System.exit(0);
 			}
 			String name="voter" + (voterID<10? "0":"") + voterID;

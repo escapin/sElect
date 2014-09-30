@@ -89,7 +89,7 @@ public class Utils
 	{
 		VoterID[] voterList = elManifest.votersList;
 		for(VoterID voter: voterList)
-			if(voter.uniqueID==voterID)
+			if(voter.email==voterID)
 				return new Verifier(voter.verification_key);
 		return null;
 	}
@@ -98,7 +98,7 @@ public class Utils
 	{
 		VoterID[] voterList = elManifest.votersList;
 		for(VoterID voter: voterList)
-			if(voter.uniqueID==voterID)
+			if(voter.email==voterID)
 				return new Encryptor(voter.encryption_key);
 		return null;
 	}
