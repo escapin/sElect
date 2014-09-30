@@ -16,11 +16,11 @@ import de.uni.trier.infsec.eVotingSystem.apps.AppParams;
 public class TLSEmail {
      
 	
-// public static void main(String[] args) {
-//    
-//	 sendEmail("scapin.enrico@gmail.com", "test1", "test2");
-//      
-// }
+ public static void main(String[] args) {
+    
+	 sendEmail("scapin.enrico@gmail.com", "ciao", "ciao ciao");
+      
+ }
  
  // just a wrapper
  public static void sendEmail(String toEmail, String subject, String body){

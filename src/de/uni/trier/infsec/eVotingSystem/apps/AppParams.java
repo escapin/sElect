@@ -29,15 +29,16 @@ public class AppParams
 	
 	
 	public static final String FROM_NAME="sElect";
-//	 public static final String SMTP_HOST="infsec.uni-trier.de";
-//	 public static final int SMTP_PORT=25;
-//	 public static final String FROM_EMAIL="evoting@infsec.uni-trier.de";
-//	 public static final String PASSWORD=null;
-	
-	public static final String SMTP_HOST="smtp.gmail.com";
-	public static final String SMTP_PORT="587";
-	public static final String FROM_EMAIL="selectevotingsystem@gmail.com";
-	public static final String PASSWORD="TreeBustDartRandom";
+	public static final String SMTP_HOST="infsec.uni-trier.de";
+	public static final int SMTP_PORT=25;
+	public static final String FROM_EMAIL="evoting@infsec.uni-trier.de";
+	public static final String PASSWORD="tL0FWx0-ZD-gMDR9g24psP-D";
+
+	/* gmail credentials */
+//	public static final String SMTP_HOST="smtp.gmail.com";
+//	public static final String SMTP_PORT="587";
+//	public static final String FROM_EMAIL="selectevotingsystem@gmail.com";
+//	public static final String PASSWORD="TreeBustDartRandom";
 	
 	
 	

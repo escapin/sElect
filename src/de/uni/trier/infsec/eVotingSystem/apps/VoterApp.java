@@ -112,8 +112,8 @@ public class VoterApp extends JFrame {
 	// STRING DISPLAYED FIELDS
 		// login phase
 	private final String lblCREDENTIALS = "Please enter";
-	private final String lblVOTERID = "Your Voter ID: ";
-	private final String lblPASSWORD = "Your Password: ";
+	private final String lblVOTERID = "Your email: ";
+	private final String lblPASSWORD = "Your code: ";
 	private final String lblLOGIN = "Submit";
 		// vote phase
 	private final String lblYOURCHOICE = "Your Choice:";
@@ -128,6 +128,7 @@ public class VoterApp extends JFrame {
 	
 	
 	private static VoterApp frame;
+	private JTextField textField;
 	/**
 	 * Launch the application.
 	 */
@@ -275,6 +276,81 @@ public class VoterApp extends JFrame {
 		
 		// main windows panel
 		JPanel main = new JPanel();
+		
+		JPanel registration = new JPanel();
+		getContentPane().add(registration, "name_1712557546136769");
+		
+		textField = new JTextField();
+		textField.setFont(new Font("Dialog", Font.PLAIN, 20));
+		textField.setColumns(11);
+		
+		JLabel label_2 = new JLabel("sElect");
+		label_2.setHorizontalAlignment(SwingConstants.CENTER);
+		label_2.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
+		
+		JLabel label_3 = new JLabel();
+		label_3.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		JLabel lblPleaseEnterYour = new JLabel("Please enter your email address:");
+		lblPleaseEnterYour.setFont(new Font("Dialog", Font.BOLD, 15));
+		
+		JLabel label_5 = new JLabel("");
+		label_5.setHorizontalAlignment(SwingConstants.LEFT);
+		label_5.setForeground(Color.RED);
+		label_5.setFont(new Font("Dialog", Font.BOLD, 14));
+		
+		JButton btnGetACode = new JButton("Get a code");
+		btnGetACode.setFont(new Font("Dialog", Font.BOLD, 14));
+		
+		JLabel lblRegistrationPhase = new JLabel("Registration Phase");
+		lblRegistrationPhase.setFont(new Font("Dialog", Font.BOLD, 15));
+		GroupLayout gl_registration = new GroupLayout(registration);
+		gl_registration.setHorizontalGroup(
+			gl_registration.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_registration.createSequentialGroup()
+					.addGroup(gl_registration.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_registration.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(label_2, GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE))
+						.addGroup(gl_registration.createSequentialGroup()
+							.addGap(33)
+							.addGroup(gl_registration.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblPleaseEnterYour, GroupLayout.PREFERRED_SIZE, 301, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_registration.createSequentialGroup()
+									.addGap(279)
+									.addComponent(btnGetACode, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE))
+								.addComponent(lblRegistrationPhase, GroupLayout.PREFERRED_SIZE, 211, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textField, GroupLayout.PREFERRED_SIZE, 440, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(gl_registration.createSequentialGroup()
+							.addGap(62)
+							.addComponent(label_5, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(label_3, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap())
+		);
+		gl_registration.setVerticalGroup(
+			gl_registration.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_registration.createSequentialGroup()
+					.addContainerGap(15, Short.MAX_VALUE)
+					.addComponent(label_2, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+					.addGap(26)
+					.addComponent(lblRegistrationPhase, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+					.addGap(46)
+					.addComponent(lblPleaseEnterYour, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(textField, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
+					.addGroup(gl_registration.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_registration.createSequentialGroup()
+							.addComponent(label_3)
+							.addGap(49)
+							.addComponent(label_5, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
+							.addGap(236))
+						.addGroup(Alignment.TRAILING, gl_registration.createSequentialGroup()
+							.addComponent(btnGetACode, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
+							.addGap(342))))
+		);
+		registration.setLayout(gl_registration);
 		
 		// add the two layout to the main
 		getContentPane().add(login, LOGIN);
