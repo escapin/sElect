@@ -5,7 +5,6 @@ import static de.uni.trier.infsec.utils.Utilities.byteArrayToHexString;
 import static de.uni.trier.infsec.eVotingSystem.core.Utils.out;
 import static de.uni.trier.infsec.eVotingSystem.core.Utils.outl;
 
-
 import java.awt.EventQueue;
 
 import javax.swing.AbstractAction;
@@ -45,13 +44,15 @@ import java.awt.Font;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import de.uni.trier.infsec.eVotingSystem.bean.VoterID;
 import de.uni.trier.infsec.eVotingSystem.core.Params;
 import de.uni.trier.infsec.eVotingSystem.core.Voter;
 import de.uni.trier.infsec.eVotingSystem.core.Voter.Error;
+import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.functionalities.digsig.*;
-import de.uni.trier.infsec.functionalities.pki.PKI;
-import de.uni.trier.infsec.functionalities.pkienc.*;
+import de.uni.trier.infsec.functionalities.pkenc.*;
 import de.uni.trier.infsec.utils.MessageTools;
+import de.uni.trier.infsec.utils.Utilities;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
 
@@ -73,8 +74,12 @@ public class VoterApp extends JFrame {
 	private JPasswordField fldPassword;
 	private JLabel lblUserNotRegister;
 	private JPanel center;
+	private JPanel main;
+	private JPanel north;
 	private final static String LOGIN = "LOGIN";
 	private final static String MAIN = "MAIN";
+	private final static String REGISTRATION = "REGISTRATION";
+	
 	private final static String VOTE = "VOTE";
 	private final static String ACCEPTED="ACCEPTED";
     private final static String REJECTED = "REJECTED";
@@ -87,8 +92,9 @@ public class VoterApp extends JFrame {
 	private JLabel lblCandidateSelected = new JLabel("Candidate Selected");
 	private JLabel lblWait = new JLabel("Wait...");
 	private JLabel lblVoterID = new JLabel("VoterID");
-	private JLabel lblElectionID = new JLabel("ElectionID");
 	private JLabel lblElectionMsg = new JLabel("Election Message");
+	
+	private JLabel lblGetCodeProblem;
 	
 	private JButton[] btnCandidates = new JButton[1];
 	private JButton btnVote = new JButton();
@@ -101,7 +107,7 @@ public class VoterApp extends JFrame {
 	private Decryptor voter_decr;
 	private Signer voter_sign;
 	private byte[] serverResponse=null;
-	private static ElectionMetadata electionData;
+	private static ElectionManifest manifest;
 	private Voter.ResponseTag responseTag;
 	private Voter.Receipt receipt;
 	//private static final int STORE_ATTEMPTS = 3; 
@@ -128,7 +134,8 @@ public class VoterApp extends JFrame {
 	
 	
 	private static VoterApp frame;
-	private JTextField textField;
+	private JTextField fldEmail;
+	private JTextField otpField;
 	/**
 	 * Launch the application.
 	 */
@@ -163,8 +170,8 @@ public class VoterApp extends JFrame {
 		setBounds(100, 100, 530, 700);
 				// (530, 334);
 		
-		out("Getting election metadata...");
-		electionData=getElectionData(AppParams.ELECTIONID);
+		out("Getting election manifest...");
+		manifest=AppUtils.retrieveElectionManifest();
 		outl("OK");
 		
 		CardLayout cl = new CardLayout();
@@ -275,119 +282,118 @@ public class VoterApp extends JFrame {
 		
 		
 		// main windows panel
-		JPanel main = new JPanel();
+		main = new JPanel();
 		
 		JPanel registration = new JPanel();
-		getContentPane().add(registration, "name_1712557546136769");
 		
-		textField = new JTextField();
-		textField.setFont(new Font("Dialog", Font.PLAIN, 20));
-		textField.setColumns(11);
+		fldEmail = new JTextField();
+		fldEmail.setFont(new Font("Dialog", Font.PLAIN, 20));
+		fldEmail.setColumns(11);
 		
 		JLabel label_2 = new JLabel("sElect");
 		label_2.setHorizontalAlignment(SwingConstants.CENTER);
 		label_2.setFont(new Font("Dialog", Font.BOLD | Font.ITALIC, 30));
 		
-		JLabel label_3 = new JLabel();
-		label_3.setHorizontalAlignment(SwingConstants.CENTER);
-		
 		JLabel lblPleaseEnterYour = new JLabel("Please enter your email address:");
 		lblPleaseEnterYour.setFont(new Font("Dialog", Font.BOLD, 15));
 		
-		JLabel label_5 = new JLabel("");
-		label_5.setHorizontalAlignment(SwingConstants.LEFT);
-		label_5.setForeground(Color.RED);
-		label_5.setFont(new Font("Dialog", Font.BOLD, 14));
+		lblGetCodeProblem = new JLabel("");
+		lblGetCodeProblem.setHorizontalAlignment(SwingConstants.LEFT);
+		lblGetCodeProblem.setForeground(Color.RED);
+		lblGetCodeProblem.setFont(new Font("Dialog", Font.BOLD, 14));
 		
 		JButton btnGetACode = new JButton("Get a code");
 		btnGetACode.setFont(new Font("Dialog", Font.BOLD, 14));
 		
-		JLabel lblRegistrationPhase = new JLabel("Registration Phase");
+		btnGetACode.addActionListener(new GetCode());
+		btnGetACode.addKeyListener(new GetCodePressed());
+		
+		JLabel lblRegistrationPhase = new JLabel(manifest.title);
 		lblRegistrationPhase.setFont(new Font("Dialog", Font.BOLD, 15));
+		
+		JLabel label = new JLabel(manifest.description);
+		label.setFont(new Font("Dialog", Font.BOLD, 15));
 		GroupLayout gl_registration = new GroupLayout(registration);
 		gl_registration.setHorizontalGroup(
 			gl_registration.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_registration.createSequentialGroup()
 					.addGroup(gl_registration.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_registration.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(label_2, GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE))
-						.addGroup(gl_registration.createSequentialGroup()
-							.addGap(33)
-							.addGroup(gl_registration.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblPleaseEnterYour, GroupLayout.PREFERRED_SIZE, 301, GroupLayout.PREFERRED_SIZE)
+							.addGap(45)
+							.addGroup(gl_registration.createParallelGroup(Alignment.TRAILING, false)
 								.addGroup(gl_registration.createSequentialGroup()
-									.addGap(279)
-									.addComponent(btnGetACode, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE))
-								.addComponent(lblRegistrationPhase, GroupLayout.PREFERRED_SIZE, 211, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField, GroupLayout.PREFERRED_SIZE, 440, GroupLayout.PREFERRED_SIZE)))
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addGroup(gl_registration.createParallelGroup(Alignment.LEADING)
+										.addComponent(label, GroupLayout.PREFERRED_SIZE, 439, GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblRegistrationPhase, GroupLayout.PREFERRED_SIZE, 439, GroupLayout.PREFERRED_SIZE)))
+								.addGroup(gl_registration.createSequentialGroup()
+									.addGroup(gl_registration.createParallelGroup(Alignment.TRAILING)
+										.addComponent(btnGetACode, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)
+										.addComponent(fldEmail, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
+										.addComponent(lblPleaseEnterYour, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 301, GroupLayout.PREFERRED_SIZE)
+										.addComponent(lblGetCodeProblem, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE))
+									.addGap(485))))
 						.addGroup(gl_registration.createSequentialGroup()
-							.addGap(62)
-							.addComponent(label_5, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(label_3, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap())
+							.addGap(23)
+							.addComponent(label_2, GroupLayout.PREFERRED_SIZE, 489, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_registration.setVerticalGroup(
 			gl_registration.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_registration.createSequentialGroup()
-					.addContainerGap(15, Short.MAX_VALUE)
+					.addContainerGap()
 					.addComponent(label_2, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
-					.addGap(26)
+					.addGap(50)
 					.addComponent(lblRegistrationPhase, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-					.addGap(46)
+					.addPreferredGap(ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+					.addComponent(label, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)
+					.addGap(77)
 					.addComponent(lblPleaseEnterYour, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(textField, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-					.addGroup(gl_registration.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_registration.createSequentialGroup()
-							.addComponent(label_3)
-							.addGap(49)
-							.addComponent(label_5, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-							.addGap(236))
-						.addGroup(Alignment.TRAILING, gl_registration.createSequentialGroup()
-							.addComponent(btnGetACode, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
-							.addGap(342))))
+					.addGap(18)
+					.addComponent(fldEmail, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
+					.addGap(61)
+					.addComponent(btnGetACode, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(lblGetCodeProblem, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
+					.addGap(88))
 		);
 		registration.setLayout(gl_registration);
 		
 		// add the two layout to the main
+		getContentPane().add(registration, REGISTRATION);
 		getContentPane().add(login, LOGIN);
 		getContentPane().add(main, MAIN);
+		
 		main.setLayout(new BorderLayout(0, 0));
 		// set the default option
-		cl.show(getContentPane(), LOGIN);
+		cl.show(getContentPane(), REGISTRATION);
 		
 		// North panel
-		JPanel north = new JPanel();
+		north = new JPanel();
 		main.add(north, BorderLayout.NORTH);
-		lblVoterID.setText(lblVOTERID);
+		lblVoterID.setText("Insert your code:");
 		
-		lblElectionID.setText("");
+		otpField = new JTextField();
+		otpField.setColumns(10);
 		//labelField.setColumns(10);
 		GroupLayout gl_north = new GroupLayout(north);
 		gl_north.setHorizontalGroup(
 			gl_north.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_north.createSequentialGroup()
-					.addGap(21)
-					.addComponent(lblVoterID)
-					.addContainerGap(314, Short.MAX_VALUE))
-				.addGroup(Alignment.TRAILING, gl_north.createSequentialGroup()
-					.addContainerGap(348, Short.MAX_VALUE)
-					.addComponent(lblElectionID, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE)
-					.addGap(20))
+					.addGap(24)
+					.addGroup(gl_north.createParallelGroup(Alignment.LEADING)
+						.addComponent(otpField, GroupLayout.PREFERRED_SIZE, 472, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblVoterID))
+					.addContainerGap(34, Short.MAX_VALUE))
 		);
 		gl_north.setVerticalGroup(
-			gl_north.createParallelGroup(Alignment.TRAILING)
+			gl_north.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_north.createSequentialGroup()
-					.addContainerGap(29, Short.MAX_VALUE)
-					.addComponent(lblVoterID)
-					.addGap(20))
-				.addGroup(Alignment.LEADING, gl_north.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblElectionID)
-					.addContainerGap(37, Short.MAX_VALUE))
+					.addComponent(lblVoterID)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(otpField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		north.setLayout(gl_north);
 		
@@ -422,13 +428,14 @@ public class VoterApp extends JFrame {
         
         
         // CREATE n BUTTONS AS NUMBER OF CANDIDATES
-        int nCandidates=electionData.candidatesArray.length;
+        int nCandidates=manifest.choicesList.length;
+//        		.candidatesArray.length;
         ballot.setLayout(new GridLayout(nCandidates,1));
         btnCandidates = new JButton[nCandidates];
         
         
         for(int i=0;i<nCandidates; i++){
-        	btnCandidates[i] = new JButton(new CandidateButton(electionData.candidatesArray[i],i, btnCandidates));
+        	btnCandidates[i] = new JButton(new CandidateButton(manifest.choicesList[i], i, btnCandidates));
         	btnCandidates[i].setFont(new Font("Dialog", Font.BOLD, 14));
         	btnCandidates[i].setForeground(Color.BLACK);
         	//btnCandidates[i].setContentAreaFilled(false);
@@ -688,6 +695,70 @@ public class VoterApp extends JFrame {
 	/*
 	 * LISTENERS
 	 */
+	private class GetCodePressed extends KeyAdapter{
+		public void keyPressed(KeyEvent e) {
+	         if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+	              onLoginPress(e);
+	         }
+	    }
+	}
+	private class GetCode implements ActionListener {
+		public void actionPerformed(ActionEvent ev) {
+			onGetCodePress(ev);
+		}
+	}
+	
+	private void onGetCodePress(AWTEvent ev){
+		if(fldEmail.getText().length()==0){
+			lblGetCodeProblem.setText("<html>Mail not inserted!</html>");
+			return;
+		}
+		String email=fldEmail.getText();
+		boolean allowedVoter=false;
+		for(VoterID vid: manifest.votersList)
+			if(allowedVoter=vid.email.equals(email))
+				break;
+		if(!allowedVoter){
+			lblGetCodeProblem.setText(html("Improper Mail inserted"));
+			return;
+		}
+		
+		
+		setupVoter(email);
+		byte[] otpReq = voter.createOTPRequest();
+		// Send the ballot:
+		out("Sending the OTP request to the server...");
+		try {
+			
+			serverResponse = NetworkClient.sendRequest(otpReq, 
+					manifest.collectingServer.uri.hostname, 
+					manifest.collectingServer.uri.port);
+		} catch (NetworkError e) {
+			outl("OTP request: networkError");
+			e.printStackTrace();
+		}
+		outl("OK");
+		Voter.ResponseTag respTag=null;
+		try {
+			respTag = voter.validateResponse(serverResponse);
+		} catch (Error e) {
+			outl("Vote [candidate <int>]: voteError");
+			e.printStackTrace();
+		}
+		if (respTag != Voter.ResponseTag.OTP_REQUEST_ACCEPTED){
+			lblGetCodeProblem.setText(html("Something went wrong"));
+			return;
+		}
+		else {
+			CardLayout cl = (CardLayout) getContentPane().getLayout();
+			cl.show(getContentPane(), MAIN);
+		}
+			
+	}
+	
+	
+	
+	
 	private class LoginPressed extends KeyAdapter{
 		public void keyPressed(KeyEvent e) {
 	         if(e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -703,64 +774,64 @@ public class VoterApp extends JFrame {
 	}
 	
 	private void onLoginPress(AWTEvent ev){
-		if(fldVoterID.getText().length()==0){
-			lblUserNotRegister.setText("<html>User ID field empty!<br>Please insert a valid ID number of a previously registered user.</html>");
-			return;
-		}
-		
-		try{
-			voterID = Integer.parseInt(fldVoterID.getText());
-			if(voterID<0)
-				throw new NumberFormatException();
-		} catch (NumberFormatException e){
-			outl("'" + fldVoterID.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
-			lblUserNotRegister.setText("<html>'" + fldVoterID.getText() + "' is not a proper userID!<br>Please insert the ID number of a registered user.</html>");
-			return;
-		}
-		
-		
-		lblUserNotRegister.setText("");
-		lblWait.setText("Wait..."); //FIXME: it doesn't work!
-		
-		JPanel loginPanel = (JPanel) ((JButton)ev.getSource()).getParent();
-		//lblWait.paintImmediately(loginPanel.getVisibleRect());
-		loginPanel.paintImmediately(loginPanel.getVisibleRect());
-		
-		boolean voterRegistered=false;
-		try {
-			setupVoter(voterID);
-			voterRegistered=true;
-		} catch (FileNotFoundException e){
-			outl("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
-			lblUserNotRegister.setText("<html>User " + voterID + " not registered!<br>Please register yourself before log in.</html>");
-		} catch (IOException e){
-			outl("IOException occurred while reading the credentials of the user!");
-			lblUserNotRegister.setText("IOException occurred while reading the credentials of the user!");
-		} catch (RegisterSig.PKIError | RegisterEnc.PKIError e){
-			outl("PKI Error occurred: perhaps the PKI server is not running!");
-			lblUserNotRegister.setText("<html>PKI Error:<br> perhaps the PKI server is not running!</html>");
-		} catch (NetworkError e){
-			//FIXME: java.net.ConnectException when the PKIServer is not running!
-			outl("Network Error occurred while connecting with the PKI server: perhaps the PKI server is not running!");
-			lblUserNotRegister.setText("<html>Network Error occurred:<br> perhaps the PKI server is not running!</html>");
-		} finally{
-			lblWait.setText("");
-		}
-		if(voterRegistered){
-			fldVoterID.setText("");
-			//setTitle("Voter " + voterID + " - " + AppParams.APPNAME);
-			
-			//FIXME: it does not work
-			//getContentPane().setSize(530,600);
-			
-			CardLayout cl = (CardLayout) getContentPane().getLayout();
-			cl.show(getContentPane(), MAIN);
-			//getContentPane().setVisible(true);
-			
-		}
-		lblVoterID.setText("<html>" +  lblVOTERID + "<strong>" + voterID + "</strong></html>");
-		lblElectionID.setText(new String(electionData.id));
-		lblElectionMsg.setText("<html>" +  electionData.introMsg + "</html>");
+//		if(fldVoterID.getText().length()==0){
+//			lblUserNotRegister.setText("<html>User ID field empty!<br>Please insert a valid ID number of a previously registered user.</html>");
+//			return;
+//		}
+//		
+//		try{
+//			voterID = Integer.parseInt(fldVoterID.getText());
+//			if(voterID<0)
+//				throw new NumberFormatException();
+//		} catch (NumberFormatException e){
+//			outl("'" + fldVoterID.getText() + "' is not a proper userID!\nPlease insert the ID number of a previously registered user.");
+//			lblUserNotRegister.setText("<html>'" + fldVoterID.getText() + "' is not a proper userID!<br>Please insert the ID number of a registered user.</html>");
+//			return;
+//		}
+//		
+//		
+//		lblUserNotRegister.setText("");
+//		lblWait.setText("Wait..."); //FIXME: it doesn't work!
+//		
+//		JPanel loginPanel = (JPanel) ((JButton)ev.getSource()).getParent();
+//		//lblWait.paintImmediately(loginPanel.getVisibleRect());
+//		loginPanel.paintImmediately(loginPanel.getVisibleRect());
+//		
+//		boolean voterRegistered=false;
+//		try {
+//			setupVoter(voterID);
+//			voterRegistered=true;
+//		} catch (FileNotFoundException e){
+//			outl("User " + voterID + " not registered!\nType \'UserRegisterApp <user_id [int]>\' in a terminal to register him/her.");
+//			lblUserNotRegister.setText("<html>User " + voterID + " not registered!<br>Please register yourself before log in.</html>");
+//		} catch (IOException e){
+//			outl("IOException occurred while reading the credentials of the user!");
+//			lblUserNotRegister.setText("IOException occurred while reading the credentials of the user!");
+//		} catch (RegisterSig.PKIError | RegisterEnc.PKIError e){
+//			outl("PKI Error occurred: perhaps the PKI server is not running!");
+//			lblUserNotRegister.setText("<html>PKI Error:<br> perhaps the PKI server is not running!</html>");
+//		} catch (NetworkError e){
+//			//FIXME: java.net.ConnectException when the PKIServer is not running!
+//			outl("Network Error occurred while connecting with the PKI server: perhaps the PKI server is not running!");
+//			lblUserNotRegister.setText("<html>Network Error occurred:<br> perhaps the PKI server is not running!</html>");
+//		} finally{
+//			lblWait.setText("");
+//		}
+//		if(voterRegistered){
+//			fldVoterID.setText("");
+//			//setTitle("Voter " + voterID + " - " + AppParams.APPNAME);
+//			
+//			//FIXME: it does not work
+//			//getContentPane().setSize(530,600);
+//			
+//			CardLayout cl = (CardLayout) getContentPane().getLayout();
+//			cl.show(getContentPane(), MAIN);
+//			//getContentPane().setVisible(true);
+//			
+//		}
+//		lblVoterID.setText("<html>" +  lblVOTERID + "<strong>" + voterID + "</strong></html>");
+//		lblElectionID.setText(new String(manifest.electionID));
+//		lblElectionMsg.setText("<html>" +  manifest.headline + "</html>");
 	}
 	
 	private class CloseTheApp implements ActionListener{
@@ -832,7 +903,7 @@ public class VoterApp extends JFrame {
 			outl("Candidate Selected: " + selectedCandidate);
 			
 			btnVote.setEnabled(true);
-			lblCandidateSelected.setText(html(electionData.candidatesArray[candidateNumber]));
+			lblCandidateSelected.setText(html(manifest.choicesList[candidateNumber]));
 			
 			
 			
@@ -845,13 +916,22 @@ public class VoterApp extends JFrame {
 			super(name);
 		}
 		public void actionPerformed(ActionEvent ev){
-			if(selectedCandidate<0 || selectedCandidate>=electionData.candidatesArray.length)
+			if(selectedCandidate<0 || selectedCandidate>=manifest.choicesList.length)
 				return; // no valid candidate has been selected
+			boolean isNull=false;
+			String otp=null;
+			try{
+				otp=otpField.getText();
+			} catch (NullPointerException e){
+				isNull=true;	
+			}
+			if(isNull || otp.equals("")) return;
+				
 			// Create a ballot;
 			//TODO: comment this line and uncomment the other after testing
 			out("Creating a ballot with candidate number " + selectedCandidate + "...");
 			//outl("Creating the ballot...");
-			byte[] ballot = voter.createBallot(selectedCandidate);
+			byte[] ballot = voter.createBallot(selectedCandidate, Utilities.hexStringToByteArray(otp));
 			outl("OK");
 			
 			// Send the ballot:
@@ -859,7 +939,9 @@ public class VoterApp extends JFrame {
 			//TODO: create another thread
 			try {
 				serverResponse = 
-						NetworkClient.sendRequest(ballot, AppParams.SERVER1_NAME, AppParams.SERVER1_PORT);
+						NetworkClient.sendRequest(ballot, 
+								manifest.collectingServer.uri.hostname, 
+								manifest.collectingServer.uri.port);
 			} catch (NetworkError e) {
 				// TODO Auto-generated catch block
 				// TODO: manage the app so that the vote is not colleted in this case
@@ -872,8 +954,7 @@ public class VoterApp extends JFrame {
 			try {
 				responseTag = voter.validateResponse(serverResponse);
 			} catch (Error e) {
-				// TODO Auto-generated catch block
-				outl("Vote [candidate <int>]: voteError");
+				outl("response validation for voting: voteError");
 				e.printStackTrace();
 			}
 			outl("Response of the server: " + responseTag);
@@ -900,6 +981,8 @@ public class VoterApp extends JFrame {
 				//textSignature.setText(byteArrayToHexString(receipt.innerBallot));
 				//textSignature.setText(byteArrayToHexString(receipt.serverSignature));
 				cl.show(center, ACCEPTED);
+				main.remove(north);
+				
 			}
 			else{
 				String rejectedReason="";
@@ -924,6 +1007,7 @@ public class VoterApp extends JFrame {
 				lblRejectedReason.setText(html(rejectedReason));
 				lblRejectedReason.setFont(new Font("Dialog", Font.PLAIN, 14));
 				cl.show(center, REJECTED);
+				main.remove(north);
 			}
 			 
 		}					
@@ -941,65 +1025,11 @@ public class VoterApp extends JFrame {
 		}
 	}
 	
-	
-	
-
-	private class ElectionMetadata{
-		//TODO: add all the other election metadata
-		//TODO: refactor the code according to another entity such as the electionAdministrator
-		public byte[] id;
-		public String introMsg;
-		public String[] candidatesArray;
-		
-		public ElectionMetadata (byte[] id, String introMsg, String[] candidatesArray){
-			this.id=id;
-			this.introMsg=introMsg;
-			this.candidatesArray=candidatesArray;
-		}
-	}
-	
-	
-	private ElectionMetadata getElectionData(byte[] electionID){
-		return new ElectionMetadata(electionID, AppParams.ELECTIONMSG, AppParams.CANDIDATESARRAY);
-	}
-	
-	
-	
-	private void setupVoter(int voterID) throws IOException, RegisterEnc.PKIError, RegisterSig.PKIError, NetworkError {
-		
-		// De-serialize keys and create cryptographic functionalities:
-		byte[] serialized=null;
-		
-		String filename = AppParams.PATH_STORAGE + "voter" + voterID + ".info";
-		outl("private keys filename = " + filename);
-		serialized = AppUtils.readBytesFromFile(filename);
-		
-		byte[] idMsg =  MessageTools.first(serialized);
-		int idFromMsg = MessageTools.byteArrayToInt(idMsg);
-		if ( idFromMsg != voterID ) {
-			outl("Something wrong with identifiers");
-			System.exit(-1);
-		}
-		byte[] decr_sig = MessageTools.second(serialized);
-		byte[] decryptorMsg = MessageTools.first(decr_sig);
-		byte[] signerMsg = MessageTools.second(decr_sig);		
-		voter_decr = Decryptor.fromBytes(decryptorMsg);
-		voter_sign = Signer.fromBytes(signerMsg);
-		
-		// Initialize the interface to the public key infrastructure:
-		System.setProperty("remotemode", Boolean.toString(true));
-		PKI.useRemoteMode();
-		
-		// Verify that the verifier stored in the file is the same as the one in the PKI:
-		Verifier myVerif = RegisterSig.getVerifier(voterID, Params.SIG_DOMAIN);
-		if ( !MessageTools.equal(myVerif.getVerificationKey(), voter_sign.getVerifier().getVerificationKey()) ) {
-			outl("Something wrong with the keys");
-			System.exit(-1);
-		}
-		
+	private void setupVoter(String email){
 		// Create the voter:
 		out("Setting up the voter...");
-		voter = new Voter(voterID, AppParams.ELECTIONID, voter_decr, voter_sign);
+		byte[] id = Utilities.stringAsBytes(email);
+		voter = new Voter(id, manifest);
 		outl("OK");
 	}
 

@@ -126,7 +126,7 @@ public class Voter
 
 	/// CONTRUCTOR(S) ///
 
-	public Voter(byte[] voterID, ElectionManifest elManifest) throws NetworkError {
+	public Voter(byte[] voterID, ElectionManifest elManifest) {
 		// TODO: Manifest should not be given here; the application should deal with it.
 		this.voterID = voterID;
 		this.elManifest=elManifest;
@@ -200,7 +200,7 @@ public class Voter
 	 *    or
 	 *    SIG_S1[ electionID, voterID, REJECTED, rejectedReason ]
 	 *    or
-	 *    SIG_S1[ electionID, voterID, OTP_ACCEPTED, empty]
+	 *    SIG_S1[ electionID, voterID, OTP_ACCEPTED, empty ]
 	 *
 	 * that is an encrypted signature of the collecting server on inner_ballot.
 	 * 
@@ -268,11 +268,6 @@ public class Voter
 		}
 		else
 			throw new MalformedMessage("Unknown tag");
-		
-		
-		// FIXME: only for the standard thing
-		
-		
 		
 	}
 

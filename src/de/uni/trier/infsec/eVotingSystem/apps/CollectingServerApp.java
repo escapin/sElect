@@ -4,14 +4,17 @@ import java.io.IOException;
 
 import de.uni.trier.infsec.eVotingSystem.core.CollectingServer;
 import de.uni.trier.infsec.eVotingSystem.core.CollectingServer.MalformedMessage;
+import de.uni.trier.infsec.eVotingSystem.core.CollectingServer.Response;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.eVotingSystem.parser.Keys;
 import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
+import de.uni.trier.infsec.eVotingSystem.smtp.TLSEmail;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.lib.network.NetworkServer;
+import de.uni.trier.infsec.utils.Utilities;
 import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.deleteFile;
 import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readCharsFromFile;
 import static de.uni.trier.infsec.eVotingSystem.core.Utils.errln;
@@ -92,13 +95,19 @@ public class CollectingServerApp {
 				byte[] request = NetworkServer.nextRequest(AppParams.colServPort);
 				if (request != null) {
 					System.out.println("reqeuest coming");
-					byte[] response=null;
+					Response response=null;
 					try {
-						response = server.collectBallot(request);
+						response = server.processRequest(request);
 					} catch (MalformedMessage e) {
 						System.out.println("Ballot malformed: " + e.toString());
 					}
-					NetworkServer.response(response);
+					// send the email
+					if(response.otp_response)
+						TLSEmail.sendEmail(response.email, AppParams.EMAIL_SUBJECT, 
+								AppParams.EMAIL_BODY + Utilities.byteArrayToHexString(response.otp));
+					
+					NetworkServer.response(response.responseMsg);
+					
 					System.out.println("responce sent");
 				} else {				
 					Thread.sleep(500);

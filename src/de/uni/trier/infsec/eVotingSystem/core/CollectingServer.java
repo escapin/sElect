@@ -203,8 +203,9 @@ public class CollectingServer
 		
 		// Check the OTP
 		VID vid = new VID(voterID);
-		if( !MessageTools.equal(otp, voterInfo.get(vid).otp) )
+		if( !MessageTools.equal(otp, voterInfo.get(vid).otp) ){
 			return errorMessage(elID, voterID, Params.WRONG_OTP);
+		}
 		
 		
 		// Check the time

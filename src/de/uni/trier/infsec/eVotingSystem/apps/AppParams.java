@@ -28,12 +28,15 @@ public class AppParams
 	public static final String FINAL_RESULT_file = RESULTS + "FinalResult.txt";
 	
 	
-	public static final String FROM_NAME="sElect";
-	public static final String SMTP_HOST="infsec.uni-trier.de";
-	public static final int SMTP_PORT=25;
-	public static final String FROM_EMAIL="evoting@infsec.uni-trier.de";
-	public static final String PASSWORD="tL0FWx0-ZD-gMDR9g24psP-D";
+	public static final String 	FROM_NAME="sElect";
+	public static final String 	SMTP_HOST="infsec.uni-trier.de";
+	public static final int 	SMTP_PORT=25;
+	public static final String 	FROM_EMAIL="evoting@infsec.uni-trier.de";
+	public static final String	PASSWORD="tL0FWx0-ZD-gMDR9g24psP-D";
 
+	public static final String	EMAIL_SUBJECT="Your code";
+	public static final String	EMAIL_BODY="Your code is: ";
+	
 	/* gmail credentials */
 //	public static final String SMTP_HOST="smtp.gmail.com";
 //	public static final String SMTP_PORT="587";
