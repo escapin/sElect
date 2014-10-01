@@ -50,16 +50,19 @@ public class CollectingServer
 		public byte[] responseMsg;
 		public boolean otp_response;
 		public byte[] otp; // set only for an otp response (if otp_response==true)
-		private Response(byte[] responseMsg, boolean otp_response, byte[] otp) {
+		public String email; // set only of an otp responses as well 
+		
+		private Response(byte[] responseMsg, boolean otp_response, byte[] otp, String email) {
 			this.otp_response = otp_response;
 			this.responseMsg = responseMsg;
 			this.otp = otp;
+			this.email = email;
 		}
 		static Response standardResponse(byte[] responseMsg) {
-			return new Response(responseMsg, false, null);
+			return new Response(responseMsg, false, null, null);
 		}
-		static Response otpResponse(byte[] responseMsg, byte[] otp) {
-			return new Response(responseMsg, true, otp);
+		static Response otpResponse(byte[] responseMsg, byte[] otp, String email) {
+			return new Response(responseMsg, true, otp, email);
 		}
 	}
 	
@@ -151,6 +154,8 @@ public class CollectingServer
 		byte[] elID = first(request);
 		byte[] voterID_tag_rest = second(request);
 		byte[] voterID = first(voterID_tag_rest);
+		System.out.print("Processing voter ");
+		System.out.println(Utilities.byteArrayToHexString(voterID));
 		byte[] tag_rest = second(voterID_tag_rest);
 		byte[] tag = first(tag_rest);
 		byte[] rest = second(tag_rest);
@@ -163,12 +168,13 @@ public class CollectingServer
 
 		// Check if the voter is eligible
 		VID vid = new VID(voterID);
-		if (!voterInfo.containsKey(vid))
+		if (!voterInfo.containsKey(vid)) {
 			return Response.standardResponse(errorMessage(elID, voterID, Params.INVALID_VOTER_ID));
+		}
 
 		// Proceed further depending on the type of request
 		if (MessageTools.equal(tag, Params.OTP_REQUEST)) { // otp request
-			return Response.otpResponse(otpAcknMessage(elID, voterID), voterInfo.get(vid).otp);
+			return Response.otpResponse(otpAcknMessage(elID, voterID), voterInfo.get(vid).otp, Utilities.byteArrayToHexString(voterID));
 		}
 		else if (MessageTools.equal(tag, Params.CAST_BALLOT)) { // cast ballot request
 			return Response.standardResponse(collectBallot(elID, voterID, rest));

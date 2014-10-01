@@ -116,12 +116,58 @@ public class TestTargetSystem extends TestCase
 		Helper.FinalEntry[] fes = Helper.finalResultAsText(finalResult, finServVerif, manifest.electionID);
 		assertTrue( fes.length == 1 );
 		assertTrue( fes[0].vote.equals("2") );
-		System.out.println("RESULT:");
-		System.out.println(fes[0].nonce);
-		System.out.println(fes[0].vote);
 	}
 
+	@Test
+	public void testClientServerProblems() throws Exception {
+		Voter.ResponseTag respTag;
+		CollectingServer.Response response;
+		byte[] ballot;
+		
+		Voter voter = createVoter("a@b.c");
+		Voter voter2 = createVoter("d@e.f");
+		Voter voter3 = createVoter("completely@unknown.voter");
+		System.out.println(voter3.getVoterId());
 
+		// Sending trash:
+		byte[] trash = {1,2,3,4,5};
+		try {
+			colServer.processRequest(trash);
+			fail("Malformed message accepted");
+		} catch (CollectingServer.MalformedMessage ex) {}
+
+		// Obtain otp (nothing wrong to be expected)
+		byte[] otpReq = voter.createOTPRequest();
+		CollectingServer.Response otpResponse = colServer.processRequest(otpReq);
+		byte[] otp = otpResponse.otp;
+		
+		// Casting a ballot with wrong otp
+		ballot = voter.createBallot(2, trash);
+		response = colServer.processRequest(ballot);
+		respTag = voter.validateResponse(response.responseMsg);
+		assertTrue(respTag == Voter.ResponseTag.WRONG_OTP);
+		
+		// Casting a ballot with the otp of somebody else
+		ballot = voter2.createBallot(2, trash);
+		response = colServer.processRequest(ballot);
+		respTag = voter2.validateResponse(response.responseMsg);
+		assertTrue(respTag == Voter.ResponseTag.WRONG_OTP);
+		
+		// A non-eligible voter tries to obtain an otp:
+		otpReq = voter3.createOTPRequest();
+		otpResponse = colServer.processRequest(otpReq);
+		respTag = voter3.validateResponse(response.responseMsg);
+		// assertTrue(respTag == Voter.ResponseTag.WRONG_OTP);
+		System.out.println(respTag);
+		
+
+		
+		
+		// Using wrong otp:
+		
+	}
+
+	
 	/*
 	@Test
 	public void testClientServerExhange() throws Exception
@@ -382,6 +428,8 @@ public class TestTargetSystem extends TestCase
 
 	private Voter createVoter(String email) throws Exception {
 		byte[] id = Utilities.stringAsBytes(email);
+		System.out.print("Created voter: ");
+		System.out.println(Utilities.byteArrayToHexString(id));
 		return new Voter(id, manifest);		
 	}
 }

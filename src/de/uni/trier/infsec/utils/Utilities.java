@@ -29,6 +29,10 @@ public class Utilities {
 		return str.getBytes(Charset.forName("UTF-8"));
 	}
 	
+	public String bytesAsString(byte[] bytes) {
+		return new String(bytes, Charset.forName("UTF-8"));
+	}
+	
 //	/**
 //	 *	Helper to enlarge the Array which stores the credentials. Used to avoid usage of Lists 
 //	 */
