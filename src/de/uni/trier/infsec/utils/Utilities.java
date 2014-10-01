@@ -1,5 +1,7 @@
 package de.uni.trier.infsec.utils;
 
+import java.nio.charset.Charset;
+
 public class Utilities {
 	
 	public static final String byteArrayToHexString(byte[] b) {
@@ -21,6 +23,10 @@ public class Utilities {
 	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
 	    }
 	    return data;
+	}
+	
+	public static byte[] stringAsBytes(String str) {
+		return str.getBytes(Charset.forName("UTF-8"));
 	}
 	
 //	/**

@@ -1,38 +1,31 @@
 package de.uni.trier.infsec.eVotingSystem.core;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Hashtable;
 
+import de.uni.trier.infsec.eVotingSystem.bean.VoterID;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
-import de.uni.trier.infsec.functionalities.digsig.Verifier;
+// import de.uni.trier.infsec.functionalities.digsig.Verifier;
+import de.uni.trier.infsec.functionalities.nonce.NonceGen;
 import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
-import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
+// import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.utils.Utilities;
+// import de.uni.trier.infsec.utils.Utilities;
 import static de.uni.trier.infsec.utils.MessageTools.first;
 import static de.uni.trier.infsec.utils.MessageTools.second;
-import static de.uni.trier.infsec.utils.MessageTools.byteArrayToInt;
+// import static de.uni.trier.infsec.utils.MessageTools.byteArrayToInt;
 import static de.uni.trier.infsec.utils.MessageTools.intToByteArray;
 import static de.uni.trier.infsec.utils.MessageTools.concatenate;
 
 public class CollectingServer 
 {
-	// CRYPTOGRAPHIC FUNCTIONALITIES
-
-	private final Decryptor decryptor;
-	private final Signer signer;
-	private final ElectionManifest elManifest;
-
-	// STATE
-
-	private boolean inVotingPhase; // indicates if the system is still in the voting phase
-	private final byte[][] ballots; 
-	private int numberOfVoters;
-	private int numberOfCastBallots = 0;
 
 
-	// CLASSES
+	// PUBLIC CLASSES
 
 	/**
 	 * Exception thrown when the request we received does not conform
@@ -47,6 +40,76 @@ public class CollectingServer
 			return "Malformed message: " + description;
 		}
 	}
+	
+	/**
+	 * Response of the server to a request. If otp flag is set, then the 
+	 * response contains, besides a response message to be sent back to the 
+	 * client, an otp to be delivered to the client via e-mail.
+	 */
+	public static class Response {
+		public byte[] responseMsg;
+		public boolean otp_response;
+		public byte[] otp; // set only for an otp response (if otp_response==true)
+		private Response(byte[] responseMsg, boolean otp_response, byte[] otp) {
+			this.otp_response = otp_response;
+			this.responseMsg = responseMsg;
+			this.otp = otp;
+		}
+		static Response standardResponse(byte[] responseMsg) {
+			return new Response(responseMsg, false, null);
+		}
+		static Response otpResponse(byte[] responseMsg, byte[] otp) {
+			return new Response(responseMsg, true, otp);
+		}
+	}
+	
+	// PRIVATE CLASSES
+	
+	// A class encapsulating a voter id (represented as bytes) and providing 'equals' and 'hashCode'.
+	private static class VID {
+		byte[] id;
+		
+		public VID(byte[] id) { this.id = id; }
+		public VID(String id) { this.id = Utilities.stringAsBytes(id); }
+		
+		@Override public boolean equals(Object that) {
+		    if (that instanceof VID) 
+		    	return Arrays.equals(this.id, ((VID)that).id);
+		    else 
+		    	return false;
+		  }
+		
+		@Override public int hashCode() {
+			return Arrays.hashCode(id);
+		}
+	}
+	
+	// Data stored by the server associated with a voter: whether a voter voted or not and her opt 
+	private static class VoterInfo {
+		public boolean voted;
+		public byte[] otp;
+		public byte[] innerBallot = null;
+		public VoterInfo(boolean voted, byte[] otp) {
+			this.voted = voted;
+			this.otp = otp;
+		}
+	}
+
+
+	// CRYPTOGRAPHIC FUNCTIONALITIES
+
+	private final Decryptor decryptor;
+	private final Signer signer;
+	private final NonceGen noncegen;
+	
+	
+	// STATE
+	private final ElectionManifest elManifest;
+	private boolean inVotingPhase; // indicates if the system is still in the voting phase
+	private final byte[][] ballots; 
+	private int numberOfCastBallots = 0;
+	private int numberOfVoters;
+	private Hashtable<VID, VoterInfo> voterInfo;
 
 
 	// CONSTRUCTORS
@@ -54,17 +117,67 @@ public class CollectingServer
 	public CollectingServer(ElectionManifest elManifest, Decryptor decryptor, Signer signer) {
 		this.signer = signer;
 		this.decryptor = decryptor;
-		this.elManifest=elManifest;
-		inVotingPhase=true;
-		this.numberOfVoters=elManifest.votersList.length+1; //FIXME: voters ID could start from 1 instead of from 0
+		this.noncegen = new NonceGen();
+		this.elManifest = elManifest;
+		this.inVotingPhase = true;
+		this.numberOfVoters = elManifest.votersList.length;
 		this.ballots = new byte[numberOfVoters][]; // (inner ballots which have been cast)
 		// initially no voter has cast their ballot:
 		for(int i=0; i<numberOfVoters; ++i)
-			ballots[i]=null;
+			ballots[i] = null;
+		this.voterInfo = new Hashtable<VID, VoterInfo>();
+		// initialize the voters' map (create an entry for every voter in the manifest)
+		for( VoterID vid : elManifest.votersList ) {
+			byte[] otp = noncegen.newNonce();
+			voterInfo.put(new VID(vid.email), new VoterInfo(false,otp));
+		}
 	}
 
 	// PUBLIC METHODS
+	
+	/**
+	 * Check the request type and call the appropriate methods to process it.
+	 * Returns null if there is no 
+	 * @param request
+	 * @return
+	 */
+	public Response processRequest(byte[] encryptedRequest) throws MalformedMessage {
+		// Processing independent of the type of request (cast ballot/opt)
+		byte[] request = decryptor.decrypt(encryptedRequest); 
+		if (request == null)
+			throw new MalformedMessage("Wrong decryption");
+		
+				
+		byte[] elID = first(request);
+		byte[] voterID_tag_rest = second(request);
+		byte[] voterID = first(voterID_tag_rest);
+		byte[] tag_rest = second(voterID_tag_rest);
+		byte[] tag = first(tag_rest);
+		byte[] rest = second(tag_rest);
+		if (elID==null || voterID==null || tag==null || rest==null)
+			throw new MalformedMessage("Malformed message");
 
+		// Check the election id
+		if( !MessageTools.equal(elID, elManifest.electionID) )
+			return Response.standardResponse(errorMessage(elID, voterID, Params.INVALID_ELECTION_ID));		
+
+		// Check if the voter is eligible
+		VID vid = new VID(voterID);
+		if (!voterInfo.containsKey(vid))
+			return Response.standardResponse(errorMessage(elID, voterID, Params.INVALID_VOTER_ID));
+
+		// Proceed further depending on the type of request
+		if (MessageTools.equal(tag, Params.OTP_REQUEST)) { // otp request
+			return Response.otpResponse(otpAcknMessage(elID, voterID), voterInfo.get(vid).otp);
+		}
+		else if (MessageTools.equal(tag, Params.CAST_BALLOT)) { // cast ballot request
+			return Response.standardResponse(collectBallot(elID, voterID, rest));
+		}
+		else
+			throw new MalformedMessage("Wrong tag");
+	}
+
+	
 	/**
 	 * Process a new ballot and return a response. A response can be either a standard
 	 * response (if the ballot has been accepted) or an error response. The method
@@ -78,62 +191,47 @@ public class CollectingServer
 	 *	that a voterID is a number between 0 and NumberOfVoters-1.
 	 *
 	 */
-	public byte[] collectBallot(byte[] ballot) throws MalformedMessage, NetworkError {
-
-		// Decrypt, check the signature, and deconstruct the input ballot.
-		// If this step fails, an exception is thrown (there is no response to be send back):
-		//
-		byte[] id_payload_sign = decryptor.decrypt(ballot);
-		byte[] voterIDmsg = first(id_payload_sign);
-		if(voterIDmsg.length!=4) // since clientID is supposed to be a integer, its length must be 4 bytes
-			throw new MalformedMessage("Client ID expected");
-		int voterID = byteArrayToInt(voterIDmsg);
-		System.out.printf(" [ voterId = %d ]\n", voterID);
-		if( voterID<0 || voterID>=numberOfVoters ) // only accept requests from eligible voters
-			throw new MalformedMessage("Not eligible voter");
-		byte[] payload_sign = second(id_payload_sign);
-		byte[] payload = first(payload_sign);
-		byte[] signVoter = second(payload_sign);
-		Verifier voter_verifier = Utils.getVerifier(voterID, elManifest); // (may throw NetworkError or PKIerror) 
-		if (voter_verifier==null)
-			throw new Error("Voter " + voterID + " not found!");
-		if (!voter_verifier.verify(signVoter, payload))  // only accept signed requests (by an eligible voter)
-			throw new MalformedMessage("Invalid signature");
-		byte[] elID = first(payload);
-		byte[] innerBallot=second(payload);
-
-		// Check if the ballot is to be rejected (with an error response).
-		byte[] problem = null;  // null means that everything is ok 
-		if( !MessageTools.equal(elID, elManifest.electionID) )
-			problem =  Params.INVALID_ELECTION_ID;
-		//TODO: maybe we should deal with the time only in the App
-		else if(System.currentTimeMillis()<elManifest.startTime.getTime())
-			problem = Params.ELECTION_NOT_STARTED;
-		else if(System.currentTimeMillis()>elManifest.endTime.getTime() )
-			problem = Params.ELECTION_OVER;
-		else if( ballots[voterID]!=null && !Utilities.arrayEqual(innerBallot, ballots[voterID]) )	// check whether the vote has already voted
-			problem = Params.ALREADY_VOTED;
+	private byte[] collectBallot(byte[] elID, byte[] voterID, byte[] otp_innerBallot) throws MalformedMessage {
+		// Decrypt and deconstruct the input ballot.
+		// If this step fails, an exception is thrown (there is no response to be send back).
+		byte[] otp = first(otp_innerBallot);
+		byte[] innerBallot = second(otp_innerBallot);	
 		
-		if (problem != null) { // there is a problem; create an error response of the form [electionID, REJECTED, rejectedReason]
-			return encapsulateResponse(voterID, concatenate(elID, concatenate(Params.REJECTED, problem)));
-			// note that we reply with the election identifier as provided in the voter's request
-		}
+		// Check the OTP
+		VID vid = new VID(voterID);
+		if( !MessageTools.equal(otp, voterInfo.get(vid).otp) )
+			return errorMessage(elID, voterID, Params.WRONG_OTP);
+		
+		
+		// Check the time
+		//TODO: maybe we should deal with the time only in the App
+		//tt: yest it should be done in the app, so that
+		//TODO: it is also checked for the otp request
+		if(System.currentTimeMillis()<elManifest.startTime.getTime())
+			return errorMessage(elID, voterID, Params.ELECTION_NOT_STARTED);
+		if(System.currentTimeMillis()>elManifest.endTime.getTime() )
+			return errorMessage(elID, voterID, Params.ELECTION_OVER);
 
-		// No errors -- record the ballot and return a standard response of the form
-		// [electionID, ACCEPTED, serverSignature(ACCEPTED, electionID, innerBallot)]
-		//
-		if(ballots[voterID] == null) { // store the inner ballot (only if the voter has sent it for the first time)
-			numberOfCastBallots++;
-			ballots[voterID] = innerBallot; 
+		// Check if the voter has already voted for a different inner ballot
+		VoterInfo vinf = voterInfo.get(vid);
+		if( vinf.voted && !MessageTools.equal(innerBallot, vinf.innerBallot) ) {
+			return errorMessage(elID, voterID, Params.ALREADY_VOTED);
+		}
+		
+		// Collect the ballot if the voter votes for the first time (not if the voter re-votes)
+		if( ! vinf.voted ) {
+			vinf.voted = true; // check the voter
+			vinf.innerBallot = innerBallot; // remember her inner ballot
+			// add the inner ballot to the list of inner ballots
+			ballots[numberOfCastBallots++] = innerBallot;
 		}
 		// create receipt for the voter
 		byte[] elID_innerBallot = concatenate(elManifest.electionID, innerBallot);
 		byte[] accepted_elID_innerBallot = concatenate(Params.ACCEPTED, elID_innerBallot);
 		byte[] receipt = signer.sign(accepted_elID_innerBallot);
-		// TODO: perhaps the server should store voters' signatures
 
 		byte[] accepted_serverSign=concatenate(Params.ACCEPTED, receipt);
-		return encapsulateResponse(voterID, concatenate(elManifest.electionID, accepted_serverSign));
+		return signResponse(concatenate(elManifest.electionID, concatenate(voterID, accepted_serverSign)));
 	}
 
 	public int getNumberOfBallots() {
@@ -149,11 +247,18 @@ public class CollectingServer
 		inVotingPhase = false;
 
 		// sort the ballots
+		/*
 		byte[][] bb = new byte[numberOfCastBallots][];
 		for (int id=0,ind=0; id<numberOfVoters; ++id) {
 			if (ballots[id]!=null)
 				bb[ind++] = ballots[id];
 		}
+		*/
+		byte[][] bb = new byte[numberOfCastBallots][];
+		for (int i=0; i<numberOfCastBallots; ++i) {
+			bb[i] = ballots[i];
+		}
+		
 		Arrays.sort(bb, new java.util.Comparator<byte[]>() {
 			public int compare(byte[] a1, byte[] a2) {
 				return Utils.compare(a1, a2);
@@ -184,25 +289,27 @@ public class CollectingServer
 
 	// PRIVATE METHODS
 
+	byte[] errorMessage(byte[] elID, byte[] voterID, byte[] problem) {
+		return signResponse(concatenate(elID, concatenate(voterID, concatenate(Params.REJECTED, problem))));
+	}
+	
+	byte[] otpAcknMessage(byte[] elID, byte[] voterID) {
+		byte[] emptyMsg = {};
+		return signResponse(concatenate(elID, concatenate(voterID, concatenate(Params.OTP_ACCEPTED, emptyMsg))));
+	}
+	
+	
 	/**
 	 * Add voterID, sign, then encrypt with the voter's public key  
 	 * @throws NetworkError
 	 * @throws RegisterEnc.PKIError 
 	 */
-	private byte[] encapsulateResponse(int voterID, byte[] payload) throws NetworkError
+	private byte[] signResponse(byte[] payload)
 	{
-		// add voterID
-		byte[] id_payload = concatenate(intToByteArray(voterID), payload);
 		// add server signature
-		byte[] signServer = signer.sign(id_payload);
-		byte[] id_payload_signature = concatenate(id_payload, signServer);
-		// encryption with the voter public key
-		Encryptor voter_encryptor = Utils.getEncryptor(voterID, elManifest);
-		if (voter_encryptor==null)
-			throw new Error("Voter " + voterID + " not found!");
-		byte[] response=voter_encryptor.encrypt(id_payload_signature);
-
-		return response;
+		byte[] signature = signer.sign(payload);
+		byte[] signed_payload = concatenate(payload, signature);
+		return signed_payload;
 	}
 	
 	// METHODS FOR TESTING //
@@ -210,7 +317,7 @@ public class CollectingServer
 	 * 		These two methods could be somehow misleading for someone using this
 	 *		class. For instance, I confused the method getBallots() with getResult()
 	 */
-
+	
 	/**
 	 * For testing. Returns array of cast ballots.
 	 */

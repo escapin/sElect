@@ -2,6 +2,7 @@ package de.uni.trier.infsec.functionalities.pkenc;
 
 import de.uni.trier.infsec.lib.crypto.KeyPair;
 import de.uni.trier.infsec.lib.crypto.CryptoLib;
+import de.uni.trier.infsec.utils.Utilities;
 import static de.uni.trier.infsec.utils.MessageTools.copyOf;
 
 /**
