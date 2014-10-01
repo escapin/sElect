@@ -29,7 +29,7 @@ public class Utilities {
 		return str.getBytes(Charset.forName("UTF-8"));
 	}
 	
-	public String bytesAsString(byte[] bytes) {
+	public static String bytesAsString(byte[] bytes) {
 		return new String(bytes, Charset.forName("UTF-8"));
 	}
 	

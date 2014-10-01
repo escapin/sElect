@@ -1,12 +1,14 @@
 package de.uni.trier.infsec.tests;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+
 import junit.framework.TestCase;
+
 import org.junit.Test;
 
 import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readCharsFromFile;
 import static de.uni.trier.infsec.eVotingSystem.core.Utils.errln;
-
 import de.uni.trier.infsec.eVotingSystem.apps.AppParams;
 import de.uni.trier.infsec.eVotingSystem.apps.AppUtils;
 import de.uni.trier.infsec.eVotingSystem.apps.Helper;
@@ -43,6 +45,13 @@ public class TestTargetSystem extends TestCase
 		assertTrue( MessageTools.equal(encryptorCS.getPublicKey(), voter.getCSPublicKey()));
 	}
 
+	@Test
+	public void testStringBytesConversion() throws Exception {
+		String a = "abc@d.e";
+		byte[] b = a.getBytes(Charset.forName("UTF-8"));
+		String c = new String(b, Charset.forName("UTF-8"));
+		assertEquals(a,c);
+	}
 
 	@Test
 	public void testClientServerStandardExhange() throws Exception
@@ -65,6 +74,8 @@ public class TestTargetSystem extends TestCase
 		assertNotNull(otpResponse.responseMsg);
 		byte[] otp = otpResponse.otp;
 		assertNotNull(otp);
+		System.out.println(otpResponse.email);
+		assertEquals("a@b.c", otpResponse.email);
 
 		// Deliver the response message (not the otp) back to the voter
 		Voter.ResponseTag respTag = voter.validateResponse(otpResponse.responseMsg);

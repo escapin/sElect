@@ -172,7 +172,7 @@ public class CollectingServer
 
 		// Proceed further depending on the type of request
 		if (MessageTools.equal(tag, Params.OTP_REQUEST)) { // otp request
-			return Response.otpResponse(otpAcknMessage(elID, voterID), voterInfo.get(vid).otp, Utilities.byteArrayToHexString(voterID));
+			return Response.otpResponse(otpAcknMessage(elID, voterID), voterInfo.get(vid).otp, Utilities.bytesAsString(voterID));
 		}
 		else if (MessageTools.equal(tag, Params.CAST_BALLOT)) { // cast ballot request
 			return Response.standardResponse(collectBallot(elID, voterID, rest));
