@@ -154,8 +154,6 @@ public class CollectingServer
 		byte[] elID = first(request);
 		byte[] voterID_tag_rest = second(request);
 		byte[] voterID = first(voterID_tag_rest);
-		System.out.print("Processing voter ");
-		System.out.println(Utilities.byteArrayToHexString(voterID));
 		byte[] tag_rest = second(voterID_tag_rest);
 		byte[] tag = first(tag_rest);
 		byte[] rest = second(tag_rest);
