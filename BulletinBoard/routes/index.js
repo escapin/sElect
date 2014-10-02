@@ -38,7 +38,7 @@ exports.index = function(manifest, RESULT_DIR) {
             })
         }
         else { // there is no file with result
-            res.render('no_result', { title: 'TrustVote: No result', electionName: electionName }); 
+            res.render('no_result', { title: 'TrustVote: No result', manifest: manifest }); 
         }
     }
 };
