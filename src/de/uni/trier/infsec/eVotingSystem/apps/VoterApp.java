@@ -324,19 +324,14 @@ public class VoterApp extends JFrame {
 					.addGroup(gl_registration.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_registration.createSequentialGroup()
 							.addGap(45)
-							.addGroup(gl_registration.createParallelGroup(Alignment.TRAILING, false)
-								.addGroup(gl_registration.createSequentialGroup()
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addGroup(gl_registration.createParallelGroup(Alignment.LEADING)
-										.addComponent(label, GroupLayout.PREFERRED_SIZE, 439, GroupLayout.PREFERRED_SIZE)
-										.addComponent(lblRegistrationPhase, GroupLayout.PREFERRED_SIZE, 439, GroupLayout.PREFERRED_SIZE)))
-								.addGroup(gl_registration.createSequentialGroup()
-									.addGroup(gl_registration.createParallelGroup(Alignment.TRAILING)
-										.addComponent(btnGetACode, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)
-										.addComponent(fldEmail, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
-										.addComponent(lblPleaseEnterYour, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 301, GroupLayout.PREFERRED_SIZE)
-										.addComponent(lblGetCodeProblem, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE))
-									.addGap(485))))
+							.addGroup(gl_registration.createParallelGroup(Alignment.TRAILING)
+								.addComponent(btnGetACode, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)
+								.addComponent(fldEmail, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
+								.addComponent(lblPleaseEnterYour, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 301, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblGetCodeProblem, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblRegistrationPhase, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 439, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 384, GroupLayout.PREFERRED_SIZE))
+							.addGap(485))
 						.addGroup(gl_registration.createSequentialGroup()
 							.addGap(23)
 							.addComponent(label_2, GroupLayout.PREFERRED_SIZE, 489, GroupLayout.PREFERRED_SIZE)))
@@ -347,11 +342,11 @@ public class VoterApp extends JFrame {
 				.addGroup(gl_registration.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(label_2, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
-					.addGap(50)
+					.addGap(18)
 					.addComponent(lblRegistrationPhase, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(label, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)
-					.addGap(77)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(label, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
 					.addComponent(lblPleaseEnterYour, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
 					.addComponent(fldEmail, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
@@ -498,7 +493,7 @@ public class VoterApp extends JFrame {
 		
 		JPanel acceptedPanel = new JPanel();
 		
-		
+		lblElectionMsg.setText("<html>" +  manifest.headline + "</html>");
 		
 		JLabel lblVoteCorrect = new JLabel(html(lblACCEPTED));
 		lblVoteCorrect.setForeground(UIManager.getColor("OptionPane.questionDialog.border.background"));
@@ -842,7 +837,7 @@ public class VoterApp extends JFrame {
 //		}
 //		lblVoterID.setText("<html>" +  lblVOTERID + "<strong>" + voterID + "</strong></html>");
 //		lblElectionID.setText(new String(manifest.electionID));
-//		lblElectionMsg.setText("<html>" +  manifest.headline + "</html>");
+
 	}
 	
 	private class CloseTheApp implements ActionListener{
