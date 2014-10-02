@@ -728,7 +728,7 @@ public class VoterApp extends JFrame {
 			if(allowedVoter=vid.email.equals(email))
 				break;
 		if(!allowedVoter){
-			lblGetCodeProblem.setText(html("Improper Mail inserted"));
+			lblGetCodeProblem.setText(html("Invalid email address."));
 			return;
 		}
 		
@@ -754,15 +754,32 @@ public class VoterApp extends JFrame {
 			outl("Vote [candidate <int>]: voteError");
 			e.printStackTrace();
 		}
-		if (respTag != Voter.ResponseTag.OTP_REQUEST_ACCEPTED){
-			lblGetCodeProblem.setText(html("Something went wrong"));
-			return;
-		}
-		else {
+		String rejectedReason="";
+		switch(respTag){
+		case OTP_REQUEST_ACCEPTED:
 			CardLayout cl = (CardLayout) getContentPane().getLayout();
 			cl.show(getContentPane(), MAIN);
+			break;
+		case ALREADY_VOTED:
+			rejectedReason += "You have already voted with a different " +
+					"ballot which has been collected properly.";
+			break;
+		case ELECTION_NOT_STARTED:
+			break;
+		case ELECTION_OVER:
+			rejectedReason += "The voting phase is over.";	
+			break;
+		case INVALID_ELECTION_ID:
+			rejectedReason += "Invalid election identifier in the manifest.";
+			break;
+		case INVALID_VOTER_ID:
+			rejectedReason += "Invalid email address.";
+			break;
+		default:
+			rejectedReason += "Something went wrong. You should try asking a polling official!";
+			break;
 		}
-			
+		lblGetCodeProblem.setText(html(rejectedReason));
 	}
 	
 	private class LoginPressed extends KeyAdapter{
@@ -883,7 +900,6 @@ public class VoterApp extends JFrame {
 //			cl.show(center, VOTE);
 //			main.add(north, BorderLayout.NORTH);
 			byte[] otp = getOTP();
-			if(otp==null) return;
 			byte[] ballot=voter.reCreateBallot(otp);
 			
 			vote(ballot);
@@ -936,7 +952,6 @@ public class VoterApp extends JFrame {
 			out("Creating a ballot with candidate number " + selectedCandidate + "...");
 			//outl("Creating the ballot...");
 			byte[] otp = getOTP();
-			if(otp==null) return;
 			byte[] ballot = voter.createBallot(selectedCandidate, otp);
 			outl("OK");
 			
@@ -956,13 +971,15 @@ public class VoterApp extends JFrame {
 		} catch (Exception e){
 			excp=true;
 		}
-		if(excp || sOtp.equals("")) return null;
+		if(excp || sOtp.equals("")) return otp="wrongOTP".getBytes();
 		
 		return otp;
 	}
 	
 	private void vote(byte[] ballot)
 	{
+		
+			
 		if(selectedCandidate<0 || selectedCandidate>=manifest.choicesList.length)
 			return; // no valid candidate has been selected
 		
