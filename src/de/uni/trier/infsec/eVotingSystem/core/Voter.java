@@ -183,7 +183,7 @@ public class Voter
 	/**
 	 *  Uses previously generated inner ballot to prepare a new ballot (for re-voting) 
 	 */
-	public byte[] reCreateBallot(byte[] otp) throws ReceiptError {
+	public byte[] reCreateBallot(byte[] otp) {
 		if (receipt == null) // cannot recreate the ballot because it has not been created yet
 			return null;
 		return encapsulateInnerBallot(otp, receipt.innerBallot);

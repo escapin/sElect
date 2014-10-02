@@ -48,6 +48,7 @@ import de.uni.trier.infsec.eVotingSystem.bean.VoterID;
 import de.uni.trier.infsec.eVotingSystem.core.Params;
 import de.uni.trier.infsec.eVotingSystem.core.Voter;
 import de.uni.trier.infsec.eVotingSystem.core.Voter.Error;
+import de.uni.trier.infsec.eVotingSystem.core.Voter.ReceiptError;
 import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
 import de.uni.trier.infsec.functionalities.digsig.*;
 import de.uni.trier.infsec.functionalities.pkenc.*;
@@ -61,6 +62,8 @@ import javax.swing.JTextArea;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 
 
@@ -73,6 +76,7 @@ public class VoterApp extends JFrame {
 	private JTextField fldVoterID;
 	private JPasswordField fldPassword;
 	private JLabel lblUserNotRegister;
+	private JButton btnVoteAgain;
 	private JPanel center;
 	private JPanel main;
 	private JPanel north;
@@ -345,7 +349,7 @@ public class VoterApp extends JFrame {
 					.addComponent(label_2, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
 					.addGap(50)
 					.addComponent(lblRegistrationPhase, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addComponent(label, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)
 					.addGap(77)
 					.addComponent(lblPleaseEnterYour, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
@@ -353,7 +357,7 @@ public class VoterApp extends JFrame {
 					.addComponent(fldEmail, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
 					.addGap(61)
 					.addComponent(btnGetACode, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
+					.addGap(84)
 					.addComponent(lblGetCodeProblem, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
 					.addGap(88))
 		);
@@ -640,17 +644,24 @@ public class VoterApp extends JFrame {
 		center.add(acceptedPanel, ACCEPTED);
 		
 		center.add(rejectedPanel, REJECTED);
+		
+		
+		btnVoteAgain = new JButton("Vote again");
+		btnVoteAgain.setVisible(false);
+		btnVoteAgain.addActionListener(new VoteAgain());
 		GroupLayout gl_rejectedPanel = new GroupLayout(rejectedPanel);
 		gl_rejectedPanel.setHorizontalGroup(
 			gl_rejectedPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_rejectedPanel.createSequentialGroup()
 					.addGroup(gl_rejectedPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_rejectedPanel.createSequentialGroup()
-							.addGap(32)
-							.addComponent(lblRejectedReason, GroupLayout.PREFERRED_SIZE, 436, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_rejectedPanel.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(lblRejected, GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE)))
+							.addComponent(lblRejected, GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE))
+						.addGroup(gl_rejectedPanel.createSequentialGroup()
+							.addGap(32)
+							.addGroup(gl_rejectedPanel.createParallelGroup(Alignment.TRAILING)
+								.addComponent(btnVoteAgain)
+								.addComponent(lblRejectedReason, GroupLayout.PREFERRED_SIZE, 436, GroupLayout.PREFERRED_SIZE))))
 					.addContainerGap())
 		);
 		gl_rejectedPanel.setVerticalGroup(
@@ -660,7 +671,9 @@ public class VoterApp extends JFrame {
 					.addComponent(lblRejected)
 					.addGap(77)
 					.addComponent(lblRejectedReason, GroupLayout.PREFERRED_SIZE, 171, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(266, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED, 156, Short.MAX_VALUE)
+					.addComponent(btnVoteAgain)
+					.addGap(52))
 		);
 		rejectedPanel.setLayout(gl_rejectedPanel);
 		
@@ -707,6 +720,7 @@ public class VoterApp extends JFrame {
 			onGetCodePress(ev);
 		}
 	}
+	
 	
 	private void onGetCodePress(AWTEvent ev){
 		if(fldEmail.getText().length()==0){
@@ -755,9 +769,6 @@ public class VoterApp extends JFrame {
 		}
 			
 	}
-	
-	
-	
 	
 	private class LoginPressed extends KeyAdapter{
 		public void keyPressed(KeyEvent e) {
@@ -864,7 +875,6 @@ public class VoterApp extends JFrame {
 	}
 	private void destroyConfidentialInfo(){
 		selectedCandidate=-100;
-		
 		voter_decr=null;
 		voter_sign=null;
 		voter=null;
@@ -872,6 +882,18 @@ public class VoterApp extends JFrame {
 		receipt=null;
 	}
 	
+	private class VoteAgain implements ActionListener {
+		public void actionPerformed(ActionEvent ev) {
+//			CardLayout cl = (CardLayout)(center.getLayout());
+//			cl.show(center, VOTE);
+//			main.add(north, BorderLayout.NORTH);
+			byte[] otp = getOTP();
+			if(otp==null) return;
+			byte[] ballot=voter.reCreateBallot(otp);
+			
+			vote(ballot);
+		}
+	}
 	
 	private class CandidateButton extends AbstractAction {
 		private JButton[] btnCandidates;
@@ -903,12 +925,10 @@ public class VoterApp extends JFrame {
 			outl("Candidate Selected: " + selectedCandidate);
 			
 			btnVote.setEnabled(true);
-			lblCandidateSelected.setText(html(manifest.choicesList[candidateNumber]));
-			
-			
-			
+			lblCandidateSelected.setText(html(manifest.choicesList[candidateNumber]));	
 		}
 	}
+	
 	
 	
 	private class VoteButton extends AbstractAction {
@@ -916,102 +936,139 @@ public class VoterApp extends JFrame {
 			super(name);
 		}
 		public void actionPerformed(ActionEvent ev){
-			if(selectedCandidate<0 || selectedCandidate>=manifest.choicesList.length)
-				return; // no valid candidate has been selected
-			boolean isNull=false;
-			String otp=null;
-			try{
-				otp=otpField.getText();
-			} catch (NullPointerException e){
-				isNull=true;	
-			}
-			if(isNull || otp.equals("")) return;
-				
 			// Create a ballot;
 			//TODO: comment this line and uncomment the other after testing
 			out("Creating a ballot with candidate number " + selectedCandidate + "...");
 			//outl("Creating the ballot...");
-			byte[] ballot = voter.createBallot(selectedCandidate, Utilities.hexStringToByteArray(otp));
+			byte[] otp = getOTP();
+			if(otp==null) return;
+			byte[] ballot = voter.createBallot(selectedCandidate, otp);
 			outl("OK");
 			
-			// Send the ballot:
-			out("Sending the ballot to the server...");
-			//TODO: create another thread
-			try {
-				serverResponse = 
-						NetworkClient.sendRequest(ballot, 
-								manifest.collectingServer.uri.hostname, 
-								manifest.collectingServer.uri.port);
-			} catch (NetworkError e) {
-				// TODO Auto-generated catch block
-				// TODO: manage the app so that the vote is not colleted in this case
-				outl("Vote [candidate <int>]: networkError");
-				e.printStackTrace();
-			}
-			outl("OK");
-			
-			// Validate the server's response:
-			try {
-				responseTag = voter.validateResponse(serverResponse);
-			} catch (Error e) {
-				outl("response validation for voting: voteError");
-				e.printStackTrace();
-			}
-			outl("Response of the server: " + responseTag);
-			
-			CardLayout cl = (CardLayout)(center.getLayout());
-			if (responseTag == Voter.ResponseTag.VOTE_COLLECTED) {
-				// Output the verification data:
-				Voter.Receipt receipt = voter.getReceipt();
-				outl("RECEIPT:");
-				outl("    nonce = " + byteArrayToHexString(receipt.nonce));
-				outl("    inner ballot = " + byteArrayToHexString(receipt.innerBallot));
-				if (receipt.serverSignature != null)
-					outl("    server's signature = " + byteArrayToHexString(receipt.serverSignature));
-				
-				// Store the receipt:
-				String receipt_fname = AppParams.RECEIPT_file + voterID + ".msg"; 
-				try {
-					AppUtils.storeAsFile(receipt.asMessage(), receipt_fname);
-				} catch (IOException e) {
-					outl("Vote(candidate <int>): IOException");
-					e.printStackTrace();
-				}
-				textNonce.setText(byteArrayToHexString(receipt.nonce));
-				//textSignature.setText(byteArrayToHexString(receipt.innerBallot));
-				//textSignature.setText(byteArrayToHexString(receipt.serverSignature));
-				cl.show(center, ACCEPTED);
-				main.remove(north);
-				
-			}
-			else{
-				String rejectedReason="";
-				switch(responseTag){
-				case INVALID_ELECTION_ID:
-					rejectedReason += "Invalid election identifier.";
-					break;
-				case ELECTION_OVER:
-					rejectedReason += "The voting phase is over.";	
-					break;
-				case ALREADY_VOTED:
-					rejectedReason += "You have already voted with a different " +
-							"ballot which has been collected properly.";	
-					break;
-//				case INVALID_VOTER_ID: //FIXME: do we still need this enum?
-//					rejectedReason += "Your identifier number is incorrect";
-//					break;
-				default:
-					rejectedReason += "I do not know the reason that your vote " +
-							"has not been collected. You should try asking a polling official!";
-				}
-				lblRejectedReason.setText(html(rejectedReason));
-				lblRejectedReason.setFont(new Font("Dialog", Font.PLAIN, 14));
-				cl.show(center, REJECTED);
-				main.remove(north);
-			}
-			 
-		}					
+			vote(ballot);
+		}
 	}
+	
+
+	
+	private byte[] getOTP(){
+		boolean excp=false;
+		String sOtp=null;
+		byte[] otp=null;
+		try{
+			sOtp=otpField.getText();
+			otp=Utilities.hexStringToByteArray(sOtp);
+		} catch (Exception e){
+			excp=true;
+		}
+		if(excp || sOtp.equals("")) return null;
+		
+		return otp;
+	}
+	
+	private void vote(byte[] ballot)
+	{
+		if(selectedCandidate<0 || selectedCandidate>=manifest.choicesList.length)
+			return; // no valid candidate has been selected
+		
+		// Send the ballot:
+		out("Sending the ballot to the server...");
+		//TODO: create another thread
+		try {
+			serverResponse = 
+					NetworkClient.sendRequest(ballot, 
+							manifest.collectingServer.uri.hostname, 
+							manifest.collectingServer.uri.port);
+		} catch (NetworkError e) {
+			// TODO Auto-generated catch block
+			// TODO: manage the app so that the vote is not colleted in this case
+			outl("Vote [candidate <int>]: networkError");
+			e.printStackTrace();
+		}
+		outl("OK");
+		
+		// Validate the server's response:
+		try {
+			responseTag = voter.validateResponse(serverResponse);
+		} catch (Error e) {
+			outl("response validation for voting: voteError");
+			e.printStackTrace();
+		}
+		outl("Response of the server: " + responseTag);
+		
+		CardLayout cl = (CardLayout)(center.getLayout());
+		if (responseTag == Voter.ResponseTag.VOTE_COLLECTED) {
+			// Output the verification data:
+			Voter.Receipt receipt = voter.getReceipt();
+			outl("RECEIPT:");
+			outl("    nonce = " + byteArrayToHexString(receipt.nonce));
+			outl("    inner ballot = " + byteArrayToHexString(receipt.innerBallot));
+			if (receipt.serverSignature != null)
+				outl("    server's signature = " + byteArrayToHexString(receipt.serverSignature));
+			
+			// Store the receipt:
+			String receipt_fname = AppParams.RECEIPT_file + voterID + ".msg"; 
+			try {
+				AppUtils.storeAsFile(receipt.asMessage(), receipt_fname);
+			} catch (IOException e) {
+				outl("Vote(candidate <int>): IOException");
+				e.printStackTrace();
+			}
+			textNonce.setText(byteArrayToHexString(receipt.nonce));
+			//textSignature.setText(byteArrayToHexString(receipt.innerBallot));
+			//textSignature.setText(byteArrayToHexString(receipt.serverSignature));
+			cl.show(center, ACCEPTED);
+			main.remove(north);
+			
+		}
+		else{
+			btnVoteAgain.setVisible(false);
+			String rejectedReason="";
+			switch(responseTag){
+			case WRONG_OTP:
+				rejectedReason += "Wrong code. Please insert the correct one and vote again.";
+				otpField.setText("");
+				btnVoteAgain.setVisible(true);
+				break;
+			case INVALID_ELECTION_ID:
+				rejectedReason += "Invalid election identifier.";
+				break;
+			case ELECTION_OVER:
+				rejectedReason += "The voting phase is over.";	
+				break;
+			case ALREADY_VOTED:
+				rejectedReason += "You have already voted with a different " +
+						"ballot which has been collected properly.";	
+				break;
+//			case INVALID_VOTER_ID: //FIXME: do we still need this enum?
+//				rejectedReason += "Your identifier number is incorrect";
+//				break;
+			default:
+				rejectedReason += "I do not know the reason that your vote " +
+						"has not been collected. You should try asking a polling official!";
+			}
+			lblRejectedReason.setText(html(rejectedReason));
+			lblRejectedReason.setFont(new Font("Dialog", Font.PLAIN, 14));
+			cl.show(center, REJECTED);
+			if(responseTag!=Voter.ResponseTag.WRONG_OTP)
+				main.remove(north);
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	private class CopyButton extends AbstractAction{
 		public CopyButton(String name){
