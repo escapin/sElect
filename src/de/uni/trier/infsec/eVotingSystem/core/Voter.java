@@ -1,18 +1,9 @@
 package de.uni.trier.infsec.eVotingSystem.core;
 
-import java.util.Arrays;
-
-import de.uni.trier.infsec.eVotingSystem.bean.CollectingServerID;
-import de.uni.trier.infsec.eVotingSystem.bean.FinalServerID;
-import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
-// import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
 import de.uni.trier.infsec.functionalities.nonce.NonceGen;
-// import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
-import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.utils.MessageTools;
-import de.uni.trier.infsec.utils.Utilities;
 import static de.uni.trier.infsec.utils.MessageTools.intToByteArray;
 import static de.uni.trier.infsec.utils.MessageTools.byteArrayToInt;
 import static de.uni.trier.infsec.utils.MessageTools.concatenate;
@@ -73,13 +64,6 @@ public class Voter
 		
 	}
 
-	public static enum ResponseTag {
-		VOTE_COLLECTED, OTP_REQUEST_ACCEPTED, 
-		INVALID_ELECTION_ID, INVALID_VOTER_ID, 
-		ELECTION_OVER, ELECTION_NOT_STARTED, 
-		ALREADY_VOTED, WRONG_OTP,
-		UNKNOWN_ERROR; 
-	}
 
 	public class Error extends Exception {
 		public Error(String msg){
@@ -110,14 +94,8 @@ public class Voter
 	
 	/// STATE ///
 
-	private final ElectionManifest elManifest;	// election identifier
-
 	private final byte[] voterID;				// e-mail address (encoded as a bitstring) that identifies the voter
-	
-	// private final int voterID;			    // PKI identifier of a voter (we assume that a voter is already registered)
-	// private final Decryptor decryptor;		// decrytpror of the voter (containing her private decryption key)
-	// private final Signer signer;				// signer of a voter (containing her private signing key)
-
+	private final byte[] electionID;			// election identifier
 	private final Encryptor server1enc;			// encryptor of the first server (ballots collecting server)
 	private final Verifier server1ver;			// verifier of the first server
 	private final Encryptor server2enc;			// encryptor of the second server (the final server)
@@ -126,33 +104,18 @@ public class Voter
 
 	/// CONTRUCTOR(S) ///
 
-	public Voter(byte[] voterID, ElectionManifest elManifest) {
-		// TODO: Manifest should not be given here; the application should deal with it.
+	public Voter(byte[] voterID, byte[] electionID, Encryptor colServEnc, Verifier colServVerif, Encryptor finServEnc) {
 		this.voterID = voterID;
-		this.elManifest=elManifest;
-		CollectingServerID colSer = elManifest.collectingServer;
-		FinalServerID finSer = elManifest.finalServer;
-		this.server1enc = new Encryptor(colSer.encryption_key);
-		this.server1ver = new Verifier(colSer.verification_key);
-		this.server2enc = new Encryptor(finSer.encryption_key);
+		this.electionID = electionID;
+		this.server1enc = colServEnc;
+		this.server1ver = colServVerif;
+		this.server2enc = finServEnc;
 		this.noncegen = new NonceGen();
 		this.receipt = null;
 	}
 
 	/// METHODS ///
 
-	/**
-	 * Creates and returns an OTP request for the given voter id. The request is if the form
-	 * 
-	 *     ENC_S1(electionId, voterID, OTP_REQUEST, empty-message )
-	 * 
-	 */
-	public byte[] createOTPRequest() {
-		byte[] emptyMsg = {};
-		byte[] payload = concatenate(elManifest.electionID, concatenate(voterID, concatenate(Params.OTP_REQUEST, emptyMsg)));
-		byte[] encryptedPayload = server1enc.encrypt(payload);
-		return encryptedPayload;
-	}
 	
 	/**
 	 * Creates and returns a ballot containing the given vote. As a side effect, it 
@@ -175,7 +138,7 @@ public class Voter
 		byte[] nonce = noncegen.newNonce();
 		byte[] vote = intToByteArray(votersChoice);
 		byte[] innerBallot = server2enc.encrypt(concatenate(nonce, vote));
-		receipt = new Receipt(elManifest.electionID, votersChoice, nonce, innerBallot, null); // no server signature yet
+		receipt = new Receipt(electionID, votersChoice, nonce, innerBallot, null); // no server signature yet
 		return encapsulateInnerBallot(otp, innerBallot);
 	}
 
@@ -189,88 +152,18 @@ public class Voter
 		return encapsulateInnerBallot(otp, receipt.innerBallot);
 	}
 
-	
-	/**
-	 * Checks whether the response is correct (using the nonce previously
-	 * generated and used by method createBallot).
-	 *
-	 * The expected response is of the form
-	 *
-	 *    SIG_S1[ electionID, voterID, ACCEPTED, Sig_S1(ACCEPTED, electionID, inner_ballot) ]
-	 *    or
-	 *    SIG_S1[ electionID, voterID, REJECTED, rejectedReason ]
-	 *    or
-	 *    SIG_S1[ electionID, voterID, OTP_ACCEPTED, empty ]
-	 *
-	 * that is an encrypted signature of the collecting server on inner_ballot.
-	 * 
-	 * The method throws an error if the response is not well formed.
-	 * Otherwise, the method 
-	 */
-	public ResponseTag validateResponse(byte[] signedResponse) throws Error {
-		
-		// verify signature
-		byte[] response = first(signedResponse);
-		byte[] signature  = second(signedResponse);
-		if(!server1ver.verify(signature, response))
-			throw new MalformedMessage("Invalid signature in the server's response"); 
-		// checks the election ID:
-		byte[] elID = first(response);
-		if (!MessageTools.equal(elID, elManifest.electionID))
-			throw new MalformedMessage("Wrond election ID in the server's response");
-		// check the voter ID
-		byte[] voterID_tag_rest = second(response);	
-		byte[] voterID = first(voterID_tag_rest);
-		if (!MessageTools.equal(voterID, this.voterID))
-			throw new MalformedMessage("Wrong voter ID in the server's response"); 
-		// check the response tag
-		byte[] tag_rest = second(voterID_tag_rest);
-		byte[] tag = first(tag_rest);
-		
-		// Now, we proceed depending on the tag:
-	
-		// TODO: this look really bad:
-		if (Arrays.equals(tag, Params.REJECTED)){  // rejected
-			byte[] reason = second(tag_rest);
-			if (Utilities.arrayEqual(reason, Params.INVALID_ELECTION_ID))
-				return ResponseTag.INVALID_ELECTION_ID;
-			else if (Utilities.arrayEqual(reason, Params.INVALID_VOTER_ID))
-				return ResponseTag.INVALID_VOTER_ID;
-			else if (Utilities.arrayEqual(reason, Params.WRONG_OTP))
-				return ResponseTag.WRONG_OTP;
-			else if (Utilities.arrayEqual(reason, Params.ELECTION_OVER))
-				return ResponseTag.ELECTION_OVER;
-			else if (Utilities.arrayEqual(reason, Params.ELECTION_NOT_STARTED))
-				return ResponseTag.ELECTION_NOT_STARTED;
-			else if (Utilities.arrayEqual(reason, Params.ALREADY_VOTED))
-				return ResponseTag.ALREADY_VOTED;
-			else return ResponseTag.UNKNOWN_ERROR;
 
-		}
-		else if (Arrays.equals(tag, Params.ACCEPTED)){ // standard (cast ballot) request accepted -- a receipt expected
-			if(receipt==null)
-				throw new ReceiptError("Validating a responce without having any receipt");
-			
-			// verify the signature on the receipt
-			byte[] server_signature = second(tag_rest);
-			byte[] expected_signed_msg = concatenate(Params.ACCEPTED, concatenate(receipt.electionID, receipt.innerBallot));
-			if (!server1ver.verify(server_signature, expected_signed_msg))
-				throw new MalformedMessage("Wrong server's signature"); 
-			// TODO: apparently, the server does not need to send us back a signed message (including the message);
-			// is would be enough if it sent the signature only. 
-			
-			// store the signed receipt
-			receipt.serverSignature = server_signature;
-			return ResponseTag.VOTE_COLLECTED;
-		}
-		else if (Arrays.equals(tag, Params.OTP_ACCEPTED)){ // OTP request accepted
-			return ResponseTag.OTP_REQUEST_ACCEPTED;
-		}
-		else
-			throw new MalformedMessage("Unknown tag");
-		
+	// Checks if the signed receipt. If yes, the method saves the signature and return true 
+	public boolean validateReceipt(byte[] receiptSignature) {		
+		// verify the signature on the receipt
+		byte[] expectedSignature = concatenate(Params.ACCEPTED, concatenate(receipt.electionID, receipt.innerBallot));
+		if (!server1ver.verify(receiptSignature, expectedSignature))
+			return false; 
+		// store the signed receipt
+		receipt.serverSignature = receiptSignature;
+		return true;
 	}
-
+	
 
 	/**
 	 * Returns (a copy of) the receipt. A receipt contains data necessary for the verification procedure.
@@ -289,7 +182,7 @@ public class Voter
 	// Given innerBallot, returns  
 	//    ENC_S1(electionId, voterID, BALLOT, otp, inner_ballot)
 	private byte[] encapsulateInnerBallot(byte[] otp, byte[] innerBallot) {
-		byte[] unencryptedBallot =  concatenate( elManifest.electionID, 
+		byte[] unencryptedBallot =  concatenate( electionID, 
 									concatenate( voterID, 
 									concatenate( Params.CAST_BALLOT,
 									concatenate( otp, 
@@ -311,5 +204,4 @@ public class Voter
 	public byte[] getCSPublicKey() {
 		return this.server1enc.getPublicKey();
 	}
-
 }
