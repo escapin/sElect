@@ -1,5 +1,5 @@
 
-var PORT = 3111;
+var PORT = 3400;
 var MANIFEST_FILE = process.env.HOME + '/.eVotingSystem/Public/Manifest/ElectionManifest.json';
 
 // Read the manifest
@@ -18,4 +18,4 @@ else { // Initialization failed
 
 exports.port = PORT;
 exports.manifest = manifest;
-
+exports.colServURI = "http://localhost:3300/";  // FIXME Should be taken from the manifest

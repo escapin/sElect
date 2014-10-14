@@ -4,8 +4,8 @@ exports.otp = function otp(req, res)
 {
     var email = req.body.email;
     if (email) {
-        var otp = '444777'; // TODO: obtain it from the core
-        res.send({ ok: true, otp:otp }); 
+        // TODO: come by with an otp and send it via e-mail
+        res.send({ ok: true }); 
     }
     else {
         res.send({ ok: false }); 
@@ -16,9 +16,9 @@ exports.cast = function welcome(req, res)
 {
     var email = req.body.email;
     var otp = req.body.otp;
-    var choice = req.body.choice;
-    console.log(' * I got ', email, otp, choice);
-    if (email && otp && choice )
+    var ballot = req.body.ballot;
+    console.log(' * I got ', email, otp, ballot);
+    if (email && otp && ballot )
         res.send({ ok: true }); 
     else
         res.send({ ok: false }); 

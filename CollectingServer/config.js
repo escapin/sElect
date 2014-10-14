@@ -1,5 +1,5 @@
 
-var PORT = 3301;
+var PORT = 3300;
 var MANIFEST_FILE = process.env.HOME + '/.eVotingSystem/Public/Manifest/ElectionManifest.json';
 
 
