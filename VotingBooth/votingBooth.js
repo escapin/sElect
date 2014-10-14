@@ -5,6 +5,7 @@ var morgan = require('morgan'); // logging
 
 var config = require('./config');
 var routes = require('./routes');
+var _voter = require('./protocol/voter');
 
 // Check the manifest 
 

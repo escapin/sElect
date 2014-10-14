@@ -1,5 +1,7 @@
 var request = require('request-json');
+var java = require('java');
 var config = require('../config');
+var voter = require('../protocol/voter');
 
 var colServ = request.newClient(config.colServURI);
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -10,9 +12,9 @@ function renderError(res, error) {
     res.render('error',   {error: error} );
 }
 
-function createBallot(email, otp, choice) {
-    // TODO implement it
-    return "12fa7789ff8988";
+function createBallot(email, choice_nr, otp, callback) {
+    console.log('createBallot', choice_nr, otp);
+    var ballot = java.callMethod(voter.voter, "createBallot", choice_nr, otp, callback);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +62,7 @@ exports.cast = function cast(req, res)
 {
     var email = req.body.email;
     var otp   = req.body.otp;
-    var choice_nr = req.body.choice; 
+    var choice_nr = + req.body.choice; 
     if (!choice_nr) {
         renderError(res, "No candidate chosen");
         return;
@@ -76,41 +78,29 @@ exports.cast = function cast(req, res)
     }
 
     // create the ballot
-    var ballot = createBallot(email, otp, choice);
+    createBallot(email, choice_nr, otp, function (err, ballot){
 
-    // send the ballot to the collecting server
-    var data = { ballot:ballot, email:email, otp:otp };
-    console.log('Trying to send: ', data);
-    colServ.post('cast', data, function(err, otp_res, body){
-        if (err) {
-            renderError(res, "No responce from the collecting server. Ballot might have been not cast.");
-            return;
-        }
-        if (!body.ok) {
-            renderError(res, "Ballot not accepted by the collecting server");
-            console.log('body: ', body);
-            return
-        }
-        
-        console.log('The collecting server accepted a ballto reqest');
-        res.render('cast',   { title: "sElect Welcome", 
-                               email: req.body.email, 
-                               choice: choice,
-                               manifest: config.manifest });
+        // send the ballot to the collecting server
+        var data = { ballot:ballot, email:email, otp:otp };
+        console.log('Trying to send: ', data);
+        colServ.post('cast', data, function(err, otp_res, body){
+            if (err) {
+                renderError(res, "No responce from the collecting server. Ballot might have been not cast.");
+                return;
+            }
+            if (!body.ok) {
+                renderError(res, "Ballot not accepted by the collecting server");
+                console.log('body: ', body);
+                return
+            }
+            
+            console.log('The collecting server accepted a ballot reqest');
+            res.render('cast',   { title: "sElect Welcome", 
+                                   email: req.body.email, 
+                                   choice: choice,
+                                   manifest: config.manifest });
+        });
     });
 
-
-
-
-
-    // TODO create the ballot
-    //
-    // TODO cast the ballot (send it to the collecting server)
-    //
-    // TODO depending on the server's response:
-    //      - say that the ballot was cast, present the
-    //        receipt-id and allow the user to save the receipt
-    //      - report the problem and ask what to do (start again?)
-    
 }
 
