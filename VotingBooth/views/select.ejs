@@ -1,0 +1,25 @@
+<% include header -%>
+
+<h1> Select </h1>
+<h2> Election Title: <%= manifest.title %> </h2>
+<h2> Description: <%= manifest.description %> </h2>
+
+<p> Hello <%= email %> / <%= otp %> </p>
+
+<p> Make your choice </p>
+
+<form action="cast" method="post">
+      <input type="hidden" name="email" value="<%= email %>">
+      
+
+      <% for( var i=0; i<manifest.choicesList.length; ++i ) { %>
+
+          <input type="radio" name="choice" value="<%= i %>"> 
+            <%= manifest.choicesList[i] %> <br> 
+      <% } %>
+
+      <input type="submit" value="Submit"> 
+    </p>
+ </form>
+
+<% include footer -%>

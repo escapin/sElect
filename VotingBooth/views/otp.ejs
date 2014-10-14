@@ -1,0 +1,21 @@
+<% include header -%>
+
+<h1> Welcome (2) </h1>
+<h2> Election Title: <%= manifest.title %> </h2>
+<h2> Description: <%= manifest.description %> </h2>
+
+<p>
+  Hello <%= email %>
+</p>
+
+<form action="select" method="post">
+    <p> Please, enter our one time password (it should have been sent to you via e-mail):</p>
+    <p>
+      <input type="hidden" name="email" value="<%= email %>">
+      <input type="text" name="otp">
+      <input type="submit" value="Continue"> 
+    </p>
+ </form>
+
+<% include footer -%>
+
