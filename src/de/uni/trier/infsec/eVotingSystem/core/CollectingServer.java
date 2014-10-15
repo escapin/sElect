@@ -85,7 +85,7 @@ public class CollectingServer
 			return null;
 
 		// Collect the ballot if the voter votes for the first time (not if the voter re-votes)
-		if( storedInnerBallot.length != 0 ) {
+		if( storedInnerBallot.length == 0 ) {
 			voterInfo.put(voterID, innerBallot); // store the inner ballot under the voter's id
 			ballots[numberOfCastBallots++] = innerBallot; // add the inner ballot to the list of inner ballots
 		}
@@ -93,12 +93,7 @@ public class CollectingServer
 		// Create a receipt for the voter
 		byte[] elID_innerBallot = concatenate(electionID, innerBallot);
 		byte[] accepted_elID_innerBallot = concatenate(Params.ACCEPTED, elID_innerBallot);
-		System.out.println("Signature produced on: ");
-		System.out.println(Utilities.byteArrayToHexString(accepted_elID_innerBallot));
 		byte[] receipt = signer.sign(accepted_elID_innerBallot);
-		System.out.println(signer);
-		System.out.println("Produced signature: ");
-		System.out.println(Utilities.byteArrayToHexString(receipt));
 
 		return receipt;
 	}

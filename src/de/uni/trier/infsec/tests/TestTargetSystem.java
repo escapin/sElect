@@ -60,7 +60,6 @@ public class TestTargetSystem extends TestCase
 		byte[] signature = colServSigner.sign(message);
 		boolean ok = colServVerif.verify(signature, message);
 		assertTrue(ok);
-		System.out.println(colServSigner);
 	}
 
 	@Test
@@ -73,10 +72,19 @@ public class TestTargetSystem extends TestCase
 		byte[] receipt = colServer.collectBallot("voter1", innerBallot);
 		assertNotNull(receipt);
 
+		// Re-vote with a different ballot
+		byte[] receipt0 = colServer.collectBallot("voter1", innerBallot);
+		assertNotNull(receipt);
+		assertTrue( MessageTools.equal(receipt, receipt0) );
+
+		
+		// Try to re-vote with a different ballot
+		byte[] anotherBallot = Voter.createBallot(2, finServEnc);
+		byte[] anotherReceipt = colServer.collectBallot("voter1", anotherBallot);
+		assertNull(anotherReceipt);
+				
 		// Deliver the response message back to the voter
-		System.out.println("I'm here");
 		boolean receiptOK =  Voter.validateReceipt(receipt, electionID, innerBallot, colServVerif);
-		System.out.println("I'm done");
 		assertTrue( receiptOK );
 		
 		// Create another ballot

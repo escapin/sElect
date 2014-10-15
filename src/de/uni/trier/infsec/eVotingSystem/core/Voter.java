@@ -37,9 +37,6 @@ public class Voter
 	public static boolean validateReceipt(byte[] receipt, byte[] electionID, byte[] ballot, Verifier colServVerif) {		
 		// verify the signature on the receipt
 		byte[] expectedMessage = concatenate(Params.ACCEPTED, concatenate(electionID, ballot));
-		System.out.println("Expected message and receipt: ");
-		System.out.println(Utilities.byteArrayToHexString(expectedMessage));
-		System.out.println(Utilities.byteArrayToHexString(receipt));
 		return colServVerif.verify(receipt, expectedMessage);
 	}
 }
