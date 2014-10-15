@@ -60,7 +60,7 @@ exports.cast = function cast(req, res)
         renderError(res, "No candidate chosen");
         return;
     }
-    var choice = manifest.choicesList[choice_nr];
+    var choice = config.manifest.choicesList[choice_nr];
     if (!choice) {
         renderError(res, "Wrong candidate number");
         return;
@@ -70,16 +70,18 @@ exports.cast = function cast(req, res)
         return;
     }
 
-    // create the ballot
-    voter.createBallot(choice_nr, function (err, ballot){
+    // Create the ballot (async Java call)
+    voter.createBallot(choice_nr, function (err, ballot) {
+        if (err) {
+            console.log('Internal error:', err)
+            renderError(res, "Internal error: cannot create a ballot.");
+            return;
+        }
 
-        console.log(' ...ballot created?');
-
-        // send the ballot to the collecting server
+        // Send the ballot to the collecting server (and obtain a receipt):
         var data = { ballot:ballot, email:email, otp:otp };
-        console.log('Trying to send: ', data);
-        colServ.post('cast', data, function(err, otp_res, body){
-            console.log('Response body: ', body);
+        console.log('Sending: ', data);
+        colServ.post('cast', data, function(err, otp_res, body) {
             if (err) {
                 renderError(res, "No responce from the collecting server. Ballot might have been not cast.");
                 return;
@@ -90,11 +92,28 @@ exports.cast = function cast(req, res)
                 return
             }
             
-            console.log('The collecting server accepted a ballot reqest');
-            res.render('cast',   { title: "sElect Welcome", 
-                                   email: req.body.email, 
-                                   choice: choice,
-                                   manifest: config.manifest });
+            var receipt = body.receipt;
+            console.log('The collecting server accepted a ballot reqest. Receipt = ', receipt);
+
+            // Check the receipt (async Java call):
+            voter.validateReceipt(receipt, config.manifest.electionID, ballot, function(err, recOK) {
+
+                if (err) {
+                    console.log('Internal error:', err)
+                    renderError(res, "Internal error: no receipt validated.");
+                    return;
+                }
+
+                if (!recOK) {
+                    console.log('Receipt not valid!');
+                    renderError(res, "Invalid receipt");
+                }
+                else {
+                    console.log('Receipt ok');
+                    res.render('cast', { title: "sElect Welcome", email: req.body.email, 
+                                         choice: choice, manifest: config.manifest });
+                }
+            });
         });
     });
 }
