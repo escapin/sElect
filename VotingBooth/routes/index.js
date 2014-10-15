@@ -4,17 +4,12 @@ var config = require('../config');
 var voter = require('../protocol/voter');
 
 var colServ = request.newClient(config.colServURI);
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Helper functions
 
-
 function renderError(res, error) {
     res.render('error',   {error: error} );
-}
-
-function createBallot(email, choice_nr, otp, callback) {
-    console.log('createBallot', choice_nr, otp);
-    var ballot = java.callMethod(voter.voter, "createBallot", choice_nr, otp, callback);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -32,26 +27,24 @@ exports.prompt_for_otp = function prompt_for_otp(req, res)
 
     // Send the otp request to the collecting server:
     var data = { email:email };
-    console.log('Trying to send: ', data);
+    console.log('Sending an otp request: ', data);
     colServ.post('otp', data, function(err, otp_res, body){
         if(err) {
-            renderError(res, "No otp responce from the collecting server");
+            renderError(res, " ...No otp responce from the collecting server");
         }
         else if (!body.ok) {
-            renderError(res, "ERROR otp responce from the collecting server");
+            renderError(res, " ...ERROR otp responce from the collecting server");
         }
         else {
-            console.log('The collecting server accepted an otp reqest');
+            console.log(' ...The collecting server accepted an otp reqest');
             // Render the page (prompting for the otp):
             res.render('otp', {title: "sElect Welcome", email:email, manifest: config.manifest});
         }
     });
 }
 
-
 exports.select = function select(req, res) 
 {
-    // render the page
     res.render('select', { title: "sElect Welcome", 
                            email: req.body.email, 
                            otp:   req.body.otp,
@@ -62,7 +55,7 @@ exports.cast = function cast(req, res)
 {
     var email = req.body.email;
     var otp   = req.body.otp;
-    var choice_nr = + req.body.choice; 
+    var choice_nr = +req.body.choice; // conversion to int
     if (!choice_nr) {
         renderError(res, "No candidate chosen");
         return;
@@ -73,17 +66,20 @@ exports.cast = function cast(req, res)
         return;
     }
     if (!email || !otp || !choice ) {
-        renderError(res, "Internal Error");
+        renderError(res, "Internal Error"); // this should not happen
         return;
     }
 
     // create the ballot
-    createBallot(email, choice_nr, otp, function (err, ballot){
+    voter.createBallot(choice_nr, function (err, ballot){
+
+        console.log(' ...ballot created?');
 
         // send the ballot to the collecting server
         var data = { ballot:ballot, email:email, otp:otp };
         console.log('Trying to send: ', data);
         colServ.post('cast', data, function(err, otp_res, body){
+            console.log('Response body: ', body);
             if (err) {
                 renderError(res, "No responce from the collecting server. Ballot might have been not cast.");
                 return;
@@ -101,6 +97,5 @@ exports.cast = function cast(req, res)
                                    manifest: config.manifest });
         });
     });
-
 }
 
