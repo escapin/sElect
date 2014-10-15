@@ -6,25 +6,25 @@ import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
 import de.uni.trier.infsec.utils.Utilities;
 
 public class VoterWrapper {
-	private Voter voter;
 	
-	public VoterWrapper(String email, String electionID, String colServEncKey, String colServVerifKey, String finServEncKey ) {
-		Encryptor colServEnc = new Encryptor(Utilities.hexStringToByteArray(colServEncKey));
-		Verifier colServVerif = new Verifier(Utilities.hexStringToByteArray(colServVerifKey));
-		Encryptor finServEnc = new Encryptor(Utilities.hexStringToByteArray(finServEncKey));
-		voter = new Voter(	Utilities.stringAsBytes(email), 
-							Utilities.hexStringToByteArray(electionID),
-							colServEnc, colServVerif, finServEnc );
-	}
+	private static String string(byte[] message) { return Utilities.byteArrayToHexString(message); }
+	private static byte[] message(String str)    { return Utilities.hexStringToByteArray(str); } 
 	
-	public String createBallot(int votersChoice, String otp) {
-		System.out.println("-- FROM JAVA --");
-		System.out.println(votersChoice);
-		System.out.println(otp);
-		System.out.println("-- END FROM JAVA --");
+	private Verifier  colServVerif;
+	private Encryptor finServEnc;
+	
 		
-		byte[] ballot = voter.createBallot(votersChoice, Utilities.hexStringToByteArray(otp));
-		return Utilities.byteArrayToHexString(ballot);
+	public VoterWrapper(String colServVerifKey, String finServEncKey ) {
+		colServVerif = new Verifier(message(colServVerifKey));
+		finServEnc = new Encryptor(message(finServEncKey));		
 	}
 	
+	public String createBallot(int votersChoice) {	
+		byte[] ballot = Voter.createBallot(votersChoice, finServEnc);
+		return string(ballot);
+	}
+	
+	public boolean validateReceipt(String receipt, String electionID, String ballot) {
+		return Voter.validateReceipt( message(receipt), message(electionID), message(ballot), colServVerif);
+	}
 }

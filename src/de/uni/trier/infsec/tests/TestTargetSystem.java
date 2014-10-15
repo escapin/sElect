@@ -25,25 +25,26 @@ import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.utils.Utilities;
 
-
-
 public class TestTargetSystem extends TestCase  
 {
-	private static Decryptor decryptorCS;
-	private static Signer signerCS;
-	private static ElectionManifest manifest; 
+	private static String[] voterIdentifiers = {"voter1", "voter2"};
+	private byte[] electionID = {100};
+
+	private static byte[] colServerVerifKey =  Utilities.hexStringToByteArray("305C300D06092A864886F70D0101010500034B003048024100863DD199FAAF19FDAA696E8ADECB5D1324B49E6AE904646875AEC215A48A69FB34996431C1938CA1A6796FD3FA65759E4A44A1D1313ABFFF9DEEF72404ACA0810203010001");
+	private static byte[] colServerSignKey = Utilities.hexStringToByteArray("30820154020100300D06092A864886F70D01010105000482013E3082013A020100024100863DD199FAAF19FDAA696E8ADECB5D1324B49E6AE904646875AEC215A48A69FB34996431C1938CA1A6796FD3FA65759E4A44A1D1313ABFFF9DEEF72404ACA08102030100010240363F7D1870899A433C3E67018F8F3709A967A42D2805325E54504EF6580BE74F998BA32A3F126FC9795C86929CF6126E66A623B23E11BAA906EB558AEA6585D1022100D382F7ADB8D8891AB25922EADB6423F71F89A3994D7D00A5572191F8C0EB23CF022100A27A2C1EDD7F2208DB3ECEC16AB44DEFC4E1CA35DCAA7258227E16CFF059FAAF02202BF9DCF937A77DCA192EC33DC563AABEA4C5FF47CE7EA0F5BF89F149A102C2AD022048AF2AE9ABE0E1D2E071DA808041A4D3EC59ADE22693418FD7EE5C3A2DA5B315022100B869F084B862822A28D533C71FFA7799569C1CE8BBBA0A7F534AE4365393C6CA");
+
+	private static byte[] finServEncrKey = Utilities.hexStringToByteArray("30819F300D06092A864886F70D010101050003818D003081890281810098C905F5200DCCD9060CFB8C8075E938216AC213A1F11690ACA5857D941D0AD40F83BC7DE1C983F8714343D4BFA490529AC35522A85B34BE4D57A9F2969A156F8A8A2B0896809D1F26D471BCFF1532ED3A3D21E8CC6C9622706FBAAC03FEB0D2CAE121AF4A97581656B0489B6925A6AF68A879228A4275D590460EDA4BB8F42D0203010001");
+	private static byte[] finServDecrKey = Utilities.hexStringToByteArray("30820277020100300D06092A864886F70D0101010500048202613082025D0201000281810098C905F5200DCCD9060CFB8C8075E938216AC213A1F11690ACA5857D941D0AD40F83BC7DE1C983F8714343D4BFA490529AC35522A85B34BE4D57A9F2969A156F8A8A2B0896809D1F26D471BCFF1532ED3A3D21E8CC6C9622706FBAAC03FEB0D2CAE121AF4A97581656B0489B6925A6AF68A879228A4275D590460EDA4BB8F42D02030100010281801AE2FD5E66B6A6FEE616B0C9C7ED780E3DAB38DE1598849D0F14CDCA0C9F93C13FBDB21500FFE26E7D18163EC13EE77AF1EB3FF72A636A83B6BE9F94A636156155A7A9A543BC067B987BCEB02F6B8366F0CCDC064DE6AB8EE0BD85DE6E54A8B69319A5CF62B49F11C85376CE15C09248E4CB6BC348BD15AF8ED1128235A44F61024100F12CE485DAB353E6E27EE7C90E7ED1B35F07EFDAAC5682F41DAFDBA5D7C117A361B90688D132EE005F7BB45AE9166F55FB281EB685CB5C36B6B065D45EE3CE19024100A22D3BEC9B0DFC675EBD654887E3DA145C5AFAA00D1BB3EBB3F12857A77A3218A9ADCD371C51C066D2382C1184C5DA8E0884FAE450A3435641081A05CF90B1350241009FEBD5C8D081731439824F2E29F77C1405E2DC705330B67B2B284E6CC5095C24518B8042BEFD978615CA90886BE11D889517406E657FB8B0EB29430CB4B3381902403D7C66DEC2BE9FB6553DFB3B6F81DC79A1B6409513C33008A9F541755222CB017CBB4F3598C009F131BC6840D014EF52B03A32A1034D92C70DEAD36AE692160D024100EC89BC4437462781DDCBB184AE2A6CD2783362C004BE40C90F588B2FA7DD6434FF6E90EDF350195092EDCC28AF9ADEC08258405E91AA7CFBA319B6E045E1517C");
+	private static byte[] finServVerifKey = Utilities.hexStringToByteArray("305C300D06092A864886F70D0101010500034B00304802410085F2AFD26CF40CFFBEB2DF88E08E8D774FE8525E28BFCC1103B4335512FD27DA02E2060A2F8266F3638CD8F3A25DA9725053054C008AEAE9C39A9ADAB6EE42050203010001");
+	private static byte[] finServSignKey = Utilities.hexStringToByteArray("30820154020100300D06092A864886F70D01010105000482013E3082013A02010002410085F2AFD26CF40CFFBEB2DF88E08E8D774FE8525E28BFCC1103B4335512FD27DA02E2060A2F8266F3638CD8F3A25DA9725053054C008AEAE9C39A9ADAB6EE420502030100010240646DC637BE2AE94822C1D869B6FC0AC3272D67FC630F12C0BB0733E9985828B4EA03CA071B8B06A27F7782CF8F00FAF0A3C551CEDF089B422C919096374B0C21022100DB51FB355F2E516AA8739BF41650C636480990EBC84EE125A63ED8CC2E36400D0221009C598FDA02A3D631C02AF4ADCDE95087BE966AF33A98EB4CB197AFDD67B513D902203CACF295B26E6B01D9F699F7AE50CC7569FA9388579353008A7CAA97DA5511E502205FBADAC052837C3FA3F8E92D8DF9402C8D3E4E27B506327417FCD75A4A086E29022100C258801F21F906FECB23C1D28BA412D3C879CF0BC1B641236BE1E53118DFEA9D");
+
+	private static Verifier colServVerif = new Verifier(colServerVerifKey);
+	private static Signer colServSigner = new Signer(colServerVerifKey, colServerSignKey);
+	private static Encryptor finServEnc = new Encryptor(finServEncrKey);
+
 	private static CollectingServer colServer;
 	private static FinalServer finServer;
-	private static Verifier finServVerif;
-	// private byte[] electionID = {100};
-	// private byte[] electionID2 = {101};
-
-	@Test
-	public void testKeysConsistency() throws Exception {
-		Voter voter = createVoter("a@b.c");
-		Encryptor encryptorCS = decryptorCS.getEncryptor();
-		assertTrue( MessageTools.equal(encryptorCS.getPublicKey(), voter.getCSPublicKey()));
-	}
+	
 
 	@Test
 	public void testStringBytesConversion() throws Exception {
@@ -52,55 +53,49 @@ public class TestTargetSystem extends TestCase
 		String c = new String(b, Charset.forName("UTF-8"));
 		assertEquals(a,c);
 	}
+	
+	@Test
+	public  void testKeys() throws Exception {
+		byte[] message = {1,2,3};
+		byte[] signature = colServSigner.sign(message);
+		boolean ok = colServVerif.verify(signature, message);
+		assertTrue(ok);
+		System.out.println(colServSigner);
+	}
 
 	@Test
 	public void testClientServerStandardExhange() throws Exception
 	{
-		// (the servers are already created by the setup)
-		// Create a voter
-		Voter voter = createVoter("a@b.c");
-
-
-		// OTP EXCHANGE
-
-		// Obtain an otp request from the voter
-		byte[] otpReq = voter.createOTPRequest();
+		// Make the voter create an inner ballot
+		byte[] innerBallot = Voter.createBallot(2, finServEnc);
 
 		// Deliver it to the collecting server
-		CollectingServer.Response otpResponse = colServer.processRequest(otpReq);
-		// Let's check in on the server side. It should be an otp response:
-		assertNotNull(otpResponse);
-		assertTrue(otpResponse.otp_response);
-		assertNotNull(otpResponse.responseMsg);
-		byte[] otp = otpResponse.otp;
-		assertNotNull(otp);
-		System.out.println(otpResponse.email);
-		assertEquals("a@b.c", otpResponse.email);
-
-		// Deliver the response message (not the otp) back to the voter
-		Voter.ResponseTag respTag = voter.validateResponse(otpResponse.responseMsg);
-		assertTrue( respTag == Voter.ResponseTag.OTP_REQUEST_ACCEPTED );
-
-
-		// BALLOT CASTING EXCHANGE
-
-		// Make the voter create a ballot
-		byte[] ballot = voter.createBallot(2, otp);
-
-		// Deliver it to the collecting server
-		CollectingServer.Response ballotResponse = colServer.processRequest(ballot);
-		// Check in on the server side. It should be an otp response:
-		assertNotNull(ballotResponse);
-		assertFalse(ballotResponse.otp_response);
-		assertNotNull(ballotResponse.responseMsg);
-		assertNull(ballotResponse.otp);
+		byte[] receipt = colServer.collectBallot("voter1", innerBallot);
+		assertNotNull(receipt);
 
 		// Deliver the response message back to the voter
-		respTag = voter.validateResponse(ballotResponse.responseMsg);
-		// For the following to hold true, one needs to make sure that the start and end time in the manifest
-		// are set correctly (and the ballot is not rejected because it is too early or too late).
-		assertTrue( respTag == Voter.ResponseTag.VOTE_COLLECTED );
+		System.out.println("I'm here");
+		boolean receiptOK =  Voter.validateReceipt(receipt, electionID, innerBallot, colServVerif);
+		System.out.println("I'm done");
+		assertTrue( receiptOK );
+		
+		// Create another ballot
+		byte[] innerBallot2 = Voter.createBallot(5, finServEnc);
 
+		// Deliver it to the collecting server
+		byte[] receipt2 = colServer.collectBallot("voter2", innerBallot2);
+		assertNotNull(receipt2);
+
+		// Deliver the response message back to the voter
+		boolean receipt2OK =  Voter.validateReceipt(receipt2, electionID, innerBallot2, colServVerif);
+		assertTrue( receipt2OK );
+		
+		// Check a wrong receipt
+		boolean receipt3OK =  Voter.validateReceipt(receipt, electionID, innerBallot2, colServVerif);
+		assertFalse( receipt3OK );
+		
+
+		/*
 		// Let's try to re-vote (using the same inner ballot)
 		byte[] ballot1 = voter.reCreateBallot(otp);
 		ballotResponse = colServer.processRequest(ballot1);
@@ -127,8 +122,10 @@ public class TestTargetSystem extends TestCase
 		Helper.FinalEntry[] fes = Helper.finalResultAsText(finalResult, finServVerif, manifest.electionID);
 		assertTrue( fes.length == 1 );
 		assertTrue( fes[0].vote.equals("2") );
+		*/
 	}
 
+	/*
 	@Test
 	public void testClientServerProblems() throws Exception {
 		Voter.ResponseTag respTag;
@@ -169,6 +166,7 @@ public class TestTargetSystem extends TestCase
 		respTag = voter3.validateResponse(otpResponse.responseMsg);
 		assertTrue(respTag == Voter.ResponseTag.INVALID_VOTER_ID);		
 	}
+	*/
 
 
 	/*
@@ -379,10 +377,8 @@ public class TestTargetSystem extends TestCase
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		manifest = AppUtils.retrieveElectionManifest();	
 		colServer = createCollectingServer();
-		finServer = createFinalServer();
-		finServVerif = new Verifier(manifest.finalServer.verification_key);
+		// finServer = createFinalServer();
 	}
 	//	dbFile = new File(PKIServerCore.DEFAULT_DATABASE + "-journal");
 	//	if (dbFile.exists())
@@ -403,13 +399,11 @@ public class TestTargetSystem extends TestCase
 		Keys k = KeysParser.parseJSONString(keyJSON);
 		if(k.encrKey==null || k.decrKey==null || k.signKey==null || k.verifKey==null)
 			errln("Invalid Collecting Server's keys.");
-
-		// create the functionalities and the server 
-		decryptorCS = new Decryptor(k.encrKey, k.decrKey);
-		signerCS = new Signer(k.verifKey, k.signKey);
-		return new CollectingServer(manifest, decryptorCS, signerCS);		
+		
+		return new CollectingServer(colServSigner, electionID, voterIdentifiers);
 	}
 
+	/*
 	private FinalServer createFinalServer() throws Exception {
 		// read the private key
 		String filename = AppParams.PRIVATE_KEY_path + "FinalServer_PR.json";
@@ -428,9 +422,6 @@ public class TestTargetSystem extends TestCase
 		Signer signer = new Signer(k.verifKey, k.signKey);
 		return new FinalServer(manifest, decryptor, signer);		
 	}
+	*/
 
-	private Voter createVoter(String email) throws Exception {
-		byte[] id = Utilities.stringAsBytes(email);
-		return new Voter(id, manifest);		
-	}
 }

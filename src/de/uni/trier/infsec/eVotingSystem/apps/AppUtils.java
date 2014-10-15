@@ -1,8 +1,6 @@
 package de.uni.trier.infsec.eVotingSystem.apps;
 
 
-import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readBytesFromFile;
-import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readCharsFromFile;
 import static de.uni.trier.infsec.eVotingSystem.core.Utils.errln;
 
 import java.io.BufferedReader;
@@ -23,8 +21,6 @@ import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifestParser;
 import de.uni.trier.infsec.eVotingSystem.parser.Keys;
 import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
-import de.uni.trier.infsec.utils.Utilities;
-
 
 public class AppUtils 
 {
