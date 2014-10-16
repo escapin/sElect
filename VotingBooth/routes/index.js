@@ -76,6 +76,7 @@ exports.cast = function cast(req, res)
     }
 
     // Create the ballot (async Java call)
+    console.log('Create ballot for %s with choice %d', email, choice_nr);
     voter.createBallot(choice_nr, function (err, ballot) {
         if (err) {
             console.log('Internal error:', err)
@@ -98,9 +99,10 @@ exports.cast = function cast(req, res)
             }
             
             var receipt = body.receipt;
-            console.log('The collecting server accepted a ballot reqest. Receipt = ', receipt);
+            console.log('The collecting server accepted the ballot reqest. Receipt = ', receipt);
 
             // Check the receipt (async Java call):
+            console.log('Validate receipt for', email);
             voter.validateReceipt(receipt, manifest.electionID, ballot, function(err, recOK) {
 
                 if (err) {

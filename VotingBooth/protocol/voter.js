@@ -17,22 +17,5 @@ var voterWrapper = java.newInstanceSync("de.uni.trier.infsec.eVotingSystem.wrapp
                                          colSerVerKey, finSerEncKey);
 console.log(' ...VoterWrapper created');
 
-// Calling Java to create a ballot
-function createBallot( choice_nr, callback) {
-    console.log('Call Java to create a ballot for choice_nr = ', choice_nr);
-    //java.callMethod(voterWrapper, "createBallot", choice_nr, callback);
-    voterWrapper.createBallot(choice_nr, callback);
-}
-
-// Calling Java to validate a receipt
-function validateReceipt(receipt, electionID, ballot, callback) {
-    console.log('Call Java to validate a receipt');
-    voterWrapper.validateReceipt(receipt, electionID, ballot, callback);
-}
-
-
-// EXPORTS
-
-exports.createBallot = createBallot;
-exports.validateReceipt = validateReceipt;
+module.exports = voterWrapper;
 
