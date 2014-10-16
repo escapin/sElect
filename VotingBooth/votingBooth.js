@@ -40,6 +40,6 @@ app.post('/cast', routes.cast);
 
 var server = app.listen(config.port, function() {
     console.log('Voting Booth running for election "%s" [%s]', manifest.title, manifest.electionID);
-    console.log('Listening on %s, port %d', server.address().address, server.address().port);
+    console.log('Listening on %s, port %d\n', server.address().address, server.address().port);
 });
 

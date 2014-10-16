@@ -1,5 +1,4 @@
 var java = require("java");
-var expandHomeDir = require('expand-home-dir')
 var config = require("./config");
 var manifest = require("./manifest")
 
@@ -9,14 +8,9 @@ for (var i=0; i<config.class_paths.length; ++i) {
     java.classpath.push(path);
 }
 
-// Read the private key of the collecting server
-var priv_key_file= expandHomeDir(config.PRIVATE_KEY_FILE);
-var colServPR = require(priv_key_file);
-var signingKey = colServPR.signatureKey;
-
 // Cryptographic Keys:
 var colSerVerKey = manifest.collectingServer.verification_key;
-var colSerSigKey = signingKey;
+var colSerSigKey = config.signingKey;
 
 // Create the list (map) of eligible voters. Usage if (eligibleVoters[v]) ...
 var eligibleVoters = {};
@@ -25,7 +19,6 @@ for( var i=0; i<manifest.votersList.length; ++i ) {
     var voter_id = manifest.votersList[i].email;
     eligibleVoters[voter_id] = true;
     listOfEligibleVoters.push(voter_id);
-    console.log(' -', voter_id);
 }
 var voterIdentifiers = java.newArray("java.lang.String", listOfEligibleVoters); 
 

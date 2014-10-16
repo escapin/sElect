@@ -1,0 +1,43 @@
+{
+    "startTime": "2014.10.08 at 15:10",
+    "endTime": "2014.10.08 at 15:15",
+ 
+    "electionID": "7AF3AE0BE3FF35170257C9BEFBA8D6A4",
+    
+    "description": "This is the election for the best RS3 project",
+    "title": "Best RS3 project",
+    
+    "headline": "Which is the best RS3 project?",
+    
+     "votersList": [
+	 {"email": "scapin.enrico@gmail.com"},
+	 {"email": "scapin@uni-trier.de"},
+	 {"email": "truderung@uni-trier.de"},
+	 {"email": "ttruderung@gmail.com"}
+     ],
+
+    "choicesList": [
+     "DeduSec (Verication of Security Properties)",
+     "IFlow (Developing Systems with Secure IFlow)",
+     "ALBIA (Logic-Based Information Flow Analysis)",
+     "Analysis of E-Voting Systems",
+     "IFC for JavaScript",
+     "IFC for Mobile Components",
+     "MORES (Data & Processes Security Requirements)",
+     "MoVeSPAcI (Verication of Security Properties)",
+     "RSCP (Security for Concurrent Programs)",
+     "SecDed (Secure Type Systems and Deduction)",
+     "SpAGAT (IFlow in Shared Document Bases)",
+     "SADAN (Data-driven Usage Control)"
+    ],
+
+    "collectingServer": {
+        "verification_key":  "305C300D06092A864886F70D0101010500034B003048024100863DD199FAAF19FDAA696E8ADECB5D1324B49E6AE904646875AEC215A48A69FB34996431C1938CA1A6796FD3FA65759E4A44A1D1313ABFFF9DEEF72404ACA0810203010001",
+        "URI": "http://136.199.52.37:3300"
+    },
+    "finalServer": {
+        "encryption_key" : "30819F300D06092A864886F70D010101050003818D003081890281810098C905F5200DCCD9060CFB8C8075E938216AC213A1F11690ACA5857D941D0AD40F83BC7DE1C983F8714343D4BFA490529AC35522A85B34BE4D57A9F2969A156F8A8A2B0896809D1F26D471BCFF1532ED3A3D21E8CC6C9622706FBAAC03FEB0D2CAE121AF4A97581656B0489B6925A6AF68A879228A4275D590460EDA4BB8F42D0203010001",
+        "verification_key" : "305C300D06092A864886F70D0101010500034B00304802410085F2AFD26CF40CFFBEB2DF88E08E8D774FE8525E28BFCC1103B4335512FD27DA02E2060A2F8266F3638CD8F3A25DA9725053054C008AEAE9C39A9ADAB6EE42050203010001",
+        "URI": "http://136.199.52.37:3301"
+    }
+}

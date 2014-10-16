@@ -44,6 +44,8 @@ exports.prompt_for_otp = function prompt_for_otp(req, res)
     });
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+
 exports.select = function select(req, res) 
 {
     res.render('select', { title: "sElect Welcome", 
@@ -51,6 +53,8 @@ exports.select = function select(req, res)
                            otp:   req.body.otp,
                            manifest: manifest});
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////
 
 exports.cast = function cast(req, res) 
 {
@@ -62,7 +66,6 @@ exports.cast = function cast(req, res)
     }
     var choice_nr = +req.body.choice; // conversion to int
     var choice = manifest.choicesList[choice_nr];
-    console.log('CHOICES: ', choice_nr, choice);
     if (!choice) {
         renderError(res, "Wrong candidate number");
         return;
@@ -111,7 +114,7 @@ exports.cast = function cast(req, res)
                     renderError(res, "Invalid receipt");
                 }
                 else {
-                    console.log('Receipt ok');
+                    console.log(' ...Receipt ok');
                     res.render('cast', { title: "sElect Welcome", email: req.body.email, 
                                          choice: choice, manifest: manifest });
                 }

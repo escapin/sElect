@@ -1,11 +1,9 @@
 var fs = require('fs');
 var config = require('./config.json')
-var expandHomeDir = require('expand-home-dir')
 
 var manifest = null;
 
-console.log('read manifest from', config.MANIFEST_FILE);
-var manifest_file = expandHomeDir(config.MANIFEST_FILE);
+var manifest_file = config.MANIFEST_FILE;
 console.log('Read manifest from:', manifest_file);
 if (fs.existsSync(manifest_file)) {
     manifest = require(manifest_file);

@@ -64,7 +64,7 @@ exports.cast = function cast(req, res)
     var email = req.body.email;
     var otp = req.body.otp;
     var ballot = req.body.ballot;
-    console.log('BALLOT COMMING:', email, otp, ballot);
+    console.log('BALLOT COMING:', email, otp, ballot);
 
     // make sure that we have all the pieces:
     if (!email || !otp || !ballot ) {

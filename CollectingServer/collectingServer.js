@@ -18,7 +18,7 @@ app.post('/cast', routes.cast);
 
 // STARTING THE SERVER
 var server = app.listen(config.port, function() {
-    console.log('sElect Collecting Server running for election "%s" [%s]', manifest.title, manifest.electionID);
-    console.log('Listening on %s, port %d', server.address().address, server.address().port);
+    console.log('Collecting Server running for election "%s" [%s]', manifest.title, manifest.electionID);
+    console.log('Listening on %s, port %d\n', server.address().address, server.address().port);
 });
 

@@ -1,6 +1,6 @@
 {
     "port" : 3400,
-    "MANIFEST_FILE" : "~/.eVotingSystem/Public/Manifest/ElectionManifest.json",
+    "MANIFEST_FILE" : "../test/ElectionManifest.json",
     "class_paths" : ["../bin", "../lib/bcprov-jdk16-146.jar"],
     "colServURI"  : "http://localhost:3300"
 }
