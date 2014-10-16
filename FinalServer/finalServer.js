@@ -13,13 +13,10 @@ app.use(bodyParser.json());
 app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging (onto console)
 
 // ROUTES
-app.post('/otp', routes.otp);
-app.post('/cast', routes.cast);
-app.get('/close', routes.close);
+app.post('/data', routes.process);
 
 // STARTING THE SERVER
 var server = app.listen(config.port, function() {
-    console.log('Collecting Server running for election "%s" [%s]', manifest.title, manifest.electionID);
+    console.log('Final Server running for election "%s" [%s]', manifest.title, manifest.electionID);
     console.log('Listening on %s, port %d\n', server.address().address, server.address().port);
 });
-

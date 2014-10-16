@@ -23,6 +23,10 @@ public class CollectingServerWrapper
 		return receipt!=null ? string(receipt) : "";
 	}
 
+	public String getResult() {
+		return string(cs.getResult()); 
+	}
+	
 	public String getFreshOTP() {
 		return string(nonceGen.newNonce());
 	}

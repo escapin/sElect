@@ -5,6 +5,8 @@
 
     "class_paths" : ["../bin", "../lib/bcprov-jdk16-146.jar"],
 
+    "finalServURI"  : "http://localhost:3301",
+
     "smtp_host" : "infsec.uni-trier.de",
     "smtp_port" : 25,
     "smtp_user" : "evoting@infsec.uni-trier.de",

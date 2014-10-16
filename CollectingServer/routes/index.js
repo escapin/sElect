@@ -1,3 +1,4 @@
+var request = require('request-json');
 var config = require('../config');
 var manifest = require('../manifest');
 var server = require('../server');
@@ -102,4 +103,35 @@ exports.cast = function cast(req, res)
     }
 };
 
+
+///////////////////////////////////////////////////////////////////////////////////////
+// ROUTE end
+//
+
+var finServ = request.newClient(config.finalServURI);
+
+exports.close = function close(req, res)  {
+    res.send({ ok: true, info: "triggered to close the election" }); 
+    console.log('Closing election.');
+    console.log('Getting the result...');
+    server.getResult(function(err, result) {
+        if (err) {
+            console.log(' ...Internal error. Cannot fetch the result: ', err);
+        }
+        else { 
+            console.log('Result:', result);
+            console.log('Sending result to the final server');
+            var data = {data: result}
+            finServ.post('data', data, function(err, otp_res, body){
+                if (err) {
+                    console.log(' ...Error: Cannot send the result to the final server: ', err);
+                }
+                else {
+                    console.log(' ...Result sent to the final server.');
+                    console.log(' ...Response:', body);
+                }
+            });
+        }
+    })
+}
 
