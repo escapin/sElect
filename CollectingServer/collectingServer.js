@@ -16,7 +16,7 @@ app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
 app.post('/otp', routes.otp);
 app.post('/cast', routes.cast);
 
-// STARGING THE SERVER
+// STARTING THE SERVER
 var server = app.listen(config.port, function() {
     console.log('sElect Collecting Server running for election "%s" [%s]', manifest.title, manifest.electionID);
     console.log('Listening on %s, port %d', server.address().address, server.address().port);

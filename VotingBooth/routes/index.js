@@ -1,6 +1,7 @@
 var request = require('request-json');
 var java = require('java');
 var config = require('../config');
+var manifest = require('../manifest');
 var voter = require('../protocol/voter');
 
 var colServ = request.newClient(config.colServURI);
@@ -16,7 +17,7 @@ function renderError(res, error) {
 
 exports.welcome = function welcome(req, res) 
 {
-    res.render('welcome', {title: "sElect Welcome", manifest: config.manifest});
+    res.render('welcome', {title: "sElect Welcome", manifest: manifest});
 };
 
 exports.prompt_for_otp = function prompt_for_otp(req, res) 
@@ -38,7 +39,7 @@ exports.prompt_for_otp = function prompt_for_otp(req, res)
         else {
             console.log(' ...The collecting server accepted an otp reqest');
             // Render the page (prompting for the otp):
-            res.render('otp', {title: "sElect Welcome", email:email, manifest: config.manifest});
+            res.render('otp', {title: "sElect Welcome", email:email, manifest: manifest});
         }
     });
 }
@@ -48,19 +49,20 @@ exports.select = function select(req, res)
     res.render('select', { title: "sElect Welcome", 
                            email: req.body.email, 
                            otp:   req.body.otp,
-                           manifest: config.manifest});
+                           manifest: manifest});
 }
 
 exports.cast = function cast(req, res) 
 {
     var email = req.body.email;
     var otp   = req.body.otp;
-    var choice_nr = +req.body.choice; // conversion to int
-    if (!choice_nr) {
+    if (req.body.choice == null) {
         renderError(res, "No candidate chosen");
         return;
     }
-    var choice = config.manifest.choicesList[choice_nr];
+    var choice_nr = +req.body.choice; // conversion to int
+    var choice = manifest.choicesList[choice_nr];
+    console.log('CHOICES: ', choice_nr, choice);
     if (!choice) {
         renderError(res, "Wrong candidate number");
         return;
@@ -96,7 +98,7 @@ exports.cast = function cast(req, res)
             console.log('The collecting server accepted a ballot reqest. Receipt = ', receipt);
 
             // Check the receipt (async Java call):
-            voter.validateReceipt(receipt, config.manifest.electionID, ballot, function(err, recOK) {
+            voter.validateReceipt(receipt, manifest.electionID, ballot, function(err, recOK) {
 
                 if (err) {
                     console.log('Internal error:', err)
@@ -111,7 +113,7 @@ exports.cast = function cast(req, res)
                 else {
                     console.log('Receipt ok');
                     res.render('cast', { title: "sElect Welcome", email: req.body.email, 
-                                         choice: choice, manifest: config.manifest });
+                                         choice: choice, manifest: manifest });
                 }
             });
         });

@@ -1,10 +1,11 @@
 var config = require('../config');
+var manifest = require('../manifest');
 var server = require('../server');
 var sendEmail = require('../sendEmail');
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// OTP STORE.
-//
+
+// OTP STORE
 // We assign a fresh OTP when the voter asks for an OTP for the first time. 
 // Then the OTP is returned (send via e-mail) whenever the voter queries 
 // for it. 
@@ -13,34 +14,20 @@ var otp_store = {};
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// ROUTES
+// ROUTE otp
 //
 
 exports.otp = function otp(req, res) 
 {
     var email = req.body.email;
-    // TODO Check that the voter is eligible
-
     if (email) {
-
-        function send_otp_and_continue(otp) // to pefrom, once we have an opt
+        if (!server.eligibleVoters[email]) // Check if the voter is eligible
         {
-            console.log('Sending an emal with otp to', email, otp);
-            sendEmail(email, 'Your One Time Password for sElect', otp, function (err,info) {
-                if (err) {
-                    console.log(' ...Error:', err);
-                }else{
-                    console.log(' ...E-mail sent: ' + info.response);
-                }
-                res.send({ ok: true }); 
-            })
+            console.log('Voter not eligible', email);
+            res.send({ ok: false, descr: 'Voter not eligible' }); 
         }
-
-        // Does the voter already have an otp?
-        if ( otp_store[email] ) {
-            send_otp_and_continue(otp_store[email]);            
-        }
-        else {
+        else // eligible voter create a fresh OTP and send it
+        {
             // Get a fresh otp (Java async call)
             console.log('Obtaining OTP...');
             server.getFreshOTP(function(err, otp) {
@@ -51,13 +38,26 @@ exports.otp = function otp(req, res)
                 // We have a fresh otp now
                 console.log(' ...Obtained a fresh OTP: ', otp);
                 otp_store[email] = otp // store the opt under the voter id (email)
-                send_otp_and_continue(otp);
+                console.log('Sending an emal with otp to', email, otp);
+                // Send e-mail
+                sendEmail(email, 'Your One Time Password for sElect', otp, function (err,info) {
+                    if (err) {
+                        console.log(' ...Error:', err);
+                    }else{
+                        console.log(' ...E-mail sent: ' + info.response);
+                    }
+                    res.send({ ok: true }); 
+                })
             }); 
         }
     }
     else 
         res.send({ ok: false }); 
 };
+
+///////////////////////////////////////////////////////////////////////////////////////
+// ROUTE cast
+//
 
 exports.cast = function cast(req, res) 
 {
@@ -72,9 +72,11 @@ exports.cast = function cast(req, res)
         return;
     }
 
+    // Check the otp (and, implicitly, the identifier)
     console.log('Checking the otp for a voter:', email, otp);
     if (otp_store[email] === otp) {
         console.log(' ...otp correct');
+
         // Cast the ballot:
         console.log('CollectBallot for', email );
         server.collectBallot(email, ballot, function(err, receipt) {
@@ -95,7 +97,7 @@ exports.cast = function cast(req, res)
     }
     else // otp not correct
     {
-        console.log(' ...otp not correct!');
+        console.log(' ...authorisation problem!');
         res.send({ ok: false }); 
     }
 };

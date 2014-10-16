@@ -1,7 +1,7 @@
 {
     "port" : 3300,
-    "MANIFEST_FILE" : "/home/truderung/.eVotingSystem/Public/Manifest/ElectionManifest.json",
-    "PRIVATE_KEY_FILE" : "/home/truderung/.eVotingSystem/Private/PrivateKeys/CollectingServer_PR.json",
+    "MANIFEST_FILE" : "~/.eVotingSystem/Public/Manifest/ElectionManifest.json",
+    "PRIVATE_KEY_FILE" : "~/.eVotingSystem/Private/PrivateKeys/CollectingServer_PR.json",
     "class_paths" : ["../bin", "../lib/bcprov-jdk16-146.jar"],
 
     "smtp_host" : "infsec.uni-trier.de",

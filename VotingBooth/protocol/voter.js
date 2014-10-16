@@ -1,5 +1,6 @@
 var java = require("java");
 var config = require("../config");
+var manifest = require('../manifest');
 
 // Add (java) class paths, as specified in the config:
 for (var i=0; i<config.class_paths.length; ++i) {
@@ -8,8 +9,8 @@ for (var i=0; i<config.class_paths.length; ++i) {
 }
 
 // Cryptographic Keys
-var colSerVerKey = config.manifest.collectingServer.verification_key;
-var finSerEncKey = config.manifest.finalServer.encryption_key;
+var colSerVerKey = manifest.collectingServer.verification_key;
+var finSerEncKey = manifest.finalServer.encryption_key;
 
 console.log('Creating an instance of VoterWrapper');
 var voterWrapper = java.newInstanceSync("de.uni.trier.infsec.eVotingSystem.wrappers.VoterWrapper", 

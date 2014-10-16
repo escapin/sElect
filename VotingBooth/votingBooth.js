@@ -4,12 +4,13 @@ var errorHandler = require('errorhandler');
 var morgan = require('morgan'); // logging
 
 var config = require('./config');
+var manifest = require('./manifest');
 var routes = require('./routes');
 var _voter = require('./protocol/voter');
 
 // Check the manifest 
 
-if (!config.manifest) { // there is no manifest
+if (!manifest) { // there is no manifest
     console.log('ERROR: Cannot find an election manifest file.');
     console.log('Server not started.');
     process.exit(1);
@@ -38,7 +39,7 @@ app.post('/cast', routes.cast);
 // STARGING THE SERVER
 
 var server = app.listen(config.port, function() {
-    console.log('Voting Booth running for election "%s" [%s]', config.manifest.title, config.manifest.electionID);
+    console.log('Voting Booth running for election "%s" [%s]', manifest.title, manifest.electionID);
     console.log('Listening on %s, port %d', server.address().address, server.address().port);
 });
 
