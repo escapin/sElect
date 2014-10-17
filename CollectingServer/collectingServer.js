@@ -15,7 +15,8 @@ app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
 // ROUTES
 app.post('/otp', routes.otp);
 app.post('/cast', routes.cast);
-app.get('/close', routes.close);
+
+app.get('/close', routes.close); // for testing
 
 // STARTING THE SERVER
 var server = app.listen(config.port, function() {

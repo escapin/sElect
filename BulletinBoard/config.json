@@ -1,0 +1,7 @@
+{
+    "RESULT_FILE": "../tmp/finalResult.msg",
+    "port" : 3111,
+    "MANIFEST_FILE" : "../test/ElectionManifest.json",
+
+    "class_paths" : ["../bin", "../lib/bcprov-jdk16-146.jar"]
+}
