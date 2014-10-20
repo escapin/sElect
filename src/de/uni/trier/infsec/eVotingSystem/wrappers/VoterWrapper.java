@@ -10,18 +10,28 @@ public class VoterWrapper {
 	private static String string(byte[] message) { return Utilities.byteArrayToHexString(message); }
 	private static byte[] message(String str)    { return Utilities.hexStringToByteArray(str); } 
 	
-	private Verifier  colServVerif;
-	private Encryptor finServEnc;
+	private final Verifier  colServVerif;
+	private final Encryptor colServEnc;
+	private final Encryptor finServEnc;
 	
 		
-	public VoterWrapper(String colServVerifKey, String finServEncKey ) {
+	public VoterWrapper(String colServVerifKey, String colServEncKey, String finServEncKey ) {
 		colServVerif = new Verifier(message(colServVerifKey));
+		colServEnc = new Encryptor(message(colServEncKey)); 
 		finServEnc = new Encryptor(message(finServEncKey));		
 	}
 	
 	public String createBallot(int votersChoice) {	
-		byte[] ballot = Voter.createBallot(votersChoice, finServEnc);
-		return string(ballot);
+		System.out.println("I'm here!");
+		try {
+		byte[] ballot = Voter.createBallot(votersChoice, colServEnc, finServEnc);
+		} 
+		catch(Error err) {
+			System.out.println("Here! Something's wrong!");
+			return "";
+		}
+		System.out.println("And now here!");
+		return ""; // string(ballot);
 	}
 	
 	public boolean validateReceipt(String receipt, String electionID, String ballot) {

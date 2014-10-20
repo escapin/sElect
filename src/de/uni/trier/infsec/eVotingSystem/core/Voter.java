@@ -3,7 +3,6 @@ package de.uni.trier.infsec.eVotingSystem.core;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
 import de.uni.trier.infsec.functionalities.nonce.NonceGen;
 import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
-import de.uni.trier.infsec.utils.Utilities;
 import static de.uni.trier.infsec.utils.MessageTools.intToByteArray;
 import static de.uni.trier.infsec.utils.MessageTools.concatenate;
 
@@ -19,16 +18,17 @@ public class Voter
 	 * Creates and returns a ballot containing the given vote. 
 	 * The ballot is of the form:
 	 * 
-	 *     ENC_S2(vote, recID),
+	 *     Enc_S1(ENC_S2(vote, recID)),
 	 * 
 	 * where recID is a freshly generated nonce, and Enc_Si(msg) denotes the message msg 
 	 * encrypted with the public key of the server Si.  
 	 */
-	public static byte[] createBallot(int votersChoice, Encryptor finServEnc) {
+	public static byte[] createBallot(int votersChoice, Encryptor colServEnc, Encryptor finServEnc) {
 		byte[] nonce = noncegen.newNonce();
 		byte[] vote = intToByteArray(votersChoice);
 		byte[] innerBallot = finServEnc.encrypt(concatenate(nonce, vote));
-		return innerBallot;
+		byte[] ballot = colServEnc.encrypt(innerBallot);
+		return ballot;
 	}
 
 	/**

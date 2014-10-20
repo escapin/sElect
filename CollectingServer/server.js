@@ -9,6 +9,8 @@ for (var i=0; i<config.class_paths.length; ++i) {
 }
 
 // Cryptographic Keys:
+var colSerEncKey = manifest.collectingServer.encryption_key;
+var colSerDecKey = config.decryptionKey;
 var colSerVerKey = manifest.collectingServer.verification_key;
 var colSerSigKey = config.signingKey;
 
@@ -25,7 +27,8 @@ var voterIdentifiers = java.newArray("java.lang.String", listOfEligibleVoters);
 // Create the instance of CollectingServerWrapper:
 console.log('Creating an instance of CollectingServerWrapper');
 var csWrapper = java.newInstanceSync("de.uni.trier.infsec.eVotingSystem.wrappers.CollectingServerWrapper", 
-                                      colSerVerKey, colSerSigKey, manifest.electionID, voterIdentifiers);
+                                      colSerEncKey, colSerDecKey, colSerVerKey, colSerSigKey, 
+                                      manifest.electionID, voterIdentifiers);
 console.log(' ...CollectingServerWrapper created');
 
 // Export the wrapper:

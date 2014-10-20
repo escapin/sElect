@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 
 import de.uni.trier.infsec.functionalities.digsig.Signer;
+import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.utils.Utilities;
 import static de.uni.trier.infsec.utils.MessageTools.intToByteArray;
@@ -11,32 +12,15 @@ import static de.uni.trier.infsec.utils.MessageTools.concatenate;
 
 public class CollectingServer 
 {
-	// PRIVATE CLASSES
-
-	/*
-	// A class encapsulating a voter id (represented as bytes) and providing 'equals' and 'hashCode'.
-	private static class VID {
-		byte[] id;
-
-		public VID(byte[] id) { this.id = id; }
-		// public VID(String id) { this.id = Utilities.stringAsBytes(id); }
-
-		@Override public boolean equals(Object that) {
-			if (that instanceof VID) 
-				return Arrays.equals(this.id, ((VID)that).id);
-			else 
-				return false;
-		}
-
-		@Override public int hashCode() {
-			return Arrays.hashCode(id);
-		}
-	}
-	*/
-
+	public static class Error extends Exception {
+		public final String info;
+		public Error(String info) { this.info = info; }
+	} 
+	
 	// CRYPTOGRAPHIC FUNCTIONALITIES
 
 	private final Signer signer;
+	private final Decryptor decryptor;
 
 	// STATE
 
@@ -49,8 +33,9 @@ public class CollectingServer
 
 	// CONSTRUCTORS
 
-	public CollectingServer(Signer signer, byte[] electionID, String[] voterIdentifiers) {
+	public CollectingServer(Decryptor decryptor, Signer signer, byte[] electionID, String[] voterIdentifiers) {
 		this.signer = signer;
+		this.decryptor = decryptor;
 		this.electionID = electionID;
 		// this.noncegen = new NonceGen();
 		this.numberOfVoters = voterIdentifiers.length;
@@ -73,16 +58,19 @@ public class CollectingServer
 	 *  ruled out on the application level) or if the voter has already voted with 
 	 *  different inner ballot, the method returns null.
 	 */
-	public byte[] collectBallot(String voterID, byte[] innerBallot) {			
+	public byte[] collectBallot(String voterID, byte[] ballot) throws Error {
 
-		// Make sure that the voter is eligible
-		if (!voterInfo.containsKey(voterID))
-			return null;
+		if (!voterInfo.containsKey(voterID)) // not eligible voter
+			throw new Error("Wrong voter id");
+
+		byte[] innerBallot = decryptor.decrypt(ballot);
+		if (innerBallot==null) // decryption has failed
+			throw new Error("Malformed ballot (decryption failed)");
 
 		// Check if the voter has already voted with different inner ballot: 
 		byte[] storedInnerBallot = voterInfo.get(voterID);
 		if( storedInnerBallot.length!=0 && !MessageTools.equal(innerBallot, storedInnerBallot) )
-			return null;
+			throw new Error("Voter already voted");
 
 		// Collect the ballot if the voter votes for the first time (not if the voter re-votes)
 		if( storedInnerBallot.length == 0 ) {

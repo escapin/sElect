@@ -10,11 +10,14 @@ for (var i=0; i<config.class_paths.length; ++i) {
 
 // Cryptographic Keys
 var colSerVerKey = manifest.collectingServer.verification_key;
+var colSerEncKey = manifest.collectingServer.encryption_key;
 var finSerEncKey = manifest.finalServer.encryption_key;
+
+console.log(colSerEncKey);
 
 console.log('Creating an instance of VoterWrapper');
 var voterWrapper = java.newInstanceSync("de.uni.trier.infsec.eVotingSystem.wrappers.VoterWrapper", 
-                                         colSerVerKey, finSerEncKey);
+                                         colSerVerKey, colSerEncKey, finSerEncKey);
 console.log(' ...VoterWrapper created');
 
 module.exports = voterWrapper;

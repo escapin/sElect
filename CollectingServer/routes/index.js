@@ -39,8 +39,8 @@ exports.otp = function otp(req, res)
                 // We have a fresh otp now
                 console.log(' ...Obtained a fresh OTP: ', otp);
                 otp_store[email] = otp // store the opt under the voter id (email)
+                /*
                 console.log('Sending an emal with otp to', email, otp);
-                // Send e-mail
                 sendEmail(email, 'Your One Time Password for sElect', otp, function (err,info) {
                     if (err) {
                         console.log(' ...Error:', err);
@@ -49,6 +49,8 @@ exports.otp = function otp(req, res)
                     }
                     res.send({ ok: true }); 
                 })
+                */
+                res.send({ ok: true }); // TODO: this is nestead of tha above
             }); 
         }
     }
@@ -80,7 +82,7 @@ exports.cast = function cast(req, res)
 
         // Cast the ballot:
         console.log('CollectBallot for', email );
-        server.collectBallot(email, ballot, function(err, receipt) {
+        server.collectBallot(email, ballot, function(err, response) {
             if (err) {
                 console.log(' ...Internal error: ', err);
                 res.send({ ok: false, descr: 'Internal error' }); 
@@ -91,8 +93,9 @@ exports.cast = function cast(req, res)
                 return;
             }
             else { // everything ok
-                console.log(' ...Balloc accepted. Receipt = ', receipt);
-                res.send({ ok: true, receipt: receipt }); 
+                // TODO Now the result has a different form
+                console.log(' ...Balloc accepted. Response = ', response);
+                res.send({ ok: true, receipt: response.data }); 
             }
         });
     }
