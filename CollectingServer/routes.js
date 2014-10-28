@@ -7,9 +7,6 @@ var sendEmail = require('./sendEmail');
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // OTP STORE
-// We assign a fresh OTP when the voter asks for an OTP for the first time. 
-// Then the OTP is returned (send via e-mail) whenever the voter queries 
-// for it. 
 
 var otp_store = {};
 
@@ -33,12 +30,17 @@ exports.otp = function otp(req, res)
             console.log('Obtaining OTP...');
             server.getFreshOTP(function(err, otp) {
                 if (err) {
-                    console.log(' ...Internal error', err);
+                    console.log(' ...Internal error:', err);
                     res.send({ ok: false, descr: 'Internal error. Cannot obtain an OTP' }); 
+                    return;
                 }
-                // We have a fresh otp now
+                // We have a fresh otp
                 console.log(' ...Obtained a fresh OTP: ', otp);
                 otp_store[email] = otp // store the opt under the voter id (email)
+                // schedule reset of the otp
+                setTimeout( function(){ otp_store[email]=null; }, 10*60000); // 10 min
+
+                // Send an email
                 /*
                 console.log('Sending an emal with otp to', email, otp);
                 sendEmail(email, 'Your One Time Password for sElect', otp, function (err,info) {
