@@ -12,11 +12,13 @@ import static de.uni.trier.infsec.utils.MessageTools.concatenate;
  */
 public class Voter 
 {
-	public static class Ballots {
+	public static class BallotInfo {
 		public final byte[] ballot;
+		public final byte[] nonce;
 		public final byte[] innerBallot;
-		public Ballots(byte[] ballot, byte[] innerBallot) {
+		public BallotInfo(byte[] ballot, byte[] nonce, byte[] innerBallot) {
 			this.ballot = ballot;
+			this.nonce = nonce;
 			this.innerBallot = innerBallot;
 		}
 	}
@@ -32,12 +34,12 @@ public class Voter
 	 * where recID is a freshly generated nonce, and Enc_Si(msg) denotes the message msg 
 	 * encrypted with the public key of the server Si.  
 	 */
-	public static Ballots createBallot(int votersChoice, Encryptor colServEnc, Encryptor finServEnc) {
+	public static BallotInfo createBallot(int votersChoice, Encryptor colServEnc, Encryptor finServEnc) {
 		byte[] nonce = noncegen.newNonce();
 		byte[] vote = intToByteArray(votersChoice);
 		byte[] innerBallot = finServEnc.encrypt(concatenate(nonce, vote));
 		byte[] ballot = colServEnc.encrypt(innerBallot);
-		return new Ballots(ballot, innerBallot);
+		return new BallotInfo(ballot, nonce, innerBallot);
 	}
 
 	/**

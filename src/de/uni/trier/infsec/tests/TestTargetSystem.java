@@ -71,44 +71,44 @@ public class TestTargetSystem extends TestCase
 	public void testClientServerStandardExhange() throws Exception
 	{
 		// Make the voter create an inner ballot
-		Voter.Ballots ballots = Voter.createBallot(2, colServEnc, finServEnc);
+		Voter.BallotInfo bi = Voter.createBallot(2, colServEnc, finServEnc);
 
 		// Deliver it to the collecting server
-		byte[] receipt = colServer.collectBallot("voter1", ballots.ballot);
+		byte[] receipt = colServer.collectBallot("voter1", bi.ballot);
 		assertNotNull(receipt);
 
 		// Re-vote with the same ballot
-		byte[] receipt0 = colServer.collectBallot("voter1", ballots.ballot);
+		byte[] receipt0 = colServer.collectBallot("voter1", bi.ballot);
 		assertNotNull(receipt);
 		assertTrue( MessageTools.equal(receipt, receipt0) );
 
 		
 		// Try to re-vote with a different ballot
-		Voter.Ballots anotherBallots = Voter.createBallot(2, colServEnc, finServEnc);
+		Voter.BallotInfo anotherBi = Voter.createBallot(2, colServEnc, finServEnc);
 		try {
-			colServer.collectBallot("voter1", anotherBallots.ballot);
+			colServer.collectBallot("voter1", anotherBi.ballot);
 			assertTrue(false);
 		} catch(CollectingServer.Error err) {
 			assertEquals(err.info, "Voter already voted");
 		} 
 				
 		// Deliver the response message back to the voter
-		boolean receiptOK =  Voter.validateReceipt(receipt, electionID, ballots.innerBallot, colServVerif);
+		boolean receiptOK =  Voter.validateReceipt(receipt, electionID, bi.innerBallot, colServVerif);
 		assertTrue( receiptOK );
 		
 		// Create another ballot
-		Voter.Ballots innerBallot2 = Voter.createBallot(5, colServEnc, finServEnc);
+		Voter.BallotInfo bi2 = Voter.createBallot(5, colServEnc, finServEnc);
 
 		// Deliver it to the collecting server
-		byte[] receipt2 = colServer.collectBallot("voter2", innerBallot2.ballot);
+		byte[] receipt2 = colServer.collectBallot("voter2", bi2.ballot);
 		assertNotNull(receipt2);
 
 		// Deliver the response message back to the voter
-		boolean receipt2OK =  Voter.validateReceipt(receipt2, electionID, innerBallot2.innerBallot, colServVerif);
+		boolean receipt2OK =  Voter.validateReceipt(receipt2, electionID, bi2.innerBallot, colServVerif);
 		assertTrue( receipt2OK );
 		
 		// Check a wrong receipt
-		boolean receipt3OK =  Voter.validateReceipt(receipt, electionID, innerBallot2.innerBallot, colServVerif);
+		boolean receipt3OK =  Voter.validateReceipt(receipt, electionID, bi2.innerBallot, colServVerif);
 		assertFalse( receipt3OK );
 		
 

@@ -77,15 +77,15 @@ exports.cast = function cast(req, res)
 
     // Create the ballot (async Java call)
     console.log('Create ballot for %s with choice %d', email, choice_nr);
-    voter.createBallot(choice_nr, function (err, ballots) {
+    voter.createBallot(choice_nr, function (err, ballot_info) {
         if (err) {
             console.log('Internal error:', err)
             renderError(res, "Internal error: cannot create a ballot.");
             return;
         }
 
-        // Send the ballot to the collecting server (and obtain a receipt):
-        var data = { ballot:ballots.ballot, email:email, otp:otp };
+        // Send the ballot to the collecting server (and obtain a receipt (signature)):
+        var data = { ballot:ballot_info.ballot, email:email, otp:otp };
         console.log('Sending: ', data);
         colServ.post('cast', data, function(err, otp_res, body) {
             if (err) {
@@ -103,7 +103,7 @@ exports.cast = function cast(req, res)
 
             // Check the receipt (async Java call):
             console.log('Validate receipt for', email);
-            voter.validateReceipt(receipt, manifest.electionID, ballots.innerBallot, function(err, recOK) {
+            voter.validateReceipt(receipt, manifest.electionID, ballot_info.innerBallot, function(err, recOK) {
 
                 if (err) {
                     console.log('Internal error:', err)
@@ -117,8 +117,12 @@ exports.cast = function cast(req, res)
                 }
                 else {
                     console.log(' ...Receipt ok');
-                    res.render('cast', { title: "sElect Welcome", email: req.body.email, 
-                                         choice: choice, manifest: manifest });
+                    res.render('cast', { title: "sElect Welcome", 
+                                         email: req.body.email, 
+                                         choice: choice, 
+                                         receipt_id: ballot_info.nonce,
+                                         inner_ballot: ballot_info.innerBallot,
+                                         manifest: manifest });
                 }
             });
         });
