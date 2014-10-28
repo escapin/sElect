@@ -34,9 +34,7 @@ public class VoterWrapper {
 	}
 	
 	public BallotInfo createBallot(int votersChoice) {	
-		System.out.println("I'm here!");
 		Voter.BallotInfo bi = Voter.createBallot(votersChoice, colServEnc, finServEnc);
-		System.out.println("And now here!");
 		return new BallotInfo(string(bi.ballot), string(bi.nonce), string(bi.innerBallot));
 	}
 	

@@ -12,7 +12,7 @@ var app = express();
 app.set('views', './views');    // location of the views
 app.set('view engine', 'ejs');  // view engine
 app.use(bodyParser.json()); 
-app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging (onto console)
+// app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging (onto console)
 
 // ROUTES
 app.post('/otp', routes.otp);

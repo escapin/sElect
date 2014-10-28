@@ -34,7 +34,7 @@ exports.prompt_for_otp = function prompt_for_otp(req, res)
             renderError(res, "No responce from the collecting server");
         }
         else if (!body.ok) {
-            renderError(res, "Wrong responce from the collecting server");
+            renderError(res, body.descr);
         }
         else {
             console.log(' ...The collecting server accepted an otp reqest');
@@ -93,9 +93,9 @@ exports.cast = function cast(req, res)
                 return;
             }
             if (!body.ok) {
-                renderError(res, "Ballot not accepted by the collecting server");
+                renderError(res, body.descr);
                 console.log('body: ', body);
-                return
+                return;
             }
             
             var receipt = body.receipt;

@@ -22,7 +22,7 @@ exports.otp = function otp(req, res)
         if (!server.eligibleVoters[email]) // Check if the voter is eligible
         {
             console.log('Voter not eligible', email);
-            res.send({ ok: false, descr: 'Voter not eligible' }); 
+            res.send({ ok: false, descr: 'Invalid voter identifier (e-mail)' }); 
         }
         else // eligible voter create a fresh OTP and send it
         {
@@ -57,7 +57,7 @@ exports.otp = function otp(req, res)
         }
     }
     else 
-        res.send({ ok: false }); 
+        res.send({ ok: false, descr: 'Empty e-mail address' }); 
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ exports.cast = function cast(req, res)
 
     // make sure that we have all the pieces:
     if (!email || !otp || !ballot ) {
-        res.send({ ok: false }); 
+        res.send({ ok: false, descr: 'Wrong request' }); 
         return;
     }
 
@@ -89,10 +89,9 @@ exports.cast = function cast(req, res)
                 console.log(' ...Internal error: ', err);
                 res.send({ ok: false, descr: 'Internal error' }); 
             }
-            else if (response.data=='') {
-                console.log(' ...Ballot rejected: ' );
-                res.send({ ok: false, descr: 'Ballot rejected' }); 
-                return;
+            else if (!response.ok) {
+                console.log(' ...Ballot rejected: ', response.data);
+                res.send({ ok: false, descr: response.data }); 
             }
             else { // everything ok
                 // TODO Now the result has a different form
@@ -103,8 +102,10 @@ exports.cast = function cast(req, res)
     }
     else // otp not correct
     {
-        console.log(' ...authorisation problem!');
-        res.send({ ok: false }); 
+        console.log(' ...Invalid OTP');
+        res.send({ ok: false, descr: 'Invalid OTP (one time password)' }); 
+        // if an invalid otp is given, we require that a new otp be generated (reset otp):
+        otp_store[email] = null;
     }
 };
 
