@@ -1,6 +1,7 @@
 var fs = require('fs');
-var manifest = require('../manifest');
-var result = require('../result');
+var manifest = require('./manifest');
+var config = require('./config');
+var result = require('./result');
 
 exports.index = function(req, res) {
     // check if the result is ready 
@@ -14,3 +15,18 @@ exports.index = function(req, res) {
         res.render('no_result', { title: 'sElect: No result', manifest: manifest }); 
     }
 };
+
+// Serve a particular static file
+
+exports.serveFile = function serveFile(path) {
+    return function (req, res) {
+        fs.exists(path, function(exists) {
+            if (exists) {
+                fs.createReadStream(path).pipe(res);
+            } else {
+                res.status(404).send('404: Not found');
+            }
+        });
+    }
+}
+

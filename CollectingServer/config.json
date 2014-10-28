@@ -7,6 +7,8 @@
 
     "finalServURI"  : "http://localhost:3301",
 
+    "RESULT_FILE": "../tmp/partialResult.msg",
+
     "smtp_host" : "infsec.uni-trier.de",
     "smtp_port" : 25,
     "smtp_user" : "evoting@infsec.uni-trier.de",

@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var util = require('util');
+var path = require('path');
 var errorHandler = require('errorhandler')
 var fs = require('fs');
 var morgan = require('morgan')
@@ -36,14 +37,14 @@ app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
 
 app.get('', routes.index);
 app.get('/index.html', routes.index);
-
+app.get('/SignedFinalResult', routes.serveFile(config.RESULT_FILE));
+app.get('/SignedPartialResult', routes.serveFile(config.PARTIAL_RESULT_FILE));
 
 // SET THE BACKROUD CHECK FOR THE RESULT FILE
 
 setInterval( result.loadResult, 5000);
 // TODO: 
-// (1) We could make sure that shit is alive on every
-// request (just in case)
+// (1) We could make sure that this is alive on every request (just in case)
 // (2) Remove this when the result is read.
 
 // STARGING THE SERVER

@@ -3,9 +3,10 @@ var manifest = require('./manifest');
 var config = require('./config');
 var wrapper = require('./wrapper');
 
-exports.result = null;
+exports.result = null;  // this is where the result is stored (when ready)
 
 var inLoadResult = false;
+
 function loadResult() {
     if (inLoadResult || exports.result) return; 
     inLoadResult = true;

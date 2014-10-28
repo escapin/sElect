@@ -1,3 +1,4 @@
+var fs = require('fs');
 var request = require('request-json');
 var config = require('./config');
 var manifest = require('./manifest');
@@ -134,6 +135,8 @@ exports.close = function close(req, res)  {
         }
         else { 
             console.log('Result:', result);
+
+            // Send the result to the final server
             console.log('Sending result to the final server');
             var data = {data: result}
             finServ.post('data', data, function(err, otp_res, body){
@@ -143,6 +146,16 @@ exports.close = function close(req, res)  {
                 else {
                     console.log(' ...Result sent to the final server.');
                     console.log(' ...Response:', body);
+                }
+            });
+
+            // Save the result
+            fs.writeFile(config.RESULT_FILE, result, function (err) {
+                if (err) {
+                    console.log('Problems with saving result', config.RESULT_FILE);
+                }
+                else {
+                    console.log('Result saved in', config.RESULT_FILE);
                 }
             });
         }
