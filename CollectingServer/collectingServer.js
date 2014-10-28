@@ -9,6 +9,8 @@ var routes = require('./routes');
 
 // CREATE AND CONFIGURE THE APP
 var app = express();
+app.set('views', './views');    // location of the views
+app.set('view engine', 'ejs');  // view engine
 app.use(bodyParser.json()); 
 app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging (onto console)
 
@@ -16,6 +18,7 @@ app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
 app.post('/otp', routes.otp);
 app.post('/cast', routes.cast);
 
+app.get('/', routes.info);
 app.get('/close', routes.close); // for testing
 
 // STARTING THE SERVER
