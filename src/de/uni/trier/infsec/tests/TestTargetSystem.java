@@ -30,6 +30,9 @@ public class TestTargetSystem extends TestCase
 	private static String[] voterIdentifiers = {"voter1", "voter2"};
 	private byte[] electionID = {100};
 
+
+	private static byte[] colServerEncKey = Utilities.hexStringToByteArray("30819F300D06092A864886F70D010101050003818D0030818902818100B21E1FA56085DFEF9DA015A731CA2243FFF2A6354CD6C3AC5210C9D047702908A876F4E822A35A097BF0D8E0397A1B9C3F7BB4A055239E3F67500A707A3B5659FBCA35A1CEFFC251D72BE04F313A4B11451845E01F3A30B18546A521B268772051BC2ADC22EBDA6B9ECE530460A6DFE8818B1F53363E5C91BB7BA450C21AFCE90203010001");
+	private static byte[] colServerDecKey = Utilities.hexStringToByteArray("30820278020100300D06092A864886F70D0101010500048202623082025E02010002818100B21E1FA56085DFEF9DA015A731CA2243FFF2A6354CD6C3AC5210C9D047702908A876F4E822A35A097BF0D8E0397A1B9C3F7BB4A055239E3F67500A707A3B5659FBCA35A1CEFFC251D72BE04F313A4B11451845E01F3A30B18546A521B268772051BC2ADC22EBDA6B9ECE530460A6DFE8818B1F53363E5C91BB7BA450C21AFCE902030100010281807401E2A297671A1EBA0ED58B7B8627231AC433346BC344D62AECFC444702E9F6D5A204885C66FFF14563EC1CBDD2A5C0F227E3D0B922E5A26DEB57A1423AFB55B128D0A4289E27D0510CDCCAF268EC471B2FDC8F8A2C270B82BB0FD115A5DF1AFECE4680A64F6F62E64BA515F03E9C5FF891F0832DC2F6103DE02D1915C1DCF1024100E53FC931375907C421471E9A02518543AC4A521E56346586C8D4E7BC3C22F55E6F485781AE23F8A6C904D936147D3EE78FC0674D275D833ED5C1E3E9BA323CEB024100C6E6EB5184781CF25E5273FAFFE9C39EACD7B1986F0356DD3CA8226B1D6AF9A1A77A0E22CB3DBC60C920FEF75C6071643C07BE59B2D09BCB292F05A79E99287B024100BF8255B483A42054BBE809AC669B6B54692D7D0452C75AB90A34B192123AB1F7BDC71533042290A9E3EBE4F8C48D0C6BAD2EF21D05F19C9E753B9005C4C20B19024100B7D0B46C5376059A5F5CE7DE711F022FE42039FA5BADC45B1531750D74D465FAE521C16A9A55658034A00FC15E57AAB32D5F22A516C1FF1893E8E6DAEF912F7D024100BA4216E24F08F731F0DAF2566CB538954148CAEB9DA3F9667A0A421F7D5739B39FD8E0CA8FD41FA1F28559783AAFB15CC542BBC29ACD955D4F02A1F30C90A007");
 	private static byte[] colServerVerifKey =  Utilities.hexStringToByteArray("305C300D06092A864886F70D0101010500034B003048024100863DD199FAAF19FDAA696E8ADECB5D1324B49E6AE904646875AEC215A48A69FB34996431C1938CA1A6796FD3FA65759E4A44A1D1313ABFFF9DEEF72404ACA0810203010001");
 	private static byte[] colServerSignKey = Utilities.hexStringToByteArray("30820154020100300D06092A864886F70D01010105000482013E3082013A020100024100863DD199FAAF19FDAA696E8ADECB5D1324B49E6AE904646875AEC215A48A69FB34996431C1938CA1A6796FD3FA65759E4A44A1D1313ABFFF9DEEF72404ACA08102030100010240363F7D1870899A433C3E67018F8F3709A967A42D2805325E54504EF6580BE74F998BA32A3F126FC9795C86929CF6126E66A623B23E11BAA906EB558AEA6585D1022100D382F7ADB8D8891AB25922EADB6423F71F89A3994D7D00A5572191F8C0EB23CF022100A27A2C1EDD7F2208DB3ECEC16AB44DEFC4E1CA35DCAA7258227E16CFF059FAAF02202BF9DCF937A77DCA192EC33DC563AABEA4C5FF47CE7EA0F5BF89F149A102C2AD022048AF2AE9ABE0E1D2E071DA808041A4D3EC59ADE22693418FD7EE5C3A2DA5B315022100B869F084B862822A28D533C71FFA7799569C1CE8BBBA0A7F534AE4365393C6CA");
 
@@ -40,6 +43,8 @@ public class TestTargetSystem extends TestCase
 
 	private static Verifier colServVerif = new Verifier(colServerVerifKey);
 	private static Signer colServSigner = new Signer(colServerVerifKey, colServerSignKey);
+	private static Encryptor colServEnc = new Encryptor(colServerEncKey);
+	private static Decryptor colServDec = new Decryptor(colServerEncKey, colServerDecKey);
 	private static Encryptor finServEnc = new Encryptor(finServEncrKey);
 
 	private static CollectingServer colServer;
@@ -66,40 +71,44 @@ public class TestTargetSystem extends TestCase
 	public void testClientServerStandardExhange() throws Exception
 	{
 		// Make the voter create an inner ballot
-		byte[] innerBallot = Voter.createBallot(2, finServEnc);
+		Voter.Ballots ballots = Voter.createBallot(2, colServEnc, finServEnc);
 
 		// Deliver it to the collecting server
-		byte[] receipt = colServer.collectBallot("voter1", innerBallot);
+		byte[] receipt = colServer.collectBallot("voter1", ballots.ballot);
 		assertNotNull(receipt);
 
-		// Re-vote with a different ballot
-		byte[] receipt0 = colServer.collectBallot("voter1", innerBallot);
+		// Re-vote with the same ballot
+		byte[] receipt0 = colServer.collectBallot("voter1", ballots.ballot);
 		assertNotNull(receipt);
 		assertTrue( MessageTools.equal(receipt, receipt0) );
 
 		
 		// Try to re-vote with a different ballot
-		byte[] anotherBallot = Voter.createBallot(2, finServEnc);
-		byte[] anotherReceipt = colServer.collectBallot("voter1", anotherBallot);
-		assertNull(anotherReceipt);
+		Voter.Ballots anotherBallots = Voter.createBallot(2, colServEnc, finServEnc);
+		try {
+			colServer.collectBallot("voter1", anotherBallots.ballot);
+			assertTrue(false);
+		} catch(CollectingServer.Error err) {
+			assertEquals(err.info, "Voter already voted");
+		} 
 				
 		// Deliver the response message back to the voter
-		boolean receiptOK =  Voter.validateReceipt(receipt, electionID, innerBallot, colServVerif);
+		boolean receiptOK =  Voter.validateReceipt(receipt, electionID, ballots.innerBallot, colServVerif);
 		assertTrue( receiptOK );
 		
 		// Create another ballot
-		byte[] innerBallot2 = Voter.createBallot(5, finServEnc);
+		Voter.Ballots innerBallot2 = Voter.createBallot(5, colServEnc, finServEnc);
 
 		// Deliver it to the collecting server
-		byte[] receipt2 = colServer.collectBallot("voter2", innerBallot2);
+		byte[] receipt2 = colServer.collectBallot("voter2", innerBallot2.ballot);
 		assertNotNull(receipt2);
 
 		// Deliver the response message back to the voter
-		boolean receipt2OK =  Voter.validateReceipt(receipt2, electionID, innerBallot2, colServVerif);
+		boolean receipt2OK =  Voter.validateReceipt(receipt2, electionID, innerBallot2.innerBallot, colServVerif);
 		assertTrue( receipt2OK );
 		
 		// Check a wrong receipt
-		boolean receipt3OK =  Voter.validateReceipt(receipt, electionID, innerBallot2, colServVerif);
+		boolean receipt3OK =  Voter.validateReceipt(receipt, electionID, innerBallot2.innerBallot, colServVerif);
 		assertFalse( receipt3OK );
 		
 
@@ -408,7 +417,7 @@ public class TestTargetSystem extends TestCase
 		if(k.encrKey==null || k.decrKey==null || k.signKey==null || k.verifKey==null)
 			errln("Invalid Collecting Server's keys.");
 		
-		return new CollectingServer(colServSigner, electionID, voterIdentifiers);
+		return new CollectingServer(colServDec, colServSigner, electionID, voterIdentifiers);
 	}
 
 	/*

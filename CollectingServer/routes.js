@@ -1,8 +1,8 @@
 var request = require('request-json');
-var config = require('../config');
-var manifest = require('../manifest');
-var server = require('../server');
-var sendEmail = require('../sendEmail');
+var config = require('./config');
+var manifest = require('./manifest');
+var server = require('./server');
+var sendEmail = require('./sendEmail');
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -87,7 +87,7 @@ exports.cast = function cast(req, res)
                 console.log(' ...Internal error: ', err);
                 res.send({ ok: false, descr: 'Internal error' }); 
             }
-            else if (receipt=='') {
+            else if (response.data=='') {
                 console.log(' ...Ballot rejected: ' );
                 res.send({ ok: false, descr: 'Ballot rejected' }); 
                 return;

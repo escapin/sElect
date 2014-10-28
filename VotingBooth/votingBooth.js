@@ -6,7 +6,7 @@ var morgan = require('morgan'); // logging
 var config = require('./config');
 var manifest = require('./manifest');
 var routes = require('./routes');
-var _voter = require('./protocol/voter');
+var _voter = require('./voter');
 
 // Check the manifest 
 
@@ -24,7 +24,7 @@ app.set('view engine', 'ejs');  // view engine
 app.use(bodyParser.urlencoded({ extended: true })); //for POST requests
 app.use(express.static('./public')); // static content
 app.use(errorHandler({ dumpExceptions: true, showStack: true })); // error handling (not for production)
-app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging (onto console)
+// app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging (onto console)
 
 
 // ROUTES

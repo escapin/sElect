@@ -1,8 +1,8 @@
 var request = require('request-json');
 var java = require('java');
-var config = require('../config');
-var manifest = require('../manifest');
-var voter = require('../protocol/voter');
+var config = require('./config');
+var manifest = require('./manifest');
+var voter = require('./voter');
 
 var colServ = request.newClient(config.colServURI);
 
@@ -31,10 +31,10 @@ exports.prompt_for_otp = function prompt_for_otp(req, res)
     console.log('Sending an otp request: ', data);
     colServ.post('otp', data, function(err, otp_res, body){
         if(err) {
-            renderError(res, " ...No otp responce from the collecting server");
+            renderError(res, "No responce from the collecting server");
         }
         else if (!body.ok) {
-            renderError(res, " ...ERROR otp responce from the collecting server");
+            renderError(res, "Wrong responce from the collecting server");
         }
         else {
             console.log(' ...The collecting server accepted an otp reqest');
@@ -77,7 +77,7 @@ exports.cast = function cast(req, res)
 
     // Create the ballot (async Java call)
     console.log('Create ballot for %s with choice %d', email, choice_nr);
-    voter.createBallot(choice_nr, function (err, ballot) {
+    voter.createBallot(choice_nr, function (err, ballots) {
         if (err) {
             console.log('Internal error:', err)
             renderError(res, "Internal error: cannot create a ballot.");
@@ -85,7 +85,7 @@ exports.cast = function cast(req, res)
         }
 
         // Send the ballot to the collecting server (and obtain a receipt):
-        var data = { ballot:ballot, email:email, otp:otp };
+        var data = { ballot:ballots.ballot, email:email, otp:otp };
         console.log('Sending: ', data);
         colServ.post('cast', data, function(err, otp_res, body) {
             if (err) {
@@ -103,7 +103,7 @@ exports.cast = function cast(req, res)
 
             // Check the receipt (async Java call):
             console.log('Validate receipt for', email);
-            voter.validateReceipt(receipt, manifest.electionID, ballot, function(err, recOK) {
+            voter.validateReceipt(receipt, manifest.electionID, ballots.innerBallot, function(err, recOK) {
 
                 if (err) {
                     console.log('Internal error:', err)

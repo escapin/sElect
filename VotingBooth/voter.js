@@ -1,6 +1,6 @@
 var java = require("java");
-var config = require("../config");
-var manifest = require('../manifest');
+var config = require("./config");
+var manifest = require('./manifest');
 
 // Add (java) class paths, as specified in the config:
 for (var i=0; i<config.class_paths.length; ++i) {

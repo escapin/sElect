@@ -7,6 +7,16 @@ import de.uni.trier.infsec.utils.Utilities;
 
 public class VoterWrapper {
 	
+	public static class Ballots {
+		public final String ballot;
+		public final String innerBallot;
+		public Ballots(String ballot, String innerBallot) {
+			this.ballot = ballot;
+			this.innerBallot = innerBallot;
+		}
+	}
+	
+	
 	private static String string(byte[] message) { return Utilities.byteArrayToHexString(message); }
 	private static byte[] message(String str)    { return Utilities.hexStringToByteArray(str); } 
 	
@@ -21,17 +31,11 @@ public class VoterWrapper {
 		finServEnc = new Encryptor(message(finServEncKey));		
 	}
 	
-	public String createBallot(int votersChoice) {	
+	public Ballots createBallot(int votersChoice) {	
 		System.out.println("I'm here!");
-		try {
-		byte[] ballot = Voter.createBallot(votersChoice, colServEnc, finServEnc);
-		} 
-		catch(Error err) {
-			System.out.println("Here! Something's wrong!");
-			return "";
-		}
+		Voter.Ballots ballots = Voter.createBallot(votersChoice, colServEnc, finServEnc);
 		System.out.println("And now here!");
-		return ""; // string(ballot);
+		return new Ballots(string(ballots.ballot), string(ballots.innerBallot));
 	}
 	
 	public boolean validateReceipt(String receipt, String electionID, String ballot) {

@@ -12,6 +12,15 @@ import static de.uni.trier.infsec.utils.MessageTools.concatenate;
  */
 public class Voter 
 {
+	public static class Ballots {
+		public final byte[] ballot;
+		public final byte[] innerBallot;
+		public Ballots(byte[] ballot, byte[] innerBallot) {
+			this.ballot = ballot;
+			this.innerBallot = innerBallot;
+		}
+	}
+	
 	private static final NonceGen noncegen = new NonceGen(); // nonce generation functionality
 
 	/**
@@ -23,20 +32,20 @@ public class Voter
 	 * where recID is a freshly generated nonce, and Enc_Si(msg) denotes the message msg 
 	 * encrypted with the public key of the server Si.  
 	 */
-	public static byte[] createBallot(int votersChoice, Encryptor colServEnc, Encryptor finServEnc) {
+	public static Ballots createBallot(int votersChoice, Encryptor colServEnc, Encryptor finServEnc) {
 		byte[] nonce = noncegen.newNonce();
 		byte[] vote = intToByteArray(votersChoice);
 		byte[] innerBallot = finServEnc.encrypt(concatenate(nonce, vote));
 		byte[] ballot = colServEnc.encrypt(innerBallot);
-		return ballot;
+		return new Ballots(ballot, innerBallot);
 	}
 
 	/**
 	 * Checks if 'receiptSignature' is a signature on the receipt. If yes, the method saves the signature and return true.  
 	 */ 
-	public static boolean validateReceipt(byte[] receipt, byte[] electionID, byte[] ballot, Verifier colServVerif) {		
+	public static boolean validateReceipt(byte[] receipt, byte[] electionID, byte[] innerBallot, Verifier colServVerif) {		
 		// verify the signature on the receipt
-		byte[] expectedMessage = concatenate(Params.ACCEPTED, concatenate(electionID, ballot));
+		byte[] expectedMessage = concatenate(Params.ACCEPTED, concatenate(electionID, innerBallot));
 		return colServVerif.verify(receipt, expectedMessage);
 	}
 }
