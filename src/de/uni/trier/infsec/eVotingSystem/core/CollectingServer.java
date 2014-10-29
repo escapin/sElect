@@ -6,12 +6,14 @@ import java.util.Hashtable;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 import de.uni.trier.infsec.utils.MessageTools;
-import de.uni.trier.infsec.utils.Utilities;
 import static de.uni.trier.infsec.utils.MessageTools.intToByteArray;
 import static de.uni.trier.infsec.utils.MessageTools.concatenate;
 
 public class CollectingServer 
 {
+	public static byte[] TAG_ACCEPTED = {0x00};
+	public static byte[] TAG_RESULT   = {0x01};
+	
 	public static class Error extends Exception {
 		public final String info;
 		public Error(String info) { this.info = info; }
@@ -80,7 +82,7 @@ public class CollectingServer
 
 		// Create a receipt for the voter
 		byte[] elID_innerBallot = concatenate(electionID, innerBallot);
-		byte[] accepted_elID_innerBallot = concatenate(Params.ACCEPTED, elID_innerBallot);
+		byte[] accepted_elID_innerBallot = concatenate(TAG_ACCEPTED, elID_innerBallot);
 		byte[] receipt = signer.sign(accepted_elID_innerBallot);
 
 		return receipt;
@@ -116,52 +118,12 @@ public class CollectingServer
 
 		// put together the election ID, inner ballots, and list of voters
 		byte[] result = concatenate(electionID, concatenate(ballotsAsAMessage, votersAsAMessage));
+		byte[] tag_result = concatenate(TAG_RESULT, result);
 
 		// sign the result
-		byte[] signature = signer.sign(result);
-		byte[] resultWithSignature = concatenate(result, signature);
+		byte[] signature = signer.sign(tag_result);
+		byte[] resultWithSignature = concatenate(tag_result, signature);
 
 		return resultWithSignature;
 	}
-
-
-	// PRIVATE METHODS
-
-
-	// METHODS FOR TESTING //
-	/* FIXME: Should we delete these two methods and change the Test according to it?
-	 * 		These two methods could be somehow misleading for someone using this
-	 *		class. For instance, I confused the method getBallots() with getResult()
-	 */
-
-	/**
-	 * For testing. Returns array of cast ballots.
-	 */
-	/*
-	public byte[][] getBallots(){
-		byte[][] b = new byte[numberOfCastBallots][];
-		int ind=0;
-		for (int i=0; i<numberOfCastBallots; ++i)
-			if(ballots[i]!=null)
-				b[ind++] = ballots[i];
-		return b;
-	}
-	*/
-
-	/**
-	 * For testing.
-	 */
-	/*
-	public int[] getListOfVotersWhoVoted()
-	{
-		int[] l = new int[numberOfCastBallots];
-		int ind = 0;
-		for (int id=0; id<numberOfVoters; ++id) {
-			if (ballots[id]!=null)
-				l[ind++] = id;
-		}
-		assert(ind == numberOfCastBallots-1);
-		return l;
-	}
-	*/
 }

@@ -4,7 +4,7 @@ var config = require('./config');
 var manifest = require('./manifest');
 var voter = require('./voter');
 
-var colServ = request.newClient(config.colServURI);
+var colServ = request.newClient(config.colServURI); // FIXME (this should be read from the manifest)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Helper functions

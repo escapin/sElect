@@ -1,6 +1,5 @@
 package de.uni.trier.infsec.eVotingSystem.wrappers;
 
-import de.uni.trier.infsec.eVotingSystem.apps.Helper.HelperError;
 import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
 import de.uni.trier.infsec.utils.MessageTools;
@@ -26,7 +25,7 @@ public class BBWrapper {
 		this.electionID = message(electionID);
 	}
 
-	public Result finalResultAsText(String signedFinalResult) throws HelperError {
+	public Result finalResultAsText(String signedFinalResult)  {
 		byte[] signedFinalResultMsg = message(signedFinalResult);
 		byte[] result = MessageTools.first(signedFinalResultMsg);
 		byte[] signature = MessageTools.second(signedFinalResultMsg);

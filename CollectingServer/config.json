@@ -9,8 +9,8 @@
 
     "RESULT_FILE": "../tmp/partialResult.msg",
 
-    "smtp_host" : "infsec.uni-trier.de",
+    "smtp_host" : "my.smtp.server.com",
     "smtp_port" : 25,
-    "smtp_user" : "evoting@infsec.uni-trier.de",
-    "smtp_pass" : "tL0FWx0-ZD-gMDR9g24psP-D"
+    "smtp_user" : "username",
+    "smtp_pass" : "password"
 }

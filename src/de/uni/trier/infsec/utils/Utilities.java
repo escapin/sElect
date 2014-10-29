@@ -32,38 +32,4 @@ public class Utilities {
 	public static String bytesAsString(byte[] bytes) {
 		return new String(bytes, Charset.forName("UTF-8"));
 	}
-	
-//	/**
-//	 *	Helper to enlarge the Array which stores the credentials. Used to avoid usage of Lists 
-//	 */
-//	public static byte[][] enlargeArray(byte[][] theArray, int i) {
-//		if (theArray.length > i) return theArray;
-//		
-//		byte[][] newArray = new byte[i+1][theArray[0].length];
-//		for (int j = 0; j < theArray.length; j++) {
-//			newArray[j] = theArray[j];
-//		}
-//		return newArray;
-//	}
-	
-	/**
-	 *	Checks two Arrays for equality 
-	 */
-	public static boolean arrayEqual(byte[] a1, byte[] a2) {
-		if(a1==null && a2==null) return true;
-		if(a1==null || a2==null) return false;
-		if (a1.length != a2.length) return false;
-		for (int i = 0; i < a1.length; i++) {
-			if (a1[i] != a2[i]) return false;
-		}
-		return true;
-	}
-	
-	public static boolean arrayEmpty(byte[] array) {
-		for (int i = 0; i < array.length; i++) {
-			if (array[i] != 0x00) return false;
-		}
-		return true;
-	}
-
 }

@@ -52,10 +52,16 @@ public class FinalServer
 	 */
 	public byte[] processTally(byte[] data) throws MalformedData {
 		// verify the signature of server1
-		byte[] payload = MessageTools.first(data);
+		byte[] tagged_payload = MessageTools.first(data);
 		byte[] signature = MessageTools.second(data);
-		if (!collectingServerVerif.verify(signature, payload))
+		if (!collectingServerVerif.verify(signature, tagged_payload))
 			throw new MalformedData("Wrong signature");
+		
+		// check the tag
+		byte[] tag = MessageTools.first(tagged_payload);
+		if (!MessageTools.equal(tag, CollectingServer.TAG_RESULT))
+			throw new MalformedData("Wrong tag");		
+		byte[] payload = MessageTools.second(tagged_payload);
 		
 		// check that election id in the processed data
 		byte[] el_id = MessageTools.first(payload);

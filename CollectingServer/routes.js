@@ -11,7 +11,6 @@ var sendEmail = require('./sendEmail');
 
 var otp_store = {};
 
-
 ///////////////////////////////////////////////////////////////////////////////////////
 // ROUTE otp
 //
@@ -123,7 +122,32 @@ exports.info = function info(req, res)  {
 // ROUTE end
 //
 
-var finServ = request.newClient(config.finalServURI);
+var finServ = request.newClient(config.finalServURI); // FIXME (this should be read from the manifest)
+
+// Save result in a file
+function saveResult(result) {
+    fs.writeFile(config.RESULT_FILE, result, function (err) {
+        if (err) 
+            console.log('Problems with saving result', config.RESULT_FILE);
+        else 
+            console.log('Result saved in', config.RESULT_FILE);
+    });
+}
+
+// Send result to the final server
+function sendResult(result) {
+    console.log('Sending result to the final server');
+    var data = {data: result}
+    finServ.post('data', data, function(err, otp_res, body) {
+        if (err) {
+            console.log(' ...Error: Cannot send the result to the final server: ', err);
+        }
+        else {
+            console.log(' ...Result sent to the final server.');
+            console.log(' ...Response:', body);
+        }
+    });
+}
 
 exports.close = function close(req, res)  {
     res.send({ ok: true, info: "triggered to close the election" }); 
@@ -135,30 +159,9 @@ exports.close = function close(req, res)  {
         }
         else { 
             console.log('Result:', result);
-
-            // Send the result to the final server
-            console.log('Sending result to the final server');
-            var data = {data: result}
-            finServ.post('data', data, function(err, otp_res, body){
-                if (err) {
-                    console.log(' ...Error: Cannot send the result to the final server: ', err);
-                }
-                else {
-                    console.log(' ...Result sent to the final server.');
-                    console.log(' ...Response:', body);
-                }
-            });
-
-            // Save the result
-            fs.writeFile(config.RESULT_FILE, result, function (err) {
-                if (err) {
-                    console.log('Problems with saving result', config.RESULT_FILE);
-                }
-                else {
-                    console.log('Result saved in', config.RESULT_FILE);
-                }
-            });
+            sendResult(result);
+            saveResult(result);
         }
-    })
+    });
 }
 

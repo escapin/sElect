@@ -47,7 +47,7 @@ public class Voter
 	 */ 
 	public static boolean validateReceipt(byte[] receipt, byte[] electionID, byte[] innerBallot, Verifier colServVerif) {		
 		// verify the signature on the receipt
-		byte[] expectedMessage = concatenate(Params.ACCEPTED, concatenate(electionID, innerBallot));
+		byte[] expectedMessage = concatenate(CollectingServer.TAG_ACCEPTED, concatenate(electionID, innerBallot));
 		return colServVerif.verify(receipt, expectedMessage);
 	}
 }

@@ -7,7 +7,7 @@ exports.process = function process(req, res)
 {
     var data = req.body.data;
     console.log('DATA COMING:', data);
-    res.send({ ok: true, info: 'thanks for the data' }); 
+    res.send({ ok: true, info: 'thanks for the data' }); // we return this answer no matter what (is the data correct)
 
     console.log('Processing the data...');
     server.processTally(data, function (err, result) {

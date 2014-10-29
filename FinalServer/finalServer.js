@@ -1,11 +1,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var morgan = require('morgan'); // logging
+var morgan = require('morgan');
 
 var config = require('./config');
 var manifest = require('./manifest')
 var routes = require('./routes');
-
 
 // CREATE AND CONFIGURE THE APP
 var app = express();

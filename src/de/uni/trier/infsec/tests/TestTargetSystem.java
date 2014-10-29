@@ -1,23 +1,14 @@
 package de.uni.trier.infsec.tests;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import static de.uni.trier.infsec.eVotingSystem.apps.AppUtils.readCharsFromFile;
-import static de.uni.trier.infsec.eVotingSystem.core.Utils.errln;
-import de.uni.trier.infsec.eVotingSystem.apps.AppParams;
-import de.uni.trier.infsec.eVotingSystem.apps.AppUtils;
-import de.uni.trier.infsec.eVotingSystem.apps.Helper;
 import de.uni.trier.infsec.eVotingSystem.core.CollectingServer;
 import de.uni.trier.infsec.eVotingSystem.core.FinalServer;
 import de.uni.trier.infsec.eVotingSystem.core.Voter;
-import de.uni.trier.infsec.eVotingSystem.parser.ElectionManifest;
-import de.uni.trier.infsec.eVotingSystem.parser.Keys;
-import de.uni.trier.infsec.eVotingSystem.parser.KeysParser;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
 import de.uni.trier.infsec.functionalities.digsig.Verifier;
 import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
@@ -405,18 +396,6 @@ public class TestTargetSystem extends TestCase
 
 	private CollectingServer createCollectingServer() throws Exception 
 	{
-		// read the private key
-		String filename = AppParams.PRIVATE_KEY_path + "CollectingServer_PR.json";
-		String keyJSON = null;
-		try {
-			keyJSON = readCharsFromFile(filename);
-		} catch (IOException e) {
-			errln("Unable to access: " + filename);
-		}
-		Keys k = KeysParser.parseJSONString(keyJSON);
-		if(k.encrKey==null || k.decrKey==null || k.signKey==null || k.verifKey==null)
-			errln("Invalid Collecting Server's keys.");
-		
 		return new CollectingServer(colServDec, colServSigner, electionID, voterIdentifiers);
 	}
 
