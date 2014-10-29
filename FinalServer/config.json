@@ -1,5 +1,7 @@
 {
     "port" : 3301,
+    "TLS_KEY_FILE":  "../test/server_key.pem",
+    "TLS_CERT_FILE": "../test/server_cert.pem",
     "MANIFEST_FILE" : "../test/ElectionManifest.json",
     "RESULT_FILE" : "../tmp/finalResult.msg",
 

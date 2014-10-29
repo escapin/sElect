@@ -1,20 +1,14 @@
 var express = require('express');
+var https = require('https');
 var bodyParser = require('body-parser');
 var errorHandler = require('errorhandler');
 var morgan = require('morgan'); // logging
+var fs = require('fs');
 
 var config = require('./config');
 var manifest = require('./manifest');
 var routes = require('./routes');
 var _voter = require('./voter');
-
-// Check the manifest 
-
-if (!manifest) { // there is no manifest
-    console.log('ERROR: Cannot find an election manifest file.');
-    console.log('Server not started.');
-    process.exit(1);
-}
 
 // CREATE AND CONFIGURE THE APP
 
@@ -38,8 +32,13 @@ app.post('/cast', routes.cast);
 
 // STARGING THE SERVER
 
-var server = app.listen(config.port, function() {
+var tls_options = {
+    key:  fs.readFileSync(config.TLS_KEY_FILE),
+    cert: fs.readFileSync(config.TLS_CERT_FILE)
+};
+
+var server = https.createServer(tls_options, app).listen(config.port, function() {
     console.log('Voting Booth running for election "%s" [%s]', manifest.title, manifest.electionID);
-    console.log('Listening on %s, port %d\n', server.address().address, server.address().port);
+    console.log('HTTPS server listening on %s, port %d\n', server.address().address, server.address().port);
 });
 

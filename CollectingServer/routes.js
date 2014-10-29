@@ -122,7 +122,11 @@ exports.info = function info(req, res)  {
 // ROUTE end
 //
 
-var finServ = request.newClient(config.finalServURI); // FIXME (this should be read from the manifest)
+var finserv_options = {};
+if (config.ignore_fin_serv_cert)
+    finserv_options = {rejectUnauthorized: false};
+
+var finServ = request.newClient(config.finalServURI, finserv_options);
 
 // Save result in a file
 function saveResult(result) {

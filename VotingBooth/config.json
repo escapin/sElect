@@ -1,6 +1,9 @@
 {
     "port" : 3400,
-    "MANIFEST_FILE" : "../test/ElectionManifest.json",
+    "TLS_KEY_FILE":  "../test/server_key.pem",
+    "TLS_CERT_FILE": "../test/server_cert.pem",
+    "MANIFEST_FILE": "../test/ElectionManifest.json",
     "class_paths" : ["../bin", "../lib/bcprov-jdk16-146.jar"],
-    "colServURI"  : "http://localhost:3300"
+    "colServURI"  : "https://localhost:3300",
+    "ignore_col_serv_cert" : true
 }

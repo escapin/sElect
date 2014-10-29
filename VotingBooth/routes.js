@@ -4,7 +4,14 @@ var config = require('./config');
 var manifest = require('./manifest');
 var voter = require('./voter');
 
-var colServ = request.newClient(config.colServURI); // FIXME (this should be read from the manifest)
+///////////////////////////////////////////////////////////////////////////////////////////
+// Collecting server object
+
+var colserv_options = {};
+if (config.ignore_col_serv_cert)
+    colserv_options = {rejectUnauthorized: false};
+
+var colServ = request.newClient(config.colServURI, colserv_options);
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Helper functions
@@ -31,6 +38,7 @@ exports.prompt_for_otp = function prompt_for_otp(req, res)
     console.log('Sending an otp request: ', data);
     colServ.post('otp', data, function(err, otp_res, body){
         if(err) {
+            console.log('Error:', err);
             renderError(res, "No responce from the collecting server");
         }
         else if (!body.ok) {
