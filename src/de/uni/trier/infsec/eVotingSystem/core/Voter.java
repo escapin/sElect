@@ -52,7 +52,7 @@ public class Voter
 	public BallotInfo createBallot(int votersChoice) {
 		byte[] nonce = noncegen.newNonce();
 		byte[] vote = intToByteArray(votersChoice);
-		byte[] innerBallot = finServEnc.encrypt(concatenate(nonce, vote));
+		byte[] innerBallot = finServEnc.encrypt(concatenate(electionID, concatenate(nonce, vote)));
 		byte[] ballot = colServEnc.encrypt(innerBallot);
 		return new BallotInfo(ballot, nonce, innerBallot);
 	}
@@ -61,7 +61,6 @@ public class Voter
 	 * Checks if 'receiptSignature' is a signature on the receipt. If yes, the method saves the signature and return true.  
 	 */ 
 	public boolean validateReceipt(byte[] receipt, byte[] innerBallot) {
-		// verify the signature on the receipt
 		byte[] expectedMessage = concatenate(CollectingServer.TAG_ACCEPTED, concatenate(electionID, innerBallot));
 		return colServVerif.verify(receipt, expectedMessage);
 	}

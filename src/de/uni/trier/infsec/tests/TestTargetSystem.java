@@ -37,6 +37,8 @@ public class TestTargetSystem extends TestCase
 	private static Encryptor colServEnc = new Encryptor(colServerEncKey);
 	private static Decryptor colServDec = new Decryptor(colServerEncKey, colServerDecKey);
 	private static Encryptor finServEnc = new Encryptor(finServEncrKey);
+	private static Decryptor finServDec = new Decryptor(finServEncrKey, finServDecrKey);
+	private static Signer    finServSign = new Signer(finServVerifKey, finServSignKey);
 
 	private static CollectingServer colServer;
 	private static FinalServer finServer;
@@ -104,6 +106,11 @@ public class TestTargetSystem extends TestCase
 		assertFalse( receipt3OK );
 		
 
+		// Get the partial result from the collecting server
+		byte[] partialResult = colServer.getResult();
+		// and deliver it to the final server
+		finServer.processTally(partialResult);
+		
 		/*
 		// Let's try to re-vote (using the same inner ballot)
 		byte[] ballot1 = voter.reCreateBallot(otp);
@@ -387,7 +394,7 @@ public class TestTargetSystem extends TestCase
 	protected void setUp() throws Exception {
 		super.setUp();
 		colServer = createCollectingServer();
-		// finServer = createFinalServer();
+		finServer = createFinalServer();
 		voter = createVoter();
 	}
 	//	dbFile = new File(PKIServerCore.DEFAULT_DATABASE + "-journal");
@@ -399,6 +406,10 @@ public class TestTargetSystem extends TestCase
 	private CollectingServer createCollectingServer() throws Exception 
 	{
 		return new CollectingServer(colServDec, colServSigner, electionID, voterIdentifiers);
+	}
+
+	private FinalServer createFinalServer() {
+		return new FinalServer(finServDec, finServSign, colServVerif, electionID, voterIdentifiers.length);
 	}
 
 	private Voter createVoter() {
