@@ -15,7 +15,8 @@ var finSerEncKey = manifest.finalServer.encryption_key;
 
 console.log('Creating an instance of VoterWrapper');
 var voterWrapper = java.newInstanceSync("de.uni.trier.infsec.eVotingSystem.wrappers.VoterWrapper", 
-                                         colSerVerKey, colSerEncKey, finSerEncKey);
+                                         manifest.electionID,
+                                         colSerEncKey, colSerVerKey, finSerEncKey);
 console.log(' ...VoterWrapper created');
 
 module.exports = voterWrapper;

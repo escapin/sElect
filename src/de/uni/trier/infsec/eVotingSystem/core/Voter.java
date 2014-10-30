@@ -25,16 +25,31 @@ public class Voter
 	
 	private static final NonceGen noncegen = new NonceGen(); // nonce generation functionality
 
+	private final byte[] electionID;
+	private final Encryptor colServEnc;
+	private final Verifier colServVerif;
+	private final Encryptor finServEnc;
+
+	public Voter(byte[] electionID, Encryptor colServEnc, Verifier colServVerif, Encryptor finServEnc) {
+		this.electionID = electionID;
+		this.colServEnc = colServEnc;
+		this.colServVerif = colServVerif;
+		this.finServEnc = finServEnc;
+	}
+
 	/**
 	 * Creates and returns a ballot containing the given vote. 
 	 * The ballot is of the form:
 	 * 
-	 *     Enc_S1(ENC_S2(vote, recID)),
+	 *     Enc_CS( innerBallot )
 	 * 
-	 * where recID is a freshly generated nonce, and Enc_Si(msg) denotes the message msg 
-	 * encrypted with the public key of the server Si.  
+	 * with innerBallot = Enc_FS(electionID, choice, receiptID)
+	 * 
+	 * where recID is a freshly generated nonce, and Enc_CS(msg) and Enc_FS denote
+	 * the message msg encrypted with the public key of, respectively the collecting
+	 * or the final server.
 	 */
-	public static BallotInfo createBallot(int votersChoice, Encryptor colServEnc, Encryptor finServEnc) {
+	public BallotInfo createBallot(int votersChoice) {
 		byte[] nonce = noncegen.newNonce();
 		byte[] vote = intToByteArray(votersChoice);
 		byte[] innerBallot = finServEnc.encrypt(concatenate(nonce, vote));
@@ -45,7 +60,7 @@ public class Voter
 	/**
 	 * Checks if 'receiptSignature' is a signature on the receipt. If yes, the method saves the signature and return true.  
 	 */ 
-	public static boolean validateReceipt(byte[] receipt, byte[] electionID, byte[] innerBallot, Verifier colServVerif) {		
+	public boolean validateReceipt(byte[] receipt, byte[] innerBallot) {
 		// verify the signature on the receipt
 		byte[] expectedMessage = concatenate(CollectingServer.TAG_ACCEPTED, concatenate(electionID, innerBallot));
 		return colServVerif.verify(receipt, expectedMessage);

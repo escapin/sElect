@@ -111,7 +111,7 @@ exports.cast = function cast(req, res)
 
             // Check the receipt (async Java call):
             console.log('Validate receipt for', email);
-            voter.validateReceipt(receipt, manifest.electionID, ballot_info.innerBallot, function(err, recOK) {
+            voter.validateReceipt(receipt, ballot_info.innerBallot, function(err, recOK) {
 
                 if (err) {
                     console.log('Internal error:', err)

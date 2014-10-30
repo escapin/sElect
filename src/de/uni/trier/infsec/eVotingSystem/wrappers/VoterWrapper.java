@@ -6,7 +6,7 @@ import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
 import de.uni.trier.infsec.utils.Utilities;
 
 public class VoterWrapper {
-	
+
 	public static class BallotInfo {
 		public final String ballot;
 		public final String nonce;
@@ -17,28 +17,25 @@ public class VoterWrapper {
 			this.innerBallot = innerBallot;
 		}
 	}
-	
-	
+
 	private static String string(byte[] message) { return Utilities.byteArrayToHexString(message); }
 	private static byte[] message(String str)    { return Utilities.hexStringToByteArray(str); } 
-	
-	private final Verifier  colServVerif;
-	private final Encryptor colServEnc;
-	private final Encryptor finServEnc;
-	
-		
-	public VoterWrapper(String colServVerifKey, String colServEncKey, String finServEncKey ) {
-		colServVerif = new Verifier(message(colServVerifKey));
-		colServEnc = new Encryptor(message(colServEncKey)); 
-		finServEnc = new Encryptor(message(finServEncKey));		
+
+	private final Voter voter;
+
+	public VoterWrapper(String electionID, String colServEncKey, String colServVerifKey, String finServEncKey ) {
+		Verifier colServVerif = new Verifier(message(colServVerifKey));
+		Encryptor colServEnc = new Encryptor(message(colServEncKey));
+		Encryptor finServEnc = new Encryptor(message(finServEncKey));
+		voter = new Voter(message(electionID), colServEnc, colServVerif, finServEnc);
 	}
-	
+
 	public BallotInfo createBallot(int votersChoice) {	
-		Voter.BallotInfo bi = Voter.createBallot(votersChoice, colServEnc, finServEnc);
+		Voter.BallotInfo bi = voter.createBallot(votersChoice);
 		return new BallotInfo(string(bi.ballot), string(bi.nonce), string(bi.innerBallot));
 	}
-	
-	public boolean validateReceipt(String receipt, String electionID, String ballot) {
-		return Voter.validateReceipt( message(receipt), message(electionID), message(ballot), colServVerif);
+
+	public boolean validateReceipt(String receipt, String innerBallot) {
+		return voter.validateReceipt( message(receipt), message(innerBallot));
 	}
 }

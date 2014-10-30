@@ -40,6 +40,7 @@ public class TestTargetSystem extends TestCase
 
 	private static CollectingServer colServer;
 	private static FinalServer finServer;
+	private static Voter voter;
 	
 
 	@Test
@@ -62,7 +63,7 @@ public class TestTargetSystem extends TestCase
 	public void testClientServerStandardExhange() throws Exception
 	{
 		// Make the voter create an inner ballot
-		Voter.BallotInfo bi = Voter.createBallot(2, colServEnc, finServEnc);
+		Voter.BallotInfo bi = voter.createBallot(2);
 
 		// Deliver it to the collecting server
 		byte[] receipt = colServer.collectBallot("voter1", bi.ballot);
@@ -75,7 +76,7 @@ public class TestTargetSystem extends TestCase
 
 		
 		// Try to re-vote with a different ballot
-		Voter.BallotInfo anotherBi = Voter.createBallot(2, colServEnc, finServEnc);
+		Voter.BallotInfo anotherBi = voter.createBallot(2);
 		try {
 			colServer.collectBallot("voter1", anotherBi.ballot);
 			assertTrue(false);
@@ -84,22 +85,22 @@ public class TestTargetSystem extends TestCase
 		} 
 				
 		// Deliver the response message back to the voter
-		boolean receiptOK =  Voter.validateReceipt(receipt, electionID, bi.innerBallot, colServVerif);
+		boolean receiptOK =  voter.validateReceipt(receipt, bi.innerBallot);
 		assertTrue( receiptOK );
 		
 		// Create another ballot
-		Voter.BallotInfo bi2 = Voter.createBallot(5, colServEnc, finServEnc);
+		Voter.BallotInfo bi2 = voter.createBallot(5);
 
 		// Deliver it to the collecting server
 		byte[] receipt2 = colServer.collectBallot("voter2", bi2.ballot);
 		assertNotNull(receipt2);
 
 		// Deliver the response message back to the voter
-		boolean receipt2OK =  Voter.validateReceipt(receipt2, electionID, bi2.innerBallot, colServVerif);
+		boolean receipt2OK =  voter.validateReceipt(receipt2, bi2.innerBallot);
 		assertTrue( receipt2OK );
 		
 		// Check a wrong receipt
-		boolean receipt3OK =  Voter.validateReceipt(receipt, electionID, bi2.innerBallot, colServVerif);
+		boolean receipt3OK =  voter.validateReceipt(receipt, bi2.innerBallot);
 		assertFalse( receipt3OK );
 		
 
@@ -387,6 +388,7 @@ public class TestTargetSystem extends TestCase
 		super.setUp();
 		colServer = createCollectingServer();
 		// finServer = createFinalServer();
+		voter = createVoter();
 	}
 	//	dbFile = new File(PKIServerCore.DEFAULT_DATABASE + "-journal");
 	//	if (dbFile.exists())
@@ -399,6 +401,11 @@ public class TestTargetSystem extends TestCase
 		return new CollectingServer(colServDec, colServSigner, electionID, voterIdentifiers);
 	}
 
+	private Voter createVoter() {
+		return new Voter(electionID, colServEnc, colServVerif, finServEnc);
+	}
+	
+	
 	/*
 	private FinalServer createFinalServer() throws Exception {
 		// read the private key
