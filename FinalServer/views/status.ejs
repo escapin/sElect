@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>sElect Final Server Status</title>
+    <link rel='stylesheet' href='/css/style.css' />
+</head>
+<body>
+    <h2> The final server is up. </h2>
+    <h3> Election ID: <%= manifest.electionID %> </h3>
+
+    <h3> <a href="/manifest"> Election manifest</a> </h3>
+
+    <% if (ready) { %>
+
+        <h3> <a href="result.msg">Result</a> is ready </h3>
+
+    <% } else { %>
+
+        <h3> Result has not been yet computed </h3>
+
+    <% } %>
+
+<div class='logo'> Powered by <img src="images/Logo.png"> </div>
+</body>
+</html>
+
