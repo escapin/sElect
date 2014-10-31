@@ -8,13 +8,29 @@ var config = require('./config');
 var manifest = require('./manifest')
 var routes = require('./routes');
 
+// CHECK IF THE RESULT ALREADY EXISTS
+var resultFileExists = fs.existsSync(config.RESULT_FILE);
+if (resultFileExists && process.argv[2] !== '--onlyServeResult') {
+    console.log('ERROR: The file with result already exists.');
+    console.log('Remove this file or run the server with --onlyServeResult option.');
+    console.log('Server not started.');
+    process.exit(1);
+}
+if (process.argv[2] === '--onlyServeResult' && !resultFileExists) {
+    console.log('ERROR: The file with result does not exist.');
+    console.log('Server not started.');
+    process.exit(1);
+}
+
 
 // CREATE AND CONFIGURE THE APP
 var app = express();
 app.set('views', './views');    // location of the views
 app.set('view engine', 'ejs');  // view engine
 app.use(bodyParser.json()); 
-// app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging (onto console)
+app.use(express.static('./public')); // static content
+// app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging
+
 
 // ROUTES
 app.post('/otp', routes.otp);
@@ -22,6 +38,8 @@ app.post('/cast', routes.cast);
 
 app.get('/', routes.info);
 app.get('/close', routes.close); // for testing
+app.get('/result.msg', routes.serveFile(config.RESULT_FILE));
+app.get('/manifest', routes.serveFile(config.MANIFEST_FILE));
 
 // STARGING THE SERVER
 var tls_options = {

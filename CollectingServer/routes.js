@@ -6,10 +6,12 @@ var server = require('./server');
 var sendEmail = require('./sendEmail');
 
 ///////////////////////////////////////////////////////////////////////////////////////
-
-// OTP STORE
+// State
 
 var otp_store = {};
+
+var resultReady = fs.existsSync(config.RESULT_FILE);
+var active = !resultReady; // active = accepts ballots
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // ROUTE otp
@@ -17,6 +19,12 @@ var otp_store = {};
 
 exports.otp = function otp(req, res) 
 {
+    if (!active) {
+        console.log('ERROR: otp request, but election is closed.')
+        res.send({ ok: false, descr: 'Election closed' }); 
+        return;
+    }
+
     var email = req.body.email;
     if (email) {
         if (!server.eligibleVoters[email]) // Check if the voter is eligible
@@ -66,6 +74,12 @@ exports.otp = function otp(req, res)
 
 exports.cast = function cast(req, res) 
 {
+    if (!active) {
+        console.log('ERROR: ballot comming, but election is closed.')
+        res.send({ ok: false, descr: 'Election closed' }); 
+        return;
+    }
+
     var email = req.body.email;
     var otp = req.body.otp;
     var ballot = req.body.ballot;
@@ -94,7 +108,6 @@ exports.cast = function cast(req, res)
                 res.send({ ok: false, descr: response.data }); 
             }
             else { // everything ok
-                // TODO Now the result has a different form
                 console.log(' ...Balloc accepted. Response = ', response);
                 res.send({ ok: true, receipt: response.data }); 
             }
@@ -115,11 +128,11 @@ exports.cast = function cast(req, res)
 // ROUTE info
 //
 exports.info = function info(req, res)  {
-    res.render('info', {manifest:manifest});
+    res.render('info', {manifest:manifest, active: active, resultReady: resultReady});
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// ROUTE end
+// ROUTE close
 //
 
 var finserv_options = {};
@@ -133,8 +146,10 @@ function saveResult(result) {
     fs.writeFile(config.RESULT_FILE, result, function (err) {
         if (err) 
             console.log('Problems with saving result', config.RESULT_FILE);
-        else 
+        else {
             console.log('Result saved in', config.RESULT_FILE);
+            resultReady = true;
+        }
     });
 }
 
@@ -154,6 +169,11 @@ function sendResult(result) {
 }
 
 exports.close = function close(req, res)  {
+    if (!active) {
+        res.send({ ok: false, info: "election already closed" }); 
+        return;
+    }
+    active = false;
     res.send({ ok: true, info: "triggered to close the election" }); 
     console.log('Closing election.');
     console.log('Getting the result...');
@@ -168,4 +188,19 @@ exports.close = function close(req, res)  {
         }
     });
 }
+
+///////////////////////////////////////////////////////////////////////////////////////
+// Serve a particular static file
+exports.serveFile = function serveFile(path) {
+    return function (req, res) {
+        fs.exists(path, function(exists) {
+            if (exists) {
+                fs.createReadStream(path).pipe(res);
+            } else {
+                res.status(404).send('404: Not found');
+            }
+        });
+    }
+}
+
 
