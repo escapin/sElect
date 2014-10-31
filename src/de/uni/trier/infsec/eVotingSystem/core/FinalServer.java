@@ -73,21 +73,23 @@ public class FinalServer
 		byte[][] entries = new byte[numberOfVoters][];
 		int numberOfEntries = 0;
 		for( MessageSplitIter iter = new MessageSplitIter(ballotsAsAMessage); iter.notEmpty(); iter.next() ) {
+			if (numberOfEntries > numberOfVoters)
+				throw new MalformedData("Too many entries");
+
 			byte[] elID_nonce_vote = decryptor.decrypt(iter.current());
 			if (elID_nonce_vote == null) // decryption failed
-				throw new MalformedData("Wrong inner ballot (decryption failed)");
+				continue;
 			byte[] elID = MessageTools.first(elID_nonce_vote);
-			if (elID==null || !MessageTools.equal(elID, electionID))
-				throw new MalformedData("Wrong inner ballot (wrong election ID)");
+			if (elID==null || !MessageTools.equal(elID, electionID)) // wrong election ID
+				continue;
 			byte[] nonce_vote = MessageTools.second(elID_nonce_vote);
-			if (nonce_vote==null || nonce_vote.length==0)
-				throw new MalformedData("Wrong inner ballot (emtpy message)");
+			if (nonce_vote==null || nonce_vote.length==0) // empty message
+				continue;
+
 			entries[numberOfEntries] = nonce_vote;
 			++numberOfEntries;
-			// FIXME We should not throw exceptions the loop above; the invalid ballots should be dropped 
-			// FIXME Check if the number of ballots exceeds the given number of eligible voters
 		}
-		
+
 		// sort the entries
 		Arrays.sort(entries, 0, numberOfEntries, new java.util.Comparator<byte[]>() {
 			public int compare(byte[] a1, byte[] a2) {
