@@ -11,6 +11,7 @@
     "ignore_fin_serv_cert" : true,
 
     "RESULT_FILE": "../tmp/partialResult.msg",
+    "ACCEPTED_BALLOTS_LOG_FILE" :   "../tmp/accepted_ballots.log",
 
     "smtp_host" : "my.smtp.server.com",
     "smtp_port" : 25,

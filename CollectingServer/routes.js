@@ -13,6 +13,20 @@ var otp_store = {};
 var resultReady = fs.existsSync(config.RESULT_FILE);
 var active = !resultReady; // active = accepts ballots
 
+
+if (fs.existsSync(config.ACCEPTED_BALLOTS_LOG_FILE)) {
+    console.log('Resuming (reading already accepted ballots)');
+    var log_data = fs.readFileSync(config.ACCEPTED_BALLOTS_LOG_FILE, {flags:'r', encoding:'utf8'});
+    log_data.split('\n').forEach(function (entry) { // for each entry in the log file
+        if (entry==='') return;
+        entry = JSON.parse(entry);
+        console.log('  - processing a ballot of', entry.email);
+        server.collectBallotSync(entry.email, entry.ballot);
+    });
+}
+
+var log = fs.createWriteStream(config.ACCEPTED_BALLOTS_LOG_FILE, {flags:'a', encoding:'utf8'});
+
 ///////////////////////////////////////////////////////////////////////////////////////
 // ROUTE otp
 //
@@ -110,6 +124,12 @@ exports.cast = function cast(req, res)
             else { // everything ok
                 console.log(' ...Balloc accepted. Response = ', response);
                 res.send({ ok: true, receipt: response.data }); 
+                // log the accepted ballot
+                log.write(JSON.stringify({ email:email, ballot:ballot })+'\n', null,
+                          function whenFlushed(e,r) {
+                    console.log('Ballot for %s logged', email);
+                });
+                // TODO: how to make sure that this stream is flushed right away
             }
         });
     }

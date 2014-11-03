@@ -6,24 +6,46 @@ var fs = require('fs');
 
 var config = require('./config');
 var manifest = require('./manifest')
-var routes = require('./routes');
 
 // CHECK IF THE RESULT ALREADY EXISTS
+var cmdline_option = process.argv[2];
 var resultFileExists = fs.existsSync(config.RESULT_FILE);
-if (resultFileExists && process.argv[2] !== '--onlyServeResult') {
+if (resultFileExists && cmdline_option !== '--onlyServeResult') {
     console.log('ERROR: The file with result already exists.');
     console.log('Remove this file or run the server with --onlyServeResult option.');
     console.log('Server not started.');
     process.exit(1);
 }
-if (process.argv[2] === '--onlyServeResult' && !resultFileExists) {
+if (cmdline_option === '--onlyServeResult' && !resultFileExists) {
     console.log('ERROR: The file with result does not exist.');
+    console.log('Server not started.');
+    process.exit(1);
+}
+
+// CHECK IF THE LOG WITH ACCEPTED BALLOTS EXISTS
+var logFileExists = fs.existsSync(config.ACCEPTED_BALLOTS_LOG_FILE);
+if (logFileExists && cmdline_option !== '--resume') {
+    console.log('ERROR: Log file with accepted ballots exists.');
+    console.log('Remove this file of run the server with --resume option.');
+    console.log('Server not started.');
+    process.exit(1);
+}
+if (cmdline_option === '--resume' && !logFileExists) {
+    console.log('ERROR: Log file with accepted ballots does not exist');
+    console.log('Server cannot be resumed.');
+    process.exit(1);
+}
+
+// CHECK FOR WRONG OPTIONS
+if ( !cmdline_option in ['--onlyServeResult', '--resume'] ) {
+    console.log('ERROR: Wrong option');
     console.log('Server not started.');
     process.exit(1);
 }
 
 
 // CREATE AND CONFIGURE THE APP
+var routes = require('./routes');
 var app = express();
 app.set('views', './views');    // location of the views
 app.set('view engine', 'ejs');  // view engine
