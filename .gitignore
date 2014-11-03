@@ -5,3 +5,4 @@ BulletinBoard/node_modules
 .classpath
 .project
 *.swp
+config.json
