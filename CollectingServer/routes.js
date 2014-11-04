@@ -159,7 +159,6 @@ var finserv_options = {};
 if (config.ignore_fin_serv_cert)
     finserv_options = {rejectUnauthorized: false};
 
-var finServ = request.newClient(config.finalServURI, finserv_options);
 
 // Save result in a file
 function saveResult(result) {
@@ -176,6 +175,7 @@ function saveResult(result) {
 // Send result to the final server
 function sendResult(result) {
     console.log('Sending result to the final server');
+    var finServ = request.newClient(manifest.finalServer.URI, finserv_options);
     var data = {data: result}
     finServ.post('data', data, function(err, otp_res, body) {
         if (err) {
@@ -186,6 +186,7 @@ function sendResult(result) {
             console.log(' ...Response:', body);
         }
     });
+    // TODO: should we somewhow close the connection to the final server?
 }
 
 exports.close = function close(req, res)  {

@@ -18,7 +18,7 @@ function checkAndParse(msg) {
         else {
             exports.result = result.data.split('\n').map( function (line) {
                 t = line.split(/ +/);
-                var vote = manifest.choicesList[t[0]];
+                var vote = manifest.choices[t[0]];
                 return {vote:vote, nonce:t[1]};
             });
             console.log('Redable retuls:', exports.result);

@@ -26,7 +26,7 @@ if (cmdline_option === '--onlyServeResult' && !resultFileExists) {
 var logFileExists = fs.existsSync(config.ACCEPTED_BALLOTS_LOG_FILE);
 if (logFileExists && cmdline_option !== '--resume') {
     console.log('ERROR: Log file with accepted ballots exists.');
-    console.log('Remove this file of run the server with --resume option.');
+    console.log('Remove this file or run the server with --resume option.');
     console.log('Server not started.');
     process.exit(1);
 }
@@ -69,9 +69,10 @@ var tls_options = {
     cert: fs.readFileSync(config.TLS_CERT_FILE)
 };
 
+// TODO: check that our IP/port is the IP/port specified for the
+// collecting server in the Manifest
 var server = https.createServer(tls_options, app).listen(config.port, function() {
     console.log('Collecting Server running for election "%s" [%s]', manifest.title, manifest.electionID);
     console.log('HTTPS server listening on %s, port %d\n', server.address().address, server.address().port);
 });
-
 

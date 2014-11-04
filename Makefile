@@ -1,4 +1,7 @@
 
+default:
+	@echo Specify the goal: devenv OR  devclean OR clean
+
 devenv: compile_java npm configs
 
 compile_java:
@@ -30,3 +33,7 @@ devclean:
 	-rm -r CollectingServer/node_modules
 	-rm -r FinalServer/node_modules
 	-rm -r tmp
+
+clean:
+	-rm tmp/*.msg
+	-rm tmp/*.log

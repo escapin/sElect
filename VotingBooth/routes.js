@@ -11,7 +11,7 @@ var colserv_options = {};
 if (config.ignore_col_serv_cert)
     colserv_options = {rejectUnauthorized: false};
 
-var colServ = request.newClient(config.colServURI, colserv_options);
+var colServ = request.newClient(manifest.collectingServer.URI, colserv_options);
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Helper functions
@@ -73,7 +73,7 @@ exports.cast = function cast(req, res)
         return;
     }
     var choice_nr = +req.body.choice; // conversion to int
-    var choice = manifest.choicesList[choice_nr];
+    var choice = manifest.choices[choice_nr];
     if (!choice) {
         renderError(res, "Wrong candidate number");
         return;

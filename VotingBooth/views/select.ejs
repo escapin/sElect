@@ -12,10 +12,10 @@
       <input type="hidden" name="email" value="<%= email %>">
       <input type="hidden" name="otp" value="<%= otp %>">
 
-      <% for( var i=0; i<manifest.choicesList.length; ++i ) { %>
+      <% for( var i=0; i<manifest.choices.length; ++i ) { %>
 
           <input type="radio" name="choice" value="<%= i %>"> 
-            <%= manifest.choicesList[i] %> <br> 
+            <%= manifest.choices[i] %> <br> 
       <% } %>
 
       <input type="submit" value="Submit"> 

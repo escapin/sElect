@@ -17,8 +17,8 @@ var colSerSigKey = config.signingKey;
 // Create the list (map) of eligible voters. Usage if (eligibleVoters[v]) ...
 var eligibleVoters = {};
 var listOfEligibleVoters = [];
-for( var i=0; i<manifest.votersList.length; ++i ) {
-    var voter_id = manifest.votersList[i].email;
+for( var i=0; i<manifest.voters.length; ++i ) {
+    var voter_id = manifest.voters[i].email;
     eligibleVoters[voter_id] = true;
     listOfEligibleVoters.push(voter_id);
 }

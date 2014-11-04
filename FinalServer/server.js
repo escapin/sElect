@@ -17,7 +17,7 @@ var signKey     = config.signing_key;
 
 
 // Create the list (map) of eligible voters. Usage if (eligibleVoters[v]) ...
-var numberOfVoters = +manifest.votersList.length;
+var numberOfVoters = +manifest.voters.length;
 
 // Create an instance of FinalServerWrapper:
 console.log('Creating an instance of FinalServerWrapper');
