@@ -1,7 +1,7 @@
 {
   "name": "BulletinBoard",
-  "description": "hello world test app",
-  "version": "0.0.1",
+  "description": "Bulletin board for the sElect voting system",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "express": "4.x",

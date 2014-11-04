@@ -1,7 +1,7 @@
 {
-  "name": "CollectingServer",
-  "description": "Collecting Server App for sElect",
-  "version": "0.0.1",
+  "name": "FinalServer",
+  "description": "Final server app for the sElect voting system",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "body-parser": ">= 1.9.0",

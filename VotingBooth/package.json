@@ -1,7 +1,7 @@
 {
-  "name": "votingBoot",
-  "description": "A remote voting booth for sElect",
-  "version": "0.0.1",
+  "name": "VotingBoot",
+  "description": "A remote voting booth for the sElect voting system",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "express": "4.x",
