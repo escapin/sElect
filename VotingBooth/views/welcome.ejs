@@ -1,11 +1,12 @@
 <% include header -%>
 
-<h1> Welcome (1) </h1>
-<h2> Election Title: <%= manifest.title %> </h2>
-<h2> Description: <%= manifest.description %> </h2>
+<h3> Welcome to the election </h3>
+<h1> <%= manifest.title %> 
+    <div class="subtitle"><%= manifest.description %></div>
+</h1>
 
 <form action="welcome" method="post">
-    <p> Provide your voter identifier (e-mail) to continue:</p>
+    <h2 class="instruction"> Provide your voter identifier (e-mail) to continue</h2>
     <p>
       <input type="text" name="email">
       <input type="submit" value="Continue"> 

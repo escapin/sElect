@@ -1,15 +1,16 @@
 <% include header -%>
 
-<h1> Welcome (2) </h1>
-<h2> Election Title: <%= manifest.title %> </h2>
-<h2> Description: <%= manifest.description %> </h2>
-
-<p>
-  Hello <%= email %>
-</p>
+<h1> <%= manifest.title %> 
+    <div class="subtitle"><%= manifest.description %></div>
+</h1>
 
 <form action="select" method="post">
-    <p> Please, enter our one time password (it should have been sent to you via e-mail):</p>
+    <h2 class="instruction"> Please enter your one time password </h2>
+    <p>
+        Your one time password has been sent to you e-mail account
+        <em><%= email %></em> (if you cannot find it, please
+        check your spam folder).
+    </p>
     <p>
       <input type="hidden" name="email" value="<%= email %>">
       <input type="text" name="otp">

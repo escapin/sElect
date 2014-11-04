@@ -1,29 +1,61 @@
 body {
-  padding: 50px;
-  padding-top: 30px;
+  padding: 0px;
+  margin: 0px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-h1 {
-  color: #e60;
+div.header, div.body {
+    padding: 6pt 20pt;
 }
 
-h2 {
+div.header {
+    text-align: right;
+    background: #346;
+    color: #aac;
+}
+
+div.header em {
+    font-size: 18px;
+    color: #ccf;
+}
+
+h1 {
+  font-size: 30;
+  font-weight: normal;
+  color: #f60;
+  color: #234;
+}
+
+h1 div.subtitle {
+  font-size: 18px;
+  color: #777;
+  margin-top: 1ex;
+  margin-bottom: 4ex;
+}
+
+h2 { 
+  font-size: 22px;
   font-weight: normal;
   color: #245;
 }
 
-div.logo {
-    text-align: right;
-    padding-top: 2ex;
-    border-top: solid 1px #bbb;
+h2.instruction { 
+  color: #08e;
 }
-div.logo img {
-    vertical-align: middle;
-    margin-left: 2ex;
+
+h3 { font-weight: normal;
+  font-size: 18px;
+  color: #777;
+}
+
+form p {
+  color: #777;
 }
 
 a {
   color: #00B7FF;
 }
+
+
+
 

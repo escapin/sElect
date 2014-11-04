@@ -1,14 +1,15 @@
 <% include header -%>
 
-<h1> Cast </h1>
-<h2> Election Title: <%= manifest.title %> </h2>
-<h2> Description: <%= manifest.description %> </h2>
+<h2 class="instruction"> Thank you for voting in: </h2>
+<h1> <%= manifest.title %> </h1>
 
-<p> Hello <%= email %> </p>
+<p> Your ballot has been accepted by the collecting server.</p>
 
-<p> You have chosen: <%= choice %>.  </p>
-<p> Ballot has been accepted by the collecting server. </p>
-<p> Receipt ID: <%= receipt_id %> </p>
-<p> InnerBallot: <%= inner_ballot %> </p>
+<h2 class="instruction">When the election is over, you can check
+that your ballot is in the final tally. If you want
+to do this, you need to copy the following receipt ID and look it
+up in the result of the election.</h2>
+
+<p> <%= receipt_id %> </p>
 
 <% include footer -%>
