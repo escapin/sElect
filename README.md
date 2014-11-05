@@ -34,7 +34,7 @@ started in the following way.
 *Collecting server*:
 ```
 cd CollectingServer
-node collsecringServer.js
+node collectingServer.js
 ```
 
 *Final server*:
