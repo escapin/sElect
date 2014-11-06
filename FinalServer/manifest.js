@@ -1,12 +1,15 @@
 var fs = require('fs');
 var config = require('./config.json')
+var crypto = require('cryptofunc')
 
 var manifest = null;
+var manifest_raw = null;
 
-var manifest_file = config.MANIFEST_FILE;
-console.log('Read manifest from:', manifest_file);
-if (fs.existsSync(manifest_file)) {
-    manifest = require(manifest_file);
+console.log('Read manifest from:', config.MANIFEST_FILE);
+if (fs.existsSync(config.MANIFEST_FILE)) {
+    manifest_raw = fs.readFileSync(config.MANIFEST_FILE, {encoding:'utf8'});
+    manifest = JSON.parse(manifest_raw);
+    manifest.hash = crypto.hash(manifest_raw);
 }
 
 if (!manifest) { // there is no manifest

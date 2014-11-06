@@ -32,7 +32,7 @@ setInterval( result.loadResult, 5000);
 
 // STARGING THE SERVER
 var server = app.listen(config.port, function() {
-    console.log('Bulleting Board running for election "%s" [%s]', manifest.title, manifest.electionID);
+    console.log('Bulleting Board running for election "%s" [%s]', manifest.title, manifest.hash);
     console.log('Listening on %s, port %d\n', server.address().address, server.address().port);
 });
 

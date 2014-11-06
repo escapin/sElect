@@ -2,7 +2,6 @@ package de.uni.trier.infsec.eVotingSystem.wrappers;
 
 import de.uni.trier.infsec.eVotingSystem.core.CollectingServer;
 import de.uni.trier.infsec.functionalities.digsig.Signer;
-import de.uni.trier.infsec.functionalities.nonce.NonceGen;
 import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
 import de.uni.trier.infsec.utils.Utilities;
 
@@ -16,7 +15,6 @@ public class CollectingServerWrapper
 
 	private static String string(byte[] message) { return Utilities.byteArrayToHexString(message); }
 	private static byte[] message(String str)    { return Utilities.hexStringToByteArray(str); }
-	private NonceGen nonceGen = new NonceGen();
 
 	private CollectingServer cs;
 
@@ -39,9 +37,5 @@ public class CollectingServerWrapper
 
 	public String getResult() {
 		return string(cs.getResult()); 
-	}
-	
-	public String getFreshOTP() {
-		return string(nonceGen.newNonce());
 	}
 }

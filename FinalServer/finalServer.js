@@ -44,7 +44,7 @@ var tls_options = {
 };
 
 var server = https.createServer(tls_options, app).listen(config.port, function() {
-    console.log('Final Server running for election "%s" [%s]', manifest.title, manifest.electionID);
+    console.log('Final Server running for election "%s" [%s]', manifest.title, manifest.hash);
     console.log('HTTPS server listening on %s, port %d\n', server.address().address, server.address().port);
 });
 

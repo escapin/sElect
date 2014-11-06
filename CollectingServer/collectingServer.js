@@ -72,7 +72,7 @@ var tls_options = {
 // TODO: check that our IP/port is the IP/port specified for the
 // collecting server in the Manifest
 var server = https.createServer(tls_options, app).listen(config.port, function() {
-    console.log('Collecting Server running for election "%s" [%s]', manifest.title, manifest.electionID);
+    console.log('Collecting Server running for election "%s" [%s]', manifest.title, manifest.hash);
     console.log('HTTPS server listening on %s, port %d\n', server.address().address, server.address().port);
 });
 
