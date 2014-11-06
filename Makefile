@@ -16,6 +16,7 @@ npm:
 	cd VotingBooth; npm install
 	cd CollectingServer; npm install
 	cd FinalServer; npm install
+	cd node_modules/cryptofunc; npm install
 
 configs:
 	-mkdir tmp
@@ -32,6 +33,7 @@ devclean:
 	-rm -r VotingBooth/node_modules
 	-rm -r CollectingServer/node_modules
 	-rm -r FinalServer/node_modules
+	-rm -r node_modules/cryptofunc/node_modules
 	-rm -r tmp
 
 clean:
