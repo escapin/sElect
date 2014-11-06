@@ -4,6 +4,7 @@ var config = require('./config');
 var manifest = require('./manifest');
 var server = require('./server');
 var sendEmail = require('./sendEmail');
+var crypto = require('cryptofunc');
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // State
@@ -48,34 +49,26 @@ exports.otp = function otp(req, res)
         }
         else // eligible voter create a fresh OTP and send it
         {
-            // Get a fresh otp (Java async call)
-            console.log('Obtaining OTP...');
-            server.getFreshOTP(function(err, otp) {
-                if (err) {
-                    console.log(' ...Internal error:', err);
-                    res.send({ ok: false, descr: 'Internal error. Cannot obtain an OTP' }); 
-                    return;
-                }
-                // We have a fresh otp
-                console.log(' ...Obtained a fresh OTP: ', otp);
-                otp_store[email] = otp // store the opt under the voter id (email)
-                // schedule reset of the otp
-                setTimeout( function(){ otp_store[email]=null; }, 10*60000); // 10 min
+            // Generate a fresh otp
+            var otp = crypto.nonce();
+            console.log(' ...Fresh OTP: ', otp);
+            otp_store[email] = otp // store the opt under the voter id (email)
+            // schedule reset of the otp
+            setTimeout( function(){ otp_store[email]=null; }, 10*60000); // 10 min
 
-                // Send an email
-                /*
-                console.log('Sending an emal with otp to', email, otp);
-                sendEmail(email, 'Your One Time Password for sElect', otp, function (err,info) {
-                    if (err) {
-                        console.log(' ...Error:', err);
-                    }else{
-                        console.log(' ...E-mail sent: ' + info.response);
-                    }
-                    res.send({ ok: true }); 
-                })
-                */
-                res.send({ ok: true }); // TODO: this is nestead of tha above
-            }); 
+            // Send an email
+            /*
+            console.log('Sending an emal with otp to', email, otp);
+            sendEmail(email, 'Your One Time Password for sElect', otp, function (err,info) {
+                if (err) {
+                    console.log(' ...Error:', err);
+                }else{
+                    console.log(' ...E-mail sent: ' + info.response);
+                }
+                res.send({ ok: true }); 
+            })
+            */
+            res.send({ ok: true }); // TODO: this is nestead of tha above
         }
     }
     else 
