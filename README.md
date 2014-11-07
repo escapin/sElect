@@ -15,7 +15,8 @@ built on top of the core are written in node.js.
 ## Dependencies
 
 * Java JDK (tested with openjdk-7).
-* Bouncy Castle crypto library (please, put the appropriate jar file in the 'lib' folder).
+* Bouncy Castle crypto Java library (please, put the appropriate jar file in the 'lib' folder).
+* Junit Java library (please, put the appropriate jar file in the 'lib' folder).
 * node.js and npm.
 
 ## Development Environment
@@ -27,7 +28,7 @@ make devenv
 ```
 
 This will create a locally runnable configuration with example config files and 
-election manifest. (These files can be removed by `make devclean`). Once the 
+an example election manifest. (These files can be removed by `make devclean`). Once the 
 development environment is created, the components of the system can be 
 started in the following way.
 
@@ -56,7 +57,7 @@ node votingBooth.js
 ```
 
 The files created during the voting process (including logs and partial 
-and final results) can be removed wih 
+and final results) can be removed with
 ```
 make clean
 ```
