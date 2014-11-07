@@ -65,9 +65,15 @@ public class CollectingServer
 		if (!voterInfo.containsKey(voterID)) // not eligible voter
 			throw new Error("Wrong voter id");
 
-		byte[] innerBallot = decryptor.decrypt(ballot);
-		if (innerBallot==null) // decryption has failed
+		byte[] elID_innerBallot = decryptor.decrypt(ballot);
+		if (elID_innerBallot==null) // decryption failed
 			throw new Error("Malformed ballot (decryption failed)");
+		byte[] elID = MessageTools.first(elID_innerBallot);
+		if (elID==null || !MessageTools.equal(electionID, elID))
+			throw new Error("Malformed ballot (wrong election ID)");
+		byte[] innerBallot = MessageTools.second(elID_innerBallot);
+		if (innerBallot==null || innerBallot.length==0)
+			throw new Error("Malformed ballot (empty inner ballot)");
 
 		// Check if the voter has already voted with different inner ballot: 
 		byte[] storedInnerBallot = voterInfo.get(voterID);
@@ -81,7 +87,7 @@ public class CollectingServer
 		}
 
 		// Create a receipt for the voter
-		byte[] elID_innerBallot = concatenate(electionID, innerBallot);
+		// byte[] elID_innerBallot = concatenate(electionID, innerBallot);
 		byte[] accepted_elID_innerBallot = concatenate(TAG_ACCEPTED, elID_innerBallot);
 		byte[] receipt = signer.sign(accepted_elID_innerBallot);
 

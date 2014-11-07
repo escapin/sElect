@@ -41,7 +41,7 @@ public class Voter
 	 * Creates and returns a ballot containing the given vote. 
 	 * The ballot is of the form:
 	 * 
-	 *     Enc_CS( innerBallot )
+	 *     Enc_CS(electionID, innerBallot )
 	 * 
 	 * with innerBallot = Enc_FS(electionID, choice, receiptID)
 	 * 
@@ -53,7 +53,7 @@ public class Voter
 		byte[] nonce = noncegen.newNonce();
 		byte[] vote = intToByteArray(votersChoice);
 		byte[] innerBallot = finServEnc.encrypt(concatenate(electionID, concatenate(nonce, vote)));
-		byte[] ballot = colServEnc.encrypt(innerBallot);
+		byte[] ballot = colServEnc.encrypt(concatenate(electionID, innerBallot));
 		return new BallotInfo(ballot, nonce, innerBallot);
 	}
 
