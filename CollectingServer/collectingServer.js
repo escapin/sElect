@@ -2,10 +2,14 @@ var express = require('express');
 var https = require('https');
 var bodyParser = require('body-parser');
 var morgan = require('morgan'); // logging
+var winston = require('winston');
 var fs = require('fs');
 
 var config = require('./config');
 var manifest = require('./manifest')
+
+// LOGGING (to a file in addition to the console)
+winston.add(winston.transports.File, { filename: config.LOG_FILE });
 
 // CHECK IF THE RESULT ALREADY EXISTS
 var cmdline_option = process.argv[2];
@@ -51,7 +55,7 @@ app.set('views', './views');    // location of the views
 app.set('view engine', 'ejs');  // view engine
 app.use(bodyParser.json()); 
 app.use(express.static('./public')); // static content
-// app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging
+app.use( morgan('*** :remote-addr [:date] :method :url :status / :referrer [:response-time ms]', {}) ); // logging
 
 
 // ROUTES
@@ -73,6 +77,7 @@ var tls_options = {
 // collecting server in the Manifest
 var server = https.createServer(tls_options, app).listen(config.port, function() {
     console.log('Collecting Server running for election "%s" [%s]', manifest.title, manifest.hash);
+    winston.info('SERVER STARTED');
     console.log('HTTPS server listening on %s, port %d\n', server.address().address, server.address().port);
 });
 

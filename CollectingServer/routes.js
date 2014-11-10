@@ -1,5 +1,6 @@
 var fs = require('fs');
 var request = require('request-json');
+var winston = require('winston');
 var config = require('./config');
 var manifest = require('./manifest');
 var server = require('./server');
@@ -34,36 +35,37 @@ var log = fs.createWriteStream(config.ACCEPTED_BALLOTS_LOG_FILE, {flags:'a', enc
 
 exports.otp = function otp(req, res) 
 {
+    var email = req.body.email;
+
     if (!active) {
-        console.log('ERROR: otp request, but election is closed.')
+        winston.info('OTP request (%s) ERROR: election closed.', email)
         res.send({ ok: false, descr: 'Election closed' }); 
         return;
     }
 
-    var email = req.body.email;
     if (email) {
         if (!server.eligibleVoters[email]) // Check if the voter is eligible
         {
-            console.log('Voter not eligible', email);
+            winston.info('OTP request (%s) ERROR: Voter not eligible', email);
             res.send({ ok: false, descr: 'Invalid voter identifier (e-mail)' }); 
         }
         else // eligible voter create a fresh OTP and send it
         {
             // Generate a fresh otp
             var otp = crypto.nonce();
-            console.log(' ...Fresh OTP: ', otp);
+            winston.info('OTP request (%s) accepted. Fresh OTP = %s', email, otp);
             otp_store[email] = otp // store the opt under the voter id (email)
             // schedule reset of the otp
             setTimeout( function(){ otp_store[email]=null; }, 10*60000); // 10 min
 
             // Send an email
             /*
-            console.log('Sending an emal with otp to', email, otp);
+            winston.info('Sending an emal with otp to', email, otp);
             sendEmail(email, 'Your One Time Password for sElect', otp, function (err,info) {
                 if (err) {
-                    console.log(' ...Error:', err);
+                    winston.info(' ...Error:', err);
                 }else{
-                    console.log(' ...E-mail sent: ' + info.response);
+                    winston.info(' ...E-mail sent: ' + info.response);
                 }
                 res.send({ ok: true }); 
             })
@@ -81,46 +83,43 @@ exports.otp = function otp(req, res)
 
 exports.cast = function cast(req, res) 
 {
-    if (!active) {
-        console.log('ERROR: ballot comming, but election is closed.')
-        res.send({ ok: false, descr: 'Election closed' }); 
-        return;
-    }
-
     var email = req.body.email;
     var otp = req.body.otp;
     var ballot = req.body.ballot;
-    console.log('BALLOT COMING:', email, otp, ballot);
 
     // make sure that we have all the pieces:
     if (!email || !otp || !ballot ) {
+        winston.info('Cast request (%s) ERROR: election closed.', email)
         res.send({ ok: false, descr: 'Wrong request' }); 
         return;
     }
 
-    // Check the otp (and, implicitly, the identifier)
-    console.log('Checking the otp for a voter:', email, otp);
-    if (otp_store[email] === otp) {
-        console.log(' ...otp correct');
+    // is the server active?
+    if (!active) {
+        winston.info('Cast request (%s) ERROR: election closed.', email)
+        res.send({ ok: false, descr: 'Election closed' }); 
+        return;
+    }
 
+    // Check the otp (and, implicitly, the identifier)
+    if (otp_store[email] === otp) {
         // Cast the ballot:
-        console.log('CollectBallot for', email );
         server.collectBallot(email, ballot, function(err, response) {
             if (err) {
-                console.log(' ...Internal error: ', err);
+                winston.info('Cast request (%s) INTERNAL ERROR %s', email, err);
                 res.send({ ok: false, descr: 'Internal error' }); 
             }
             else if (!response.ok) {
-                console.log(' ...Ballot rejected: ', response.data);
+                winston.info('Cast request (%s) BALLOT REJECTED. Response = %s', email, response.data);
                 res.send({ ok: false, descr: response.data }); 
             }
             else { // everything ok
-                console.log(' ...Balloc accepted. Response = ', response);
+                winston.info('Cast request (%s) accepted', email);
                 res.send({ ok: true, receipt: response.data }); 
                 // log the accepted ballot
                 log.write(JSON.stringify({ email:email, ballot:ballot })+'\n', null,
                           function whenFlushed(e,r) {
-                    console.log('Ballot for %s logged', email);
+                    winston.info('Ballot for %s logged', email);
                 });
                 // TODO: how to make sure that this stream is flushed right away
             }
@@ -128,7 +127,7 @@ exports.cast = function cast(req, res)
     }
     else // otp not correct
     {
-        console.log(' ...Invalid OTP');
+        winston.info('Cast request ERROR: Invalid OTP');
         res.send({ ok: false, descr: 'Invalid OTP (one time password)' }); 
         // if an invalid otp is given, we require that a new otp be generated (reset otp):
         otp_store[email] = null;
@@ -157,9 +156,9 @@ if (config.ignore_fin_serv_cert)
 function saveResult(result) {
     fs.writeFile(config.RESULT_FILE, result, function (err) {
         if (err) 
-            console.log('Problems with saving result', config.RESULT_FILE);
+            winston.info('Problems with saving result', config.RESULT_FILE);
         else {
-            console.log('Result saved in', config.RESULT_FILE);
+            winston.info('Result saved in', config.RESULT_FILE);
             resultReady = true;
         }
     });
@@ -167,16 +166,16 @@ function saveResult(result) {
 
 // Send result to the final server
 function sendResult(result) {
-    console.log('Sending result to the final server');
+    winston.info('Sending result to the final server');
     var finServ = request.newClient(manifest.finalServer.URI, finserv_options);
     var data = {data: result}
     finServ.post('data', data, function(err, otp_res, body) {
         if (err) {
-            console.log(' ...Error: Cannot send the result to the final server: ', err);
+            winston.info(' ...Error: Cannot send the result to the final server: ', err);
         }
         else {
-            console.log(' ...Result sent to the final server.');
-            console.log(' ...Response:', body);
+            winston.info(' ...Result sent to the final server.');
+            winston.info(' ...Response:', body);
         }
     });
     // TODO: should we somewhow close the connection to the final server?
@@ -189,14 +188,12 @@ exports.close = function close(req, res)  {
     }
     active = false;
     res.send({ ok: true, info: "triggered to close the election" }); 
-    console.log('Closing election.');
-    console.log('Getting the result...');
+    winston.info('Closing election.');
     server.getResult(function(err, result) {
         if (err) {
-            console.log(' ...Internal error. Cannot fetch the result: ', err);
+            winston.info(' ...INTERNAL ERROR. Cannot fetch the result: ', err);
         }
         else { 
-            console.log('Result:', result);
             sendResult(result);
             saveResult(result);
         }
