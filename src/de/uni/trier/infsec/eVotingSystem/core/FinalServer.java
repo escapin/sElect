@@ -72,21 +72,22 @@ public class FinalServer
 		byte[] ballotsAsAMessage = MessageTools.first(MessageTools.second(payload)); 
 		byte[][] entries = new byte[numberOfVoters][];
 		int numberOfEntries = 0;
+
+		// Loop over the input entries
+		byte[] last = null;
 		for( MessageSplitIter iter = new MessageSplitIter(ballotsAsAMessage); iter.notEmpty(); iter.next() ) {
-			if (numberOfEntries > numberOfVoters)
+			if (numberOfEntries > numberOfVoters) // too many entries
 				throw new MalformedData("Too many entries");
-
-			byte[] elID_nonce_vote = decryptor.decrypt(iter.current());
-			if (elID_nonce_vote == null) // decryption failed
-				continue;
+			byte[] current = iter.current();
+			if (last!=null && MessageTools.equal(current, last)) continue; // ignore duplicates
+			last = current;
+			byte[] elID_nonce_vote = decryptor.decrypt(current); // decrypt the current entry
+			if (elID_nonce_vote == null) continue; // decryption failed
 			byte[] elID = MessageTools.first(elID_nonce_vote);
-			if (elID==null || !MessageTools.equal(elID, electionID)) // wrong election ID
-				continue;
+			if (elID==null || !MessageTools.equal(elID, electionID)) continue; // wrong election ID
 			byte[] nonce_vote = MessageTools.second(elID_nonce_vote);
-			if (nonce_vote==null || nonce_vote.length==0) // empty message
-				continue;
-
-			entries[numberOfEntries] = nonce_vote;
+			if (nonce_vote==null || nonce_vote.length==0) continue; // empty message
+			entries[numberOfEntries] = nonce_vote; // entry is fine; store it
 			++numberOfEntries;
 		}
 

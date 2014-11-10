@@ -120,7 +120,7 @@ public class CollectingServer
 			if (ballots[id]!=null)
 				vv[ind++] = intToByteArray(id);
 		}
-		byte[] votersAsAMessage = Utils.concatenateMessageArray(vv);
+		byte[] votersAsAMessage = Utils.concatenateMessageArrayWithDuplicateElimination(vv);
 
 		// put together the election ID, inner ballots, and list of voters
 		byte[] result = concatenate(electionID, concatenate(ballotsAsAMessage, votersAsAMessage));

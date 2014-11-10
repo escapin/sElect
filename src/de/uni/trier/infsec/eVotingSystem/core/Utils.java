@@ -4,9 +4,23 @@ import de.uni.trier.infsec.utils.MessageTools;
 
 public class Utils 
 {
-	public static byte[] concatenateMessageArray(byte[][] messages) {
+	public static byte[] concatenateMessageArrayWithDuplicateElimination(byte[][] messages) {
 		return concatenateMessageArray(messages, messages.length);
 	}
+
+	public static byte[] concatenateMessageArrayWithDuplicateElimination(byte[][] messages, int len) {
+		byte[] msg = new byte[0];
+		byte[] last = null;
+		for (int i=len-1; i>=0; --i) { // from the last to the first
+			byte[] current = messages[i];
+			if (last==null || !MessageTools.equal(current, last)) {
+				msg = MessageTools.concatenate(current, msg);
+			}
+			last = current;
+		}
+		return msg;
+	}
+
 
 	public static byte[] concatenateMessageArray(byte[][] messages, int len) {
 		byte[] msg = new byte[0];
