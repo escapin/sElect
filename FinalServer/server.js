@@ -21,7 +21,7 @@ var numberOfVoters = +manifest.voters.length;
 
 // Create an instance of FinalServerWrapper:
 console.log('Creating an instance of FinalServerWrapper');
-var fsWrapper = java.newInstanceSync("de.uni.trier.infsec.eVotingSystem.wrappers.FinalServerWrapper", 
+var fsWrapper = java.newInstanceSync("selectvoting.system.wrappers.FinalServerWrapper", 
                                       encKey, decKey, verifKey, signKey, csVerifKey, 
                                       manifest.hash, numberOfVoters);
 console.log(' ...FinalServerWrapper created');

@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.tests;
+package selectvoting.tests;
 
 import java.nio.charset.Charset;
 
@@ -6,15 +6,15 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import de.uni.trier.infsec.eVotingSystem.core.CollectingServer;
-import de.uni.trier.infsec.eVotingSystem.core.FinalServer;
-import de.uni.trier.infsec.eVotingSystem.core.Voter;
-import de.uni.trier.infsec.functionalities.digsig.Signer;
-import de.uni.trier.infsec.functionalities.digsig.Verifier;
-import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
-import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
-import de.uni.trier.infsec.utils.MessageTools;
-import de.uni.trier.infsec.utils.Utilities;
+import selectvoting.functionalities.digsig.Signer;
+import selectvoting.functionalities.digsig.Verifier;
+import selectvoting.functionalities.pkenc.Decryptor;
+import selectvoting.functionalities.pkenc.Encryptor;
+import selectvoting.system.core.CollectingServer;
+import selectvoting.system.core.FinalServer;
+import selectvoting.system.core.Voter;
+import selectvoting.utils.MessageTools;
+import selectvoting.utils.Utilities;
 
 public class TestTargetSystem extends TestCase  
 {

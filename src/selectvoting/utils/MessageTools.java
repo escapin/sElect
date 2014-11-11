@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.utils;
+package selectvoting.utils;
 
 
 public class MessageTools {

@@ -13,7 +13,7 @@ var finSerVerKey = manifest.finalServer.verification_key;
 
 // Create the instance of CollectingServerWrapper:
 console.log('Creating an instance of BBWrapper');
-var wrapper = java.newInstanceSync("de.uni.trier.infsec.eVotingSystem.wrappers.BBWrapper", 
+var wrapper = java.newInstanceSync("selectvoting.system.wrappers.BBWrapper", 
                                    finSerVerKey, manifest.hash );
 console.log(' ...BBServerWrapper created');
 

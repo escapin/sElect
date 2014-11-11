@@ -1,10 +1,10 @@
-package de.uni.trier.infsec.eVotingSystem.core;
+package selectvoting.system.core;
 
-import de.uni.trier.infsec.functionalities.digsig.Verifier;
-import de.uni.trier.infsec.functionalities.nonce.NonceGen;
-import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
-import static de.uni.trier.infsec.utils.MessageTools.intToByteArray;
-import static de.uni.trier.infsec.utils.MessageTools.concatenate;
+import selectvoting.functionalities.digsig.Verifier;
+import selectvoting.functionalities.nonce.NonceGen;
+import selectvoting.functionalities.pkenc.Encryptor;
+import static selectvoting.utils.MessageTools.concatenate;
+import static selectvoting.utils.MessageTools.intToByteArray;
 
 /**
  * Core voter's client class. It provides cryptographic operations (formating a ballot) 

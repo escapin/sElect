@@ -1,12 +1,14 @@
-package de.uni.trier.infsec.lib.crypto;
+package selectvoting.lib.crypto;
 
 import java.security.KeyException;
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.crypto.spec.IvParameterSpec;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -18,10 +20,12 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+
 import javax.crypto.Cipher;
+
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import de.uni.trier.infsec.utils.MessageTools;
+import selectvoting.utils.MessageTools;
 
 // TODO: check how exceptions/errors are handled
 

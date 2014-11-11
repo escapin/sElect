@@ -1,9 +1,9 @@
-package de.uni.trier.infsec.eVotingSystem.wrappers;
+package selectvoting.system.wrappers;
 
-import de.uni.trier.infsec.eVotingSystem.core.Voter;
-import de.uni.trier.infsec.functionalities.digsig.Verifier;
-import de.uni.trier.infsec.functionalities.pkenc.Encryptor;
-import de.uni.trier.infsec.utils.Utilities;
+import selectvoting.functionalities.digsig.Verifier;
+import selectvoting.functionalities.pkenc.Encryptor;
+import selectvoting.system.core.Voter;
+import selectvoting.utils.Utilities;
 
 public class VoterWrapper {
 

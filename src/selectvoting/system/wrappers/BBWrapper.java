@@ -1,9 +1,9 @@
-package de.uni.trier.infsec.eVotingSystem.wrappers;
+package selectvoting.system.wrappers;
 
-import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
-import de.uni.trier.infsec.functionalities.digsig.Verifier;
-import de.uni.trier.infsec.utils.MessageTools;
-import de.uni.trier.infsec.utils.Utilities;
+import selectvoting.functionalities.digsig.Verifier;
+import selectvoting.system.core.Utils.MessageSplitIter;
+import selectvoting.utils.MessageTools;
+import selectvoting.utils.Utilities;
 
 public class BBWrapper {
 	

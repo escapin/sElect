@@ -1,13 +1,13 @@
-package de.uni.trier.infsec.eVotingSystem.core;
+package selectvoting.system.core;
 
 import java.util.Arrays;
 import java.util.Hashtable;
 
-import de.uni.trier.infsec.functionalities.digsig.Signer;
-import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
-import de.uni.trier.infsec.utils.MessageTools;
-import static de.uni.trier.infsec.utils.MessageTools.intToByteArray;
-import static de.uni.trier.infsec.utils.MessageTools.concatenate;
+import selectvoting.functionalities.digsig.Signer;
+import selectvoting.functionalities.pkenc.Decryptor;
+import selectvoting.utils.MessageTools;
+import static selectvoting.utils.MessageTools.concatenate;
+import static selectvoting.utils.MessageTools.intToByteArray;
 
 public class CollectingServer 
 {

@@ -1,9 +1,9 @@
-package de.uni.trier.infsec.eVotingSystem.wrappers;
+package selectvoting.system.wrappers;
 
-import de.uni.trier.infsec.eVotingSystem.core.CollectingServer;
-import de.uni.trier.infsec.functionalities.digsig.Signer;
-import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
-import de.uni.trier.infsec.utils.Utilities;
+import selectvoting.functionalities.digsig.Signer;
+import selectvoting.functionalities.pkenc.Decryptor;
+import selectvoting.system.core.CollectingServer;
+import selectvoting.utils.Utilities;
 
 public class CollectingServerWrapper 
 {

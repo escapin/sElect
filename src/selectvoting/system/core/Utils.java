@@ -1,6 +1,6 @@
-package de.uni.trier.infsec.eVotingSystem.core;
+package selectvoting.system.core;
 
-import de.uni.trier.infsec.utils.MessageTools;
+import selectvoting.utils.MessageTools;
 
 public class Utils 
 {

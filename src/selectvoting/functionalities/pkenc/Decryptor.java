@@ -1,9 +1,9 @@
-package de.uni.trier.infsec.functionalities.pkenc;
+package selectvoting.functionalities.pkenc;
 
-import de.uni.trier.infsec.lib.crypto.KeyPair;
-import de.uni.trier.infsec.lib.crypto.CryptoLib;
-import de.uni.trier.infsec.utils.Utilities;
-import static de.uni.trier.infsec.utils.MessageTools.copyOf;
+import selectvoting.lib.crypto.CryptoLib;
+import selectvoting.lib.crypto.KeyPair;
+import selectvoting.utils.Utilities;
+import static selectvoting.utils.MessageTools.copyOf;
 
 /**
  * Real functionality for public-key encryption: Decryptor

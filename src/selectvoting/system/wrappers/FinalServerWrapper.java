@@ -1,10 +1,10 @@
-package de.uni.trier.infsec.eVotingSystem.wrappers;
+package selectvoting.system.wrappers;
 
-import de.uni.trier.infsec.eVotingSystem.core.FinalServer;
-import de.uni.trier.infsec.functionalities.digsig.Signer;
-import de.uni.trier.infsec.functionalities.digsig.Verifier;
-import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
-import de.uni.trier.infsec.utils.Utilities;
+import selectvoting.functionalities.digsig.Signer;
+import selectvoting.functionalities.digsig.Verifier;
+import selectvoting.functionalities.pkenc.Decryptor;
+import selectvoting.system.core.FinalServer;
+import selectvoting.utils.Utilities;
 
 public class FinalServerWrapper {
 	private static String string(byte[] message) { return Utilities.byteArrayToHexString(message); }

@@ -1,12 +1,12 @@
-package de.uni.trier.infsec.eVotingSystem.core;
+package selectvoting.system.core;
 
 import java.util.Arrays;
 
-import de.uni.trier.infsec.eVotingSystem.core.Utils.MessageSplitIter;
-import de.uni.trier.infsec.functionalities.digsig.Signer;
-import de.uni.trier.infsec.functionalities.digsig.Verifier;
-import de.uni.trier.infsec.functionalities.pkenc.Decryptor;
-import de.uni.trier.infsec.utils.MessageTools;
+import selectvoting.functionalities.digsig.Signer;
+import selectvoting.functionalities.digsig.Verifier;
+import selectvoting.functionalities.pkenc.Decryptor;
+import selectvoting.system.core.Utils.MessageSplitIter;
+import selectvoting.utils.MessageTools;
 
 public class FinalServer 
 {	

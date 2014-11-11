@@ -9,7 +9,7 @@ compile_java:
 	javac -sourcepath src \
           -classpath lib/bcprov-jdk16-146.jar \
           -d bin \
-          src/de/uni/trier/infsec/eVotingSystem/wrappers/*.java 
+          src/selectvoting/system/wrappers/*.java 
 
 npm:
 	cd BulletinBoard; npm install
@@ -35,7 +35,9 @@ devclean:
 	-rm -r FinalServer/node_modules
 	-rm -r node_modules/cryptofunc/node_modules
 	-rm -r tmp
+	-rm CollectingServer/log.txt
 
 clean:
 	-rm tmp/*.msg
 	-rm tmp/*.log
+	-rm CollectingServer/log.txt
