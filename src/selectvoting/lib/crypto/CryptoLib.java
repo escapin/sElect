@@ -119,7 +119,7 @@ public class CryptoLib {
 	 *
 	 * (Note there is a limit on the message length -- this is no hybrid encryption.)
 	 */
-	private static byte[] just_pke_encrypt(byte[] message, byte[] publicKey) {
+	public static byte[] just_pke_encrypt(byte[] message, byte[] publicKey) {
 		try {
 			KeyFactory kf = KeyFactory.getInstance("RSA", "BC");
 			// for private keys use PKCS8EncodedKeySpec; for public keys use
@@ -138,7 +138,7 @@ public class CryptoLib {
 		return null;
 	}
 
-	private static byte[] just_pke_decrypt(byte[] message, byte[] privKey) {
+	public static byte[] just_pke_decrypt(byte[] message, byte[] privKey) {
 		try {
 			KeyFactory kf = KeyFactory.getInstance("RSA", "BC");
 			// for private keys use PKCS8EncodedKeySpec; for public keys use
