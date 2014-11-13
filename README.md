@@ -18,6 +18,8 @@ built on top of the core are written in node.js.
 * Bouncy Castle crypto Java library (please, put the appropriate jar file in the 'lib' folder).
 * Junit Java library (please, put the appropriate jar file in the 'lib' folder).
 * node.js and npm.
+* node-jasmine (a test suite; type "npm install node-jasmine -g"
+  to install).
 
 ## Development Environment
 
@@ -70,3 +72,9 @@ collecting server, as of now, ignores the opening and closing
 times. The server needs to be triggered manually to close the
 election, which can be done through the status page served by
 this server.
+
+**Testing.**
+To run the test suite, type
+```
+make test
+```

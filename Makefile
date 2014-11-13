@@ -27,6 +27,10 @@ configs:
 	cp templates/config_fs.json FinalServer/config.json
 	cp templates/config_vb.json VotingBooth/config.json
 
+test:
+	cd tests; npm install
+	jasmine-node tests
+
 devclean:
 	-rm -r bin
 	-rm -r BulletinBoard/node_modules
@@ -36,6 +40,7 @@ devclean:
 	-rm -r node_modules/cryptofunc/node_modules
 	-rm -r tmp
 	-rm CollectingServer/log.txt
+	-rm -r tests/node_modules
 
 clean:
 	-rm tmp/*.msg
