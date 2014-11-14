@@ -4,6 +4,19 @@ var crypto = require('cryptofunc');
 var hexToBytes = forge.util.hexToBytes;
 var bytesToHex = forge.util.bytesToHex;
 
+describe( 'Conatenation and deconcatenation', function()
+{
+    it( 'are consistent', function()
+    {
+        var a = 'ffaa77';
+        var b = 'cc9911227733';
+        var p = crypto.deconcatenate(crypto.concatenate(a, b));
+        expect (p.first) .toBe(a);
+        expect (p.second).toBe(b);
+    });
+});
+
+
 describe( 'Symmetric encryption', function()
 {
     it( 'encrypts and then decrypts correctly', function()
@@ -62,6 +75,19 @@ describe( 'PKE Encryption', function()
     });
 });
 
+
+describe( 'Hybrid encryption', function()
+{
+    it( 'encrypts and then decrypts correctly messages', function()
+    {
+        var m = bytesToHex(forge.random.getBytesSync(1000)); // a random message
+        var k = crypto.pke_keygen();
+        var c = crypto.pke_encrypt(k.encryptionKey, m);
+        var d = crypto.pke_decrypt(k.decryptionKey, c);
+        var res = (d===m)
+        expect(res).toBe(true);
+    });
+});
 
 /*
 describe( '', function()

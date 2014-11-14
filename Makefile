@@ -31,6 +31,9 @@ test:
 	cd tests; npm install
 	jasmine-node tests
 
+testclean:
+	-rm -r tests/node_modules
+
 devclean:
 	-rm -r bin
 	-rm -r BulletinBoard/node_modules
