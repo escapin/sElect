@@ -4,7 +4,7 @@ var crypto = require('cryptofunc');
 var hexToBytes = forge.util.hexToBytes;
 var bytesToHex = forge.util.bytesToHex;
 
-xdescribe( 'Conatenation and deconcatenation', function()
+describe( 'Conatenation and deconcatenation', function()
 {
     it( 'are consistent', function()
     {
@@ -17,7 +17,7 @@ xdescribe( 'Conatenation and deconcatenation', function()
 });
 
 
-xdescribe( 'Symmetric encryption', function()
+describe( 'Symmetric encryption', function()
 {
     it( 'encrypts and then decrypts correctly', function()
     {
@@ -30,7 +30,7 @@ xdescribe( 'Symmetric encryption', function()
 });
 
 
-xdescribe( 'PKE Encryption', function()
+describe( 'PKE Encryption', function()
 {
     it( 'encrypts and then decrypts correctly', function()
     {
@@ -99,9 +99,38 @@ describe( 'Hybrid encryption', function()
         expect(d).toBe(plaintext);
 
         var c = crypto.pke_encrypt(encryption_key, plaintext);
-        console.log(c);
     });
 });
+
+
+describe( 'Digital signatures scheme', function()
+{
+    it( 'signs and verifies correctly', function()
+    {
+        var k = crypto.sig_keygen();
+        var message  = 'ff008833';
+        var message1 = 'ff008831';
+        var signature = crypto.sign(k.signingKey, message);
+        expect (crypto.verifsig(k.verificationKey, message, signature)).toBe(true);
+        expect (crypto.verifsig(k.verificationKey, message1, signature)).toBe(false);
+    });
+
+    
+    it( 'works correctly for some fixtures', function()
+    {
+        var verificationKey = "30819F300D06092A864886F70D010101050003818D0030818902818100B21E1FA56085DFEF9DA015A731CA2243FFF2A6354CD6C3AC5210C9D047702908A876F4E822A35A097BF0D8E0397A1B9C3F7BB4A055239E3F67500A707A3B5659FBCA35A1CEFFC251D72BE04F313A4B11451845E01F3A30B18546A521B268772051BC2ADC22EBDA6B9ECE530460A6DFE8818B1F53363E5C91BB7BA450C21AFCE90203010001";
+        var signingKey = "30820278020100300D06092A864886F70D0101010500048202623082025E02010002818100B21E1FA56085DFEF9DA015A731CA2243FFF2A6354CD6C3AC5210C9D047702908A876F4E822A35A097BF0D8E0397A1B9C3F7BB4A055239E3F67500A707A3B5659FBCA35A1CEFFC251D72BE04F313A4B11451845E01F3A30B18546A521B268772051BC2ADC22EBDA6B9ECE530460A6DFE8818B1F53363E5C91BB7BA450C21AFCE902030100010281807401E2A297671A1EBA0ED58B7B8627231AC433346BC344D62AECFC444702E9F6D5A204885C66FFF14563EC1CBDD2A5C0F227E3D0B922E5A26DEB57A1423AFB55B128D0A4289E27D0510CDCCAF268EC471B2FDC8F8A2C270B82BB0FD115A5DF1AFECE4680A64F6F62E64BA515F03E9C5FF891F0832DC2F6103DE02D1915C1DCF1024100E53FC931375907C421471E9A02518543AC4A521E56346586C8D4E7BC3C22F55E6F485781AE23F8A6C904D936147D3EE78FC0674D275D833ED5C1E3E9BA323CEB024100C6E6EB5184781CF25E5273FAFFE9C39EACD7B1986F0356DD3CA8226B1D6AF9A1A77A0E22CB3DBC60C920FEF75C6071643C07BE59B2D09BCB292F05A79E99287B024100BF8255B483A42054BBE809AC669B6B54692D7D0452C75AB90A34B192123AB1F7BDC71533042290A9E3EBE4F8C48D0C6BAD2EF21D05F19C9E753B9005C4C20B19024100B7D0B46C5376059A5F5CE7DE711F022FE42039FA5BADC45B1531750D74D465FAE521C16A9A55658034A00FC15E57AAB32D5F22A516C1FF1893E8E6DAEF912F7D024100BA4216E24F08F731F0DAF2566CB538954148CAEB9DA3F9667A0A421F7D5739B39FD8E0CA8FD41FA1F28559783AAFB15CC542BBC29ACD955D4F02A1F30C90A007";
+        var message  = '3f221f';
+        var message1 = '3f221e';
+        var signature = crypto.sign(signingKey, message);
+        expect (crypto.verifsig(verificationKey, message, signature)).toBe(true);
+        expect (crypto.verifsig(verificationKey, message1, signature)).toBe(false);
+
+        var signature1 = "62B0A89386126CD02FA293F50E2F783F170FF8ACCE69773186B3D0EBDAE17D86C319650A5DC1C491C4F5B122E88DC1E067C29B5597A0718AEF2024663C9AA4D5F6F66CB045ED8734361CB2DCAECE49CDB5D616124FF1249B9F226955640407F56D674730E0ECF75267E6486E175B3A2D01DF372430A098362F6452DA50E797CD";
+        expect (crypto.verifsig(verificationKey, message, signature1)).toBe(true);
+    });
+});
+
 
 /*
 describe( '', function()
