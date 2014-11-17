@@ -4,6 +4,18 @@ var crypto = require('cryptofunc');
 var hexToBytes = forge.util.hexToBytes;
 var bytesToHex = forge.util.bytesToHex;
 
+describe( 'Int/hex conversion', function()
+{
+    it( 'works as expected', function()
+    {
+        var n = 123467789;
+        var hex = crypto.int32ToHexString(n);
+        var r = crypto.hexStringToInt(hex);
+        expect (r).toBe(n);
+    });
+});
+
+
 describe( 'Conatenation and deconcatenation', function()
 {
     it( 'are consistent', function()
