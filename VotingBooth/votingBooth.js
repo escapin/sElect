@@ -8,7 +8,6 @@ var fs = require('fs');
 var config = require('./config');
 var manifest = require('./manifest');
 var routes = require('./routes');
-var _voter = require('./voter');
 
 // CREATE AND CONFIGURE THE APP
 

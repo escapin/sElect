@@ -1,8 +1,16 @@
 var request = require('request-json');
 var java = require('java');
+var voterClient = require('voterClient');
 var config = require('./config');
 var manifest = require('./manifest');
-var voter = require('./voter');
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Voter Client object
+
+var voter = voterClient.create( manifest.hash, 
+                                manifest.collectingServer.encryption_key, 
+                                manifest.collectingServer.verification_key, 
+                                manifest.finalServer.encryption_key );
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Collecting server object
@@ -56,8 +64,8 @@ exports.prompt_for_otp = function prompt_for_otp(req, res)
 
 exports.select = function select(req, res) 
 {
-    res.render('select', { title: "sElect Welcome", 
-                           email: req.body.email, 
+    res.render('select', { title: "sElect Welcome",
+                           email: req.body.email,
                            otp:   req.body.otp,
                            manifest: manifest});
 }
@@ -85,55 +93,46 @@ exports.cast = function cast(req, res)
 
     // Create the ballot (async Java call)
     console.log('Create ballot for %s with choice %d', email, choice_nr);
-    voter.createBallot(choice_nr, function (err, ballot_info) {
+    var ballot_info = voter.createBallot(choice_nr);
+    if (!ballot_info.ballot) {
+        console.log('Internal error: cannot create a ballot');
+        renderError(res, "Internal error: cannot create a ballot.");
+        return;
+    }
+
+    // Send the ballot to the collecting server (and obtain a receipt (signature)):
+    var data = { ballot:ballot_info.ballot, email:email, otp:otp };
+    console.log('Sending: ', data);
+    colServ.post('cast', data, function(err, otp_res, body) {
         if (err) {
-            console.log('Internal error:', err)
-            renderError(res, "Internal error: cannot create a ballot.");
+            renderError(res, "No responce from the collecting server. Ballot might have been not cast.");
+            return;
+        }
+        if (!body.ok) {
+            renderError(res, body.descr);
+            console.log('body: ', body);
             return;
         }
 
-        // Send the ballot to the collecting server (and obtain a receipt (signature)):
-        var data = { ballot:ballot_info.ballot, email:email, otp:otp };
-        console.log('Sending: ', data);
-        colServ.post('cast', data, function(err, otp_res, body) {
-            if (err) {
-                renderError(res, "No responce from the collecting server. Ballot might have been not cast.");
-                return;
-            }
-            if (!body.ok) {
-                renderError(res, body.descr);
-                console.log('body: ', body);
-                return;
-            }
-            
-            var receipt = body.receipt;
-            console.log('The collecting server accepted the ballot reqest. Receipt = ', receipt);
+        var receipt = body.receipt;
+        console.log('The collecting server accepted the ballot reqest. Receipt = ', receipt);
 
-            // Check the receipt (async Java call):
-            console.log('Validate receipt for', email);
-            voter.validateReceipt(receipt, ballot_info.innerBallot, function(err, recOK) {
-
-                if (err) {
-                    console.log('Internal error:', err)
-                    renderError(res, "Internal error: no receipt validated.");
-                    return;
-                }
-
-                if (!recOK) {
-                    console.log('Receipt not valid!');
-                    renderError(res, "Invalid receipt");
-                }
-                else {
-                    console.log(' ...Receipt ok');
-                    res.render('cast', { title: "sElect Welcome", 
-                                         email: req.body.email, 
-                                         choice: choice, 
-                                         receipt_id: ballot_info.nonce,
-                                         inner_ballot: ballot_info.innerBallot,
-                                         manifest: manifest });
-                }
-            });
-        });
+        // Check the receipt (async Java call):
+        console.log('Validate receipt for', email);
+        var recOK = voter.validateReceipt(receipt, ballot_info.innerBallot )
+        if (!recOK) {
+            console.log('Receipt not valid!');
+            renderError(res, "Invalid receipt");
+        }
+        else {
+            console.log(' ...Receipt ok');
+            res.render('cast', { title: "sElect Welcome",
+                                 email: req.body.email,
+                                 choice: choice,
+                                 receipt_id: ballot_info.nonce,
+                                 inner_ballot: ballot_info.innerBallot,
+                                 manifest: manifest });
+        }
     });
 }
 
