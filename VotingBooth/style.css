@@ -22,16 +22,16 @@ h3, h1 .subtitle  {
     font-size:14pt;
     font-weight: 300;
     color: #444;
-    text-shadow: 1px 1px 1px #bbb;
+    text-shadow: 0px 0px 1px #bbb;
 }
 h1 {
     margin-top: .2ex;
-    text-shadow: 1px 1px 3px #aaa;
+    text-shadow: 0px 0px 3px #bbb;
 }
 
 h1.error {
     color: #e00;
-    text-shadow: 1px 1px 3px #f77;
+    text-shadow: 0px 0px 3px #f66;
 }
 
 .pure-skin-mine .pure-form label {
@@ -59,7 +59,7 @@ div.extra-info {
     font-weight: 300;
     font-size: 18pt;
     margin: 1ex 0;
-    text-shadow: 1px 1px 3px #bbf;
+    text-shadow: 0px 0px 2px #ccf;
 }
 
 div.header {
