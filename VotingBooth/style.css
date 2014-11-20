@@ -91,6 +91,25 @@ div.body {
     text-align: right;
 }
 
-#otp, #choice, #result, #error {
+
+.pure-skin-mine .pure-form label {
+    font-size: 13pt;
+    font-weight: bold;
+    color: #666;
+}
+
+.pure-skin-mine .pure-form label.checked {
+    color: black;
+}
+
+.pure-skin-mine .pure-form label.notchecked {
+    color: #bbb;
+}
+
+#-welcome,
+#otp, 
+#choice, 
+#result, 
+#error {
     display:none;
 }

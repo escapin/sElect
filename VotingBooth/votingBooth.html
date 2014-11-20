@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     <div class="pure-u-1-3 toright">
-                        <button type="submit" class="pure-button pure-button-primary">Proceed to voting</button>
+                        <button id='submit-email' type="submit" class="pure-button pure-button-primary" disabled>Proceed to voting</button>
                     </div>
                 </div>    
             </fieldset>
@@ -54,7 +54,7 @@
                 <legend>Please enter your one-time password</legend>
                 <div class="pure-g">
                     <div class="pure-u-2-3">
-                        <input id='inp-otp' class="pure-input-1" type="text" size="50" placeholder="one-time password">
+                        <input id='inp-otp' class="pure-input-1" type="number" size="50" placeholder="one-time password">
                         <div class="extra-info"> 
                             Your one time password has been sent to you
                             e-mail account (if you cannot find it, please
@@ -62,7 +62,7 @@
                         </div>
                     </div>
                     <div class="pure-u-1-3 toright">
-                        <button type="submit" class="pure-button pure-button-primary">Continue</button>
+                        <button id='submit-otp' type="submit" class="pure-button pure-button-primary" disabled>Continue</button>
                     </div>
                 </div>    
             </fieldset>
@@ -73,27 +73,27 @@
         <h1> Title of the Election
         </h1>
 
-        <form class="pure-form" action="">
+        <form id="choice-form" class="pure-form" action="">
             <fieldset>
                 <legend>Please select your choice</legend>
                         <label for="option-1" class="pure-radio">
-                            <input id="option-1" type="radio" name="optionsRadios" value="option1">
+                            <input id="option-1" type="radio" name="choice" value="option1">
                             Option one
                         </label>
                         <label for="option-2" class="pure-radio">
-                            <input id="option-2" type="radio" name="optionsRadios" value="option2">
+                            <input id="option-2" type="radio" name="choice" value="option2">
                             Option two
                         </label>
                         <label for="option-3" class="pure-radio">
-                            <input id="option-3" type="radio" name="optionsRadios" value="option2">
+                            <input id="option-3" type="radio" name="choice" value="option2">
                             Option three
                         </label>
                         <label for="option-4" class="pure-radio">
-                            <input id="option-4" type="radio" name="optionsRadios" value="option2">
+                            <input id="option-4" type="radio" name="choice" value="option2">
                             Option four
                         </label>
                     <div class="toright">
-                        <button type="submit" class="pure-button pure-button-primary">Cast your vote</button>
+                        <button id='submit-choice' type="submit" class="pure-button pure-button-primary" disabled>Cast your vote</button>
                     </div>
                 </div>    
                 <div class="pure-g">
@@ -131,7 +131,6 @@
         </form>
 
     </div>
-
 </body>
 </html>
 <script type="text/javascript">
