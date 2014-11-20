@@ -7,7 +7,6 @@ body {
     font-weight: 400;
 }
 
-
 h1, h2 {
     font-size:36pt;
     font-weight: 100;
@@ -70,11 +69,11 @@ div.header {
     text-align: right;
 
     font-size: small;
-    color:gray;
+    color:#999;
 }
 
 div.header em {
-    color: #444;
+    font-weight: 500;
 }
 
 div.body {
@@ -90,4 +89,8 @@ div.body {
 
 .toright {
     text-align: right;
+}
+
+#otp, #choice, #result, #error {
+    display:none;
 }

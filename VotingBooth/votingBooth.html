@@ -5,13 +5,15 @@
     <link rel="stylesheet" href="custom-pure.css">
     <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/selectBooth.js"></script>
 </head>
 <body class="pure-skin-mine">
     <div class="header">
         Secure elections powered by <em>sElect</em>
     </div>
     <!-- --------------------------------------------------------------------------------- -->
-    <div class="body">
+    <div class="body" id="welcome">
         <h3 class="lead">Welcome to </h3>
         <h1> Title of the Election
             <div class="subtitle"> 
@@ -23,12 +25,12 @@
             </div>
         </h1>
 
-        <form class="pure-form" action="welcome" method="post">
+        <form class="pure-form" action="">
             <fieldset>
                 <legend>Provide your voter identifier (e-mail) to continue</legend>
                 <div class="pure-g">
                     <div class="pure-u-2-3">
-                        <input class="pure-input-1" type="email" size="50" placeholder="email">
+                        <input id='inp-email' class="pure-input-1" type="email" size="50" placeholder="email">
                         <div class="extra-info"> 
                             The e-mail address you provide should
                             be listed in the election manifest
@@ -43,16 +45,16 @@
         </form>
     </div>
     <!-- --------------------------------------------------------------------------------- -->
-    <div class="body">
+    <div class="body" id="otp">
         <h1> Title of the Election
         </h1>
 
-        <form class="pure-form" action="welcome" method="post">
+        <form class="pure-form" action="">
             <fieldset>
                 <legend>Please enter your one-time password</legend>
                 <div class="pure-g">
                     <div class="pure-u-2-3">
-                        <input class="pure-input-1" type="text" size="50" placeholder="one-time password">
+                        <input id='inp-otp' class="pure-input-1" type="text" size="50" placeholder="one-time password">
                         <div class="extra-info"> 
                             Your one time password has been sent to you
                             e-mail account (if you cannot find it, please
@@ -67,11 +69,11 @@
         </form>
     </div>
     <!-- --------------------------------------------------------------------------------- -->
-    <div class="body">
+    <div class="body" id="choice">
         <h1> Title of the Election
         </h1>
 
-        <form class="pure-form" action="welcome" method="post">
+        <form class="pure-form" action="">
             <fieldset>
                 <legend>Please select your choice</legend>
                         <label for="option-1" class="pure-radio">
@@ -99,7 +101,7 @@
         </form>
     </div>
     <!-- --------------------------------------------------------------------------------- -->
-    <div class="body">
+    <div class="body" id="result">
         <h1> Title of the Election
         </h1>
 
@@ -112,16 +114,16 @@
         <h3 class="legend"> copy the following receipt ID</h3>
         <p> and look it up in the result of the election.</p>
 
-        <p> Recipt id: <b>RECEIPT-ID</b> </p>
+        <p> Your recipt id: <b>72F8AA723FB</b> </p>
 
         <p><em>Thank you!</em></p>
     </div>
     <!-- --------------------------------------------------------------------------------- -->
-    <div class="body">
+    <div class="body" id="error">
         <h1 class="error"> Something went wrong! </h1>
 
         <p> You provided a wrong one-time password.  </p>
-        <form class="pure-form" action="welcome" method="post">
+        <form class="pure-form" action="">
             <fieldset>
                 <button type="submit" class="pure-button
                 pure-button-primary">Start over and try again</button>
@@ -132,4 +134,7 @@
 
 </body>
 </html>
+<script type="text/javascript">
+    $(document).ready(selectBooth);
+</script>
 
