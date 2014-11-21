@@ -21,27 +21,47 @@ function selectBooth() {
     //////////////////////////////////////////////////////////////////////////////
     /// HANDLERS FOR SUMBITTING DATA 
 
+    function showError(errorMessage) {
+        $('#errorMsg').text(errorMessage);
+        activeTabId = '#error';
+        $(activeTabId).fadeIn(FADE_TIME);
+    }
+
     function onSubmitWelcome(event) 
     {
-        // Consuming the input
+        // Fetching the email from the form
         var e = $('#inp-email').val();
-        if( !e || e==='' ) {
-            console.log('Undefined or empty email');
-        }
-        else {
-            console.log(e);
-            email = e;
-        }
+        if( !e || e==='' ) // it should not happen
+            return false;
+        email = e;
 
         // Make the active tab disappear
         $(activeTabId).fadeOut(FADE_TIME, function() {
-            activeTabId = '#otp';
-            // Make the otp tab appear
-            $(activeTabId).fadeIn(FADE_TIME);
-            $('#inp-otp').focus();
+
+            // Make an (ajax) otp request:
+            // TODO Show something to indicate work in progress
+            // FIXME Use the address from the manifest
+            $.post("https://localhost:3300/otp", {'email': email})
+             .done(function otpRequestDone(result) {
+                if (!result) {
+                    showError('Unexpected error');
+                }
+                else if (!result.ok) {
+                    showError("Server's responce: " + result.descr);
+                }
+                else {
+                    // Show the next window (OTP)
+                    activeTabId = '#otp';
+                    $(activeTabId).fadeIn(FADE_TIME);
+                    $('#inp-otp').focus();
+                }
+              })
+             .fail(function otpRequestFailed() {
+                showError('Cannot connect with the server');
+              });
         });
-        return false; // prevents any further submit action
-    }
+        return false;
+    };
 
     function onSubmitOTP(event) {
         // make the active tab disappear
@@ -57,7 +77,7 @@ function selectBooth() {
     function onSubmitChoice(event) {
         // make the active tab disappear
         $(activeTabId).fadeOut(FADE_TIME, function() {
-            activeTabId = '#error';
+            activeTabId = '#result';
 
             // make the otp tab appear
             $(activeTabId).fadeIn(FADE_TIME);
@@ -102,11 +122,9 @@ function selectBooth() {
         // Update the status of the submit button (active only when something is selected)
         if($('input[name="choice"]:checked').length == 0) { // no choice selected 
             $('#submit-choice').prop('disabled', true);
-            console.log('disabling');
         }
         else { // some choice selected
             $('#submit-choice').prop('disabled', null);
-            console.log('enabling');
         }
     }
 

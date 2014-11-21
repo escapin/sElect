@@ -33,6 +33,7 @@ h1.error {
     text-shadow: 0px 0px 3px #f66;
 }
 
+
 .pure-skin-mine .pure-form label {
     font-weight: bold;
 }
@@ -53,12 +54,18 @@ div.extra-info {
     color: #888;
 }
 
-.pure-skin-mine .pure-form legend, h3.legend {
+.pure-skin-mine .pure-form legend, h3.legend, div.error {
     color: #08e;
     font-weight: 300;
     font-size: 18pt;
     margin: 1ex 0;
     text-shadow: 0px 0px 2px #ccf;
+}
+
+div.error {
+    color: #a00;
+    text-shadow: 0px 0px 2px #f66;
+    margin-bottom: 2ex;
 }
 
 div.header {
