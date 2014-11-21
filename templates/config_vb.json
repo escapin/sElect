@@ -1,8 +1,0 @@
-{
-    "port" : 3400,
-    "MANIFEST_FILE": "../tmp/ElectionManifest.json",
-    "TLS_KEY_FILE":  "../tmp/server_key.pem",
-    "TLS_CERT_FILE": "../tmp/server_cert.pem",
-    "class_paths" : ["../bin", "../lib/bcprov-jdk16-146.jar"],
-    "ignore_col_serv_cert" : true
-}

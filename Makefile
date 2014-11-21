@@ -13,7 +13,6 @@ compile_java:
 
 npm:
 	cd BulletinBoard; npm install
-	cd VotingBooth; npm install
 	cd CollectingServer; npm install
 	cd FinalServer; npm install
 	cd node_modules/cryptofunc; npm install
@@ -25,7 +24,6 @@ configs:
 	cp templates/config_bb.json BulletinBoard/config.json
 	cp templates/config_cs.json CollectingServer/config.json
 	cp templates/config_fs.json FinalServer/config.json
-	cp templates/config_vb.json VotingBooth/config.json
 
 test:
 	cd tests; npm install
@@ -37,7 +35,6 @@ testclean:
 devclean:
 	-rm -r bin
 	-rm -r BulletinBoard/node_modules
-	-rm -r VotingBooth/node_modules
 	-rm -r CollectingServer/node_modules
 	-rm -r FinalServer/node_modules
 	-rm -r node_modules/cryptofunc/node_modules
