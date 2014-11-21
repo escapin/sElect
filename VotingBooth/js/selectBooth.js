@@ -57,6 +57,7 @@ function selectBooth() {
                 }
                 else {
                     // Show the next window (OTP)
+                    // TODO The otp field should be always emptied 
                     activeTabId = '#otp';
                     $(activeTabId).fadeIn(FADE_TIME);
                     $('#inp-otp').focus();
@@ -92,19 +93,40 @@ function selectBooth() {
         choice = + option.slice('option-'.length);
         console.log('CHOICE:', choice);
 
-        console.log('CREATING BALLOT FOR:', email, otp, choice);
-        var ballotInfo = voter.createBallot(choice);
-        console.log('BALLOT_INFO:', ballotInfo);
-        // TODO Send the ballot
-        // TODO Verify the receipt
-
-        // make the active tab disappear
+        // Make the active tab disappear
         $(activeTabId).fadeOut(FADE_TIME, function() {
-            activeTabId = '#result';
 
-            // make the otp tab appear
-            $(activeTabId).fadeIn(FADE_TIME);
+            // Create the ballot
+            console.log('CREATING BALLOT FOR:', email, otp, choice);
+            var ballotInfo = voter.createBallot(choice);
+            console.log('BALLOT_INFO:', ballotInfo);
+
+            // Make an (ajax) cast request:
+            // TODO Show something to indicate work in progress
+            // FIXME Use the address from the manifest
+            $.post("https://localhost:3300/cast", {'email': email, 'otp': otp, 'ballot': ballotInfo.ballot})
+             .fail(function otpRequestFailed() {  // request failed
+                showError('Cannot connect with the server');
+              })
+             .done(function castRequestDone(result) {  // we have some response
+                if (!result) {  // but for some reason this is not set!
+                    showError('Unexpected error');
+                }
+                else if (!result.ok) {  // server has not accepted the ballot
+                    showError("Server's responce: " + result.descr);
+                }
+                else { // Ballot accepted
+
+                    // TODO Verify the receipt
+                    
+                    // show the "ballot accepted tab
+                    activeTabId = '#result';
+                    $(activeTabId).fadeIn(FADE_TIME);
+                }
+              });
+
         });
+
         return false; // prevents any further submit action
     }
 
