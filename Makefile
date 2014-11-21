@@ -2,7 +2,7 @@
 default:
 	@echo Specify the goal: devenv OR  devclean OR clean
 
-devenv: compile_java npm configs
+devenv: compile_java npm configs copy_files
 
 compile_java:
 	-mkdir bin
@@ -10,6 +10,10 @@ compile_java:
           -classpath lib/bcprov-jdk16-146.jar \
           -d bin \
           src/selectvoting/system/wrappers/*.java 
+
+copy_files:
+	cp node_modules/voterClient.js VotingBooth/js/voterClient.js
+	cp node_modules/cryptofunc/index.js VotingBooth/js/cryptofunc.js
 
 npm:
 	cd BulletinBoard; npm install
@@ -34,6 +38,8 @@ testclean:
 
 devclean:
 	-rm -r bin
+	-rm -r VotingBooth/js/voterClient.js
+	-rm -r VotingBooth/js/cryptofunc.js
 	-rm -r BulletinBoard/node_modules
 	-rm -r CollectingServer/node_modules
 	-rm -r FinalServer/node_modules
