@@ -16,7 +16,7 @@ Programme *Reliably Secure Software Systems* (RS3)
 * Bouncy Castle crypto Java library (please, put the appropriate jar file in the 'lib' folder).
 * Junit Java library (please, put the appropriate jar file in the 'lib' folder).
 * node.js and npm.
-* node-jasmine (only for unit testing; type "npm install node-jasmine -g"
+* jasmine-node (only for unit testing; type "npm install jasmine-node -g"
   to install).
 
 ## Development Environment
