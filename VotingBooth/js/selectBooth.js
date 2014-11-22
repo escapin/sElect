@@ -67,7 +67,7 @@ function selectBooth() {
                 showError('Cannot connect with the server');
               });
         });
-        return false;
+        return false; // prevents any further submit action
     };
 
     function onSubmitOTP(event) {
@@ -91,7 +91,6 @@ function selectBooth() {
         // Fetch the choice from the form
         var option = $('input[name="choice"]:checked').attr('id');
         choice = + option.slice('option-'.length);
-        console.log('CHOICE:', choice);
 
         // Make the active tab disappear
         $(activeTabId).fadeOut(FADE_TIME, function() {
@@ -115,13 +114,17 @@ function selectBooth() {
                 else if (!result.ok) {  // server has not accepted the ballot
                     showError("Server's responce: " + result.descr);
                 }
-                else { // Ballot accepted
-
-                    // TODO Verify the receipt
-                    
-                    // show the "ballot accepted tab
-                    activeTabId = '#result';
-                    $(activeTabId).fadeIn(FADE_TIME);
+                else {
+                    // Ballot accepted. Verify the receipt
+                    var receiptValid = voter.validateReceipt(result.receipt, ballotInfo.innerBallot); 
+                    if (receiptValid) {
+                        // show the "ballot accepted" tab
+                        activeTabId = '#result';
+                        $(activeTabId).fadeIn(FADE_TIME);
+                    }
+                    else { // receipt not valid
+                        showError('Invalid receipt');
+                    }
                 }
               });
 
@@ -133,9 +136,8 @@ function selectBooth() {
     function onSubmitError(event) {
         // make the active tab disappear
         $(activeTabId).fadeOut(FADE_TIME, function() {
+            // show the welcome tab
             activeTabId = '#welcome';
-
-            // make the otp tab appear
             $(activeTabId).fadeIn(FADE_TIME);
             $('#inp-email').focus();
         });
