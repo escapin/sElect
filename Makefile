@@ -15,6 +15,8 @@ copy_files:
 	cp node_modules/voterClient.js VotingBooth/js/voterClient.js
 	cp node_modules/cryptofunc/index.js VotingBooth/js/cryptofunc.js
 
+
+
 npm:
 	cd BulletinBoard; npm install
 	cd CollectingServer; npm install
@@ -28,6 +30,7 @@ configs:
 	cp templates/config_bb.json BulletinBoard/config.json
 	cp templates/config_cs.json CollectingServer/config.json
 	cp templates/config_fs.json FinalServer/config.json
+	node tools/manifest2js.js templates/ElectionManifest.json > VotingBooth/ElectionManifest.js
 
 test:
 	cd tests; npm install
@@ -45,6 +48,7 @@ devclean:
 	-rm -r FinalServer/node_modules
 	-rm -r node_modules/cryptofunc/node_modules
 	-rm -r tmp
+	-rm VotingBooth/ElectionManifest.js
 	-rm CollectingServer/log.txt
 	-rm -r tests/node_modules
 

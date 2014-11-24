@@ -1,6 +1,7 @@
 
 function selectBooth() {
 
+
     //////////////////////////////////////////////////////////////////////////////
     /// PARAMETERS
 
@@ -9,19 +10,24 @@ function selectBooth() {
     //////////////////////////////////////////////////////////////////////////////
     /// STATE
 
+
     // For navigation
     var activeTabId = "#welcome";
+
+    // Manifest
+    var manifest = JSON.parse(electionManifestRaw);
+    manifest.hash = cryptofunc.hash(electionManifestRaw);
+    console.log('Election hash =', manifest.hash);
 
     // Voter and status
     var email = null;
     var otp = null;
     var choice = null;
 
-    // FIXME This should be taken from the manifest
-    var electionID = "0e64cae3f0f3fa302504d9a7fb4d0c40edb7c069";
-    var colServEncKey = "30819F300D06092A864886F70D010101050003818D0030818902818100B21E1FA56085DFEF9DA015A731CA2243FFF2A6354CD6C3AC5210C9D047702908A876F4E822A35A097BF0D8E0397A1B9C3F7BB4A055239E3F67500A707A3B5659FBCA35A1CEFFC251D72BE04F313A4B11451845E01F3A30B18546A521B268772051BC2ADC22EBDA6B9ECE530460A6DFE8818B1F53363E5C91BB7BA450C21AFCE90203010001";
-    var colServVerifKey = "305C300D06092A864886F70D0101010500034B003048024100863DD199FAAF19FDAA696E8ADECB5D1324B49E6AE904646875AEC215A48A69FB34996431C1938CA1A6796FD3FA65759E4A44A1D1313ABFFF9DEEF72404ACA0810203010001";
-    var finServEncKey = "30819F300D06092A864886F70D010101050003818D003081890281810081C2A661FB08D41F742A2EE037FBB41724AE0D04C1D4804E67147E0BBB3FFD4373B460000C3CFABC2A2A536BEAAA8FDFB188C7CDA4D05C8AA61EDB63B697217B1B12B8B5E9AF1BF918C13D8621715AA34539279B6E9AAD8F3792D1ECA4AAA7F78ACA1023DA580541EAC647E3CA7CDC50BC4648AEC16028F23979F329D83BF8550203010001";
+    var electionID = manifest.hash;
+    var colServEncKey = manifest.collectingServer.encryption_key;
+    var colServVerifKey = manifest.collectingServer.verification_key;
+    var finServEncKey = manifest.finalServer.encryption_key;
     var voter = voterClient.create(electionID, colServEncKey, colServVerifKey, finServEncKey);
 
     //////////////////////////////////////////////////////////////////////////////
@@ -120,6 +126,7 @@ function selectBooth() {
                     if (receiptValid) {
                         // show the "ballot accepted" tab
                         activeTabId = '#result';
+                        $('#receipt-id').text(ballotInfo.nonce);
                         $(activeTabId).fadeIn(FADE_TIME);
                     }
                     else { // receipt not valid
