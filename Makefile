@@ -1,8 +1,8 @@
 
 default:
-	@echo Specify the goal: devenv OR  devclean OR clean
+	@echo Specify the goal: devenv OR  devclean OR cleanElection
 
-devenv: compile_java npm configs copy_files
+devenv: compile_java npm configs copy_files download
 
 compile_java:
 	-mkdir bin
@@ -15,7 +15,8 @@ copy_files:
 	cp node_modules/voterClient.js VotingBooth/js/voterClient.js
 	cp node_modules/cryptofunc/index.js VotingBooth/js/cryptofunc.js
 
-
+download:
+	cd VotingBooth/js; wget http://code.jquery.com/jquery-1.11.1.min.js
 
 npm:
 	cd BulletinBoard; npm install
@@ -49,10 +50,11 @@ devclean:
 	-rm -r node_modules/cryptofunc/node_modules
 	-rm -r tmp
 	-rm VotingBooth/ElectionManifest.js
+	-rm VotingBooth/js/jquery-1.11.1.min.js
 	-rm CollectingServer/log.txt
 	-rm -r tests/node_modules
 
-clean:
+cleanElection:
 	-rm tmp/*.msg
 	-rm tmp/*.log
 	-rm CollectingServer/log.txt
