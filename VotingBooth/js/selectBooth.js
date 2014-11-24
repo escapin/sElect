@@ -16,7 +16,7 @@ function selectBooth() {
 
     // Manifest
     var manifest = JSON.parse(electionManifestRaw);
-    manifest.hash = cryptofunc.hash(electionManifestRaw);
+    manifest.hash = cryptofunc.hash(electionManifestRaw).toUpperCase();
     console.log('Election hash =', manifest.hash);
 
     // Voter and status
@@ -29,6 +29,27 @@ function selectBooth() {
     var colServVerifKey = manifest.collectingServer.verification_key;
     var finServEncKey = manifest.finalServer.encryption_key;
     var voter = voterClient.create(electionID, colServEncKey, colServVerifKey, finServEncKey);
+
+    //////////////////////////////////////////////////////////////////////////////
+    /// AUXILIARY FUNCTIONS
+
+    function optionsAsHTML() {
+        var options = '';
+        var choices = manifest.choices;
+        for (var i=0; i<choices.length; ++i) {
+            var choice = choices[i];
+            // console.log(choice);
+            var slabel = '<label for="option-' +i+ '" class="pure-radio">\n';
+            // console.log(slabel);
+            var sinput = '<input id="option-' +i+ '" type="radio" name="choice" value="option' +1+ 
+                         '"> ' +choice+ '</label>\n';
+            // console.log(sinput);
+            options += slabel;
+            options += sinput;
+        }
+        console.log(options);
+        return options;
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     /// HANDLERS FOR SUMBITTING DATA 
@@ -126,7 +147,7 @@ function selectBooth() {
                     if (receiptValid) {
                         // show the "ballot accepted" tab
                         activeTabId = '#result';
-                        $('#receipt-id').text(ballotInfo.nonce);
+                        $('#receipt-id').text(ballotInfo.nonce.toUpperCase());
                         $(activeTabId).fadeIn(FADE_TIME);
                     }
                     else { // receipt not valid
@@ -183,6 +204,12 @@ function selectBooth() {
     //////////////////////////////////////////////////////////////////////////////
     /// INITIALISATION AND BINDING
     
+    // Election data
+    $('h1.title').text(manifest.title);
+    $('h3.subtitle').text(manifest.description);
+    $('#choice-list').html(optionsAsHTML());
+
+    // Event handlers binding
     $('#welcome form').submit(onSubmitWelcome);
     $('#otp form').submit(onSubmitOTP);
     $('#choice form').submit(onSubmitChoice);
