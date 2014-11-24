@@ -30,8 +30,8 @@ h1 {
 }
 
 h1.error {
-    color: #e00;
-    text-shadow: 0px 0px 3px #f66;
+    color: #a00;
+    text-shadow: 0px 0px 2px #f66;
 }
 
 
@@ -44,8 +44,12 @@ h3.lead {
     color: #888;
 }
 
-h1 .subtitle {
-    margin-top: .8ex;
+h1 .electionid {
+    margin-top: .5ex;
+    font-weight: normal;
+    font-size: 11pt;
+    text-shadow: none;
+    color: #999;
 }
 
 
@@ -60,12 +64,12 @@ div.extra-info {
     font-weight: 300;
     font-size: 18pt;
     margin: 1ex 0;
-    text-shadow: 0px 0px 2px #ccf;
+    text-shadow: 0px 0px 1px #ccf;
 }
 
 div.error {
     color: #a00;
-    text-shadow: 0px 0px 2px #f66;
+    text-shadow: 0px 0px 1px #f66;
     margin-bottom: 2ex;
 }
 

@@ -84,7 +84,7 @@ function selectBooth() {
                 }
                 else {
                     // Show the next window (OTP)
-                    // TODO The otp field should be always emptied 
+                    $('#inp-otp').val(''); // emtpy the otp input field
                     activeTabId = '#otp';
                     $(activeTabId).fadeIn(FADE_TIME);
                     $('#inp-otp').focus();
@@ -205,7 +205,7 @@ function selectBooth() {
     /// INITIALISATION AND BINDING
     
     // Election data
-    $('h1.title').text(manifest.title);
+    $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +manifest.hash+ ')</div>');
     $('h3.subtitle').text(manifest.description);
     $('#choice-list').html(optionsAsHTML());
 
