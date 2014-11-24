@@ -54,15 +54,13 @@ node bb.js
 ```
 
 *Voting booth*:
-```
-cd VotingBooth
-node votingBooth.js
-```
+
+Simply open VotingBooth/votingBooth.html in your browser.
 
 The files created during the voting process (including logs and partial 
 and final results) can be removed with
 ```
-make clean
+make cleanElection
 ```
 
 **Remark.**
