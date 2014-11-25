@@ -13,15 +13,15 @@ var manifest = require('./manifest')
 winston.add(winston.transports.File, { filename: config.LOG_FILE });
 
 // CHECK IF THE RESULT ALREADY EXISTS
-var cmdline_option = process.argv[2];
+var cmdlineOption = process.argv[2];
 var resultFileExists = fs.existsSync(config.RESULT_FILE);
-if (resultFileExists && cmdline_option !== '--onlyServeResult') {
+if (resultFileExists && cmdlineOption !== '--serveResult') {
     console.log('ERROR: The file with result already exists.');
-    console.log('Remove this file or run the server with --onlyServeResult option.');
+    console.log('Remove this file or run the server with --serveResult option.');
     console.log('Server not started.');
     process.exit(1);
 }
-if (cmdline_option === '--onlyServeResult' && !resultFileExists) {
+if (cmdlineOption === '--serveResult' && !resultFileExists) {
     console.log('ERROR: The file with result does not exist.');
     console.log('Server not started.');
     process.exit(1);
@@ -29,20 +29,20 @@ if (cmdline_option === '--onlyServeResult' && !resultFileExists) {
 
 // CHECK IF THE LOG WITH ACCEPTED BALLOTS EXISTS
 var logFileExists = fs.existsSync(config.ACCEPTED_BALLOTS_LOG_FILE);
-if (logFileExists && cmdline_option !== '--resume') {
+if (logFileExists && !resultFileExists && cmdlineOption !== '--resume') {
     console.log('ERROR: Log file with accepted ballots exists.');
     console.log('Remove this file or run the server with --resume option.');
     console.log('Server not started.');
     process.exit(1);
 }
-if (cmdline_option === '--resume' && !logFileExists) {
+if (cmdlineOption === '--resume' && !logFileExists) {
     console.log('ERROR: Log file with accepted ballots does not exist');
     console.log('Server cannot be resumed.');
     process.exit(1);
 }
 
 // CHECK FOR WRONG OPTIONS
-if ( !cmdline_option in ['--onlyServeResult', '--resume'] ) {
+if (cmdlineOption && cmdlineOption!=='--resume' && cmdlineOption!=='--serveResult') {
     console.log('ERROR: Wrong option');
     console.log('Server not started.');
     process.exit(1);

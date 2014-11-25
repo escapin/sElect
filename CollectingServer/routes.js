@@ -1,4 +1,5 @@
 var fs = require('fs');
+var util = require('util');
 var request = require('request-json');
 var winston = require('winston');
 var config = require('./config');
@@ -6,17 +7,19 @@ var manifest = require('./manifest');
 var server = require('./server');
 var sendEmail = require('./sendEmail');
 var crypto = require('cryptofunc');
+var selectUtils = require('selectUtils');
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // State
 
 var otp_store = {};
 
+//  status and opening/closing time
 var resultReady = fs.existsSync(config.RESULT_FILE);
-var active = !resultReady; // active = accepts ballots
 
-
-if (fs.existsSync(config.ACCEPTED_BALLOTS_LOG_FILE)) {
+// If there is no result yet, but there are some accepted
+// ballots, we need to read these ballots to resume the operation:
+if (!resultReady && fs.existsSync(config.ACCEPTED_BALLOTS_LOG_FILE)) {
     console.log('Resuming (reading already accepted ballots)');
     var log_data = fs.readFileSync(config.ACCEPTED_BALLOTS_LOG_FILE, {flags:'r', encoding:'utf8'});
     log_data.split('\n').forEach(function (entry) { // for each entry in the log file
@@ -25,6 +28,70 @@ if (fs.existsSync(config.ACCEPTED_BALLOTS_LOG_FILE)) {
         console.log('  - processing a ballot of', entry.email);
         server.collectBallotSync(entry.email, entry.ballot);
     });
+}
+
+// Status
+function Status() {
+    var _open = false;
+    var _closed = false;
+
+    return {
+        isOpen : function () {
+            return _open;
+        },
+        isClosed : function () {
+            return _closed;
+        },
+        isActive : function () {
+            return _open && !_closed;
+        },
+        status : function () {
+            if (_closed) return 'closed'
+            else if (_open) return 'open'
+            else return 'not open yet';
+        },
+        open : function () {
+            if (!_closed) _open = true;
+        },
+        close : function () {
+            _closed = true;
+        }
+    }
+}
+var status = Status();
+
+// Time
+var startTime = new Date(manifest.startTime);
+var endTime = new Date(manifest.endTime);
+var now = new Date();
+var timeToOpen = startTime - now;
+var timeToClose = endTime - now;
+console.log('Time to open:  %s (%s)', selectUtils.timeDelta2String(timeToOpen), startTime);
+console.log('Time to close: %s (%s)', selectUtils.timeDelta2String(timeToClose), endTime);
+
+// DETERMINING THE INITIAL STATUS
+
+// if the result is ready (saved in the file), set the status to
+// closed (no further ballots are accepted; the result will not be
+// sent)
+if (resultReady) {
+    console.log('Result already exits. Election status set to closed');
+    status.close();
+}
+// if the result is not ready yet, but the time is over, close
+// election (this will save and send the result, and set the
+// status to closed):
+else if (timeToClose <= 0) {
+    closeElection();
+}
+// otherwise (the result is not ready, time is not over) set the
+// timeouts for the opening and closing:
+else {
+    setTimeout(closeElection, timeToClose);    
+    setTimeout(function() {
+        status.open();
+        winston.info('OPENING ELECTION.');
+    }, timeToOpen); // fires right away (in the next click), if timeToOpen <= 0; 
 }
 
 var log = fs.createWriteStream(config.ACCEPTED_BALLOTS_LOG_FILE, {flags:'a', encoding:'utf8'});
@@ -37,9 +104,10 @@ exports.otp = function otp(req, res)
 {
     var email = req.body.email;
 
-    if (!active) {
-        winston.info('OTP request (%s) ERROR: election closed.', email)
-        res.send({ ok: false, descr: 'Election closed' }); 
+    if (!status.isActive()) {
+        var descr = (status.isClosed() ? 'Election closed' : 'Election not opened yet');
+        winston.info('OTP request (%s) ERROR: %s.', email, descr)
+        res.send({ ok: false, descr: descr }); 
         return;
     }
 
@@ -95,9 +163,10 @@ exports.cast = function cast(req, res)
     }
 
     // is the server active?
-    if (!active) {
-        winston.info('Cast request (%s) ERROR: election closed.', email)
-        res.send({ ok: false, descr: 'Election closed' }); 
+    if (!status.isActive()) {
+        var descr = (status.isClosed() ? 'Election closed' : 'Election not opened yet');
+        winston.info('Cast request (%s) ERROR: %s.', email, descr)
+        res.send({ ok: false, descr: descr }); 
         return;
     }
 
@@ -140,7 +209,17 @@ exports.cast = function cast(req, res)
 // ROUTE info
 //
 exports.info = function info(req, res)  {
-    res.render('info', {manifest:manifest, active: active, resultReady: resultReady});
+    var now = new Date();
+    var timeToOpen = startTime - now;
+    var timeToClose = endTime - now;
+    var openingTime = util.format('Time to open:  %s (%s)', selectUtils.timeDelta2String(timeToOpen), startTime);
+    var closingTime =     util.format('Time to close: %s (%s)', selectUtils.timeDelta2String(timeToClose), endTime);
+    res.render('info', {manifest:manifest, 
+                        status: status.status(),
+                        openingTime: openingTime, 
+                        closingTime: closingTime,
+                        active: status.isActive(),
+                        resultReady:resultReady});
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +238,6 @@ function saveResult(result) {
             winston.info('Problems with saving result', config.RESULT_FILE);
         else {
             winston.info('Result saved in', config.RESULT_FILE);
-            resultReady = true;
         }
     });
 }
@@ -181,14 +259,11 @@ function sendResult(result) {
     // TODO: should we somewhow close the connection to the final server?
 }
 
-exports.close = function close(req, res)  {
-    if (!active) {
-        res.send({ ok: false, info: "election already closed" }); 
-        return;
-    }
-    active = false;
-    res.send({ ok: true, info: "triggered to close the election" }); 
-    winston.info('Closing election.');
+function closeElection() {
+    if (status.isClosed()) return;
+    status.close();
+    winston.info('CLOSING ELECTION.');
+    // get the result, send it to the final server, and save it.
     server.getResult(function(err, result) {
         if (err) {
             winston.info(' ...INTERNAL ERROR. Cannot fetch the result: ', err);
@@ -198,6 +273,16 @@ exports.close = function close(req, res)  {
             saveResult(result);
         }
     });
+}
+
+exports.close = function close(req, res)  {
+    if (status.isClosed()) {
+        res.send({ ok: false, info: "election already closed" }); 
+    }
+    else {
+        res.send({ ok: true, info: "triggered to close the election" }); 
+        closeElection();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -213,5 +298,4 @@ exports.serveFile = function serveFile(path) {
         });
     }
 }
-
 

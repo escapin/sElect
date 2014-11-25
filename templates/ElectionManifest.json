@@ -1,8 +1,8 @@
 {
     "title": "Coolest Thing Election",
     "description": "This is the election for the coolest thing in the world",
-    "startTime": "2014.01.01 at 15:00",
-    "endTime": "2099.10.10 at 15:00",
+    "startTime": "2014.01.01 15:00 GMT+0100",
+    "endTime": "2018.11.10 16:00 GMT+0100",
     
      "voters": [
          {"email": "a@ema.il"},
