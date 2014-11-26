@@ -87,11 +87,26 @@ else if (timeToClose <= 0) {
 // otherwise (the result is not ready, time is not over) set the
 // timeouts for the opening and closing:
 else {
-    setTimeout(closeElection, timeToClose);    
-    setTimeout(function() {
-        status.open();
-        winston.info('OPENING ELECTION.');
-    }, timeToOpen); // fires right away (in the next click), if timeToOpen <= 0; 
+    if (timeToClose > 2147483647) { // it is too much for node (v8); the event would fire immediately
+        console.log('WARNING: the closing time is too far in the future.');
+        console.log('         The election will not close automatically.');
+        // FIXME This is clearly a temporary solution. We should handle this limitation.
+    }
+    else {
+        setTimeout(closeElection, timeToClose);
+    }
+
+    if (timeToOpen > 2147483647) { // again, too much for v8
+        console.log('WARNING: the opening time is too far in the future.');
+        console.log('         The election will not open automatically.');
+        // FIXME As above.
+    }
+    else {
+        setTimeout(function() {
+            status.open();
+            winston.info('OPENING ELECTION.');
+        }, timeToOpen); // fires right away (in the next click), if timeToOpen <= 0;
+    }
 }
 
 var log = fs.createWriteStream(config.ACCEPTED_BALLOTS_LOG_FILE, {flags:'a', encoding:'utf8'});
