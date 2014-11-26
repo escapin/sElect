@@ -1,14 +1,14 @@
-package selectvoting.tests;
+package de.unitrier.infsec.tests;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import selectvoting.lib.crypto.CryptoLib;
-import selectvoting.lib.crypto.KeyPair;
-import selectvoting.utils.Utilities;
-import static selectvoting.utils.MessageTools.equal;
-import static selectvoting.utils.Utilities.hexStringToByteArray;
+import de.unitrier.infsec.lib.crypto.CryptoLib;
+import de.unitrier.infsec.lib.crypto.KeyPair;
+import de.unitrier.infsec.utils.Utilities;
+import static de.unitrier.infsec.utils.MessageTools.equal;
+import static de.unitrier.infsec.utils.Utilities.hexStringToByteArray;
 
 
 public class TestCryptoLib extends TestCase {

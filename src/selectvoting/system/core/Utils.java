@@ -1,6 +1,6 @@
 package selectvoting.system.core;
 
-import selectvoting.utils.MessageTools;
+import de.unitrier.infsec.utils.MessageTools;
 
 public class Utils 
 {

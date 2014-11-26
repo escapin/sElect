@@ -1,9 +1,9 @@
 package selectvoting.system.wrappers;
 
-import selectvoting.functionalities.digsig.Verifier;
-import selectvoting.functionalities.pkenc.Encryptor;
+import de.unitrier.infsec.functionalities.digsig.Verifier;
+import de.unitrier.infsec.functionalities.pkenc.Encryptor;
+import de.unitrier.infsec.utils.Utilities;
 import selectvoting.system.core.Voter;
-import selectvoting.utils.Utilities;
 
 public class VoterWrapper {
 

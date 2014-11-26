@@ -1,10 +1,10 @@
 package selectvoting.system.core;
 
-import selectvoting.functionalities.digsig.Verifier;
-import selectvoting.functionalities.nonce.NonceGen;
-import selectvoting.functionalities.pkenc.Encryptor;
-import static selectvoting.utils.MessageTools.concatenate;
-import static selectvoting.utils.MessageTools.intToByteArray;
+import de.unitrier.infsec.functionalities.digsig.Verifier;
+import de.unitrier.infsec.functionalities.nonce.NonceGen;
+import de.unitrier.infsec.functionalities.pkenc.Encryptor;
+import static de.unitrier.infsec.utils.MessageTools.concatenate;
+import static de.unitrier.infsec.utils.MessageTools.intToByteArray;
 
 /**
  * Core voter's client class. It provides cryptographic operations (formating a ballot) 

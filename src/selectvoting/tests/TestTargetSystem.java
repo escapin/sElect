@@ -6,15 +6,15 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import selectvoting.functionalities.digsig.Signer;
-import selectvoting.functionalities.digsig.Verifier;
-import selectvoting.functionalities.pkenc.Decryptor;
-import selectvoting.functionalities.pkenc.Encryptor;
+import de.unitrier.infsec.functionalities.digsig.Signer;
+import de.unitrier.infsec.functionalities.digsig.Verifier;
+import de.unitrier.infsec.functionalities.pkenc.Decryptor;
+import de.unitrier.infsec.functionalities.pkenc.Encryptor;
+import de.unitrier.infsec.utils.MessageTools;
+import de.unitrier.infsec.utils.Utilities;
 import selectvoting.system.core.CollectingServer;
 import selectvoting.system.core.FinalServer;
 import selectvoting.system.core.Voter;
-import selectvoting.utils.MessageTools;
-import selectvoting.utils.Utilities;
 
 public class TestTargetSystem extends TestCase  
 {

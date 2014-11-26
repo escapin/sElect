@@ -1,6 +1,6 @@
-package selectvoting.functionalities.nonce;
+package de.unitrier.infsec.functionalities.nonce;
 
-import selectvoting.lib.crypto.CryptoLib;
+import de.unitrier.infsec.lib.crypto.CryptoLib;
 
 public class NonceGen {
 	public NonceGen() {

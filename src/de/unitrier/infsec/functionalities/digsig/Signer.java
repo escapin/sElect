@@ -1,8 +1,8 @@
-package selectvoting.functionalities.digsig;
+package de.unitrier.infsec.functionalities.digsig;
 
-import selectvoting.lib.crypto.CryptoLib;
-import selectvoting.lib.crypto.KeyPair;
-import static selectvoting.utils.MessageTools.copyOf;
+import de.unitrier.infsec.lib.crypto.CryptoLib;
+import de.unitrier.infsec.lib.crypto.KeyPair;
+import static de.unitrier.infsec.utils.MessageTools.copyOf;
 
 /**
  * An object encapsulating a signing/verification key pair and allowing a user to

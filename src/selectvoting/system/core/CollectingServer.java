@@ -3,11 +3,11 @@ package selectvoting.system.core;
 import java.util.Arrays;
 import java.util.Hashtable;
 
-import selectvoting.functionalities.digsig.Signer;
-import selectvoting.functionalities.pkenc.Decryptor;
-import selectvoting.utils.MessageTools;
-import static selectvoting.utils.MessageTools.concatenate;
-import static selectvoting.utils.MessageTools.intToByteArray;
+import de.unitrier.infsec.functionalities.digsig.Signer;
+import de.unitrier.infsec.functionalities.pkenc.Decryptor;
+import de.unitrier.infsec.utils.MessageTools;
+import static de.unitrier.infsec.utils.MessageTools.concatenate;
+import static de.unitrier.infsec.utils.MessageTools.intToByteArray;
 
 public class CollectingServer 
 {

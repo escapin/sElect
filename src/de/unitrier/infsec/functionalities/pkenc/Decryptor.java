@@ -1,9 +1,8 @@
-package selectvoting.functionalities.pkenc;
+package de.unitrier.infsec.functionalities.pkenc;
 
-import selectvoting.lib.crypto.CryptoLib;
-import selectvoting.lib.crypto.KeyPair;
-import selectvoting.utils.Utilities;
-import static selectvoting.utils.MessageTools.copyOf;
+import de.unitrier.infsec.lib.crypto.CryptoLib;
+import de.unitrier.infsec.lib.crypto.KeyPair;
+import static de.unitrier.infsec.utils.MessageTools.copyOf;
 
 /**
  * Real functionality for public-key encryption: Decryptor

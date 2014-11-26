@@ -1,4 +1,4 @@
-package selectvoting.lib.crypto;
+package de.unitrier.infsec.lib.crypto;
 
 import java.security.KeyException;
 import java.security.KeyFactory;
@@ -25,7 +25,7 @@ import javax.crypto.Cipher;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import selectvoting.utils.MessageTools;
+import de.unitrier.infsec.utils.MessageTools;
 
 // TODO: check how exceptions/errors are handled
 

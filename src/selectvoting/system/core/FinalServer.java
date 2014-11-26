@@ -2,11 +2,11 @@ package selectvoting.system.core;
 
 import java.util.Arrays;
 
-import selectvoting.functionalities.digsig.Signer;
-import selectvoting.functionalities.digsig.Verifier;
-import selectvoting.functionalities.pkenc.Decryptor;
+import de.unitrier.infsec.functionalities.digsig.Signer;
+import de.unitrier.infsec.functionalities.digsig.Verifier;
+import de.unitrier.infsec.functionalities.pkenc.Decryptor;
+import de.unitrier.infsec.utils.MessageTools;
 import selectvoting.system.core.Utils.MessageSplitIter;
-import selectvoting.utils.MessageTools;
 
 public class FinalServer 
 {	

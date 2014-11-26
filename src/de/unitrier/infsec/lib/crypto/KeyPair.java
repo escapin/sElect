@@ -1,4 +1,4 @@
-package selectvoting.lib.crypto;
+package de.unitrier.infsec.lib.crypto;
 
 public class KeyPair {
 	public byte[] publicKey;

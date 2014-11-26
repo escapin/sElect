@@ -1,7 +1,7 @@
-package selectvoting.functionalities.digsig;
+package de.unitrier.infsec.functionalities.digsig;
 
-import static selectvoting.utils.MessageTools.copyOf;
-import selectvoting.lib.crypto.CryptoLib;
+import static de.unitrier.infsec.utils.MessageTools.copyOf;
+import de.unitrier.infsec.lib.crypto.CryptoLib;
 
 /**
  * An object encapsulating the verification key and allowing a user to verify

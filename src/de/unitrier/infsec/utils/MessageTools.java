@@ -1,4 +1,4 @@
-package selectvoting.utils;
+package de.unitrier.infsec.utils;
 
 
 public class MessageTools {

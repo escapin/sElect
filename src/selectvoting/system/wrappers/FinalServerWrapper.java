@@ -1,10 +1,10 @@
 package selectvoting.system.wrappers;
 
-import selectvoting.functionalities.digsig.Signer;
-import selectvoting.functionalities.digsig.Verifier;
-import selectvoting.functionalities.pkenc.Decryptor;
+import de.unitrier.infsec.functionalities.digsig.Signer;
+import de.unitrier.infsec.functionalities.digsig.Verifier;
+import de.unitrier.infsec.functionalities.pkenc.Decryptor;
+import de.unitrier.infsec.utils.Utilities;
 import selectvoting.system.core.FinalServer;
-import selectvoting.utils.Utilities;
 
 public class FinalServerWrapper {
 	private static String string(byte[] message) { return Utilities.byteArrayToHexString(message); }
