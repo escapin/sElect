@@ -16,6 +16,7 @@ copy_files:
 	cp node_modules/cryptofunc/index.js VotingBooth/js/cryptofunc.js
 
 download:
+	-rm -r VotingBooth/js/jquery-1.11.1.min.js
 	cd VotingBooth/js; wget http://code.jquery.com/jquery-1.11.1.min.js
 
 npm:
