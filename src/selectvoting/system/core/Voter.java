@@ -50,7 +50,7 @@ public class Voter
 	 * or the final server.
 	 */
 	public BallotInfo createBallot(int votersChoice) {
-		byte[] nonce = noncegen.newNonce();
+		byte[] nonce = noncegen.nextNonce();
 		byte[] vote = intToByteArray(votersChoice);
 		byte[] innerBallot = finServEnc.encrypt(concatenate(electionID, concatenate(nonce, vote)));
 		byte[] ballot = colServEnc.encrypt(concatenate(electionID, innerBallot));

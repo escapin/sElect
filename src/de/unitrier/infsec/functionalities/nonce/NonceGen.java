@@ -6,7 +6,7 @@ public class NonceGen {
 	public NonceGen() {
 	}
 
-	public byte[] newNonce() {
+	public byte[] nextNonce() {
 		return CryptoLib.nextNonce();
 	}
 }
