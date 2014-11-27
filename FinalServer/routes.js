@@ -7,37 +7,43 @@ var resultReady = false;
 if (fs.existsSync(config.RESULT_FILE))
     resultReady = true;
 
-exports.process = function process(req, res) 
-{
-    if (resultReady) {
-        console.log('Error: result already exists');
-        res.send({ok: false, info: 'result already exists'})
-        return;
-    }
-
-    var data = req.body.data;
-    console.log('DATA COMING:', data);
-
-    console.log('Processing the data...');
+// Processes data (partial result)
+// Parameter res is optional. If present, the summary
+// (success/failure) will be sent to it.
+//
+function processData(data, res) {
     server.processTally(data, function (err, result) {
         if (err) {
-            console.log(' ...Internal error. Cannot process the tally: ', err);
-            res.send({ ok: false, info: 'Internal error' });
+            console.log(' ...INTERNAL ERROR. Cannot process the tally: ', err);
+            console.log('RESULT NOT SAVED');
+            if (res) res.send({ ok: false, info: 'INTERNAL ERROR' });
         }
         else if (result.ok) { 
             var finalRes = result.data;
-            console.log('Result produced:', finalRes);
             // Save the result:
             fs.writeFileSync(config.RESULT_FILE, finalRes);
             console.log('Result saved in', config.RESULT_FILE);
             resultReady = true;
-            res.send({ ok: true, info: 'Data accepted'});
+            if (res) res.send({ ok: true, info: 'Data accepted'});
         }
         else {
-            console.log('Error:', result.data);
-            res.send({ ok: false, info: result.data });
+            console.log('ERROR:', result.data);
+            console.log('RESULT NOT SAVED');
+            if (res) res.send({ ok: false, info: result.data });
         }
-    })
+    });
+}
+
+exports.process = function process(req, res) 
+{
+    if (resultReady) {
+        console.log('ERROR: result already exists');
+        res.send({ok: false, info: 'result already exists'})
+        return;
+    }
+    var data = req.body.data;
+    console.log('Partial result coming. Processing...');
+    processData(data);
 };
 
 exports.statusPage = function statusPage(req, res) {
@@ -57,3 +63,9 @@ exports.serveFile = function serveFile(path) {
     }
 }
 
+// Reads data from the given file and  processes it as the partial result
+exports.processFile = function processFile(dataFileName) {
+    console.log('Processing the file ', dataFileName);
+    var data = fs.readFileSync(dataFileName, {encoding:'utf8'});
+    processData(data);
+}

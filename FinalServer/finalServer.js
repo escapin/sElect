@@ -8,18 +8,37 @@ var config = require('./config');
 var manifest = require('./manifest')
 var routes = require('./routes');
 
-// CHECK IF THE RESULT ALREADY EXISTS
-var resultFileExists = fs.existsSync(config.RESULT_FILE);
-if (resultFileExists && process.argv[2] !== '--onlyServeResult') {
-    console.log('ERROR: The file with result already exists.');
-    console.log('Remove this file or run the server with --onlyServeResult option.');
-    console.log('Server not started.');
+
+// Display the error message and halt the process.
+function error(info) {
+    console.log('ERROR:', info);
+    console.log('SERVER NOT STARTED.');
     process.exit(1);
 }
-if (process.argv[2] === '--onlyServeResult' && !resultFileExists) {
-    console.log('ERROR: The file with result does not exist.');
-    console.log('Server not started.');
-    process.exit(1);
+
+// CHECK IF THE RESULT ALREADY EXISTS
+var cmdlineOption = process.argv[2];
+var resultFileExists = fs.existsSync(config.RESULT_FILE);
+if (resultFileExists && cmdlineOption !== '--serveResult') {
+    error('The file with result already exists.\nRemove this file or run the server with --serveResult option.');
+}
+if (cmdlineOption === '--serveResult' && !resultFileExists) {
+    error('The file with result does not exist.');
+}
+
+// PROCESSING DATA (THE PARTIAL RESULT) FROM A FILE
+if (cmdlineOption==='--processData') {
+    var dataFileName = process.argv[3];
+    if (!dataFileName) 
+        error('File name not given');
+    if (!fs.existsSync(dataFileName)) 
+        error('The file does not exist.');
+    routes.processFile(dataFileName);
+}
+
+// CHECK FOR WRONG OPTIONS
+if (cmdlineOption && cmdlineOption!=='--processData' && cmdlineOption!=='--serveResult') {
+    error('Wrong option');
 }
 
 // CREATE AND CONFIGURE THE APP
@@ -45,6 +64,6 @@ var tls_options = {
 
 var server = https.createServer(tls_options, app).listen(config.port, function() {
     console.log('Final Server running for election "%s" [%s]', manifest.title, manifest.hash);
-    console.log('HTTPS server listening on %s, port %d\n', server.address().address, server.address().port);
+    console.log('HTTPS server listening on %s, port %d', server.address().address, server.address().port);
 });
 

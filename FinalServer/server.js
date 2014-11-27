@@ -20,10 +20,8 @@ var signKey     = config.signing_key;
 var numberOfVoters = +manifest.voters.length;
 
 // Create an instance of FinalServerWrapper:
-console.log('Creating an instance of FinalServerWrapper');
 var fsWrapper = java.newInstanceSync("selectvoting.system.wrappers.FinalServerWrapper", 
                                       encKey, decKey, verifKey, signKey, csVerifKey, 
                                       manifest.hash, numberOfVoters);
-console.log(' ...FinalServerWrapper created');
 
 module.exports = fsWrapper;
