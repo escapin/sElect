@@ -53,9 +53,9 @@ public class CryptoLib {
 			return seckey.getEncoded();
 
 		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-			e.printStackTrace();
-			return null;
+			// e.printStackTrace();
 		}
+		return null;
 	}
 
 	/**
@@ -78,9 +78,9 @@ public class CryptoLib {
 			byte[] encrypted =  c.doFinal(plaintext);
 			return MessageTools.raw_concatenate(iv_bytes, encrypted);
 		} catch (Exception e) { // (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException |  e)			
-			e.printStackTrace();
-			return null;
+			//e.printStackTrace();
 		}
+		return null;
 	}
 
 	/**
@@ -109,8 +109,8 @@ public class CryptoLib {
 			return null;  // mac check in GCM failed --- return bottom
 		} catch (Exception e) { // (NoSuchAlgorithmException | NoSuchProviderException	| NoSuchPaddingException |  e) {			
 			// e.printStackTrace();
-			return null;
 		}
+		return null;
 	}
 
 
@@ -188,7 +188,7 @@ public class CryptoLib {
 			out.publicKey = pair.getPublic().getEncoded();
 			return out;
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
 	}
@@ -206,9 +206,9 @@ public class CryptoLib {
 			signer.update(data);
 			return signer.sign();
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | KeyException | SignatureException | InvalidKeySpecException e) {
-			System.out.println("Signature creation failed " + e.getLocalizedMessage());
-			return null;
+			//System.out.println("Signature creation failed " + e.getLocalizedMessage());
 		}
+		return null;
 	}
 
 	public static boolean verify(byte[] data, byte[] signature, byte[] verificationKey) {
@@ -225,9 +225,9 @@ public class CryptoLib {
 			signer.update(data);
 			return signer.verify(signature);
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | KeyException | SignatureException | InvalidKeySpecException e) {
-			System.out.println("Signature verification failed " + e.getLocalizedMessage());
-			return false;
+			//System.out.println("Signature verification failed " + e.getLocalizedMessage());
 		}
+		return false;
 	}
 
 	public static KeyPair generateSignatureKeyPair() {
@@ -241,12 +241,12 @@ public class CryptoLib {
 			out.publicKey = pair.getPublic().getEncoded();
 			return out;
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return null;
 	}
 
-	public static byte[] generateNonce() {
+	public static byte[] nextNonce() {
 		SecureRandom random = new SecureRandom();
 		byte bytes[] = new byte[nonce_length];
 		random.nextBytes(bytes);
