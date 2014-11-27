@@ -60,6 +60,8 @@ app.use(bodyParser.json());
 app.use(express.static('./public')); // static content
 app.use( morgan('*** :remote-addr [:date] :method :url :status / :referrer [:response-time ms]', {}) ); // logging
 
+// Insert some delay (for testing only):
+// app.use(function(req, res, next) { setTimeout(next, 300); });
 
 // ROUTES
 app.post('/otp', routes.otp);

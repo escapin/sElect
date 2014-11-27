@@ -55,9 +55,20 @@ function selectBooth() {
     /// HANDLERS FOR SUMBITTING DATA 
 
     function showError(errorMessage) {
+        $('#processing').hide();
         $('#errorMsg').text(errorMessage);
         activeTabId = '#error';
         $(activeTabId).fadeIn(FADE_TIME);
+    }
+
+    function showTab(tabId) {
+        $('#processing').hide();
+        activeTabId = tabId;
+        $(tabId).fadeIn(FADE_TIME);
+    }
+
+    function showProgressIcon() {
+        $('#processing').fadeIn(FADE_TIME*2);
     }
 
     function onSubmitWelcome(event) 
@@ -71,8 +82,9 @@ function selectBooth() {
         // Make the active tab disappear
         $(activeTabId).fadeOut(FADE_TIME, function() {
 
+            // show processing icon
+            showProgressIcon();
             // Make an (ajax) otp request:
-            // TODO Show something to indicate work in progress
             // FIXME Use the address from the manifest
             $.post("https://localhost:3300/otp", {'email': email})
              .done(function otpRequestDone(result) {
@@ -85,9 +97,8 @@ function selectBooth() {
                 else {
                     // Show the next window (OTP)
                     $('#inp-otp').val(''); // emtpy the otp input field
-                    activeTabId = '#otp';
-                    $(activeTabId).fadeIn(FADE_TIME);
                     $('#inp-otp').focus();
+                    showTab('#otp');
                 }
               })
              .fail(function otpRequestFailed() {
@@ -104,12 +115,8 @@ function selectBooth() {
             return false;
         otp = o;
 
-        // make the active tab disappear
         $(activeTabId).fadeOut(FADE_TIME, function() {
-            activeTabId = '#choice';
-
-            // make the otp tab appear
-            $(activeTabId).fadeIn(FADE_TIME);
+            showTab('#choice');
         });
         return false; // prevents any further submit action
     }
@@ -127,8 +134,8 @@ function selectBooth() {
             var ballotInfo = voter.createBallot(choice);
             console.log('BALLOT_INFO:', ballotInfo);
 
+            showProgressIcon();
             // Make an (ajax) cast request:
-            // TODO Show something to indicate work in progress
             // FIXME Use the address from the manifest
             $.post("https://localhost:3300/cast", {'email': email, 'otp': otp, 'ballot': ballotInfo.ballot})
              .fail(function otpRequestFailed() {  // request failed
@@ -146,9 +153,8 @@ function selectBooth() {
                     var receiptValid = voter.validateReceipt(result.receipt, ballotInfo.innerBallot); 
                     if (receiptValid) {
                         // show the "ballot accepted" tab
-                        activeTabId = '#result';
+                        showTab('#result');
                         $('#receipt-id').text(ballotInfo.nonce.toUpperCase());
-                        $(activeTabId).fadeIn(FADE_TIME);
                     }
                     else { // receipt not valid
                         showError('Invalid receipt');
@@ -165,9 +171,8 @@ function selectBooth() {
         // make the active tab disappear
         $(activeTabId).fadeOut(FADE_TIME, function() {
             // show the welcome tab
-            activeTabId = '#welcome';
-            $(activeTabId).fadeIn(FADE_TIME);
             $('#inp-email').focus();
+            showTab('#welcome');
         });
         return false; // prevents any further submit action
     }
