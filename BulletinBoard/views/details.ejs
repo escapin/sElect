@@ -1,0 +1,89 @@
+<% include header %>
+    <div class="menu-content">
+        <div class="pure-menu pure-menu-open pure-menu-horizontal">
+            <ul>
+            <% if (!ready) { %>
+                <li><a href="summary">Summary</a></li>
+                <li class="pure-menu-disabled"><a href="#">List of Votes</a></li>
+                <li class="pure-menu-disabled"><a href="#">List of Voters</a></li>
+                <li class="pure-menu-selected><a href="details">Details</a></li>
+            <% } else { %>
+                <li><a href="summary">Summary</a></li>
+                <li><a href="votes">List of Votes</a></li>
+                <li><a href="voters">List of Voters</a></li>
+                <li class="pure-menu-selected><a href="details">Details</a></li>
+            <% }  %>
+            </ul>
+        </div>
+        <div class="content center">
+
+            <table class="pure-table pure-table-horizontal">
+                <tbody>
+                    <tr>
+                        <td>Opening time:</td>
+                        <td> <%= openingTime %> </td>
+                    </tr>
+                    <tr>
+                        <td>Closing time:</td>
+                        <td> <%= closingTime %> </td>
+                    </tr>
+                    <tr>
+                        <td>Collecting server:</td>
+                        <td><a href="<%= manifest.collectingServer.URI %>/status"><%= manifest.collectingServer.URI %></a> </td>
+                    </tr>
+                    <tr>
+                        <td>Collecting server's status:</td>
+                        <td> <span id="cs-status">?</span> </td>
+                    </tr>
+                    <tr>
+                        <td>Final server:</td>
+                        <td> <a href="<%= manifest.finalServer.URI %>"><%= manifest.finalServer.URI %></a> </td>
+                    </tr>
+                    <tr>
+                        <td>Final server's status:</td>
+                        <td> <span id="fs-status">?</span> </td>
+                    </tr>
+                    <tr>
+                        <td>Full election manifest:</td>
+                        <td> <a href="ElectionManifest.json">ElectionManifest.json</a> </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="toright">
+                <a class="pure-button" href="details">Refresh</a> 
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var electionID = '<%= manifest.hash %>';
+
+            var csURI = '<%= manifest.collectingServer.URI %>/status';
+            $.get(csURI)
+             .fail(function otpRequestFailed() { 
+                $("#cs-status").addClass('error').text('does not respond');
+              })
+             .done(function castRequestDone(result) {  // we have some response
+                if (result.electionID === electionID) 
+                    $("#cs-status").text(result.status);
+                else
+                    $("#cs-status").addClass('error').text('NOT MATCHING ELECTION ID');
+              });
+
+            var fsURI = '<%= manifest.finalServer.URI %>/';
+            console.log(fsURI);
+            $.get(fsURI)
+             .fail(function otpRequestFailed() { 
+                $("#fs-status").addClass('error').text('does not respond');
+              })
+             .done(function castRequestDone(result) {  // we have some response
+                if (result.electionID === electionID) 
+                    $("#fs-status").text(result.status);
+                else
+                    $("#fs-status").addClass('error').text('NOT MATCHING ELECTION ID');
+              });
+
+        });
+    </script>
+<% include footer %>

@@ -1,0 +1,53 @@
+<% include header %>
+    <div class="menu-content">
+        <div class="pure-menu pure-menu-open pure-menu-horizontal">
+            <ul>
+            <% if (!ready) { %>
+                <li><a href="summary">Summary</a></li>
+                <li class="pure-menu-selected"><a href="votes">List of Votes</a></li>
+                <li class="pure-menu-disabled"><a href="#">List of Voters</a></li>
+                <li><a href="details">Details</a></li>
+            <% } else { %>
+                <li><a href="summary">Summary</a></li>
+                <li class="pure-menu-selected"><a href="votes">List of Votes</a></li>
+                <li><a href="voters">List of Voters</a></li>
+                <li><a href="details">Details</a></li>
+            <% }  %>
+            </ul>
+        </div>
+        <div class="content">
+        <% if (!ready) { %>
+            <h2>
+                The result is not ready yet.
+            </h2>
+            <h3>
+                The election should be closed at: <%= closingTime %>.
+            </h3>
+        <% } else { %>
+
+            <h2>
+                List of Votes (ballot identifier / choice)
+            </h2>
+
+            <table class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <th>ballot identifier</th>
+                        <th>choice </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(var i=0; i<result.length; i++) { %>
+                       <tr>
+                           <td> <%= result[i].nonce %> </td>
+                           <td> <%= result[i].vote %> </td>
+                       </tr>
+                    <% } %>
+                </tbody>
+            </table>
+
+
+        <% }  %>
+        </div>
+    </div>
+<% include footer %>

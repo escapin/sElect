@@ -56,6 +56,5 @@ function loadResult() {
 
 // TODO Once a (wrong) file is processed, this routine does not check for a new file
 
-
 exports.loadResult = loadResult;
 

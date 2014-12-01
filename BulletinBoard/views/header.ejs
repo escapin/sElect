@@ -1,8 +1,32 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-</head>
-<body>
-<div class='logo'> <img src="images/Logo.png"> </div>
+<html lang="en">
+    <link rel="stylesheet" href="pure/pure-min.css">
+    <link rel="stylesheet" href="stylesheets/custom-pure.css">
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="js/jquery-1.11.1.min.js"></script>
+
+    <title>sElect Bulletin Board</title>
+  </head>
+
+<body class="pure-skin-mine">
+    <div class="container header">
+        Secure elections powered by <em>sElect</em>
+    </div>
+    <div class="banner">
+        <div class="container">
+            <h3> Public Bulletin Board for </h3>
+            <h1> <%= manifest.title %> </h1>
+            <div class="election-id">
+                <b>Election ID:</b> <%= manifest.hash %>
+            </div>
+        </div>
+    </div>
+    <div class="body">
+
+    <!-- ************************ HEADER **************************************** -->
+
+    <div class="description">
+        <%= manifest.description %>
+    </div>

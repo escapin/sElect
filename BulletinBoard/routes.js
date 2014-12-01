@@ -3,19 +3,6 @@ var manifest = require('./manifest');
 var config = require('./config');
 var result = require('./result');
 
-exports.index = function(req, res) {
-    // check if the result is ready 
-    if (result.result) {
-        res.render('result', {  manifest: manifest,
-                                title: 'sElect Result', 
-                                result: result.result 
-                             });
-    }
-    else { // there is no file with result
-        res.render('no_result', { title: 'sElect: No result', manifest: manifest }); 
-    }
-};
-
 // Serve a particular static file
 
 exports.serveFile = function serveFile(path) {
@@ -30,3 +17,41 @@ exports.serveFile = function serveFile(path) {
     }
 }
 
+//////////////////////////////////////////////////////////////
+
+var openingTime = Date(manifest.startTime);
+var closingTime = Date(manifest.endTime);
+
+exports.summary = function(req, res) {
+    var ready = result.result !== null;
+    console.log(ready);
+    res.render('summary', {
+            manifest: manifest,
+            ready: ready,
+            title: 'select result',
+            closingTime: closingTime,
+        });
+};
+
+exports.votes = function(req, res) {
+    var ready = result.result !== null;
+    res.render('votes', {
+            manifest: manifest,
+            ready: ready,
+            result: result.result,
+            closingTime: closingTime,
+        });
+}
+
+exports.voters = function(req, res) {
+}
+
+exports.details = function(req, res) {
+    var ready = result.result !== null;
+    res.render('details', {
+            manifest: manifest,
+            ready: ready,
+            closingTime: closingTime,
+            openingTime: openingTime,
+        });
+}

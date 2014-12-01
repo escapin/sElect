@@ -1,0 +1,36 @@
+<% include header %>
+    <div class="menu-content">
+        <div class="pure-menu pure-menu-open pure-menu-horizontal">
+            <ul>
+            <% if (!ready) { %>
+                <li class="pure-menu-selected"><a href="summary">Summary</a></li>
+                <li class="pure-menu-disabled"><a href="#">List of Votes</a></li>
+                <li class="pure-menu-disabled"><a href="#">List of Voters</a></li>
+                <li><a href="details">Details</a></li>
+            <% } else { %>
+                <li class="pure-menu-selected"><a href="summary">Summary</a></li>
+                <li><a href="votes">List of Votes</a></li>
+                <li><a href="voters">List of Voters</a></li>
+                <li><a href="details">Details</a></li>
+            <% }  %>
+            </ul>
+        </div>
+        <div class="content">
+        <% if (!ready) { %>
+            <h2>
+                The result is not ready yet.
+            </h2>
+            <h3>
+                The election should be closed at: <%= closingTime %>.
+            </h3>
+        <% } else { %>
+
+            <h2>
+                The result is ready!
+            </h2>
+            
+
+        <% }  %>
+        </div>
+    </div>
+<% include footer %>
