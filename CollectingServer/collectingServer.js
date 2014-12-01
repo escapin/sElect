@@ -4,6 +4,7 @@ var https = require('https');
 var bodyParser = require('body-parser');
 var morgan = require('morgan'); // logging
 var winston = require('winston');
+var basicAuth = require('basic-auth-connect');
 var fs = require('fs');
 
 var config = require('./config');
@@ -59,6 +60,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json()); 
 app.use(express.static('./public')); // static content
 app.use( morgan('*** :remote-addr [:date] :method :url :status / :referrer [:response-time ms]', {}) ); // logging
+app.use('/admin/*', basicAuth('admin', config.serverAdminPassword)); // authentication for the admin panel only
 
 // Insert some delay (for testing only):
 // app.use(function(req, res, next) { setTimeout(next, 300); });
@@ -67,8 +69,9 @@ app.use( morgan('*** :remote-addr [:date] :method :url :status / :referrer [:res
 app.post('/otp', routes.otp);
 app.post('/cast', routes.cast);
 
-app.get('/', routes.info);
-app.get('/close', routes.close); // for testing
+app.get('/status', routes.info);
+app.get('/admin/panel', routes.controlPanel);
+app.get('/admin/close', routes.close);
 app.get('/result.msg', routes.serveFile(config.RESULT_FILE));
 app.get('/manifest', routes.serveFile(config.MANIFEST_FILE));
 
@@ -83,6 +86,6 @@ var tls_options = {
 var server = https.createServer(tls_options, app).listen(config.port, function() {
     console.log('Collecting Server running for election "%s" [%s]', manifest.title, manifest.hash);
     winston.info('SERVER STARTED');
-    console.log('HTTPS server listening on %s, port %d\n', server.address().address, server.address().port);
+    console.log('HTTPS server listening on %s, port %d', server.address().address, server.address().port);
 });
 

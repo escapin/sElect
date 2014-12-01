@@ -225,6 +225,26 @@ exports.cast = function cast(req, res)
 //
 exports.info = function info(req, res)  {
     var now = new Date();
+    var timeToOpen  = selectUtils.timeDelta2String(startTime - now);
+    var timeToClose = selectUtils.timeDelta2String(endTime - now);
+    var openingTime = util.format('Time to open:  %s (%s)', selectUtils.timeDelta2String(timeToOpen), startTime);
+    var closingTime =     util.format('Time to close: %s (%s)', selectUtils.timeDelta2String(timeToClose), endTime);
+
+    res.send({
+        electionID : manifest.hash,
+        status: status.status(),
+        title: manifest.title,
+        timeToOpen: timeToOpen,
+        timeToClose: timeToClose,
+    });
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+// ROUTE controlPanel
+//
+exports.controlPanel = function info(req, res)  {
+    var now = new Date();
     var timeToOpen = startTime - now;
     var timeToClose = endTime - now;
     var openingTime = util.format('Time to open:  %s (%s)', selectUtils.timeDelta2String(timeToOpen), startTime);
@@ -253,6 +273,7 @@ function saveResult(result) {
             winston.info('Problems with saving result', config.RESULT_FILE);
         else {
             winston.info('Result saved in', config.RESULT_FILE);
+            resultReady = true;
         }
     });
 }
@@ -271,7 +292,6 @@ function sendResult(result) {
             winston.info(' ...Response:', body);
         }
     });
-    // TODO: should we somewhow close the connection to the final server?
 }
 
 function closeElection() {
