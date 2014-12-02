@@ -85,8 +85,7 @@ function selectBooth() {
             // show processing icon
             showProgressIcon();
             // Make an (ajax) otp request:
-            // FIXME Use the address from the manifest
-            $.post("https://localhost:3300/otp", {'email': email})
+            $.post(manifest.collectingServer.URI+"/otp", {'email': email})
              .done(function otpRequestDone(result) {
                 if (!result) {
                     showError('Unexpected error');
@@ -136,8 +135,7 @@ function selectBooth() {
 
             showProgressIcon();
             // Make an (ajax) cast request:
-            // FIXME Use the address from the manifest
-            $.post("https://localhost:3300/cast", {'email': email, 'otp': otp, 'ballot': ballotInfo.ballot})
+            $.post(manifest.collectingServer.URI+"/cast", {'email': email, 'otp': otp, 'ballot': ballotInfo.ballot})
              .fail(function otpRequestFailed() {  // request failed
                 showError('Cannot connect with the server');
               })
