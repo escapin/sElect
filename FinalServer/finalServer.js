@@ -1,4 +1,5 @@
 var express = require('express');
+var cors = require('cors');
 var https = require('https');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
@@ -43,7 +44,7 @@ if (cmdlineOption && cmdlineOption!=='--processData' && cmdlineOption!=='--serve
 
 // CREATE AND CONFIGURE THE APP
 var app = express();
-
+app.use(cors()); // enable all CORS request
 app.set('views', './views');    // view engine and location of the views
 app.set('view engine', 'ejs'); 
 app.use(bodyParser.json()); 
@@ -52,6 +53,7 @@ app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
 
 // ROUTES
 app.get('/', routes.statusPage);
+app.get('/status', routes.statusPage);
 app.post('/data', routes.process);
 app.get('/manifest', routes.serveFile(config.MANIFEST_FILE));
 app.get('/result.msg', routes.serveFile(config.RESULT_FILE));

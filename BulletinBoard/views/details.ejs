@@ -71,8 +71,7 @@
                     $("#cs-status").addClass('error').text('NOT MATCHING ELECTION ID');
               });
 
-            var fsURI = '<%= manifest.finalServer.URI %>/';
-            console.log(fsURI);
+            var fsURI = '<%= manifest.finalServer.URI %>/status';
             $.get(fsURI)
              .fail(function otpRequestFailed() { 
                 $("#fs-status").addClass('error').text('does not respond');

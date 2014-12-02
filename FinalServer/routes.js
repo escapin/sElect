@@ -47,7 +47,8 @@ exports.process = function process(req, res)
 };
 
 exports.statusPage = function statusPage(req, res) {
-    res.render('status', {manifest: manifest, ready: resultReady});
+    var status = resultReady ? 'result ready' : 'waiting for data';
+    res.send({electionID : manifest.hash, status : status });
 }
 
 // Serve a particular static file
