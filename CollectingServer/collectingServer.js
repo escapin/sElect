@@ -76,16 +76,21 @@ app.get('/result.msg', routes.serveFile(config.RESULT_FILE));
 app.get('/manifest', routes.serveFile(config.MANIFEST_FILE));
 
 // STARGING THE SERVER
-var tls_options = {
-    key:  fs.readFileSync(config.TLS_KEY_FILE),
-    cert: fs.readFileSync(config.TLS_CERT_FILE)
-};
 
 // TODO: check that our IP/port is the IP/port specified for the
 // collecting server in the Manifest
-var server = https.createServer(tls_options, app).listen(config.port, function() {
+if (config.useTLS) {
+    var tls_options = {
+        key:  fs.readFileSync(config.TLS_KEY_FILE),
+        cert: fs.readFileSync(config.TLS_CERT_FILE)
+    };
+    app = https.createServer(tls_options, app)
+}
+var server = app.listen(config.port, function() {
     console.log('Collecting Server running for election "%s" [%s]', manifest.title, manifest.hash);
     winston.info('SERVER STARTED');
-    console.log('HTTPS server listening on %s, port %d', server.address().address, server.address().port);
+    console.log('Server listening on %s, port %d', server.address().address, server.address().port);
+    if (config.useTLS) 
+        console.log('Using TLS');
 });
 
