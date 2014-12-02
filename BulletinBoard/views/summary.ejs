@@ -26,9 +26,26 @@
         <% } else { %>
 
             <h2>
-                The result is ready!
+                Result of the election
             </h2>
             
+            <table class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <th>Choice</th>
+                        <th>Number of votes </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(var i=0; i<summary.length; i++) { %>
+                       <tr>
+                           <td> <%= summary[i].choice %> </td>
+                           <td> <%= summary[i].votes %> </td>
+                       </tr>
+                    <% } %>
+                </tbody>
+            </table>
+
 
         <% }  %>
         </div>

@@ -25,11 +25,14 @@ var closingTime = Date(manifest.endTime);
 exports.summary = function(req, res) {
     var ready = result.result !== null;
     console.log(ready);
+    var summary = null;
+    if (ready)
+        summary = result.summary;
     res.render('summary', {
             manifest: manifest,
             ready: ready,
-            title: 'select result',
             closingTime: closingTime,
+            summary: summary,
         });
 };
 

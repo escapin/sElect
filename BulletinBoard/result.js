@@ -73,13 +73,25 @@ function parseFinalResult(signedFinalResult) {
         return;
     }
 
-
     // Get the choice/nonce pairs
     var t = [];
+    var ccount = manifest.choices.map(function(x) {return 0;}); // initialize the counters for choices with 0's
     splitter(p.second, function(item) { 
         p = crypto.deconcatenate(item);
-        t.push({nonce: p.first, vote: manifest.choices[+p.second]});
+        var choice = +p.second
+        // add the choice/nonce pair to the list of votes
+        t.push({nonce: p.first, vote: manifest.choices[choice]});
+        // add one vote for choice 
+        ++ccount[choice];
     });
+
+    // format the summary (number votes for different candidates) 
+    var summary = [];
+    for (var i=0; i<ccount.length; ++i) {
+        summary.push({choice : manifest.choices[i],  votes : ccount[i] });
+    }
+
+    exports.summary = summary;
     exports.result = t;
 }
 

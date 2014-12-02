@@ -30,8 +30,8 @@ app.get('/SignedPartialResult', routes.serveFile(config.PARTIAL_RESULT_FILE));
 app.get('/ElectionManifest.json', routes.serveFile(config.MANIFEST_FILE));
 
 // SET THE BACKROUD CHECK FOR THE RESULT FILE
-// setInterval( result.loadResult, 5000);
-result.loadResult();
+setInterval( result.loadResult, 5000);
+// result.loadResult();
 // TODO: 
 // (1) We could make sure that this is alive on every request (just in case)
 // (2) Remove this when the result is read.
