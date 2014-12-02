@@ -3,14 +3,14 @@
         <div class="pure-menu pure-menu-open pure-menu-horizontal">
             <ul>
             <% if (!ready) { %>
-                <li class="pure-menu-selected"><a href="summary">Summary</a></li>
+                <li><a href="summary">Summary</a></li>
                 <li class="pure-menu-disabled"><a href="votes">List of Votes</a></li>
-                <li class="pure-menu-disabled"><a href="voters">List of Voters</a></li>
+                <li class="pure-menu-selected"><a href="voters">List of Voters</a></li>
                 <li><a href="details">Details</a></li>
             <% } else { %>
-                <li class="pure-menu-selected"><a href="summary">Summary</a></li>
+                <li><a href="summary">Summary</a></li>
                 <li><a href="votes">List of Votes</a></li>
-                <li><a href="voters">List of Voters</a></li>
+                <li class="pure-menu-selected"><a href="voters">List of Voters</a></li>
                 <li><a href="details">Details</a></li>
             <% }  %>
             </ul>
@@ -26,9 +26,20 @@
         <% } else { %>
 
             <h2>
-                The result is ready!
+                Voters who have successfully cast their ballots
             </h2>
-            
+
+            <table class="pure-table pure-table-horizontal">
+                <tbody>
+                    <% for(var i=0; i<voters.length; i++) { %>
+                       <tr>
+                           <td> <%= voters[i] %> </td>
+                       </tr>
+                    <% } %>
+                </tbody>
+            </table>
+
+
 
         <% }  %>
         </div>

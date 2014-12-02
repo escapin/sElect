@@ -44,6 +44,14 @@ exports.votes = function(req, res) {
 }
 
 exports.voters = function(req, res) {
+    var ready = result.result !== null;
+    console.log(result.voters);
+    res.render('voters', {
+            manifest: manifest,
+            ready: ready,
+            voters: result.voters,
+            closingTime: closingTime,
+        });
 }
 
 exports.details = function(req, res) {

@@ -1,60 +1,124 @@
 var fs = require('fs');
 var manifest = require('./manifest');
 var config = require('./config');
-var wrapper = require('./wrapper');
+// var wrapper = require('./wrapper');
+var crypto = require('cryptofunc');
 
 exports.result = null;  // this is where the result is stored (when ready)
+exports.voters = null;  // this is where the list of voters is stored
 
-// Use the wrapper object to check the signature on msg and parse
-// it to a readable text format. Store the result in exports.result
-function checkAndParse(msg) {
-    wrapper.finalResultAsText(msg, function (err, result) {
-        if (err) {
-            console.log(' ...Internal error:', error);
-        } 
-        else if (!result.ok) {
-            console.log(' ...Result not ok (perhaps wring signature)');
-        }
-        else {
-            exports.result = result.data.split('\n').map( function (line) {
-                t = line.split(/ +/);
-                var vote = manifest.choices[t[0]];
-                return {vote:vote, nonce:t[1]};
-            });
-            console.log('Redable retuls:', exports.result);
-        }
+function splitter(msg, callback) {
+    if (msg.length !== 0)  {
+        var p = crypto.deconcatenate(msg);
+        callback(p.first);
+        splitter(p.second, callback);
+    }
+}
+
+function parsePartialResult(signedFinalResult) {
+    var p = crypto.deconcatenate(signedFinalResult);
+    var result = p.first;
+    var signature = p.second;
+    
+    // Verify the signature
+    var sig_ok = crypto.verifsig(manifest.collectingServer.verification_key, result, signature);
+    if (!sig_ok) {
+        console.log('ERROR: Wrong signature');
+        return;
+    }
+    
+    // Check the tag:
+    p = crypto.deconcatenate(result);
+    if (p.first !== '01') {
+        console.log('ERROR: Wrong tag');
+        return;
+    }
+    var payload = p.second;
+
+    // Check the election id
+    p = crypto.deconcatenate(payload);
+    if (manifest.hash.toUpperCase() !== p.first.toUpperCase()) {
+        console.log('ERROR: Wrong election ID');
+        return;
+    }
+
+    // Get the voters as a mesage
+    p = crypto.deconcatenate(p.second); 
+    votersMsg = p.second;
+    // And collect them
+    var t = [];
+    splitter(votersMsg, function (item) {
+        t.push(item);
     });
+    
+    exports.voters = t;
+}
+
+function parseFinalResult(signedFinalResult) {
+    var p = crypto.deconcatenate(signedFinalResult);
+    var result = p.first;
+    var signature = p.second;
+    
+    // Verify the signature
+    var sig_ok = crypto.verifsig(manifest.finalServer.verification_key, result, signature);
+    if (!sig_ok) {
+        console.log('ERROR: Wrong signature');
+        return;
+    }
+
+    // Check the election id
+    p = crypto.deconcatenate(result);
+    if (manifest.hash.toUpperCase() !== p.first.toUpperCase()) {
+        console.log('ERROR: Wrong election ID');
+        return;
+    }
+
+
+    // Get the choice/nonce pairs
+    var t = [];
+    splitter(p.second, function(item) { 
+        p = crypto.deconcatenate(item);
+        t.push({nonce: p.first, vote: manifest.choices[+p.second]});
+    });
+    exports.result = t;
 }
 
 var fileProcessed = false;
 
-// Check whether there is the result file and, if so, parse it
-function loadResult() {
-    if (fileProcessed || exports.result) return; 
-
-    console.log('Looking for the result file');
-    fs.exists(config.RESULT_FILE, function(exists) {
+// Check whether there is the final result file and, if so, parse it
+function loadFileAndContinue(filename, cont) {
+    console.log('Looking for file',  filename);
+    fs.exists(filename, function(exists) {
         if(exists) {
-            if (fileProcessed) return;
-            fileProcessed = true;
-            console.log('Result file found. Processing...');
-            fs.readFile(config.RESULT_FILE, {encoding:'ascii'}, function (err, msg_res) { 
+            console.log('Processing', filename);
+            fs.readFile(filename, {encoding:'ascii'}, function (err, data) { 
                 if (err) { 
                     console.log('Error:', err); 
                     return; 
                 }
-                console.log('Result:', msg_res);
-                console.log('Obtain readable results...');
-                checkAndParse(msg_res);
+                cont(data);
             });
         }
         else {
-            console.log('Result file not found');
+            console.log(filename, 'not found');
         }
     });
 }
 
+
 // TODO Once a (wrong) file is processed, this routine does not check for a new file
 
-exports.loadResult = loadResult;
+exports.loadResult = function () {
+    // load / parse the final result
+    if (exports.result === null) {
+        loadFileAndContinue(config.RESULT_FILE, parseFinalResult);
+    }
+
+
+    // load /parse the partial result
+    if (exports.voters === null) {
+        loadFileAndContinue(config.PARTIAL_RESULT_FILE, parsePartialResult);
+    }
+}
+
 
