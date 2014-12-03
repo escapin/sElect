@@ -49,6 +49,7 @@ function parsePartialResult(signedFinalResult) {
     // And collect them
     var t = [];
     splitter(votersMsg, function (item) {
+        item = (new Buffer(item, 'hex')).toString('utf8');
         t.push(item);
     });
     
