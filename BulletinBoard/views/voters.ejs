@@ -17,12 +17,18 @@
         </div>
         <div class="content">
         <% if (!ready) { %>
+
             <h2>
                 The result is not ready yet.
             </h2>
             <h3>
                 The election should be closed at: <%= closingTime %>.
             </h3>
+
+        <% } else if (!partialResultReady) { %>
+
+            <h2 class='error'> Partial results not available </h2>
+
         <% } else { %>
 
             <h2>
@@ -39,9 +45,8 @@
                 </tbody>
             </table>
 
-
-
         <% }  %>
+
         </div>
     </div>
 <% include footer %>

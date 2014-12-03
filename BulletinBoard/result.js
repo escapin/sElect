@@ -1,4 +1,5 @@
 var fs = require('fs');
+var request = require('request');
 var manifest = require('./manifest');
 var config = require('./config');
 // var wrapper = require('./wrapper');
@@ -118,19 +119,49 @@ function loadFileAndContinue(filename, cont) {
 }
 
 
-// TODO Once a (wrong) file is processed, this routine does not check for a new file
+function fetchData(url, cont) {
+    request(url, function (err, response, body) {
+        if (!err && response.statusCode == 200) {
+            cont(null, body);
+        }
+        else {
+            cont('Cannot fetch the page');
+        }
+    });
+
+}
 
 exports.loadResult = function () {
+
+    // Load /parse the partial result
+    if (exports.voters === null) {
+        console.log('...TRY TO GET THE PARTIAL RESULT...');
+        fetchData(manifest.collectingServer.URI + '/result.msg', function (err, data) {
+            if (err) console.log('ERROR when fetchin the partial result:', err);
+            else     parsePartialResult(data); 
+        });
+    }
+
+    // Load /parse the final result
+    if (exports.result === null) {
+        console.log('...TRY TO GET THE FINAL RESULT...');
+        fetchData(manifest.finalServer.URI + '/result.msg', function (err, data) {
+            if (err) console.log('ERROR when fetchin the final result:', err);
+            else     parseFinalResult(data); 
+        });
+    }
+
+    /*
     // load / parse the final result
     if (exports.result === null) {
         loadFileAndContinue(config.RESULT_FILE, parseFinalResult);
     }
 
-
     // load /parse the partial result
     if (exports.voters === null) {
         loadFileAndContinue(config.PARTIAL_RESULT_FILE, parsePartialResult);
     }
+    */
 }
 
 

@@ -47,11 +47,13 @@ exports.votes = function(req, res) {
 }
 
 exports.voters = function(req, res) {
-    var ready = result.result !== null;
+    var ready = (result.result !== null);
+    var partialResultReady = (result.voters !== null);
     console.log(result.voters);
     res.render('voters', {
             manifest: manifest,
             ready: ready,
+            partialResultReady: partialResultReady,
             voters: result.voters,
             closingTime: closingTime,
         });
