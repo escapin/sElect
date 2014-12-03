@@ -100,7 +100,11 @@ div.body {
 .description {
     margin-bottom: 30pt;
     font-size: 15pt;
-    color: #057;
+    color: #666;
+}
+
+.description b {
+    color: #649;
 }
 
 .menu-content {

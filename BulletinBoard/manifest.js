@@ -11,7 +11,7 @@ if (fs.existsSync(config.MANIFEST_FILE)) {
     manifest_raw = fs.readFileSync(config.MANIFEST_FILE, {encoding:'utf8'});
     manifest_raw = selectUtils.normalizeManifest(manifest_raw);
     manifest = JSON.parse(manifest_raw);
-    manifest.hash = crypto.hash(manifest_raw);
+    manifest.hash = crypto.hash(manifest_raw).toUpperCase();
 }
 
 if (!manifest) { // there is no manifest

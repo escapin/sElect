@@ -65,7 +65,7 @@
                 $("#cs-status").addClass('error').text('does not respond');
               })
              .done(function castRequestDone(result) {  // we have some response
-                if (result.electionID === electionID) 
+                if (result.electionID.toUpperCase() === electionID) 
                     $("#cs-status").text(result.status);
                 else
                     $("#cs-status").addClass('error').text('NOT MATCHING ELECTION ID');
@@ -77,7 +77,7 @@
                 $("#fs-status").addClass('error').text('does not respond');
               })
              .done(function castRequestDone(result) {  // we have some response
-                if (result.electionID === electionID) 
+                if (result.electionID.toUpperCase() === electionID) 
                     $("#fs-status").text(result.status);
                 else
                     $("#fs-status").addClass('error').text('NOT MATCHING ELECTION ID');
