@@ -2,6 +2,5 @@
     "port" : 3111,
     "MANIFEST_FILE" : "../tmp/ElectionManifest.json",
     "RESULT_FILE": "../tmp/finalResult.msg",
-    "PARTIAL_RESULT_FILE": "../tmp/partialResult.msg", 
-    "class_paths" : ["../bin", "../lib/bcprov-jdk16-146.jar"]
+    "PARTIAL_RESULT_FILE": "../tmp/partialResult.msg" 
 }
