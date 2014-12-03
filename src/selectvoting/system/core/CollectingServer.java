@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import de.unitrier.infsec.functionalities.digsig.Signer;
 import de.unitrier.infsec.functionalities.pkenc.Decryptor;
 import de.unitrier.infsec.utils.MessageTools;
+import de.unitrier.infsec.utils.Utilities;
 import static de.unitrier.infsec.utils.MessageTools.concatenate;
 import static de.unitrier.infsec.utils.MessageTools.intToByteArray;
 
@@ -30,6 +31,7 @@ public class CollectingServer
 	private final byte[][] ballots; 
 	private int numberOfCastBallots = 0;
 	private int numberOfVoters;
+	private String[] voterIdentifiers;
 	private Hashtable<String, byte[]> voterInfo;
 
 
@@ -39,6 +41,7 @@ public class CollectingServer
 		this.signer = signer;
 		this.decryptor = decryptor;
 		this.electionID = electionID;
+		this.voterIdentifiers = voterIdentifiers;
 		// this.noncegen = new NonceGen();
 		this.numberOfVoters = voterIdentifiers.length;
 		this.ballots = new byte[numberOfVoters][]; // (inner ballots which have been cast)
@@ -116,10 +119,14 @@ public class CollectingServer
 
 		// concatenate identifiers of the voters who voted (they are already "sorted")
 		byte[][] vv = new byte[numberOfCastBallots][];
-		for (int id=0,ind=0; id<numberOfVoters; ++id) {
-			if (ballots[id]!=null)
-				vv[ind++] = intToByteArray(id);
-		}
+		
+		int i = 0;
+		for (String vid : voterIdentifiers) {
+			if (voterInfo.containsKey(vid) && voterInfo.get(vid).length!=0) { // voter voted
+				vv[i++] = Utilities.stringAsBytes(vid);
+				System.out.println(vid);
+			}
+		}	
 		byte[] votersAsAMessage = Utils.concatenateMessageArrayWithDuplicateElimination(vv);
 
 		// put together the election ID, inner ballots, and list of voters
