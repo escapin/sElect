@@ -19,8 +19,10 @@ exports.serveFile = function serveFile(path) {
 
 //////////////////////////////////////////////////////////////
 
-var openingTime = Date(manifest.startTime);
-var closingTime = Date(manifest.endTime);
+var openingTime = new Date(manifest.startTime);
+var closingTime = new Date(manifest.endTime);
+console.log(manifest.startTime);
+console.log(manifest.endTime);
 
 exports.summary = function(req, res) {
     var ready = result.result !== null;

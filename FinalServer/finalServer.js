@@ -69,7 +69,6 @@ if (config.useTLS) {
 
 var server = app.listen(config.port, function() {
     console.log('Final Server running for election "%s" [%s]', manifest.title, manifest.hash);
-    console.log('HTTPS server listening on %s, port %d', server.address().address, server.address().port);
     if (config.useTLS) 
         console.log('Using TLS');
 });

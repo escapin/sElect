@@ -136,19 +136,21 @@ exports.loadResult = function () {
 
     // Load /parse the partial result
     if (exports.voters === null) {
-        console.log('...TRY TO GET THE PARTIAL RESULT...');
         fetchData(manifest.collectingServer.URI + '/result.msg', function (err, data) {
-            if (err) console.log('ERROR when fetchin the partial result:', err);
-            else     parsePartialResult(data); 
+            if (!err) {
+                console.log('PARTIAL RESULT FILE FETCHED');
+                parsePartialResult(data); 
+            }
         });
     }
 
     // Load /parse the final result
     if (exports.result === null) {
-        console.log('...TRY TO GET THE FINAL RESULT...');
         fetchData(manifest.finalServer.URI + '/result.msg', function (err, data) {
-            if (err) console.log('ERROR when fetchin the final result:', err);
-            else     parseFinalResult(data); 
+            if (!err) {
+                console.log('FINAL RESULT FILE FETCHED');
+                parseFinalResult(data); 
+            }
         });
     }
 

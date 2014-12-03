@@ -25,11 +25,9 @@ for( var i=0; i<manifest.voters.length; ++i ) {
 var voterIdentifiers = java.newArray("java.lang.String", listOfEligibleVoters); 
 
 // Create the instance of CollectingServerWrapper:
-console.log('Creating an instance of CollectingServerWrapper');
 var csWrapper = java.newInstanceSync("selectvoting.system.wrappers.CollectingServerWrapper", 
                                       colSerEncKey, colSerDecKey, colSerVerKey, colSerSigKey, 
                                       manifest.hash, voterIdentifiers);
-console.log(' ...CollectingServerWrapper created');
 
 // Export the wrapper:
 module.exports = csWrapper;
