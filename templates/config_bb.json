@@ -1,6 +1,4 @@
 {
     "port" : 3111,
-    "MANIFEST_FILE" : "../tmp/ElectionManifest.json",
-    "RESULT_FILE": "../tmp/finalResult.msg",
-    "PARTIAL_RESULT_FILE": "../tmp/partialResult.msg" 
+    "MANIFEST_FILE" : "../tmp/ElectionManifest.json"
 }
