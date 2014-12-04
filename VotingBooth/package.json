@@ -1,0 +1,10 @@
+{
+  "name": "StaticFileServer",
+  "description": "Simple server (of static files) for sElect voting booth",
+  "version": "0.2.0",
+  "private": true,
+  "dependencies": {
+    "express": "4.x",
+    "morgan": "^1.5.0"
+  }
+}
