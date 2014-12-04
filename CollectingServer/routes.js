@@ -142,18 +142,19 @@ exports.otp = function otp(req, res)
             setTimeout( function(){ otp_store[email]=null; }, 10*60000); // 10 min
 
             // Send an email
-            /*
-            winston.info('Sending an emal with otp to', email, otp);
-            sendEmail(email, 'Your One Time Password for sElect', otp, function (err,info) {
-                if (err) {
-                    winston.info(' ...Error:', err);
-                }else{
-                    winston.info(' ...E-mail sent: ' + info.response);
-                }
-                res.send({ ok: true }); 
-            })
-            */
-            res.send({ ok: true }); // TODO: this is nestead of tha above
+            if (config.sendEmail) {
+                winston.info('Sending an emal with otp to', email, otp);
+                sendEmail(email, 'Your One Time Password for sElect', otp, function (err,info) {
+                    if (err) {
+                        winston.info(' ...Error:', err);
+                        // TODO: what to do if we are here (the e-mail has not been sent)?
+                    }else{
+                        winston.info(' ...E-mail sent: ' + info.response);
+                    }
+                });
+            }
+
+            res.send({ ok: true });
         }
     }
     else 

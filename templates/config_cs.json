@@ -15,6 +15,7 @@
     "class_paths" : ["../bin", "../lib/bcprov-jdk16-146.jar"],
     "ignore_fin_serv_cert" : true,
 
+    "sendEmail" : false,
     "smtp_host" : "my.smtp.server.com",
     "smtp_port" : 25,
     "smtp_user" : "username",
