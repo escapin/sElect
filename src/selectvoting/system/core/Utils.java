@@ -1,8 +1,9 @@
 package selectvoting.system.core;
 
-import de.unitrier.infsec.utils.MessageTools;
-import java.util.Hashtable;
 import java.util.Arrays;
+import java.util.Hashtable;
+
+import de.unitrier.infsec.utils.MessageTools;
 
 public class Utils 
 {
@@ -64,9 +65,7 @@ public class Utils
 	}	
 	
 	public static void sort(byte[][] byteArrays, int fromIndex, int toIndex)
-	{
-		/* to VERIFY: comment the body of this method out */
-		
+	{	
 		Arrays.sort(byteArrays, fromIndex, toIndex, new java.util.Comparator<byte[]>() {
 			public int compare(byte[] a1, byte[] a2) {
 				return Utils.compare(a1, a2);
@@ -76,7 +75,6 @@ public class Utils
 	
 	public static class ObjectsMap
 	{
-		//private MessagePairList map = new MessagePairList();
 		private Hashtable<Object, Object> map = new Hashtable<Object, Object>();
 		
 		public void put(Object key, Object value) throws NullPointerException
@@ -91,44 +89,6 @@ public class Utils
 		
 		public boolean containsKey(Object key){
 			return map.containsKey(key);
-		}
-		
-		private static class MessagePairList {
-			private static class MessagePair
-			{
-				Object key;
-				Object value;
-				MessagePair next;
-				public MessagePair(Object key, Object value) {
-					this.key = key;
-					this.value = value;
-					this.next = null;
-				}
-			}
-			public MessagePair head, last;
-			public void put(Object key, Object value) throws NullPointerException{
-				if(key==null || value==null)
-					throw new NullPointerException();
-				MessagePair newEntry = new MessagePair(key, value);
-				if(head==null)
-					head=last=newEntry;
-				else{
-					last.next=newEntry;
-					last=newEntry;
-				}
-			}
-
-			public Object get(Object key) {
-				for(MessagePair entry=head; entry!=null; entry=entry.next) {
-					if( entry.key.equals(key) )
-						return entry.value;
-				}
-				return null;
-			}
-
-			public boolean containsKey(Object key) {
-				return get(key) != null;
-			}
 		}
 	}
 }

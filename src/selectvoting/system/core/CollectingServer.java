@@ -1,8 +1,5 @@
 package selectvoting.system.core;
 
-import java.util.Arrays;
-import java.util.Hashtable;
-
 import de.unitrier.infsec.functionalities.digsig.Signer;
 import de.unitrier.infsec.functionalities.pkenc.Decryptor;
 import de.unitrier.infsec.utils.MessageTools;
@@ -31,8 +28,8 @@ public class CollectingServer
 	private final byte[][] ballots; 
 	private int numberOfCastBallots = 0;
 	private int numberOfVoters;
+	private Utils.ObjectsMap voterInfo;
 	private String[] voterIdentifiers;
-	private Hashtable<String, byte[]> voterInfo;
 
 
 	// CONSTRUCTORS
@@ -48,10 +45,10 @@ public class CollectingServer
 		// initially no voter has cast their ballot:
 		for(int i=0; i<numberOfVoters; ++i)	ballots[i] = null;
 		// initialize the map with information kept for each voter 
-		voterInfo = new Hashtable<String, byte[]>();
-		for( String vid : voterIdentifiers ) {
+		voterInfo = new Utils.ObjectsMap();
+		for(int i=0; i<numberOfVoters;i++){
 			byte[] empty = {};
-			voterInfo.put(vid, empty); // empty means no (inner) ballot collected
+			voterInfo.put(voterIdentifiers[i], empty); // empty means no (inner) ballot collected
 		}
 	}
 
@@ -79,7 +76,7 @@ public class CollectingServer
 			throw new Error("Malformed ballot (empty inner ballot)");
 
 		// Check if the voter has already voted with different inner ballot: 
-		byte[] storedInnerBallot = voterInfo.get(voterID);
+		byte[] storedInnerBallot = (byte[]) voterInfo.get(voterID);
 		if( storedInnerBallot.length!=0 && !MessageTools.equal(innerBallot, storedInnerBallot) )
 			throw new Error("Voter already voted");
 
@@ -108,11 +105,8 @@ public class CollectingServer
 			bb[i] = ballots[i];
 		}
 
-		Arrays.sort(bb, new java.util.Comparator<byte[]>() {
-			public int compare(byte[] a1, byte[] a2) {
-				return Utils.compare(a1, a2);
-			}
-		});
+		Utils.sort(bb, 0, bb.length);
+		
 
 		// concatenate all the (inner) ballots
 		byte[] ballotsAsAMessage = Utils.concatenateMessageArray(bb, numberOfCastBallots);
@@ -122,7 +116,7 @@ public class CollectingServer
 		
 		int i = 0;
 		for (String vid : voterIdentifiers) {
-			if (voterInfo.containsKey(vid) && voterInfo.get(vid).length!=0) { // voter voted
+			if (voterInfo.containsKey(vid) && ((byte[]) voterInfo.get(vid)).length!=0) { // voter voted
 				vv[i++] = Utilities.stringAsBytes(vid);
 				System.out.println(vid);
 			}

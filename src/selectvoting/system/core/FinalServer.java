@@ -1,6 +1,6 @@
 package selectvoting.system.core;
 
-import java.util.Arrays;
+
 
 import de.unitrier.infsec.functionalities.digsig.Signer;
 import de.unitrier.infsec.functionalities.digsig.Verifier;
@@ -92,11 +92,7 @@ public class FinalServer
 		}
 
 		// sort the entries
-		Arrays.sort(entries, 0, numberOfEntries, new java.util.Comparator<byte[]>() {
-			public int compare(byte[] a1, byte[] a2) {
-				return Utils.compare(a1, a2);
-			}
-		});
+		Utils.sort(entries, 0, numberOfEntries);
 		
 		// format entries as one message
 		byte[] entriesAsAMessage = Utils.concatenateMessageArray(entries, numberOfEntries);
