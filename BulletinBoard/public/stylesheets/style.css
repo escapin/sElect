@@ -124,6 +124,9 @@ div.body {
     background: #538;
 }
 
+.pure-skin-mine .pure-menu  a:hover {
+    box-shadow: 0px 1px 12px 2px #cce;
+}
 /*
 .pure-skin-mine .pure-menu.pure-menu-open  {
     background: #f0e0ff;
@@ -147,4 +150,22 @@ div.body {
 
 .error {
     color: #c00;
+}
+
+.extrainfobox {
+    margin-top: 20pt;
+    margin-bottom: 10pt;
+}
+
+.extrainfo {
+    margin: 0pt 10pt;
+    margin-top: 20pt;
+    padding: 10pt;
+    text-align: center;
+    vertical-align: text-bottom;
+    height: 88pt;
+    color: #444;
+    background: #eee;
+    border-radius: 6px;
+    box-shadow: 0px 1px 12px 3px #ddd;
 }
