@@ -17,7 +17,7 @@ winston.add(winston.transports.File, { filename: config.LOG_FILE });
 var cmdlineOption = process.argv[2];
 var resultFileExists = fs.existsSync(config.RESULT_FILE);
 if (resultFileExists && cmdlineOption !== '--serveResult') {
-    console.log('ERROR: The file with result already exists.');
+    console.log('ERROR: The file with result (%s) already exists.', config.RESULT_FILE);
     console.log('Remove this file or run the server with --serveResult option.');
     console.log('Server not started.');
     process.exit(1);
@@ -31,7 +31,7 @@ if (cmdlineOption === '--serveResult' && !resultFileExists) {
 // CHECK IF THE LOG WITH ACCEPTED BALLOTS EXISTS
 var logFileExists = fs.existsSync(config.ACCEPTED_BALLOTS_LOG_FILE);
 if (logFileExists && !resultFileExists && cmdlineOption !== '--resume') {
-    console.log('ERROR: Log file with accepted ballots exists.');
+    console.log('ERROR: Log file with accepted ballots (%s) exists.', config.ACCEPTED_BALLOTS_LOG_FILE);
     console.log('Remove this file or run the server with --resume option.');
     console.log('Server not started.');
     process.exit(1);

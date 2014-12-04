@@ -21,7 +21,7 @@ function error(info) {
 var cmdlineOption = process.argv[2];
 var resultFileExists = fs.existsSync(config.RESULT_FILE);
 if (resultFileExists && cmdlineOption !== '--serveResult') {
-    error('The file with result already exists.\nRemove this file or run the server with --serveResult option.');
+    error('The file with result (' +config.RESULT_FILE+ ') already exists.\nRemove this file or run the server with --serveResult option.');
 }
 if (cmdlineOption === '--serveResult' && !resultFileExists) {
     error('The file with result does not exist.');
