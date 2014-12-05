@@ -144,7 +144,8 @@ exports.otp = function otp(req, res)
             // Send an email
             if (config.sendEmail) {
                 winston.info('Sending an emal with otp to', email, otp);
-                sendEmail(email, 'Your One Time Password for sElect', otp, function (err,info) {
+                var emailContent = 'Election: ' + manifest.title + '\n\nOne time password: ' + otp + '\n';
+                sendEmail(email, 'Your One Time Password for sElect', emailContent, function (err,info) {
                     if (err) {
                         winston.info(' ...Error:', err);
                         // TODO: what to do if we are here (the e-mail has not been sent)?
