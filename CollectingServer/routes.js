@@ -119,7 +119,7 @@ exports.otp = function otp(req, res)
 {
     var email = req.body.email;
 
-    if (!status.isActive()) {
+    if (!status.isActive()) { // if the status is not active, reject the request
         var descr = (status.isClosed() ? 'Election closed' : 'Election not opened yet');
         winston.info('OTP request (%s) ERROR: %s.', email, descr)
         res.send({ ok: false, descr: descr }); 
@@ -135,7 +135,7 @@ exports.otp = function otp(req, res)
         else // eligible voter create a fresh OTP and send it
         {
             // Generate a fresh otp
-            var otp = crypto.nonce();
+            var otp = crypto.nonce().slice(0,10); // an otp will have 5 bytes
             winston.info('OTP request (%s) accepted. Fresh OTP = %s', email, otp);
             otp_store[email] = otp // store the opt under the voter id (email)
             // schedule reset of the otp
@@ -157,8 +157,9 @@ exports.otp = function otp(req, res)
             res.send({ ok: true });
         }
     }
-    else 
+    else {
         res.send({ ok: false, descr: 'Empty e-mail address' }); 
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -191,15 +192,15 @@ exports.cast = function cast(req, res)
         // Cast the ballot:
         server.collectBallot(email, ballot, function(err, response) {
             if (err) {
-                winston.info('Cast request (%s) INTERNAL ERROR %s', email, err);
+                winston.info('Cast request (%s/%s) INTERNAL ERROR %s', email, otp, err);
                 res.send({ ok: false, descr: 'Internal error' }); 
             }
             else if (!response.ok) {
-                winston.info('Cast request (%s) BALLOT REJECTED. Response = %s', email, response.data);
+                winston.info('Cast request (%s/%s) BALLOT REJECTED. Response = %s', email, otp, response.data);
                 res.send({ ok: false, descr: response.data }); 
             }
             else { // everything ok
-                winston.info('Cast request (%s) accepted', email);
+                winston.info('Cast request (%s/%s) accepted', email, otp);
                 res.send({ ok: true, receipt: response.data }); 
                 // log the accepted ballot
                 log.write(JSON.stringify({ email:email, ballot:ballot })+'\n', null,
@@ -212,7 +213,7 @@ exports.cast = function cast(req, res)
     }
     else // otp not correct
     {
-        winston.info('Cast request ERROR: Invalid OTP');
+        winston.info('Cast request ERROR: Invalid OTP:', otp);
         res.send({ ok: false, descr: 'Invalid OTP (one time password)' }); 
         // if an invalid otp is given, we require that a new otp be generated (reset otp):
         otp_store[email] = null;

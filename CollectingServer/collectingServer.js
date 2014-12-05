@@ -19,12 +19,12 @@ var resultFileExists = fs.existsSync(config.RESULT_FILE);
 if (resultFileExists && cmdlineOption !== '--serveResult') {
     console.log('ERROR: The file with result (%s) already exists.', config.RESULT_FILE);
     console.log('Remove this file or run the server with --serveResult option.');
-    console.log('Server not started.');
+    console.log('SERVER NOT STARTED.');
     process.exit(1);
 }
 if (cmdlineOption === '--serveResult' && !resultFileExists) {
     console.log('ERROR: The file with result does not exist.');
-    console.log('Server not started.');
+    console.log('SERVER NOT STARTED.');
     process.exit(1);
 }
 
@@ -33,7 +33,7 @@ var logFileExists = fs.existsSync(config.ACCEPTED_BALLOTS_LOG_FILE);
 if (logFileExists && !resultFileExists && cmdlineOption !== '--resume') {
     console.log('ERROR: Log file with accepted ballots (%s) exists.', config.ACCEPTED_BALLOTS_LOG_FILE);
     console.log('Remove this file or run the server with --resume option.');
-    console.log('Server not started.');
+    console.log('SERVER NOT STARTED.');
     process.exit(1);
 }
 if (cmdlineOption === '--resume' && !logFileExists) {
@@ -45,7 +45,7 @@ if (cmdlineOption === '--resume' && !logFileExists) {
 // CHECK FOR WRONG OPTIONS
 if (cmdlineOption && cmdlineOption!=='--resume' && cmdlineOption!=='--serveResult') {
     console.log('ERROR: Wrong option');
-    console.log('Server not started.');
+    console.log('SERVER NOT STARTED.');
     process.exit(1);
 }
 
