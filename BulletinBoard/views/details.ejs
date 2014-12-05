@@ -59,28 +59,40 @@
         $(document).ready(function(){
             var electionID = '<%= manifest.hash %>';
 
-            var csURI = '<%= manifest.collectingServer.URI %>/status';
-            $.get(csURI)
+            var csURI = '<%= manifest.collectingServer.URI %>';
+            var csStatusURI = csURI + '/status';
+            $.get(csStatusURI)
              .fail(function otpRequestFailed() { 
                 $("#cs-status").addClass('error').text('does not respond');
               })
              .done(function castRequestDone(result) {  // we have some response
-                if (result.electionID.toUpperCase() === electionID) 
-                    $("#cs-status").text(result.status);
-                else
+                if (result.electionID.toUpperCase() === electionID) {
+                    var status = result.status;
+                    if (status==='closed')
+                        status += ' (<a href="' +csURI+ '/result.msg">signed result</a>)'
+                    $("#cs-status").html(status);
+                }
+                else {
                     $("#cs-status").addClass('error').text('NOT MATCHING ELECTION ID');
+                }
               });
 
-            var fsURI = '<%= manifest.finalServer.URI %>/status';
-            $.get(fsURI)
+            var fsURI = '<%= manifest.finalServer.URI %>';
+            var fsStatusURI = fsURI+'/status';
+            $.get(fsStatusURI)
              .fail(function otpRequestFailed() { 
                 $("#fs-status").addClass('error').text('does not respond');
               })
              .done(function castRequestDone(result) {  // we have some response
-                if (result.electionID.toUpperCase() === electionID) 
-                    $("#fs-status").text(result.status);
-                else
+                if (result.electionID.toUpperCase() === electionID) {
+                    var status = result.status;
+                    if (status==='result ready')
+                        status += ' (<a href="' +fsURI+ '/result.msg">signed result</a>)'
+                    $("#fs-status").html(status);
+                }
+                else {
                     $("#fs-status").addClass('error').text('NOT MATCHING ELECTION ID');
+                }
               });
 
         });
