@@ -25,6 +25,7 @@ function selectBooth() {
     var choice = null;
 
     var electionID = manifest.hash;
+    var shortenedElectionID = electionID.slice(0,6) + '...';
     var colServEncKey = manifest.collectingServer.encryption_key;
     var colServVerifKey = manifest.collectingServer.verification_key;
     var finServEncKey = manifest.finalServer.encryption_key;
@@ -96,8 +97,8 @@ function selectBooth() {
                 else {
                     // Show the next window (OTP)
                     $('#inp-otp').val(''); // emtpy the otp input field
-                    $('#inp-otp').focus();
                     showTab('#otp');
+                    $('#inp-otp').focus();
                 }
               })
              .fail(function otpRequestFailed() {
@@ -208,7 +209,7 @@ function selectBooth() {
     /// INITIALISATION AND BINDING
     
     // Election data
-    $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +manifest.hash+ ')</div>');
+    $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +shortenedElectionID+ ')</div>');
     $('h3.subtitle').text(manifest.description);
     $('#choice-list').html(optionsAsHTML());
 

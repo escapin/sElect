@@ -4,6 +4,12 @@
     <link rel="stylesheet" href="pure/pure-min.css">
     <link rel="stylesheet" href="custom-pure.css">
     <link rel="stylesheet" href="style.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="pure/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="pure/grids-responsive-min.css">
+    <!--<![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script>
         // Mock require
@@ -22,11 +28,12 @@
     <script src="js/selectBooth.js"></script>
 </head>
 <body class="pure-skin-mine">
+    <!-- --------------------------------------------------------------------------------- -->
+    <div class="container" id="welcome">
     <div class="header">
         Secure elections powered by <em>sElect</em>
     </div>
-    <!-- --------------------------------------------------------------------------------- -->
-    <div class="body" id="welcome">
+    <div class="body">
         <h3 class="lead">Welcome to </h3>
         <h1 class="title"> TITLE OF THE ELECTION <div class="electionid">ELECTION-ID</div> </h1>
         <h3 class="subtitle"> DESCRIPTION </h3>
@@ -36,7 +43,7 @@
             <fieldset>
                 <legend>Provide your voter identifier (e-mail) to continue</legend>
                 <div class="pure-g">
-                    <div class="pure-u-2-3">
+                    <div class="pure-u-1 pure-u-md-2-3">
                         <input id='inp-email' class="pure-input-1" type="email" size="50" placeholder="email">
                         <div class="extra-info"> 
                             The e-mail address you provide should
@@ -44,15 +51,20 @@
                             (in the list of eligible voters)
                         </div>
                     </div>
-                    <div class="pure-u-1-3 toright">
+                    <div class="pure-u-1 pure-u-md-1-3 toright">
                         <button id='submit-email' type="submit" class="pure-button pure-button-primary" disabled>Proceed to voting</button>
                     </div>
                 </div>    
             </fieldset>
         </form>
     </div>
+    </div>
     <!-- --------------------------------------------------------------------------------- -->
-    <div class="body" id="otp">
+    <div class="container" id="otp">
+    <div class="header">
+        Secure elections powered by <em>sElect</em>
+    </div>
+    <div class="body">
         <h1 class="title"> TITLE OF THE ELECTION </h1>
 
         <h3> 
@@ -64,23 +76,28 @@
             <fieldset>
                 <legend>Please copy the OTP from this e-mail and enter it in the field below </legend>
                 <div class="pure-g">
-                    <div class="pure-u-2-3">
+                    <div class="pure-u-1 pure-u-md-2-3">
                         <input id='inp-otp' class="pure-input-1" type="text" size="50" placeholder="one-time password">
                         <div class="extra-info"> 
-                            Your one time password has been sent to you
-                            e-mail account (if you cannot find it, please
-                            check your spam folder).
+                            If you cannot find the e-mail with
+                            an OTP, please check your spam
+                            folder.
                         </div>
                     </div>
-                    <div class="pure-u-1-3 toright">
+                    <div class="pure-u-1 pure-u-md-1-3 toright">
                         <button id='submit-otp' type="submit" class="pure-button pure-button-primary" disabled>Continue</button>
                     </div>
                 </div>    
             </fieldset>
         </form>
     </div>
+    </div>
     <!-- --------------------------------------------------------------------------------- -->
-    <div class="body" id="choice">
+    <div class="container" id="choice">
+    <div class="header">
+        Secure elections powered by <em>sElect</em>
+    </div>
+    <div class="body">
         <h1 class="title"> TITLE OF THE ELECTION </h1>
 
         <form id="choice-form" class="pure-form" action="">
@@ -102,8 +119,13 @@
             </fieldset>
         </form>
     </div>
+    </div>
     <!-- --------------------------------------------------------------------------------- -->
-    <div class="body" id="result">
+    <div class="container" id="result">
+    <div class="header">
+        Secure elections powered by <em>sElect</em>
+    </div>
+    <div class="body">
         <h1 class="title"> TITLE OF THE ELECTION </h1>
 
         <p><b>Your ballot has been accepted by the collecting
@@ -119,8 +141,13 @@
 
         <p><em>Thank you!</em></p>
     </div>
+    </div>
     <!-- --------------------------------------------------------------------------------- -->
-    <div class="body" id="error">
+    <div class="container" id="error">
+    <div class="header">
+        Secure elections powered by <em>sElect</em>
+    </div>
+    <div class="body">
         <h1 class="error"> Something went wrong! </h1>
 
         <div id='errorMsg' class='error'>ERROR MESSAGE</div>
@@ -131,7 +158,7 @@
                 pure-button-primary">Start over and try again</button>
             </fieldset>
         </form>
-
+    </div>
     </div>
     <!-- --------------------------------------------------------------------------------- -->
     <div id="processing">
