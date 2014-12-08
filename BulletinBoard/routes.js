@@ -3,6 +3,8 @@ var manifest = require('./manifest');
 var config = require('./config');
 var result = require('./result');
 
+manifest.shortHash = manifest.hash.slice(0,6) + '...';
+
 // Serve a particular static file
 
 exports.serveFile = function serveFile(path) {
