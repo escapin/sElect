@@ -1,4 +1,4 @@
-# sElect -- Secure Election
+# sElect - Secure Elections
 
 sElect is a remote electronic voting system designed to provide 
 **privacy** and **verifiability**.
@@ -24,7 +24,7 @@ Programme *Reliably Secure Software Systems* (RS3)
 To achieve its security goals (verifiability and privacy), 
 the sElect voting system uses only standard cryptographic
 operations, such as public key encryption and digital signatures
-(unlike most other systems that aim at providing these security
+(unlike most other e-voting systems that aim at providing these security
 goals). The design is also relatively simple (considering, again,
 the security goals the system is designed to achieve).
 
@@ -71,29 +71,25 @@ net_.
 
 ## Security Properties
 
-We now briefly discuss to which extent and under which
-assumptions sElect provides verifiability/accountability and
-privacy.
-
 _Verifiability_ is achieved in a very direct way: once the result
 has been published, every voter can simply check whether her
 verification code is included in the published election result,
-next to her choice. For this mechanism to work, we need to make
+along with the voter's choice. For this mechanism to work, one needs to make
 sure that the client program is honest and indeed uses a randomly
-selected, and hence unique, verification code.
+chosen, and hence unique, verification code.
 
-Furthermore, by making use of the digital signatures and
-the output of the collecting server, sElect also provides a
+Furthermore, sElect also provides a
 reasonable level of _accountability_: when a voter has a signed
 acknowledgment from the collecting server and then the
 verification fails (the expected verification code is not listed
 as required), it is possible to tell which of the servers has
-misbehaved and even to provide an evidence for this misbehavior.
+misbehaved and even (by making use of the digital signatures)
+to provide an evidence for this misbehavior.
 
 sElect provides _privacy_ under the assumption that one of the
 servers is honest (the two servers do not collude). The steps
 taken by an honest server, by design, hide the link between its
-input and output entries. Therefore, no party can link the ballot
+input and output entries. Therefore, no one can link the ballot
 of a given voter to his/her choice-identifier-pair in the final
 output.
 
@@ -134,7 +130,7 @@ node bb.js
 
 *Voting booth*:
 
-Simply open VotingBooth/votingBooth.html in your browser.
+Simply open VotingBooth/webapp/votingBooth.html in your browser.
 
 The files created during the voting process (including logs and partial 
 and final results) can be removed with
