@@ -1,5 +1,5 @@
 var fs = require('fs');
-var config = require('./config');
+var config = require('../config');
 var manifest = require('./manifest');
 var server = require('./server');
 

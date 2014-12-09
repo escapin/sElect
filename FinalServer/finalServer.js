@@ -6,8 +6,8 @@ var morgan = require('morgan');
 var fs = require('fs');
 
 var config = require('./config');
-var manifest = require('./manifest')
-var routes = require('./routes');
+var manifest = require('./src/manifest')
+var routes = require('./src/routes');
 
 
 // Display the error message and halt the process.

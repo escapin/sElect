@@ -1,7 +1,7 @@
 var fs = require('fs');
 var request = require('request');
 var manifest = require('./manifest');
-var config = require('./config');
+var config = require('../config');
 // var wrapper = require('./wrapper');
 var crypto = require('cryptofunc');
 

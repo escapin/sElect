@@ -4,14 +4,14 @@ var errorHandler = require('errorhandler')
 var morgan = require('morgan')
 
 var config = require('./config');
-var manifest = require('./manifest');
-var routes = require('./routes');
-var result = require('./result');
+var manifest = require('./src/manifest');
+var routes = require('./src/routes');
+var result = require('./src/result');
 
 // CREATE AND CONFIGURE THE APP
 var app = express();
 
-app.set('views', './views');    // view engine and location of the views
+app.set('views', './src/views');    // view engine and location of the views
 app.set('view engine', 'ejs'); 
 app.use(bodyParser.urlencoded({ extended: true })); // body parser (important for POST request)
 app.use(express.static('./public')); // static content // was: __dirname + '/public'

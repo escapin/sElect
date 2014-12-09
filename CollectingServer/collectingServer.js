@@ -8,7 +8,7 @@ var basicAuth = require('basic-auth-connect');
 var fs = require('fs');
 
 var config = require('./config');
-var manifest = require('./manifest')
+var manifest = require('./src/manifest')
 
 // LOGGING (to a file in addition to the console)
 winston.add(winston.transports.File, { filename: config.LOG_FILE });
@@ -51,10 +51,10 @@ if (cmdlineOption && cmdlineOption!=='--resume' && cmdlineOption!=='--serveResul
 
 
 // CREATE AND CONFIGURE THE APP
-var routes = require('./routes');
+var routes = require('./src/routes');
 var app = express();
 app.use(cors()); // enable all CORS request
-app.set('views', './views');    // location of the views
+app.set('views', './src/views');    // location of the views
 app.set('view engine', 'ejs');  // view engine
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json()); 

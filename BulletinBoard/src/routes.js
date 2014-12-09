@@ -1,6 +1,6 @@
 var fs = require('fs');
 var manifest = require('./manifest');
-var config = require('./config');
+var config = require('../config');
 var result = require('./result');
 
 manifest.shortHash = manifest.hash.slice(0,6) + '...';
