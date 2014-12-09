@@ -74,6 +74,9 @@ function selectBooth() {
 
     function onSubmitWelcome(event) 
     {
+        if (activeTabId!=='#welcome') return false;
+        activeTabId=''; 
+
         // Fetching the email from the form
         var e = $('#inp-email').val();
         if( !e || e==='' ) // it should not happen
@@ -81,7 +84,7 @@ function selectBooth() {
         email = e;
 
         // Make the active tab disappear
-        $(activeTabId).fadeOut(FADE_TIME, function() {
+        $('#welcome').fadeOut(FADE_TIME, function() {
 
             // show processing icon
             showProgressIcon();
@@ -109,25 +112,31 @@ function selectBooth() {
     };
 
     function onSubmitOTP(event) {
+        if (activeTabId!=='#otp') return false;
+        activeTabId=''; 
+
         // Fetching the otp from the form
         var o = $('#inp-otp').val();
         if( !o || o==='' ) // it should not happen
             return false;
         otp = o;
 
-        $(activeTabId).fadeOut(FADE_TIME, function() {
+        $('#otp').fadeOut(FADE_TIME, function() {
             showTab('#choice');
         });
         return false; // prevents any further submit action
     }
 
     function onSubmitChoice(event) {
+        if (activeTabId!=='#choice') return false;
+        activeTabId=''; 
+
         // Fetch the choice from the form
         var option = $('input[name="choice"]:checked').attr('id');
         choice = + option.slice('option-'.length);
 
         // Make the active tab disappear
-        $(activeTabId).fadeOut(FADE_TIME, function() {
+        $('#choice').fadeOut(FADE_TIME, function() {
 
             // Create the ballot
             console.log('CREATING BALLOT FOR:', email, otp, choice);
@@ -160,15 +169,17 @@ function selectBooth() {
                     }
                 }
               });
-
         });
 
         return false; // prevents any further submit action
     }
 
     function onSubmitError(event) {
+        if (activeTabId!=='#error') return false;
+        activeTabId=''; 
+
         // make the active tab disappear
-        $(activeTabId).fadeOut(FADE_TIME, function() {
+        $('#error').fadeOut(FADE_TIME, function() {
             // show the welcome tab
             $('#inp-email').focus();
             showTab('#welcome');
