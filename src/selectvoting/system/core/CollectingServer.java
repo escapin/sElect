@@ -4,8 +4,6 @@ import de.unitrier.infsec.functionalities.digsig.Signer;
 import de.unitrier.infsec.functionalities.pkenc.Decryptor;
 import de.unitrier.infsec.utils.MessageTools;
 import de.unitrier.infsec.utils.Utilities;
-import static de.unitrier.infsec.utils.MessageTools.concatenate;
-import static de.unitrier.infsec.utils.MessageTools.intToByteArray;
 
 public class CollectingServer 
 {
@@ -88,12 +86,13 @@ public class CollectingServer
 
 		// Create a receipt for the voter
 		// byte[] elID_innerBallot = concatenate(electionID, innerBallot);
-		byte[] accepted_elID_innerBallot = concatenate(TAG_ACCEPTED, elID_innerBallot);
+		byte[] accepted_elID_innerBallot = MessageTools.concatenate(TAG_ACCEPTED, elID_innerBallot);
 		byte[] receipt = signer.sign(accepted_elID_innerBallot);
 
 		return receipt;
 	}
 
+	
 	/**
 	 * Return the result.
 	 */
@@ -114,22 +113,22 @@ public class CollectingServer
 		// concatenate identifiers of the voters who voted (they are already "sorted")
 		byte[][] vv = new byte[numberOfCastBallots][];
 		
-		int i = 0;
-		for (String vid : voterIdentifiers) {
-			if (voterInfo.containsKey(vid) && ((byte[]) voterInfo.get(vid)).length!=0) { // voter voted
-				vv[i++] = Utilities.stringAsBytes(vid);
-				System.out.println(vid);
+		int k = 0;
+		for(int i=0; i<voterIdentifiers.length; ++i){
+			String vid=voterIdentifiers[i];
+			if (voterInfo.containsKey(vid) && ((byte[])voterInfo.get(vid)).length!=0) { // voter voted
+				vv[k++] = Utilities.stringAsBytes(vid);
 			}
 		}	
 		byte[] votersAsAMessage = Utils.concatenateMessageArrayWithDuplicateElimination(vv);
 
 		// put together the election ID, inner ballots, and list of voters
-		byte[] result = concatenate(electionID, concatenate(ballotsAsAMessage, votersAsAMessage));
-		byte[] tag_result = concatenate(TAG_RESULT, result);
+		byte[] result = MessageTools.concatenate(electionID, MessageTools.concatenate(ballotsAsAMessage, votersAsAMessage));
+		byte[] tag_result = MessageTools.concatenate(TAG_RESULT, result);
 
 		// sign the result
 		byte[] signature = signer.sign(tag_result);
-		byte[] resultWithSignature = concatenate(tag_result, signature);
+		byte[] resultWithSignature = MessageTools.concatenate(tag_result, signature);
 
 		return resultWithSignature;
 	}

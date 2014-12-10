@@ -2,9 +2,9 @@ package selectvoting.system.core;
 
 import de.unitrier.infsec.functionalities.digsig.Verifier;
 import de.unitrier.infsec.functionalities.nonce.NonceGen;
-import de.unitrier.infsec.functionalities.pkenc.Encryptor;
-import static de.unitrier.infsec.utils.MessageTools.concatenate;
-import static de.unitrier.infsec.utils.MessageTools.intToByteArray;
+import de.unitrier.infsec.functionalities.pkenc.Encryptor; 
+import de.unitrier.infsec.utils.MessageTools;
+
 
 /**
  * Core voter's client class. It provides cryptographic operations (formating a ballot) 
@@ -51,9 +51,9 @@ public class Voter
 	 */
 	public BallotInfo createBallot(int votersChoice) {
 		byte[] nonce = noncegen.nextNonce();
-		byte[] vote = intToByteArray(votersChoice);
-		byte[] innerBallot = finServEnc.encrypt(concatenate(electionID, concatenate(nonce, vote)));
-		byte[] ballot = colServEnc.encrypt(concatenate(electionID, innerBallot));
+		byte[] vote = MessageTools.intToByteArray(votersChoice);
+		byte[] innerBallot = finServEnc.encrypt(MessageTools.concatenate(electionID, MessageTools.concatenate(nonce, vote)));
+		byte[] ballot = colServEnc.encrypt(MessageTools.concatenate(electionID, innerBallot));
 		return new BallotInfo(ballot, nonce, innerBallot);
 	}
 
@@ -61,7 +61,7 @@ public class Voter
 	 * Checks if 'receiptSignature' is a signature on the receipt. If yes, the method saves the signature and return true.  
 	 */ 
 	public boolean validateReceipt(byte[] receipt, byte[] innerBallot) {
-		byte[] expectedMessage = concatenate(CollectingServer.TAG_ACCEPTED, concatenate(electionID, innerBallot));
+		byte[] expectedMessage = MessageTools.concatenate(CollectingServer.TAG_ACCEPTED, MessageTools.concatenate(electionID, innerBallot));
 		return colServVerif.verify(receipt, expectedMessage);
 	}
 }
