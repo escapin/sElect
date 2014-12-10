@@ -127,7 +127,7 @@ public class CryptoLib {
 			X509EncodedKeySpec ks = new X509EncodedKeySpec(publicKey);
 			PublicKey pk = kf.generatePublic(ks);
 
-			Cipher c = Cipher.getInstance("RSA/ECB/PKCS1Padding", "BC");
+			Cipher c = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", "BC");
 			c.init(Cipher.ENCRYPT_MODE, pk);
 			byte[] out = c.doFinal(message);
 			return out;
@@ -145,7 +145,7 @@ public class CryptoLib {
 			// X509EncodedKeySpec
 			PKCS8EncodedKeySpec ks = new PKCS8EncodedKeySpec(privKey);
 			PrivateKey pk = kf.generatePrivate(ks);
-			Cipher c = Cipher.getInstance("RSA/ECB/PKCS1Padding", "BC");
+			Cipher c = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding", "BC");
 			c.init(Cipher.DECRYPT_MODE, pk);
 			byte[] out = c.doFinal(message);
 			return out;
