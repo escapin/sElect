@@ -25,7 +25,7 @@ public class CollectingServer
 	// STATE
 
 	private final byte[] electionID;
-	private final byte[][] ballots; 
+	private final byte[][] innerBallots; 
 	private int numberOfCastBallots = 0;
 	private int numberOfVoters;
 	private Utils.ObjectsMap voterInfo;
@@ -41,9 +41,9 @@ public class CollectingServer
 		this.voterIdentifiers = voterIdentifiers;
 		// this.noncegen = new NonceGen();
 		this.numberOfVoters = voterIdentifiers.length;
-		this.ballots = new byte[numberOfVoters][]; // (inner ballots which have been cast)
+		this.innerBallots = new byte[numberOfVoters][]; // (inner ballots which have been cast)
 		// initially no voter has cast their ballot:
-		for(int i=0; i<numberOfVoters; ++i)	ballots[i] = null;
+		for(int i=0; i<numberOfVoters; ++i)	innerBallots[i] = null;
 		// initialize the map with information kept for each voter 
 		voterInfo = new Utils.ObjectsMap();
 		for(int i=0; i<numberOfVoters;i++){
@@ -83,7 +83,7 @@ public class CollectingServer
 		// Collect the ballot if the voter votes for the first time (not if the voter re-votes)
 		if( storedInnerBallot.length == 0 ) {
 			voterInfo.put(voterID, innerBallot); // store the inner ballot under the voter's id
-			ballots[numberOfCastBallots++] = innerBallot; // add the inner ballot to the list of inner ballots
+			innerBallots[numberOfCastBallots++] = innerBallot; // add the inner ballot to the list of inner ballots
 		}
 
 		// Create a receipt for the voter
@@ -102,7 +102,7 @@ public class CollectingServer
 		// sort the ballots
 		byte[][] bb = new byte[numberOfCastBallots][];
 		for (int i=0; i<numberOfCastBallots; ++i) {
-			bb[i] = ballots[i];
+			bb[i] = innerBallots[i];
 		}
 
 		Utils.sort(bb, 0, bb.length);
