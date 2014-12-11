@@ -193,7 +193,7 @@ exports.cast = function cast(req, res)
         // Cast the ballot:
         server.collectBallot(email, ballot, function(err, response) {
             if (err) {
-                winston.info('Cast request (%s/%s) INTERNAL ERROR %s', email, otp, err);
+                winston.info('Cast request (%s/%s) INTERNAL ERROR %s', email, otp, err.toString());
                 res.send({ ok: false, descr: 'Internal error' }); 
             }
             else if (!response.ok) {
