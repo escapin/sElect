@@ -201,12 +201,13 @@ public class CryptoLib {
 			PKCS8EncodedKeySpec ks = new PKCS8EncodedKeySpec(signingKey);
 			PrivateKey pk = kf.generatePrivate(ks);
 
-			signer = Signature.getInstance("SHA256WithRSA", "BC");
+			// signer = Signature.getInstance("SHA256WithRSA", "BC");
+			signer = Signature.getInstance("SHA256withRSAandMGF1", "BC");
 			signer.initSign(pk);
 			signer.update(data);
 			return signer.sign();
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | KeyException | SignatureException | InvalidKeySpecException e) {
-			//System.out.println("Signature creation failed " + e.getLocalizedMessage());
+			System.out.println("Signature creation failed " + e.getLocalizedMessage());
 		}
 		return null;
 	}
@@ -220,7 +221,8 @@ public class CryptoLib {
 			X509EncodedKeySpec ks = new X509EncodedKeySpec(verificationKey);
 			PublicKey pk = kf.generatePublic(ks);
 
-			signer = Signature.getInstance("SHA256WithRSA", "BC");
+			// signer = Signature.getInstance("SHA256WithRSA", "BC");
+			signer = Signature.getInstance("SHA256withRSAandMGF1", "BC");
 			signer.initVerify(pk);
 			signer.update(data);
 			return signer.verify(signature);
