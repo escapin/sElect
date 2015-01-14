@@ -43,7 +43,7 @@ exports.process = function process(req, res)
     }
     var data = req.body.data;
     console.log('Partial result coming. Processing...');
-    processData(data);
+    processData(data, res);
 };
 
 exports.statusPage = function statusPage(req, res) {

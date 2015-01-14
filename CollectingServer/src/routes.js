@@ -130,7 +130,7 @@ exports.otp = function otp(req, res)
         if (!server.eligibleVoters[email]) // Check if the voter is eligible
         {
             winston.info('OTP request (%s) ERROR: Voter not eligible', email);
-            res.send({ ok: false, descr: 'Invalid voter identifier (e-mail)' }); 
+            res.send({ ok: false, descr: 'Invalid voter identifier (e-mail)' });
         }
         else // eligible voter create a fresh OTP and send it
         {
@@ -175,8 +175,8 @@ exports.cast = function cast(req, res)
 
     // make sure that we have all the pieces:
     if (!email || !otp || !ballot ) {
-        winston.info('Cast request (%s) ERROR: election closed.', email)
-        res.send({ ok: false, descr: 'Wrong request' }); 
+        winston.info('Cast request (%s) ERROR: Invalid request', email)
+        res.send({ ok: false, descr: 'Invalid request' });
         return;
     }
 
@@ -286,6 +286,7 @@ function sendResult(result) {
     winston.info('Sending result to the final server');
     var finServ = request.newClient(manifest.finalServer.URI, finserv_options);
     var data = {data: result}
+    // one could add something like {timeout:10000} to the request below, after 'data'
     finServ.post('data', data, function(err, otp_res, body) {
         if (err) {
             winston.info(' ...Error: Cannot send the result to the final server: ', err);
