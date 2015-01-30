@@ -12,12 +12,11 @@ Programme *Reliably Secure Software Systems* (RS3)
 
 ## Dependencies
 
-* Java JDK (tested with openjdk-7).
-* Bouncy Castle crypto Java library (please, put the appropriate jar file in the 'lib' folder).
-* Junit Java library (please, put the appropriate jar file in the 'lib' folder).
+* Java JDK (tested with both openjdk-7 and oraclejdk-8).
 * node.js and npm.
-* jasmine-node (only for unit testing; type "npm install jasmine-node -g"
-  to install).
+* Java Cryptography Extension (JCE) (only for oraclejdk).
+* wget (only for downloading the libraries).
+* junit and jasmine-node (only for testing; type "make testsuite" to get them).
 
 ## The Design
 
@@ -148,6 +147,11 @@ election, which can be done through the status page served by
 this server.
 
 **Unit Testing.**
+To get and install the test suite (if you haven't already done), type:
+```
+make testsuite
+```
+
 To run the test suite, type
 ```
 make test

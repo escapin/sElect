@@ -1,3 +1,9 @@
+# java libraries
+#BCPROV_t=jdk15on
+#BCPROV_v=1.51
+BCPROV_t=jdk16
+BCPROV_v=1.46
+JUNIT_v=4.12
 
 default:
 	@echo Specify the goal: devenv OR  devclean OR cleanElection
@@ -5,9 +11,11 @@ default:
 devenv: compile_java npm configs copy_files download
 
 compile_java:
-	-mkdir bin
+	-mkdir -p lib
+	wget -P lib -nc http://central.maven.org/maven2/org/bouncycastle/bcprov-${BCPROV_t}/${BCPROV_v}/bcprov-${BCPROV_t}-${BCPROV_v}.jar
+	-mkdir -p bin
 	javac -sourcepath src \
-          -classpath lib/bcprov-jdk16-146.jar \
+          -classpath lib/bcprov-${BCPROV_t}-${BCPROV_v}.jar \
           -d bin \
           src/selectvoting/system/wrappers/*.java 
 
@@ -42,7 +50,7 @@ npm:
 	cd node_modules/cryptofunc; npm install
 
 configs:
-	-mkdir tmp
+	-mkdir -p tmp
 	cp templates/*.pem tmp/
 	cp templates/ElectionManifest.json tmp/
 	cp templates/config_bb.json BulletinBoard/config.json
@@ -50,6 +58,11 @@ configs:
 	cp templates/config_fs.json FinalServer/config.json
 	node tools/manifest2js.js templates/ElectionManifest.json > VotingBooth/webapp/ElectionManifest.js
 
+testsuite:
+	-mkdir -p lib
+	wget -P lib -nc http://central.maven.org/maven2/junit/junit/${JUNIT_v}/junit-${JUNIT_v}.jar
+	if [ -z $(shell npm list -g | grep -o jasmine-node) ]; then npm install -g jasmine-node;  fi
+	
 test:
 	cd tests; npm install
 	jasmine-node tests
