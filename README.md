@@ -150,3 +150,4 @@ To run the test suite, type
 ```
 make test
 ```
+(if not already installed, it will install 'jasmine-node' in global mode)
