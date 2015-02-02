@@ -1,23 +1,42 @@
-# java libraries
-#BCPROV_t=jdk15on
-#BCPROV_v=1.51
-BCPROV_t=jdk16
-BCPROV_v=1.46
+# java libraries: version
+BCPROV_t=jdk15on
+BCPROV_v=1.51
+#BCPROV_t=jdk16
+#BCPROV_v=1.46
 JUNIT_v=4.12
+HARMCRESTCORE_v=1.3
 
 default:
 	@echo Specify the goal: devenv OR  devclean OR cleanElection
 
 devenv: compile_java npm configs copy_files download
 
+test: test_download test_config test_run
+
 compile_java:
 	-mkdir -p lib
 	wget -P lib -nc http://central.maven.org/maven2/org/bouncycastle/bcprov-${BCPROV_t}/${BCPROV_v}/bcprov-${BCPROV_t}-${BCPROV_v}.jar
 	-mkdir -p bin
 	javac -sourcepath src \
-          -classpath lib/bcprov-${BCPROV_t}-${BCPROV_v}.jar \
+          -classpath "lib/*" \
           -d bin \
           src/selectvoting/system/wrappers/*.java 
+
+npm:
+	cd BulletinBoard; npm install
+	cd CollectingServer; npm install
+	cd FinalServer; npm install
+	cd VotingBooth; npm install
+	cd node_modules/cryptofunc; npm install
+	
+configs:
+	-mkdir -p tmp
+	cp templates/*.pem tmp/
+	cp templates/ElectionManifest.json tmp/
+	cp templates/config_bb.json BulletinBoard/config.json
+	cp templates/config_cs.json CollectingServer/config.json
+	cp templates/config_fs.json FinalServer/config.json
+	node tools/manifest2js.js templates/ElectionManifest.json > VotingBooth/webapp/ElectionManifest.js
 
 copy_files:
 	cp node_modules/voterClient.js VotingBooth/webapp/js/voterClient.js
@@ -41,36 +60,39 @@ download:
 	-rm BulletinBoard/public/pure/grids-responsive-min.css
 	cd BulletinBoard/public/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css 
 
-
-npm:
-	cd BulletinBoard; npm install
-	cd CollectingServer; npm install
-	cd FinalServer; npm install
-	cd VotingBooth; npm install
-	cd node_modules/cryptofunc; npm install
-
-configs:
-	-mkdir -p tmp
-	cp templates/*.pem tmp/
-	cp templates/ElectionManifest.json tmp/
-	cp templates/config_bb.json BulletinBoard/config.json
-	cp templates/config_cs.json CollectingServer/config.json
-	cp templates/config_fs.json FinalServer/config.json
-	node tools/manifest2js.js templates/ElectionManifest.json > VotingBooth/webapp/ElectionManifest.js
-
-testsuite:
+test_download:
 	-mkdir -p lib
 	wget -P lib -nc http://central.maven.org/maven2/junit/junit/${JUNIT_v}/junit-${JUNIT_v}.jar
+	wget -P lib -nc http://central.maven.org/maven2/org/bouncycastle/bcprov-${BCPROV_t}/${BCPROV_v}/bcprov-${BCPROV_t}-${BCPROV_v}.jar
+	wget -P lib -nc https://hamcrest.googlecode.com/files/hamcrest-core-${HARMCRESTCORE_v}.jar
+
 	if [ -z $(shell npm list -g | grep -o jasmine-node) ]; then npm install -g jasmine-node;  fi
-	
-test:
+
+test_config:
+	-mkdir -p bin
+	-classpath "lib/*"  
+	javac -sourcepath src \
+          -classpath "lib/*" \
+          -d bin \
+          src/selectvoting/tests/*.java
+    
+	cd node_modules/cryptofunc; npm install
 	cd tests; npm install
+
+	
+test_run:
+	@echo	
+	@echo     [RUN] tests: java
+	cd bin; java -cp ".:../lib/*" selectvoting.tests.RunTests
+	@echo
+	@echo     [RUN] tests: node.js
 	jasmine-node tests
 
 testclean:
+	-rm -r bin/selectvoting/tests/
 	-rm -r tests/node_modules
 
-devclean:
+devclean: testclean
 	-rm -r bin
 	-rm VotingBooth/webapp/js/voterClient.js
 	-rm VotingBooth/webapp/js/cryptofunc.js

@@ -15,8 +15,7 @@ Programme *Reliably Secure Software Systems* (RS3)
 * Java JDK (tested with both openjdk-7 and oraclejdk-8).
 * node.js and npm.
 * Java Cryptography Extension (JCE) (only for oraclejdk).
-* wget (only for downloading the libraries).
-* junit and jasmine-node (only for testing; type "make testsuite" to get them).
+* wget (used only in Makefile for getting the java libraries).
 
 ## The Design
 
@@ -147,11 +146,6 @@ election, which can be done through the status page served by
 this server.
 
 **Unit Testing.**
-To get and install the test suite (if you haven't already done), type:
-```
-make testsuite
-```
-
 To run the test suite, type
 ```
 make test

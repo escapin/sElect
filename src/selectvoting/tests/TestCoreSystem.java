@@ -16,7 +16,7 @@ import selectvoting.system.core.CollectingServer;
 import selectvoting.system.core.FinalServer;
 import selectvoting.system.core.Voter;
 
-public class TestTargetSystem extends TestCase  
+public class TestCoreSystem extends TestCase  
 {
 	private static String[] voterIdentifiers = {"voter1", "voter2"};
 	private byte[] electionID = {100};
