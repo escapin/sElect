@@ -4,7 +4,7 @@ build: compile_java npm
 compile_java:
 	-mkdir ../bin
 	cd .. ; javac -sourcepath src \
-          -classpath lib/bcprov-jdk16-146.jar \
+          -classpath "lib/*" \
           -d bin \
           src/selectvoting/system/wrappers/*.java 
 

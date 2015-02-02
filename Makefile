@@ -9,20 +9,22 @@ HARMCRESTCORE_v=1.3
 default:
 	@echo Specify the goal: devenv OR  devclean OR cleanElection
 
-devenv: compile_java npm configs copy_files download
+devenv: java_download java_compile npm_install configs copy_files download
 
 test: test_download test_config test_run
 
-compile_java:
+java_download:
 	-mkdir -p lib
 	wget -P lib -nc http://central.maven.org/maven2/org/bouncycastle/bcprov-${BCPROV_t}/${BCPROV_v}/bcprov-${BCPROV_t}-${BCPROV_v}.jar
+
+java_compile:
 	-mkdir -p bin
 	javac -sourcepath src \
           -classpath "lib/*" \
           -d bin \
           src/selectvoting/system/wrappers/*.java 
 
-npm:
+npm_install:
 	cd BulletinBoard; npm install
 	cd CollectingServer; npm install
 	cd FinalServer; npm install
@@ -92,7 +94,7 @@ testclean:
 	-rm -r bin/selectvoting/tests/
 	-rm -r tests/node_modules
 
-devclean: testclean
+devclean:
 	-rm -r bin
 	-rm VotingBooth/webapp/js/voterClient.js
 	-rm VotingBooth/webapp/js/cryptofunc.js
