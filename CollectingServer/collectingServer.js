@@ -75,7 +75,7 @@ app.get('/admin/close', routes.close);
 app.get('/result.msg', routes.serveFile(config.RESULT_FILE));
 app.get('/manifest', routes.serveFile(config.MANIFEST_FILE));
 
-// STARGING THE SERVER
+// STARTING THE SERVER
 
 // TODO: check that our IP/port is the IP/port specified for the
 // collecting server in the Manifest
