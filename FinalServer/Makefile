@@ -16,8 +16,8 @@ npm_install:
 	
 config:
 	-mkdir -p ../tmp
-	cp -u ../templates/ElectionManifest.json ../tmp/
 	cp -u ../templates/*.pem ../tmp/
+	cp -u ../templates/ElectionManifest.json ../tmp/
 	cp -u ../templates/config_fs.json config.json
 
 clean:

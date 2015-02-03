@@ -12,7 +12,7 @@
     "ACCEPTED_BALLOTS_LOG_FILE" :   "../tmp/accepted_ballots.log",
     "LOG_FILE" : "log.txt",
 
-    "class_paths" : ["../bin", "../lib/bcprov-jdk16-146.jar"],
+    "class_paths" : ["../bin", "../lib/*"],
     "ignore_fin_serv_cert" : true,
 
     "sendEmail" : false,
