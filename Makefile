@@ -11,7 +11,7 @@ default:
 
 devenv: java_download java_compile npm_install configs copy_files download
 
-test: test_download test_config test_run
+test: test_download test_configs test_run
 
 java_download:
 	-mkdir -p lib
@@ -68,9 +68,8 @@ test_download:
 	wget -P lib -nc http://central.maven.org/maven2/org/bouncycastle/bcprov-${BCPROV_t}/${BCPROV_v}/bcprov-${BCPROV_t}-${BCPROV_v}.jar
 	wget -P lib -nc https://hamcrest.googlecode.com/files/hamcrest-core-${HARMCRESTCORE_v}.jar
 
-	if [ -z $(shell npm list -g | grep -o jasmine-node) ]; then npm install -g jasmine-node;  fi
 
-test_config:
+test_configs:
 	-mkdir -p bin
 	-classpath "lib/*"  
 	javac -sourcepath src \

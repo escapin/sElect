@@ -14,7 +14,7 @@ Programme *Reliably Secure Software Systems* (RS3)
 
 * Java JDK (tested with both openjdk-7 and oraclejdk-8).
 * node.js and npm.
-* Java Cryptography Extension (JCE) (only for oraclejdk).
+* Java Cryptography Extension (only for oraclejdk).
 * wget (used only in the Makefile(s) for getting the proper libraries).
 
 ## The Design
@@ -150,4 +150,3 @@ To run the test suite, type
 ```
 make test
 ```
-(if not already installed, it will install 'jasmine-node' in global mode)
