@@ -74,7 +74,7 @@ test_configs:
 	javac -sourcepath src \
           -classpath "lib/*" \
           -d bin \
-          src/selectvoting/tests/*.java
+          src/tests/*.java
     
 	cd node_modules/cryptofunc; npm install
 	cd tests; npm install
@@ -83,7 +83,7 @@ test_configs:
 test_run:
 	@echo	
 	@echo     [RUN] tests: java
-	cd bin; java -cp ".:../lib/*" selectvoting.tests.RunTests
+	cd bin; java -cp ".:../lib/*" tests.RunTestSuite
 	@echo
 	@echo     [RUN] tests: node.js
 	./tests/node_modules/.bin/jasmine-node tests
