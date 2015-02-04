@@ -71,7 +71,6 @@ test_download:
 
 test_configs:
 	-mkdir -p bin
-	-classpath "lib/*"  
 	javac -sourcepath src \
           -classpath "lib/*" \
           -d bin \
@@ -87,7 +86,7 @@ test_run:
 	cd bin; java -cp ".:../lib/*" selectvoting.tests.RunTests
 	@echo
 	@echo     [RUN] tests: node.js
-	jasmine-node tests
+	./tests/node_modules/.bin/jasmine-node tests
 
 testclean:
 	-rm -r bin/selectvoting/tests/
