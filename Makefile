@@ -1,8 +1,8 @@
 # java libraries: version
-BCPROV_t=jdk15on
-BCPROV_v=1.51
-#BCPROV_t=jdk16
-#BCPROV_v=1.46
+#BCPROV_t=jdk15on
+#BCPROV_v=1.51
+BCPROV_t=jdk16
+BCPROV_v=1.46
 JUNIT_v=4.12
 HARMCRESTCORE_v=1.3
 
