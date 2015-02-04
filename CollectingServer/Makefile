@@ -1,5 +1,5 @@
 
-build: java_compile npm_install config
+build: java_compile npm_install configs
 
 cleanall: clean cleanElection
 
@@ -14,11 +14,11 @@ npm_install:
 	npm install
 	cd ../node_modules/cryptofunc; npm install
 	
-config:
-	-mkdir -p tmp
+configs:
+	-mkdir -p ../tmp
 	cp -u ../templates/*.pem ../tmp/
 	cp -u ../templates/ElectionManifest.json ../tmp/
-	cp ../templates/config_cs.json config.json
+	cp -u ../templates/config_cs.json config.json
 
 clean:
 	-rm -r ../bin
