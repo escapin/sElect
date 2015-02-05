@@ -17,6 +17,7 @@ public class RunTestSuite {
 		//Add test cases
 		testCases.add(de.unitrier.infsec.tests.TestCryptoLib.class);
 		testCases.add(selectvoting.tests.TestCoreSystem.class);
+		testCases.add(selectvoting.tests.TestMixServer.class);
 
 
 		for (Class testCase : testCases)

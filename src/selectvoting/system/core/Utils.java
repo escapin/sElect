@@ -10,7 +10,8 @@ public class Utils
 	public static byte[] concatenateMessageArrayWithDuplicateElimination(byte[][] messages) {
 		return concatenateMessageArray(messages, messages.length);
 	}
-
+	
+	// we assume messages[][] is sorted
 	public static byte[] concatenateMessageArrayWithDuplicateElimination(byte[][] messages, int len) {
 		byte[] msg = new byte[0];
 		byte[] last = null;
