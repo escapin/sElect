@@ -121,7 +121,7 @@ public class CollectingServer
 
 		// put together the election ID, inner ballots, and list of voters
 		byte[] result = MessageTools.concatenate(electionID, MessageTools.concatenate(ballotsAsAMessage, votersAsAMessage));
-		byte[] tag_result = MessageTools.concatenate(Tag.RESULT, result);
+		byte[] tag_result = MessageTools.concatenate(Tag.BALLOTS, result);
 
 		// sign the result
 		byte[] signature = signer.sign(tag_result);
