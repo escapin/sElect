@@ -15,7 +15,7 @@ Programme *Reliably Secure Software Systems* (RS3)
 * Java JDK (tested with both openjdk-7 and oraclejdk-8).
 * Java Cryptography Extension (only for oraclejdk).
 * node.js and npm.
-* wget (used only in the Makefile(s) for getting the proper libraries).
+* wget (used only in the Makefile for getting the proper libraries).
 
 ## The Design
 
