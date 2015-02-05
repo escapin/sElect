@@ -7,9 +7,6 @@ import de.unitrier.infsec.utils.Utilities;
 
 public class CollectingServer 
 {
-	public static byte[] TAG_ACCEPTED = {0x00};
-	public static byte[] TAG_RESULT   = {0x01};
-	
 	public static class Error extends Exception {
 		public final String info;
 		public Error(String info) { this.info = info; }
@@ -86,7 +83,7 @@ public class CollectingServer
 
 		// Create a receipt for the voter
 		// byte[] elID_innerBallot = concatenate(electionID, innerBallot);
-		byte[] accepted_elID_innerBallot = MessageTools.concatenate(TAG_ACCEPTED, elID_innerBallot);
+		byte[] accepted_elID_innerBallot = MessageTools.concatenate(Tag.ACCEPTED, elID_innerBallot);
 		byte[] receipt = signer.sign(accepted_elID_innerBallot);
 
 		return receipt;
@@ -124,7 +121,7 @@ public class CollectingServer
 
 		// put together the election ID, inner ballots, and list of voters
 		byte[] result = MessageTools.concatenate(electionID, MessageTools.concatenate(ballotsAsAMessage, votersAsAMessage));
-		byte[] tag_result = MessageTools.concatenate(TAG_RESULT, result);
+		byte[] tag_result = MessageTools.concatenate(Tag.RESULT, result);
 
 		// sign the result
 		byte[] signature = signer.sign(tag_result);

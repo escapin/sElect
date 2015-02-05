@@ -59,7 +59,7 @@ public class FinalServer
 		
 		// check the tag
 		byte[] tag = MessageTools.first(tagged_payload);
-		if (!MessageTools.equal(tag, CollectingServer.TAG_RESULT))
+		if (!MessageTools.equal(tag, Tag.RESULT))
 			throw new MalformedData("Wrong tag");		
 		byte[] payload = MessageTools.second(tagged_payload);
 		

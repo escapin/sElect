@@ -61,7 +61,7 @@ public class Voter
 	 * Checks if 'receiptSignature' is a signature on the receipt. If yes, the method saves the signature and return true.  
 	 */ 
 	public boolean validateReceipt(byte[] receipt, byte[] innerBallot) {
-		byte[] expectedMessage = MessageTools.concatenate(CollectingServer.TAG_ACCEPTED, MessageTools.concatenate(electionID, innerBallot));
+		byte[] expectedMessage = MessageTools.concatenate(Tag.ACCEPTED, MessageTools.concatenate(electionID, innerBallot));
 		return colServVerif.verify(receipt, expectedMessage);
 	}
 }
