@@ -78,6 +78,7 @@ public class TestMixServer extends TestCase
 		for(int i=0;i<mixServ.length;++i)
 			data=mixServ[i].processBallots(data);
 		
+		
 		// verify the signature of the last mixserver
 		byte[] tagged_payload = MessageTools.first(data);
 		byte[] signature = MessageTools.second(data);
@@ -108,6 +109,7 @@ public class TestMixServer extends TestCase
 		}
 		assertTrue(numberOfEntries==innermostBallots.length && bijection(entries, innermostBallots));
 		
+
 	}
 
 	// [nonce, vote]

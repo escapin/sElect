@@ -1,13 +1,11 @@
 package selectvoting.system.core;
 
 
-
 import de.unitrier.infsec.functionalities.digsig.Signer;
 import de.unitrier.infsec.functionalities.digsig.Verifier;
 import de.unitrier.infsec.functionalities.pkenc.Decryptor;
 import de.unitrier.infsec.functionalities.pkenc.Encryptor;
 import de.unitrier.infsec.utils.MessageTools;
-import de.unitrier.infsec.utils.Utilities;
 import selectvoting.system.core.Utils.MessageSplitIter;
 
 public class MixServer 
@@ -19,6 +17,20 @@ public class MixServer
 	private final byte[] electionID;
 	private final int numberOfVoters;
 	
+	// PUBLIC CLASSES
+	/**
+	 * Error thrown if the input data is ill-formed.
+	 */
+	@SuppressWarnings("serial")
+	public static class MalformedData extends Exception {
+		public String description;
+		public MalformedData(String description) {
+			this.description = description;
+		}
+		public String toString() {
+			return "Final Server Error: " + description;
+		}
+	}
 	
 	// CONSTRUCTORS
 	
@@ -55,7 +67,7 @@ public class MixServer
 			throw new MalformedData("Wrong tag");		
 		byte[] payload = MessageTools.second(tagged_payload);
 		
-		// check that election id in the processed data
+		// check the election id 
 		byte[] el_id = MessageTools.first(payload);
 		if (!MessageTools.equal(el_id, electionID))
 			throw new MalformedData("Wrong election ID");
