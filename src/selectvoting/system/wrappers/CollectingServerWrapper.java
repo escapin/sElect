@@ -7,11 +7,6 @@ import selectvoting.system.core.CollectingServer;
 
 public class CollectingServerWrapper 
 {
-	public class Result {
-		public final boolean ok;
-		public final String data;
-		public Result(boolean ok, String data) { this.ok = ok;  this.data = data;}
-	}
 
 	private static String string(byte[] message) { return Utilities.byteArrayToHexString(message); }
 	private static byte[] message(String str)    { return Utilities.hexStringToByteArray(str); }

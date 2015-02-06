@@ -5,6 +5,7 @@ import de.unitrier.infsec.functionalities.digsig.Verifier;
 import de.unitrier.infsec.functionalities.pkenc.Decryptor;
 import de.unitrier.infsec.utils.Utilities;
 import selectvoting.system.core.FinalServer;
+import selectvoting.system.core.MalformedData;
 
 public class FinalServerWrapper {
 	private static String string(byte[] message) { return Utilities.byteArrayToHexString(message); }
@@ -28,7 +29,7 @@ public class FinalServerWrapper {
 		try {
 			byte[] result = fs.processTally(message(data));
 			return new Result(true, string(result));
-		} catch(FinalServer.MalformedData ex) {
+		} catch(MalformedData ex) {
 			return new Result(false, ex.description);
 		}
 	}
