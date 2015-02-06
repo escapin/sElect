@@ -19,21 +19,6 @@ public class MixServer
 	private final byte[] electionID;
 	private final int numberOfVoters;
 	
-	// CLASSES
-	/**
-	 * Error thrown if the input data is ill-formed.
-	 */
-	public static class MalformedData extends Exception 
-	{
-		public String description;
-		public MalformedData(String description) {
-			this.description = description;
-		}
-		public String toString() {
-			return "Final Server Error: " + description;
-		}
-	}
-
 	
 	// CONSTRUCTORS
 	
