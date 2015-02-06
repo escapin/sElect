@@ -30,25 +30,60 @@ import de.unitrier.infsec.utils.MessageTools;
 // TODO: check how exceptions/errors are handled
 
 /**
- * Real implementation of same interface as environment.crypto.CryptoLib
+ * Real implementation of same interface as environment.crypto.CryptoLib.
+ * Check "Java Cryptography Architecture Standard Algorithm Name" 
+ * for information about standard algorithm names.
  */
 public class CryptoLib {
-
-	private static final int pkKeySize 		= 1024; // 1024 Bits keysize for public key crypto
-	private static final int signKeySize 	= 512; // 512 Bits keysize for Signature -- in order to encrypt signatures, we need a larger PK for encryption!
-	private static final int nonce_length 	= 16; // 16 Bytes = 128 Bit nonce length
+	
+	private final static int pkKeySize 	= KeySize.pkKeySize;
+	private final static int signKeySize 	= KeySize.signKeySize;
+	private final static int symKeySize	= KeySize.symKeySize;
+	private final static int nonce_length = KeySize.nonce_length;
 
 	static {
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
+	public static KeyPair pke_generateKeyPair() {
+		KeyPair out = new KeyPair();
+		KeyPairGenerator keyPairGen;
+		try {
+			keyPairGen = KeyPairGenerator.getInstance("RSA", "BC");
+			keyPairGen.initialize(pkKeySize);
+			java.security.KeyPair pair = keyPairGen.generateKeyPair();
+			out.privateKey = pair.getPrivate().getEncoded();
+			out.publicKey = pair.getPublic().getEncoded();
+			return out;
+		} catch (Exception e) {
+			//e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static KeyPair generateSignatureKeyPair() {
+		KeyPair out = new KeyPair();
+		KeyPairGenerator keyPairGen;
+		try {
+			keyPairGen = KeyPairGenerator.getInstance("RSA", "BC");
+			keyPairGen.initialize(signKeySize);
+			java.security.KeyPair pair = keyPairGen.generateKeyPair();
+			out.privateKey = pair.getPrivate().getEncoded();
+			out.publicKey = pair.getPublic().getEncoded();
+			return out;
+		} catch (Exception e) {
+			//e.printStackTrace();
+		}
+		return null;
+	}
+	
 	/**
 	 * Key generation for symmetric encryption.
 	 */
 	public static byte[] symkey_generateKey() {
 		try {
 			KeyGenerator kgen = KeyGenerator.getInstance("AES", "BC");
-			kgen.init(256);
+			kgen.init(symKeySize);
 			SecretKey seckey = kgen.generateKey();
 			return seckey.getEncoded();
 
@@ -57,7 +92,15 @@ public class CryptoLib {
 		}
 		return null;
 	}
-
+	
+	public static byte[] nextNonce() {
+		SecureRandom random = new SecureRandom();
+		byte bytes[] = new byte[nonce_length];
+		random.nextBytes(bytes);
+		return bytes;
+	}
+	
+	
 	/**
 	 *  Authenticated encryption.
 	 * 
@@ -177,21 +220,6 @@ public class CryptoLib {
 		return symkey_decrypt(aux_key, encrypted_message);
 	}
 
-	public static KeyPair pke_generateKeyPair() {
-		KeyPair out = new KeyPair();
-		KeyPairGenerator keyPairGen;
-		try {
-			keyPairGen = KeyPairGenerator.getInstance("RSA", "BC");
-			keyPairGen.initialize(pkKeySize);
-			java.security.KeyPair pair = keyPairGen.generateKeyPair();
-			out.privateKey = pair.getPrivate().getEncoded();
-			out.publicKey = pair.getPublic().getEncoded();
-			return out;
-		} catch (Exception e) {
-			//e.printStackTrace();
-		}
-		return null;
-	}
 
 	public static byte[] sign(byte[] data, byte[] signingKey) {
 		Signature signer;
@@ -230,29 +258,6 @@ public class CryptoLib {
 			//System.out.println("Signature verification failed " + e.getLocalizedMessage());
 		}
 		return false;
-	}
-
-	public static KeyPair generateSignatureKeyPair() {
-		KeyPair out = new KeyPair();
-		KeyPairGenerator keyPairGen;
-		try {
-			keyPairGen = KeyPairGenerator.getInstance("RSA", "BC");
-			keyPairGen.initialize(signKeySize);
-			java.security.KeyPair pair = keyPairGen.generateKeyPair();
-			out.privateKey = pair.getPrivate().getEncoded();
-			out.publicKey = pair.getPublic().getEncoded();
-			return out;
-		} catch (Exception e) {
-			//e.printStackTrace();
-		}
-		return null;
-	}
-
-	public static byte[] nextNonce() {
-		SecureRandom random = new SecureRandom();
-		byte bytes[] = new byte[nonce_length];
-		random.nextBytes(bytes);
-		return bytes;
 	}
 
 }
