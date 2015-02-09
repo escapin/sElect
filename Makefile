@@ -27,7 +27,7 @@ java_compile:
 npm_install:
 	cd BulletinBoard; npm install
 	cd CollectingServer; npm install
-	cd FinalServer; npm install
+	cd MixServer; npm install
 	cd VotingBooth; npm install
 	cd node_modules/cryptofunc; npm install
 	
@@ -37,7 +37,7 @@ configs:
 	cp templates/ElectionManifest.json tmp/
 	cp templates/config_bb.json BulletinBoard/config.json
 	cp templates/config_cs.json CollectingServer/config.json
-	cp templates/config_fs.json FinalServer/config.json
+	cp templates/config_mix.json MixServer/config.json
 	node tools/manifest2js.js templates/ElectionManifest.json > VotingBooth/webapp/ElectionManifest.js
 
 copy_files:
@@ -107,7 +107,7 @@ devclean:
 	-rm BulletinBoard/public/pure/grids-responsive-min.css
 	-rm -r BulletinBoard/node_modules
 	-rm -r CollectingServer/node_modules
-	-rm -r FinalServer/node_modules
+	-rm -r MixServer/node_modules
 	-rm -r VotingBooth/node_modules
 	-rm -r node_modules/cryptofunc/node_modules
 	-rm -r tmp
