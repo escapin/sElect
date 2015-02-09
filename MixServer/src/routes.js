@@ -7,21 +7,21 @@ var resultReady = false;
 if (fs.existsSync(config.RESULT_FILE))
     resultReady = true;
 
-// Processes data (partial result)
+// Processes the ballots 
 // Parameter res is optional. If present, the summary
 // (success/failure) will be sent to it.
 //
-function processData(data, res) {
-    server.processTally(data, function (err, result) {
+function processBallots(data, res) {
+    server.processBallots(data, function (err, result) {
         if (err) {
-            console.log(' ...INTERNAL ERROR. Cannot process the tally: ', err);
+            console.log(' ...INTERNAL ERROR. Cannot process the ballots: ', err);
             console.log('RESULT NOT SAVED');
             if (res) res.send({ ok: false, info: 'INTERNAL ERROR' });
         }
-        else if (result.ok) { 
-            var finalRes = result.data;
-            // Save the result:
-            fs.writeFileSync(config.RESULT_FILE, finalRes);
+        else if (result.ok) {
+            var innerBallots = result.data;
+            // Save the inner ballots:
+            fs.writeFileSync(config.RESULT_FILE, innerBallots);
             console.log('Result saved in', config.RESULT_FILE);
             resultReady = true;
             if (res) res.send({ ok: true, info: 'Data accepted'});
@@ -42,8 +42,8 @@ exports.process = function process(req, res)
         return;
     }
     var data = req.body.data;
-    console.log('Partial result coming. Processing...');
-    processData(data, res);
+    console.log('Ballots coming. Processing...');
+    processBallots(data, res);
 };
 
 exports.statusPage = function statusPage(req, res) {
@@ -57,6 +57,8 @@ exports.serveFile = function serveFile(path) {
         fs.exists(path, function(exists) {
             if (exists) {
                 fs.createReadStream(path).pipe(res);
+                // pull out all the content of the file in path
+                // and write it to res
             } else {
                 res.status(404).send('404: Not found');
             }
@@ -64,9 +66,9 @@ exports.serveFile = function serveFile(path) {
     }
 }
 
-// Reads data from the given file and  processes it as the partial result
+// Reads data from the given file and  processes it as the ballots
 exports.processFile = function processFile(dataFileName) {
     console.log('Processing the file ', dataFileName);
     var data = fs.readFileSync(dataFileName, {encoding:'utf8'});
-    processData(data);
+    processBallots(data);
 }

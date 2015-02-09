@@ -1,6 +1,6 @@
 {
-  "name": "FinalServer",
-  "description": "Final server app for the sElect voting system",
+  "name": "MixServer",
+  "description": "Mix server app for the sElect voting system",
   "version": "0.2.0",
   "private": true,
   "dependencies": {

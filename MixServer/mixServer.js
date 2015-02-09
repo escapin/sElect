@@ -27,7 +27,7 @@ if (cmdlineOption === '--serveResult' && !resultFileExists) {
     error('The file with result does not exist.');
 }
 
-// PROCESSING DATA (THE PARTIAL RESULT) FROM A FILE
+// PROCESSING DATA (THE BALLOTS) FROM A FILE
 if (cmdlineOption==='--processData') {
     var dataFileName = process.argv[3];
     if (!dataFileName) 
@@ -65,10 +65,10 @@ if (config.useTLS) {
         cert: fs.readFileSync(config.TLS_CERT_FILE)
     };
     app = https.createServer(tls_options, app)
-}
+
 
 var server = app.listen(config.port, function() {
-    console.log('Final Server running for election "%s" [%s]', manifest.title, manifest.hash);
+    console.log('Mix Server running for election "%s" [%s]', manifest.title, manifest.hash);
     console.log('Server listening on %s, port %d', server.address().address, server.address().port);
     if (config.useTLS) 
         console.log('Using TLS');
