@@ -264,9 +264,9 @@ exports.controlPanel = function info(req, res)  {
 // ROUTE close
 //
 
-var finserv_options = {};
+var mixserv_options = {};
 if (config.ignore_fin_serv_cert)
-    finserv_options = {rejectUnauthorized: false};
+    mixserv_options = {rejectUnauthorized: false};
 
 
 // Save result in a file
@@ -281,18 +281,18 @@ function saveResult(result) {
     });
 }
 
-// Send result to the final server
+// Send result to the first mix server
 function sendResult(result) {
-    winston.info('Sending result to the final server');
-    var finServ = request.newClient(manifest.finalServer.URI, finserv_options);
+    winston.info('Sending result to the first mix server');
+    var mixServ = request.newClient(manifest.mixServers[0].URI, mixserv_options);
     var data = {data: result}
     // one could add something like {timeout:10000} to the request below, after 'data'
-    finServ.post('data', data, function(err, otp_res, body) {
+    mixServ.post('data', data, function(err, otp_res, body) {
         if (err) {
-            winston.info(' ...Error: Cannot send the result to the final server: ', err);
+            winston.info(' ...Error: Cannot send the result to the first mix server: ', err);
         }
         else {
-            winston.info(' ...Result sent to the final server.');
+            winston.info(' ...Result sent to the first mix server.');
             winston.info(' ...Response:', body);
         }
     });
