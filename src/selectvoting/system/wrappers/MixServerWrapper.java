@@ -24,7 +24,7 @@ public class MixServerWrapper {
 		public Result(boolean ok, String data) { this.ok = ok;  this.data = data;}
 	}
 	
-	public Result processTally(String data) {
+	public Result processBallots(String data) {
 		try {
 			byte[] result = mixServ.processBallots(message(data));
 			return new Result(true, string(result));
