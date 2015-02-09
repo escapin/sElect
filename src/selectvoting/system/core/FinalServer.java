@@ -17,6 +17,19 @@ public class FinalServer
 	private final byte[] electionID;
 	private final int numberOfVoters;
 	
+	// PUBLIC CLASSES
+	/**
+	 * Error thrown if the input data is ill-formed.
+	 */
+	public static class MalformedData extends Exception {
+		public String description;
+		public MalformedData(String description) {
+			this.description = description;
+		}
+		public String toString() {
+			return "Final Server Error: " + description;
+		}
+	}
 	
 	// CONSTRUCTORS
 	public FinalServer(Decryptor decryptor, Signer signer, Verifier colServVerif, byte[] electionID, int numberOfVoters) {
@@ -28,6 +41,7 @@ public class FinalServer
 	}
 	
 	// PUBLIC METHODS
+	
 	
 	/**
 	 * Process data that supposed to be the input tally prepared and signed 
