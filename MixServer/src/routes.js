@@ -55,19 +55,17 @@ if (config.ignore_fin_serv_cert)
 // Send result to the next mix server, if it is listed in the manifest.
 // Print only a message error, otherwise.
 function sendResultToNextMix(innerBallots) {
-	var index 	= config.chainIndex;
-	if(index+1 >= +manifest.mixServers.length) {
+	var indexNext 	= config.chainIndex+1;
+	if(indexNext >= +manifest.mixServers.length)
 		console.log('Warning: result not sent. No other mix servers.');
-	}
 	else {
-		console.log('Sending result to the next mix server (#%d)', index+1);
-		var nextMixServ = request.newClient(manifest.nextMixServers[index+1].URI, mixserv_options);
+		console.log('Sending result to the next mix server (#%d)', indexNext);
+		var nextMixServ = request.newClient(manifest.nextMixServers[indexNext].URI, mixserv_options);
 		var data = {data: innerBallots}
 		// one could add something like {timeout:10000} to the request below, after 'data'
 		nextMixServ.post('data', data, function(err, res, body) {
-			if (err) {
+			if (err)
 				console.log(' ...Error: Cannot send the result to the next mix server: ', err);
-			}
 			else {
 				console.log(' ...Result sent to the next mix server (#%d).', index+1);
 				console.log(' ...Response:', body);
