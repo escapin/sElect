@@ -28,8 +28,12 @@ function selectBooth() {
     var shortenedElectionID = electionID.slice(0,6) + '...';
     var colServEncKey = manifest.collectingServer.encryption_key;
     var colServVerifKey = manifest.collectingServer.verification_key;
-    var finServEncKey = manifest.finalServer.encryption_key;
-    var voter = voterClient.create(electionID, colServEncKey, colServVerifKey, finServEncKey);
+    var mixServEncKeys = [];
+    // retrieve the encryption keys of the mix servers from the manifest
+    for(i=0; i<manifest.mixServers.length; ++i)
+    	mixServEncKeys.push(manifest.mixServers[i].encryption_key);
+    var voter = voterClient.create(electionID, colServEncKey, colServVerifKey, mixServEncKeys);
+
 
     //////////////////////////////////////////////////////////////////////////////
     /// AUXILIARY FUNCTIONS
