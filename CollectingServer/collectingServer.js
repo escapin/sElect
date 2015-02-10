@@ -69,6 +69,7 @@ app.use('/admin/*', basicAuth('admin', config.serverAdminPassword)); // authenti
 app.post('/otp', routes.otp);
 app.post('/cast', routes.cast);
 
+app.get('/', routes.info);
 app.get('/status', routes.info);
 app.get('/admin/panel', routes.controlPanel);
 app.get('/admin/close', routes.close);
