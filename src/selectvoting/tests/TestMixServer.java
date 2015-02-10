@@ -64,6 +64,9 @@ public class TestMixServer extends TestCase
 		for(int i=0; i<numberOfVoters;++i)
 			encrBallots[i]=encryptBallot(mixServ, innermostBallots[i]);
 		
+		// the input ballots to a mix server are always sorted 
+		Utils.sort(encrBallots, 0, encrBallots.length);
+		
 		byte[] ballotsAsAMessage=Utils.concatenateMessageArray(encrBallots, encrBallots.length);
 		// add election id, tag and sign
 		byte[] elID_ballots = MessageTools.concatenate(electionID, ballotsAsAMessage);
