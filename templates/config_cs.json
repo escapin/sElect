@@ -1,5 +1,5 @@
 {
-    "port" : 3300,
+    "port" : 3299,
     "MANIFEST_FILE" : "../tmp/ElectionManifest.json",
     "TLS_KEY_FILE":  "../tmp/server_key.pem",
     "TLS_CERT_FILE": "../tmp/server_cert.pem",

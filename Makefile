@@ -9,7 +9,7 @@ HARMCRESTCORE_v=1.3
 default:
 	@echo Specify the goal: devenv OR  devclean OR cleanElection
 
-devenv: java_download java_compile npm_install configs copy_files download
+devenv: java_download java_compile npm_install configs mix_configs copy_files download
 
 test: test_download test_configs test_run
 
@@ -39,6 +39,9 @@ configs:
 	cp templates/config_cs.json CollectingServer/config.json
 	cp templates/config_mix.json MixServer/config.json
 	node tools/manifest2js.js templates/ElectionManifest.json > VotingBooth/webapp/ElectionManifest.js
+	
+mix_configs:
+	python configMixServers.py
 
 copy_files:
 	cp node_modules/voterClient.js VotingBooth/webapp/js/voterClient.js
@@ -113,6 +116,7 @@ devclean:
 	-rm -r tmp
 	-rm CollectingServer/log.txt
 	-rm -r tests/node_modules
+	$(shell ls | egrep "MixServer[0-9]+" | xargs rm -r)
 
 cleanElection:
 	-rm tmp/*.msg

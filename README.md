@@ -16,6 +16,7 @@ Programme *Reliably Secure Software Systems* (RS3)
 * Java Cryptography Extension (only for oraclejdk).
 * node.js and npm.
 * wget (used only in the Makefile for getting the proper libraries).
+* python (used only in the root MakeFile for configuring the mix servers) 
 
 ## The Design
 
