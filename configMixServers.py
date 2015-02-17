@@ -1,6 +1,7 @@
 import os
 import re
 import shutil
+import sys
 
 path="templates"
 pattern="config_mix[0-9]+.json"
@@ -14,12 +15,14 @@ def config_mix_servers():
     configMix_files=filter(p.search, files)
     # now only the numbers
     numbers = [re.search('[0-9]+', x).group(0) for x in configMix_files]
+    if(len(numbers)!=len(configMix_files)):
+        sys.exit("Something went wrong with the pattern matching operators.")
     # create the as many 'MixServer' folders as config files found
     for i in range(0, len(numbers)):
         curr_dir=main_dir + numbers[i]
         if(os.path.isfile(curr_dir)):
             os.remove(curr_dirr)
-        if(os.path.isdir(curr_dir)):
+        elif(os.path.isdir(curr_dir)):
             shutil.rmtree(curr_dir)
         shutil.copytree(main_dir, curr_dir);
         # ...and copy the corresponding config file
