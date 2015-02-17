@@ -43,7 +43,7 @@ function parsePartialResult(signedFinalResult) {
         return;
     }
 
-    // Get the voters as a mesage
+    // Get the voters as a message
     p = crypto.deconcatenate(p.second); 
     votersMsg = p.second;
     // And collect them
@@ -56,13 +56,16 @@ function parsePartialResult(signedFinalResult) {
     exports.voters = t;
 }
 
+// expected data format:
+//		SIGN_lastMixServer[elID, nonce, choice]
+//
 function parseFinalResult(signedFinalResult) {
     var p = crypto.deconcatenate(signedFinalResult);
     var result = p.first;
     var signature = p.second;
     
     // Verify the signature
-    var sig_ok = crypto.verifsig(manifest.finalServer.verification_key, result, signature);
+    var sig_ok = crypto.verifsig(manifest.mixServers[+manifest.mixServers.length-1].verification_key, result, signature);
     if (!sig_ok) {
         console.log('ERROR: Wrong signature');
         return;
@@ -75,7 +78,7 @@ function parseFinalResult(signedFinalResult) {
         return;
     }
 
-    // Get the choice/nonce pairs
+    // Get the nonce/choice pairs
     var t = [];
     var ccount = manifest.choices.map(function(x) {return 0;}); // initialize the counters for choices with 0's
     splitter(p.second, function(item) { 
@@ -134,7 +137,7 @@ function fetchData(url, cont) {
 
 exports.loadResult = function () {
 
-    // Load /parse the partial result
+    // Load /parse the result from the collecting server
     if (exports.voters === null) {
         fetchData(manifest.collectingServer.URI + '/result.msg', function (err, data) {
             if (!err) {
@@ -144,9 +147,9 @@ exports.loadResult = function () {
         });
     }
 
-    // Load /parse the final result
+    // Load /parse the final result (from the last mix server)
     if (exports.result === null) {
-        fetchData(manifest.finalServer.URI + '/result.msg', function (err, data) {
+        fetchData(manifest.mixServers[+manifest.mixServers.length-1].URI + '/result.msg', function (err, data) {
             if (!err) {
                 console.log('FINAL RESULT FILE FETCHED');
                 parseFinalResult(data); 
