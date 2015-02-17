@@ -15,8 +15,8 @@ Programme *Reliably Secure Software Systems* (RS3)
 * Java JDK (tested with both openjdk-7 and oraclejdk-8).
 * Java Cryptography Extension (only for oraclejdk).
 * node.js and npm.
-* wget (used only in the Makefile for getting the proper libraries).
-* python (used only in the root Makefile for configuring the mix servers) 
+* wget (used only in the makefiles for getting the proper libraries).
+* python (used only in the root makefile for configuring the mix servers).
 
 ## The Design
 
@@ -93,7 +93,7 @@ of a given voter to his/her choice-identifier-pair in the final
 output.
 
 
-## Development Environment
+## Development Environment (under construction)
 
 The development environment can be created with
 
@@ -115,10 +115,10 @@ cd CollectingServer
 node collectingServer.js
 ```
 
-*Final server*:
+*Mix server*:
 ```
-cd FinalServer
-node finalServer.js
+cd MixServer
+node mixServer.js
 ```
 
 *Bulletin board*:
