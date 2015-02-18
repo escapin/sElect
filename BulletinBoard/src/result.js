@@ -71,8 +71,13 @@ function parseFinalResult(signedFinalResult) {
         return;
     }
 
-    // Check the election id
     p = crypto.deconcatenate(result);
+    var tag = p.first;
+    //TODO: check that 'tag' is equals to Tag.BALLOTS (see core.Tag.java class)
+    
+    var elID_entriesAsAMessage = p.second;
+    // Check the election id
+    p = crypto.deconcatenate(elID_entriesAsAMessage);
     if (manifest.hash.toUpperCase() !== p.first.toUpperCase()) {
         console.log('ERROR: Wrong election ID');
         return;
