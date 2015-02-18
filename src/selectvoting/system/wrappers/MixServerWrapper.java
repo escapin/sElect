@@ -30,6 +30,8 @@ public class MixServerWrapper {
 			return new Result(true, string(result));
 		} catch(MixServer.MalformedData ex) {
 			return new Result(false, ex.description);
+		} catch(MixServer.ServerMisbehavior ex) {
+			return new Result(false, ex.description);
 		}
 	}
 }

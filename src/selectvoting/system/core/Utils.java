@@ -51,7 +51,15 @@ public class Utils
 				rest = MessageTools.second(rest);
 		}
 	}
-
+	
+	/**
+	 * Compares its two array arguments for lexicographic order. 
+	 * 
+	 * @param a1 the first array to be compared.
+	 * @param a2 the second array to be compared.
+	 * @return a negative integer, zero, or a positive integer as the first argument is 
+	 * 			less than, equal to, or greater than the second
+	 */
 	public static int compare(byte[] a1, byte[] a2) {
 		int n1 = a1.length;
 		int n2 = a2.length;

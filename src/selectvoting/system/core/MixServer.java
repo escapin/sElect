@@ -28,7 +28,17 @@ public class MixServer
 			this.description = description;
 		}
 		public String toString() {
-			return "Final Server Error: " + description;
+			return "Mix Server Error: " + description;
+		}
+	}
+	@SuppressWarnings("serial")
+	public static class ServerMisbehavior extends Exception {
+		public String description;
+		public ServerMisbehavior(String description) {
+			this.description = description;
+		}
+		public String toString() {
+			return "Previous Server Misbehavior: " + description;
 		}
 	}
 	
@@ -54,8 +64,8 @@ public class MixServer
 	 * 			ENC_curr[elID, innerBallot] 
 	 *   
 	 */
-	public byte[] processBallots(byte[] data) throws MalformedData {
-		// verify the signature of preceding server
+	public byte[] processBallots(byte[] data) throws MalformedData, ServerMisbehavior {
+		// verify the signature of previous server
 		byte[] tagged_payload = MessageTools.first(data);
 		byte[] signature = MessageTools.second(data);
 		if (!precServVerif.verify(signature, tagged_payload))
@@ -78,18 +88,22 @@ public class MixServer
 		byte[][] entries = new byte[numberOfVoters][];
 		int numberOfEntries = 0;
 
-		// Loop over the input entries eliminating duplicates (under the assumption ballots are sorted)
+		// Loop over the input entries 
 		byte[] last = null;
 		for( MessageSplitIter iter = new MessageSplitIter(ballotsAsAMessage); iter.notEmpty(); iter.next() ) {
 			if (numberOfEntries > numberOfVoters) // too many entries
 				throw new MalformedData("Too many entries");
 			byte[] current = iter.current();
-			if (last!=null && MessageTools.equal(current, last)) continue; // ignore duplicates
+			if (last!=null && Utils.compare(last, current)>0)
+				throw new ServerMisbehavior("Wrong lexicographic order.");
+			if (last!=null && Utils.compare(last, current)==0)
+				throw new ServerMisbehavior("Duplicates among the ballots."); 
 			last = current;
 			byte[] currentDecr = decryptor.decrypt(current); // decrypt the current ballot
 			if (currentDecr == null) continue; // decryption failed			
 			byte[] elID = MessageTools.first(currentDecr);
-			if (elID==null || !MessageTools.equal(elID, electionID)) continue; // wrong election ID
+			if (elID==null || !MessageTools.equal(elID, electionID))
+				throw new ServerMisbehavior("Wrong election ID.");
 			entries[numberOfEntries] = MessageTools.second(currentDecr);
 			++numberOfEntries;
 		}
@@ -109,10 +123,11 @@ public class MixServer
 		return signedResult;
 	}
 	
+	
+	// methods for testing
 	public Encryptor getEncryptor(){
 		return decryptor.getEncryptor();
-	}
-	
+	}	
 	public Verifier getVerifier(){
 		return signer.getVerifier();
 	}

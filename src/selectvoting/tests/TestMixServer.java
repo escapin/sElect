@@ -64,6 +64,10 @@ public class TestMixServer extends TestCase
 		for(int i=0; i<numberOfVoters;++i)
 			encrBallots[i]=encryptBallot(mixServ, innermostBallots[i]);
 		
+		// scramble a bit
+		byte[] tmp=encrBallots[0];
+		encrBallots[0]=encrBallots[numberOfVoters-1];
+		encrBallots[numberOfVoters-1]=tmp;
 		// the input ballots to a mix server are always sorted 
 		Utils.sort(encrBallots, 0, encrBallots.length);
 		
