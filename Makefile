@@ -22,7 +22,7 @@ java_compile:
 	javac -sourcepath src \
           -classpath "lib/*" \
           -d bin \
-          src/selectvoting/system/wrappers/*.jav          
+          src/selectvoting/system/wrappers/*.java 
 
 npm_install:
 	cd BulletinBoard; npm install

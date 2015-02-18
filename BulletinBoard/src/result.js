@@ -83,13 +83,13 @@ function parseFinalResult(signedFinalResult) {
         return;
     }
 
-    // Get the [nonce,choice] pairs
+    // Get the nonce/choice pairs
     var t = [];
     var ccount = manifest.choices.map(function(x) {return 0;}); // initialize the counters for choices with 0's
     splitter(p.second, function(item) { 
         p = crypto.deconcatenate(item);
         var choice = +p.second
-        // add the [nonce,choice] pair to the list of votes
+        // add the choice/nonce pair to the list of votes
         t.push({nonce: p.first, vote: manifest.choices[choice]});
         // add one vote for choice 
         ++ccount[choice];
