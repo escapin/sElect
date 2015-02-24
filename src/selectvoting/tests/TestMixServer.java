@@ -18,14 +18,15 @@ import selectvoting.system.core.Utils.MessageSplitIter;
 
 public class TestMixServer extends TestCase  
 {
-	private static final int NUMBER_MIXSERV=3;
+	private static final int NUMBER_MIXSERV=5;
 	
 	private static MixServer[] mixServ;
 	private static Signer authServSign;
 	
-	private static String[] voterIdentifiers = {"voter1", "voter2", "voter3"};
-	private static int numberOfVoters=voterIdentifiers.length;
-	private static byte[] electionID = {100};
+	//private static String[] voterIdentifiers = {"voter1", "voter2", "voter3"};
+	//private static int numberOfVoters=voterIdentifiers.length;
+	private static int numberOfVoters=100;
+	private static byte[] electionID = {0101};
 
 	private static final NonceGen noncegen = new NonceGen(); // nonce generation functionality
 	
