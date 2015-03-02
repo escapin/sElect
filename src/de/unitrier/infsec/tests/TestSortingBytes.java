@@ -77,7 +77,7 @@ public class TestSortingBytes extends TestCase
 		hashedEncrBallots[0]=hashedEncrBallots[numberOfVoters-1];
 		hashedEncrBallots[numberOfVoters-1]=tmp;
 		
-			System.out.println("\tUnsorted:");
+			System.out.println("\tUnsorted:\t\t\t\t\trepr: UNSIGNED int\t\t\t\t\t\t\t\t\t\t\t\t\t\t\trepr: SIGNED int");
 			System.out.println(toString(hashedEncrBallots));
 		
 		byte[][] toBeSortedSigned=MessageTools.copyOf(hashedEncrBallots);
@@ -86,9 +86,9 @@ public class TestSortingBytes extends TestCase
 		Utils.sortSigned(toBeSortedSigned, 0, toBeSortedSigned.length); 
 		Utils.sortUnsigned(toBeSortedUnsigned, 0, toBeSortedUnsigned.length);
 			
-			System.out.println("\tSorted signed:");
+			System.out.println("\tSorted signed:\t\t\t\t\trepr: UNSIGNED int\t\t\t\t\t\t\t\t\t\t\t\t\t\t\trepr: SIGNED int");
 			System.out.println(toString(toBeSortedSigned));
-			System.out.println("\tSorted unsigned:");
+			System.out.println("\tSorted unsigned:\t\t\t\trepr: UNSIGNED int\t\t\t\t\t\t\t\t\t\t\t\t\t\t\trepr: SIGNED int");
 			System.out.println(toString(toBeSortedUnsigned));
 		
 		assertTrue(bijection(hashedEncrBallots, toBeSortedSigned));
@@ -97,7 +97,7 @@ public class TestSortingBytes extends TestCase
 		
 		Utils.sort(hashedEncrBallots, 0, hashedEncrBallots.length);
 			
-			System.out.println("\tSorted:");
+			System.out.println("\tSorted:\t\t\t\t\t\trepr: UNSIGNED int\t\t\t\t\t\t\t\t\t\t\t\t\t\t\trepr: SIGNED int");
 			System.out.println(toString(hashedEncrBallots));
 		
 	}
@@ -106,7 +106,7 @@ public class TestSortingBytes extends TestCase
 	{
 		StringBuffer sb = new StringBuffer();
 		for(int i=0;i<a.length;++i){
-			sb.append(Utilities.byteArrayToHexString(a[i]) + "\t" + byteArraysToSignIntString(a[i]) + "\t\t\t" + byteArraysToUnsignIntString(a[i]) + "\n");
+			sb.append(Utilities.byteArrayToHexString(a[i]) + "\t" + byteArraysToUnsignIntString(a[i]) + "\t\t\t" + byteArraysToSignIntString(a[i]) + "\n");
 		}
 		return sb.toString();
 	}
