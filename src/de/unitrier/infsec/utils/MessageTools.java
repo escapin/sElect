@@ -12,6 +12,14 @@ public class MessageTools {
 		return copy;
 	}
 
+	public static byte[][] copyOf(byte[][] arr) {
+		if (arr==null) return null;
+		byte[][] copy = new byte[arr.length][];
+		for (int i = 0; i < arr.length; i++)
+			copy[i] = copyOf(arr[i]);
+		return copy;
+	}
+	
     public static boolean equal(byte[] a, byte[] b) {
         if( a.length != b.length ) return false;
         for( int i=0; i<a.length; ++i)

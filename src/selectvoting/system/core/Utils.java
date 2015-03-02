@@ -51,26 +51,50 @@ public class Utils
 		}
 	}
 
-	public static int compare(byte[] a1, byte[] a2) {
+	public static int compareSigned(byte[] a1, byte[] a2) {
 		int n1 = a1.length;
 		int n2 = a2.length;
 		int min = Math.min(n1, n2);
 		for (int i = 0; i < min; i++){
-			byte b1 = a1[i];
-			byte b2 = a2[i];
+			int b1 = a1[i];
+			int b2 = a2[i];
 			if (b1 != b2)
 				return b1 - b2;
 		}
 		return n1 - n2;
-	}	
-	
-	public static void sort(byte[][] byteArrays, int fromIndex, int toIndex)
+	}
+	public static void sortSigned(byte[][] byteArrays, int fromIndex, int toIndex)
 	{	
 		Arrays.sort(byteArrays, fromIndex, toIndex, new java.util.Comparator<byte[]>() {
 			public int compare(byte[] a1, byte[] a2) {
-				return Utils.compare(a1, a2);
+				return Utils.compareSigned(a1, a2);
 			}
 		});
+	}
+	public static int compareUnsigned(byte[] a1, byte[] a2) {
+		int n1 = a1.length;
+		int n2 = a2.length;
+		int min = Math.min(n1, n2);
+		for (int i = 0; i < min; i++){
+			int b1 = (a1[i] & 0xff); // last 8 bits interpreted as natural numbers
+			int b2 = (a2[i] & 0xff);
+			if (b1 != b2)
+				return b1 - b2;
+		}
+		return n1 - n2;
+	}
+	public static void sortUnsigned(byte[][] byteArrays, int fromIndex, int toIndex)
+	{	
+		Arrays.sort(byteArrays, fromIndex, toIndex, new java.util.Comparator<byte[]>() {
+			public int compare(byte[] a1, byte[] a2) {
+				return Utils.compareUnsigned(a1, a2);
+			}
+		});
+	}
+	
+	public static void sort(byte[][] byteArrays, int fromIndex, int toIndex)
+	{
+		sortUnsigned(byteArrays, fromIndex, toIndex);
 	}
 	
 	public static class ObjectsMap
