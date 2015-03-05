@@ -16,6 +16,8 @@
     "ignore_fin_serv_cert" : true,
 
     "sendEmail" : false,
+    "timespanEmail" : 10,
+    
     "smtp_host" : "my.smtp.server.com",
     "smtp_port" : 25,
     "smtp_user" : "username",
