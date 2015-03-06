@@ -116,6 +116,9 @@ devclean:
 	-rm -r tmp
 	-rm CollectingServer/log.txt
 	-rm -r tests/node_modules
+	cleanmixdirs
+
+cleanmixdirs:
 	$(shell ls | egrep "MixServer[0-9]+" | xargs rm -r)
 
 cleanElection:
