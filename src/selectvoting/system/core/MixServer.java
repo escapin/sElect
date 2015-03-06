@@ -101,13 +101,19 @@ public class MixServer
 				throw new ServerMisbehavior("Duplicate ballots."); 
 			last = current;
 			byte[] decryptedBallot = decryptor.decrypt(current); // decrypt the current ballot
-			if (decryptedBallot == null) continue; // decryption failed
-			byte[] elID = MessageTools.first(decryptedBallot);
-			if (elID!=null || MessageTools.equal(elID, electionID)) { // otherwise ballot is invalid and we ignore it
-				entries[numberOfEntries++] = MessageTools.second(decryptedBallot);
+			if (decryptedBallot == null){
+				System.err.println("[MixServer.java] Decryption failed for ballot #" + numberOfEntries);
+				continue;
 			}
+			byte[] elID = MessageTools.first(decryptedBallot);
+			if (elID!=null || MessageTools.equal(elID, electionID)) // otherwise ballot is invalid and we ignore it
+				entries[numberOfEntries++] = MessageTools.second(decryptedBallot);
+			else
+				System.err.println("[MixServer.java] Ballot #" + numberOfEntries + " invalid");
 		}
-
+		if(numberOfEntries==0)
+			throw new MalformedData("No ballots to mix");
+		
 		// sort the entries
 		Utils.sort(entries, 0, numberOfEntries);
 		
