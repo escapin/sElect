@@ -129,46 +129,50 @@ exports.otp = function otp(req, res)
     }
 
     if (email) {
-        if (!server.eligibleVoters[email]) // Check if the voter is eligible
+        if (!server.eligibleVoters[email]) // not eligible voter
         {
             winston.info('OTP request (%s) ERROR: Voter not eligible', email);
             res.send({ ok: false, descr: 'Invalid voter identifier (e-mail)' });
         }
-        else // eligible voter create a fresh OTP and send it
+        else // voter is eligible; create a fresh OTP and send it
         {
-            // Generate a fresh OTP only if the voter never requested it before
-        	if (otp_store[email]==null){
-        		// store the OTP under the voter id (email)
+            // Generate OTP (if not generated yet):
+        	if (otp_store[email]==null) { // OTP not generated yet (for the given voter)
+        		// generate store the OTP under the voter id (email)
         		otp_store[email] = crypto.nonce().slice(0,10); // an OTP will have 5 bytes
         		winston.info('OTP request (%s) accepted. Fresh OTP = %s', email, otp_store[email]);
         	}
-        	else
+        	else // OTP already generated
         		winston.info('OTP request (%s) accepted. Already stored OTP = %s', email, otp_store[email]);
-            
 
-            // Send an email
-        	var now = new Date();
-        	var timespanEmail = config.timespanEmail*60000; // working in milliseconds
-        	var timepassed = (mail_timestamp[email]!=null)? now-mail_timestamp[email]: Number.MAX_VALUE;
-            if (config.sendEmail && timepassed>=timespanEmail){
-                winston.info('Sending an email to \'%s\' with OTP  ', email, otp_store[email]);
-                var emailContent = 'Election: ' + manifest.title + '\n\nOne time password: ' + otp_store[email] + '\n';
-                mail_timestamp[email] = new Date(); // now
-                sendEmail(email, 'Your One Time Password for sElect', emailContent, function (err,info) {
-                    if (err) {
-                        winston.info(' ...Error:', err);
-                        // TODO: what to do if we are here (the e-mail has not been sent)?
-                        res.send({ ok: false, descr: 'Problems in sending the E-mail.' });
-                    }else{
-                        winston.info(' ...E-mail sent: ' + info.response);
-                        res.send({ ok: true });
-                    }
-                });
+            // Send email:
+            if (config.sendEmail) {
+                var now = new Date();
+                var sentRecently = mail_timestamp[email] != null
+                                   && (now - mail_timestamp[email]) < config.timespanEmail*60000; // timespan is specified in minutes (in the config file)
+                if (!sentRecently) {
+                    // Sent an e-mail with the OTP
+                    winston.info('Sending an email to \'%s\' with OTP  ', email, otp_store[email]);
+                    var emailContent = 'Election: ' + manifest.title + '\n\nOne time password: ' + otp_store[email] + '\n';
+                    sendEmail(email, 'Your One Time Password for sElect', emailContent, function (err,info) {
+                        if (err) {
+                            winston.info(' ...Error:', err);
+                            // TODO: what to do if we are here (the e-mail has not been sent)?
+                            res.send({ ok: false, descr: 'Problems in sending the E-mail.' });
+                        } else {
+                            winston.info(' ...E-mail sent: ' + info.response);
+                            mail_timestamp[email] = new Date(); // now
+                            res.send({ ok: true });
+                        }
+                    });
+                }
+                else { // otp was sent recently
+                    winston.info('E-mail to \'%s\' was sent recently (not sent this time).', email );
+                    res.send({ ok: true });
+                }
             }
-            else if (config.sendEmail && timepassed<timespanEmail) {
-            	var msg = 'The next E-mail will be sent in: ' + selectUtils.timeDelta2String(timespanEmail-timepassed);
-            	winston.info('E-mail to \'%s\' not sent. %s', email, msg);
-            	res.send({ ok: true, descr: 'E-mail not sent. ' + msg});
+            else { // ! config.sentEmail
+                res.send({ ok: true });
             }
         }
     }
