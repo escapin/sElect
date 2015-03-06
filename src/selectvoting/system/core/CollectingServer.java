@@ -117,6 +117,12 @@ public class CollectingServer
 				vv[k++] = Utilities.stringAsBytes(vid);
 			}
 		}	
+		
+		// Sorting a set of UTF-8 encoded strings as strings of unsigned bytes yields
+		// the same order as sorting the corresponding Unicode strings lexicographically
+		// by codepoint
+		Utils.sort(vv, 0, vv.length);
+		
 		byte[] votersAsAMessage = Utils.concatenateMessageArrayWithDuplicateElimination(vv);
 
 		// put together the election ID, inner ballots, and list of voters
