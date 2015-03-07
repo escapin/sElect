@@ -5,8 +5,12 @@ var config = require('../config');
 // var wrapper = require('./wrapper');
 var crypto = require('cryptofunc');
 
+var TAG_BALLOTS = '01';
+
 exports.result = null;  // this is where the result is stored (when ready)
 exports.voters = null;  // this is where the list of voters is stored
+exports.summary = null; // the summary of the election
+
 
 function splitter(msg, callback) {
     if (msg.length !== 0)  {
@@ -30,7 +34,7 @@ function parsePartialResult(signedFinalResult) {
     
     // Check the tag:
     p = crypto.deconcatenate(result);
-    if (p.first !== '01') {
+    if (p.first !== TAG_BALLOTS) {
         console.log('ERROR: Wrong tag');
         return;
     }
@@ -48,11 +52,12 @@ function parsePartialResult(signedFinalResult) {
     votersMsg = p.second;
     // And collect them
     var t = [];
+    console.log("Fetching the list of voters.");
     splitter(votersMsg, function (item) {
         item = (new Buffer(item, 'hex')).toString('utf8');
         t.push(item);
+        console.log("\t" + item);
     });
-    
     exports.voters = t;
 }
 
@@ -65,15 +70,18 @@ function parseFinalResult(signedFinalResult) {
     var signature = p.second;
     
     // Verify the signature
-    var sig_ok = crypto.verifsig(manifest.mixServers[+manifest.mixServers.length-1].verification_key, result, signature);
+    var sig_ok = crypto.verifsig(manifest.mixServers[manifest.mixServers.length-1].verification_key, result, signature);
     if (!sig_ok) {
         console.log('ERROR: Wrong signature');
         return;
     }
 
     p = crypto.deconcatenate(result);
-    var tag = p.first;
-    //TODO: check that 'tag' is equals to Tag.BALLOTS (see core.Tag.java class)
+    // Check the tag:
+    if (p.first !== TAG_BALLOTS) {
+        console.log('ERROR: Wrong tag');
+        return;
+    }
     
     var elID_entriesAsAMessage = p.second;
     // Check the election id
@@ -86,11 +94,14 @@ function parseFinalResult(signedFinalResult) {
     // Get the [nonce,choice] pairs
     var t = [];
     var ccount = manifest.choices.map(function(x) {return 0;}); // initialize the counters for choices with 0's
-    splitter(p.second, function(item) { 
+    console.log("Fetching the voters' choices.");
+    console.log(p);
+    splitter(p.second, function(item) {
         p = crypto.deconcatenate(item);
         var choice = +p.second
         // add the [nonce,choice] pair to the list of votes
         t.push({nonce: p.first, vote: manifest.choices[choice]});
+        console.log("nonce: " + p.first + "\tvote: " + manifest.choices[choice]);
         // add one vote for choice 
         ++ccount[choice];
     });

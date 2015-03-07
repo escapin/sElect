@@ -19,7 +19,7 @@ app.use(errorHandler({ dumpExceptions: true, showStack: true })); // error handl
 app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
 
 // ROUTES
-app.get('', routes.summary);
+app.get('/', routes.summary);
 app.get('/summary', routes.summary);
 app.get('/votes', routes.votes);
 app.get('/voters', routes.voters);
