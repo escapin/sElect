@@ -56,7 +56,7 @@ if (config.ignore_fin_serv_cert)
 // Print only a message error, otherwise.
 function sendResultToNextMix(innerBallots) {
 	var nextIndex 	= config.chainIndex+1;
-	if(nextIndex >= +manifest.mixServers.length)
+	if(nextIndex >= manifest.mixServers.length)
 		console.log('Warning: result not sent. No other mix servers.');
 	else {
 		console.log('Sending result to the next mix server (#%d)', nextIndex);
@@ -87,7 +87,7 @@ exports.process = function process(req, res)
     var data = req.body.data;
     console.log('Ballots coming. Processing...');
     // process the ballots and ...
-    if(config.chainIndex+1 >= +manifest.mixServers.length) // ... no other mix servers
+    if(config.chainIndex+1 >= manifest.mixServers.length) // ... no other mix servers
     	processBallots(data, res);
     else // ... send the result to the next mix server
     	processBallots(data, res, sendResultToNextMix);

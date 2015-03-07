@@ -68,7 +68,7 @@ if (config.useTLS) {
 }
 
 var server = app.listen(config.port, function() {
-    console.log('Mix Server #%s running for election "%s" [%s]', config.chainIndex+1, manifest.title, manifest.hash);
+    console.log('Mix Server #%s running for election "%s" [%s]', config.chainIndex, manifest.title, manifest.hash);
     console.log('Server listening on %s, port %d', server.address().address, server.address().port);
     if (config.useTLS) 
         console.log('Using TLS');
