@@ -9,6 +9,7 @@ main_dir="MixServer"
 dest_config_file="config.json"
 
 # to be run after the MixServer has been configured by the make file
+# and the files "config_mix[0-9]+.json" are already in template
 def config_mix_servers():
     files = os.listdir(path)
     p=re.compile(pattern) 
@@ -27,7 +28,7 @@ def config_mix_servers():
         shutil.copytree(main_dir, curr_dir);
         # ...and copy the corresponding config file
         shutil.copy(os.path.join(path, configMix_files[i]), os.path.join(curr_dir, dest_config_file))
-        
+        print "\tDirectory '" + curr_dir + "' created and '" + dest_config_file + "' file copied inside";
 
 if __name__ == '__main__':
     config_mix_servers()
