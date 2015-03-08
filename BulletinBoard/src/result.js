@@ -95,13 +95,12 @@ function parseFinalResult(signedFinalResult) {
     var t = [];
     var ccount = manifest.choices.map(function(x) {return 0;}); // initialize the counters for choices with 0's
     console.log("Fetching the voters' choices.");
-    console.log(p);
     splitter(p.second, function(item) {
         p = crypto.deconcatenate(item);
         var choice = +p.second
         // add the [nonce,choice] pair to the list of votes
         t.push({nonce: p.first, vote: manifest.choices[choice]});
-        console.log("nonce: " + p.first + "\tvote: " + manifest.choices[choice]);
+        console.log("\tnonce: " + p.first + "\tvote: " + manifest.choices[choice]);
         // add one vote for choice 
         ++ccount[choice];
     });
