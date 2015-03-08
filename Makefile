@@ -7,11 +7,11 @@ JUNIT_v=4.12
 HARMCRESTCORE_v=1.3
 
 default:
-	@echo Specify the goal: devenv OR  devclean OR cleanElection
+	@echo Specify the goal: devenv OR  devclean OR cleanElection OR updateCryptoKeys
 
 
 
-updatecryptokeys: updatecryptokeys_cs updatecryptokeys_mix
+updateCryptoKeys: updatecryptokeys_cs updatecryptokeys_mix
 
 updatecryptokeys_cs:
 	cd node_modules/cryptofunc; npm install
