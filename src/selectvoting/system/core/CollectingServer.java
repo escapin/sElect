@@ -92,6 +92,7 @@ public class CollectingServer
 	
 	/**
 	 * Return the result.
+	 * 	SIGN_cs[tag_ballot, electionID, ballotsAsAMessage, votersAsAMessage]
 	 */
 	public byte[] getResult() 
 	{
