@@ -281,11 +281,35 @@ function saveResult(result) {
     });
 }
 
+
 // Send result to the first mix server
 function sendResult(result) {
+	// since the result contains also 'votersAsAMessage' we must remove it
+	// FIXME: it will change anyway when we get rid of the CollectingServer.java
+		// result: SIGN_cs[tag_ballot, electionID, ballotsAsAMessage, votersAsAMessage]
+	var p = crypto.deconcatenate(result);
+    var tag_elID_ballots_voters = p.first;
+    var signature = p.second;
+	// we assume the signature is correct
+    var p = crypto.deconcatenate(tag_elID_ballots_voters);
+    var tag = p.first;
+    var elID_ballots_voters = p.second;
+    var p = crypto.deconcatenate(elID_ballots_voters);
+    var elID = p.first;
+    var ballots_voters = p.second;
+    var p = crypto.deconcatenate(ballots_voters);
+    var ballotsAsAMessage = p.first;
+    var votersAsAMessage = p.second;
+
+    // what the mix servers expect: SIGN_cs[tag, elID, ballotsAsAMessage]
+    var elID_ballots = crypto.concatenate(elID, ballotsAsAMessage);
+    var tag_elID_ballots = crypto.concatenate(tag, elID_ballots);
+    var signatureOnResult = crypto.sign(config.signingKey, tag_elID_ballots);
+    var signedResult = crypto.concatenate(tag_elID_ballots, signatureOnResult);
+
     winston.info('Sending result to the first mix server');
     var mixServ = request.newClient(manifest.mixServers[0].URI, mixserv_options);
-    var data = {data: result}
+    var data = {data: signedResult}
     // one could add something like {timeout:10000} to the request below, after 'data'
     mixServ.post('data', data, function(err, otp_res, body) {
         if (err) {
