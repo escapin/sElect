@@ -320,7 +320,7 @@ function sendResult(result) {
     // what the mix servers expect: SIGN_cs[tag, elID, ballotsAsAMessage]
     var elID_ballots = crypto.concatenate(elID, ballotsAsAMessage);
     var tag_elID_ballots = crypto.concatenate(tag, elID_ballots);
-    var signatureOnResult = crypto.sign(config.signingKey, tag_elID_ballots);
+    var signatureOnResult = crypto.sign(config.signing_key, tag_elID_ballots);
     var signedResult = crypto.concatenate(tag_elID_ballots, signatureOnResult);
 
     winston.info('Sending result to the first mix server');

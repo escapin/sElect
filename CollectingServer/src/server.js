@@ -10,9 +10,9 @@ for (var i=0; i<config.class_paths.length; ++i) {
 
 // Cryptographic Keys:
 var colSerEncKey = manifest.collectingServer.encryption_key;
-var colSerDecKey = config.decryptionKey;
+var colSerDecKey = config.decryption_key;
 var colSerVerKey = manifest.collectingServer.verification_key;
-var colSerSigKey = config.signingKey;
+var colSerSigKey = config.signing_key;
 
 // Create the list (map) of eligible voters. Usage if (eligibleVoters[v]) ...
 var eligibleVoters = {};

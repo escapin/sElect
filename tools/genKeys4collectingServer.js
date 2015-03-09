@@ -34,8 +34,8 @@ manifest.collectingServer.encryption_key=keys.encryption_key;
 manifest.collectingServer.verification_key=keys.verification_key;
 
 // update the private keys
-config.decryptionKey=keys.decryption_key;
-config.signingKey=keys.signing_key;
+config.decryption_key=keys.decryption_key;
+config.signing_key=keys.signing_key;
 
 // write the json obj in the files
 save_jsonObj(manifest_path, manifest);
