@@ -16,11 +16,11 @@ def runMake():
 # to be run after the 'config_mix[0-9]+.json' files are in the current folder
 def updateKeys():
     files = os.listdir(current)
-    p=re.compile(pattern) 
+    p=re.compile(pattern)
     configMix_files=filter(p.search, files);
     for file in configMix_files:
         print "***\t" + file + "\t***\n";
-        subprocess.call(["node", os.path.join(tools_path,keyGenerator_file), 
+        subprocess.call(["node", os.path.join(tools_path,keyGenerator_file),
                 os.path.join(current,electionManifest), os.path.join(current,file)]);
         print;
 

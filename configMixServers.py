@@ -12,7 +12,7 @@ dest_config_file="config.json"
 # and the files "config_mix[0-9]+.json" are already in template
 def config_mix_servers():
     files = os.listdir(path)
-    p=re.compile(pattern) 
+    p=re.compile(pattern)
     configMix_files=filter(p.search, files)
     # now only the numbers
     numbers = [re.search('[0-9]+', x).group(0) for x in configMix_files]
