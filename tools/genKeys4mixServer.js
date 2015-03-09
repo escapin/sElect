@@ -8,7 +8,7 @@ var config = require(config_path);
 
 function save_jsonObj(file, jsonObj) {
 	fs.writeFile(file, JSON.stringify(jsonObj, null, 4), function (err) {
-        if (err) 
+        if (err)
             console.log('Problems with saving the json object in ', file);
         else
             console.log('json object saved in', file);
@@ -17,10 +17,10 @@ function save_jsonObj(file, jsonObj) {
 
 var ek = crypto.rsa_keygen();
 var sk = crypto.sig_keygen();
-var keys = 	{ 	encryption_key: ek.encryptionKey, 
-             	decryption_key: ek.decryptionKey,
-             	verification_key: sk.verificationKey,
-             	signing_key: sk.signingKey
+var keys = 	{ 	encryption_key: ek.encryptionKey,
+				decryption_key: ek.decryptionKey,
+				verification_key: sk.verificationKey,
+				signing_key: sk.signingKey
              	}
 console.log(keys);
 console.log();
@@ -31,7 +31,7 @@ if(index<0 || index>=manifest.mixServers.length){
 }
 // update the public keys
 manifest.mixServers[index].encryption_key=keys.encryption_key;
-manifest.mixServers[index].verification_key=keys.verification_key;	
+manifest.mixServers[index].verification_key=keys.verification_key;
 
 // update the private keys
 config.decryption_key=keys.decryption_key;
