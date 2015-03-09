@@ -29,8 +29,8 @@ else
 var numberOfVoters = +manifest.voters.length;
 
 // Create an instance of MixServerWrapper:
-var mixServWrapper = java.newInstanceSync("selectvoting.system.wrappers.MixServerWrapper", 
-                                      encKey, decKey, verifKey, signKey, precServVerifKey, 
+var mixServWrapper = java.newInstanceSync("selectvoting.system.wrappers.MixServerWrapper",
+                                      encKey, decKey, verifKey, signKey, precServVerifKey,
                                       manifest.hash, numberOfVoters);
 
 module.exports = mixServWrapper;

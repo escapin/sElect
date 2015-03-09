@@ -30,9 +30,9 @@ if (cmdlineOption === '--serveResult' && !resultFileExists) {
 // PROCESSING DATA (THE BALLOTS) FROM A FILE
 if (cmdlineOption==='--processData') {
     var dataFileName = process.argv[3];
-    if (!dataFileName) 
+    if (!dataFileName)
         error('File name not given');
-    if (!fs.existsSync(dataFileName)) 
+    if (!fs.existsSync(dataFileName))
         error('The file does not exist.');
     routes.processFile(dataFileName);
 }
@@ -46,8 +46,8 @@ if (cmdlineOption && cmdlineOption!=='--processData' && cmdlineOption!=='--serve
 var app = express();
 app.use(cors()); // enable all CORS request
 app.set('views', './views');    // view engine and location of the views
-app.set('view engine', 'ejs'); 
-app.use(bodyParser.json()); 
+app.set('view engine', 'ejs');
+app.use(bodyParser.json());
 app.use(express.static('./public')); // static content
 app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging
 
@@ -70,7 +70,7 @@ if (config.useTLS) {
 var server = app.listen(config.port, function() {
     console.log('Mix Server #%s running for election "%s" [%s]', config.chainIndex, manifest.title, manifest.hash);
     console.log('Server listening on %s, port %d', server.address().address, server.address().port);
-    if (config.useTLS) 
+    if (config.useTLS)
         console.log('Using TLS');
 });
 

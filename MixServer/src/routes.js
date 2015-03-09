@@ -10,7 +10,7 @@ if (fs.existsSync(config.RESULT_FILE))
 
 function saveResult(innerBallots) {
 	fs.writeFile(config.RESULT_FILE, innerBallots, function (err) {
-        if (err) 
+        if (err)
             console.log('Problems with saving result', config.RESULT_FILE);
         else {
             console.log('Result saved in', config.RESULT_FILE);
@@ -19,7 +19,7 @@ function saveResult(innerBallots) {
     });
 }
 
-// Processes the ballots 
+// Processes the ballots
 // Parameter 'res' is optional. If present, the summary
 // (success/failure) will be sent to it.
 // Function 'sendResult' is optional. If present, it will
@@ -40,7 +40,7 @@ function processBallots(data, res, sendResult) {
         else {
             var innerBallots = result.data;
             // save the  inner ballots
-            saveResult(innerBallots);    
+            saveResult(innerBallots);
             if (res) res.send({ ok: true, info: 'Data accepted'});
             // send the inner ballots to the next server, if it exists
             if (sendResult) sendResult(innerBallots);
@@ -75,9 +75,9 @@ function sendResultToNextMix(innerBallots) {
 }
 
 
-// Get the data (in 'req'), processes it as the ballots, 
+// Get the data (in 'req'), processes it as the ballots,
 // and send it to the next mix server
-exports.process = function process(req, res) 
+exports.process = function process(req, res)
 {
     if (resultReady) {
         console.log('ERROR: result already exists');
