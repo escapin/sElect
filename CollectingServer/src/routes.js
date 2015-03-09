@@ -13,6 +13,8 @@ var selectUtils = require('selectUtils');
 // State
 
 var otp_store = {};
+var mail_timestamp = {};
+
 
 //  status and opening/closing time
 var resultReady = fs.existsSync(config.RESULT_FILE);
@@ -127,35 +129,51 @@ exports.otp = function otp(req, res)
     }
 
     if (email) {
-        if (!server.eligibleVoters[email]) // Check if the voter is eligible
+        if (!server.eligibleVoters[email]) // not eligible voter
         {
             winston.info('OTP request (%s) ERROR: Voter not eligible', email);
             res.send({ ok: false, descr: 'Invalid voter identifier (e-mail)' });
         }
-        else // eligible voter create a fresh OTP and send it
+        else // voter is eligible; create a fresh OTP and send it
         {
-            // Generate a fresh otp
-            var otp = crypto.nonce().slice(0,10); // an otp will have 5 bytes
-            winston.info('OTP request (%s) accepted. Fresh OTP = %s', email, otp);
-            otp_store[email] = otp // store the opt under the voter id (email)
-            // schedule reset of the otp
-            setTimeout( function(){ otp_store[email]=null; }, 10*60000); // 10 min
+            // Generate OTP (if not generated yet):
+        	if (otp_store[email]==null) { // OTP not generated yet (for the given voter)
+        		// generate store the OTP under the voter id (email)
+        		otp_store[email] = crypto.nonce().slice(0,10); // an OTP will have 5 bytes
+        		winston.info('OTP request (%s) accepted. Fresh OTP = %s', email, otp_store[email]);
+        	}
+        	else // OTP already generated
+        		winston.info('OTP request (%s) accepted. Already stored OTP = %s', email, otp_store[email]);
 
-            // Send an email
+            // Send email:
             if (config.sendEmail) {
-                winston.info('Sending an emal with otp to', email, otp);
-                var emailContent = 'Election: ' + manifest.title + '\n\nOne time password: ' + otp + '\n';
-                sendEmail(email, 'Your One Time Password for sElect', emailContent, function (err,info) {
-                    if (err) {
-                        winston.info(' ...Error:', err);
-                        // TODO: what to do if we are here (the e-mail has not been sent)?
-                    }else{
-                        winston.info(' ...E-mail sent: ' + info.response);
-                    }
-                });
+                var now = new Date();
+                var sentRecently = mail_timestamp[email] != null
+                                   && (now - mail_timestamp[email]) < config.timespanEmail*60000; // timespan is specified in minutes (in the config file)
+                if (!sentRecently) {
+                    // Sent an e-mail with the OTP
+                    winston.info('Sending an email to \'%s\' with OTP  ', email, otp_store[email]);
+                    var emailContent = 'Election: ' + manifest.title + '\n\nOne time password: ' + otp_store[email] + '\n';
+                    sendEmail(email, 'Your One Time Password for sElect', emailContent, function (err,info) {
+                        if (err) {
+                            winston.info(' ...Error:', err);
+                            // TODO: what to do if we are here (the e-mail has not been sent)?
+                            res.send({ ok: false, descr: 'Problems in sending the E-mail.' });
+                        } else {
+                            winston.info(' ...E-mail sent: ' + info.response);
+                            mail_timestamp[email] = new Date(); // now
+                            res.send({ ok: true });
+                        }
+                    });
+                }
+                else { // otp was sent recently
+                    winston.info('E-mail to \'%s\' was sent recently (not sent this time).', email );
+                    res.send({ ok: true });
+                }
             }
-
-            res.send({ ok: true });
+            else { // ! config.sentEmail
+                res.send({ ok: true });
+            }
         }
     }
     else {
@@ -188,7 +206,7 @@ exports.cast = function cast(req, res)
         return;
     }
 
-    // Check the otp (and, implicitly, the identifier)
+    // Check the OTP (and, implicitly, the identifier)
     if (otp_store[email] === otp) {
         // Cast the ballot:
         server.collectBallot(email, ballot, function(err, response) {
@@ -212,12 +230,10 @@ exports.cast = function cast(req, res)
             }
         });
     }
-    else // otp not correct
+    else // OTP not correct
     {
         winston.info('Cast request ERROR: Invalid OTP:', otp);
-        res.send({ ok: false, descr: 'Invalid OTP (one time password)' }); 
-        // if an invalid otp is given, we require that a new otp be generated (reset otp):
-        otp_store[email] = null;
+        res.send({ ok: false, descr: 'Invalid OTP (one time password)' });
     }
 };
 
