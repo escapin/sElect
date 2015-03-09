@@ -113,8 +113,11 @@ public class Utils
 		});
 	}
 	
-	public static void sort(byte[][] byteArrays, int fromIndex, int toIndex)
-	{
+	public static int compare(byte[] a1, byte[] a2) {
+		return compareUnsigned(a1, a2);
+	}
+	
+	public static void sort(byte[][] byteArrays, int fromIndex, int toIndex){
 		sortUnsigned(byteArrays, fromIndex, toIndex);
 	}
 	
