@@ -84,7 +84,7 @@ public class Utils
 	}
 	
 	/**
-	 * Compares its two array arguments for lexicographic order.
+	 * Compares the two arrays for lexicographic order.
 	 * Each byte is interpreted as an unsigned byte. 
 	 * 
 	 * @param a1 the first array to be compared.
