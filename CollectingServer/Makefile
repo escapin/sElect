@@ -1,5 +1,5 @@
 
-build: java_compile npm_install
+build: npm_install
 
 java_compile:
 	-mkdir ../bin
