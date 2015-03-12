@@ -112,6 +112,29 @@ describe( 'Hybrid encryption', function()
         var d = crypto.pke_decrypt(decryption_key, ciphertext);
         expect(d).toBe(plaintext);
     });
+
+    it( 'works correctly with explicit randomness', function()
+    {
+        var m = '0123456789abcdef';
+        var k = crypto.pke_keygen();
+
+        var r = crypto.pke_generateEncryprionCoins();
+        var c0 = crypto.pke_encrypt(k.encryptionKey, m);
+        var c1 = crypto.pke_encrypt(k.encryptionKey, m, r);
+        var c2 = crypto.pke_encrypt(k.encryptionKey, m, r);
+
+        var d0 = crypto.pke_decrypt(k.decryptionKey, c0);
+        var d1 = crypto.pke_decrypt(k.decryptionKey, c1);
+        var d2 = crypto.pke_decrypt(k.decryptionKey, c2);
+
+        expect(d0).toBe(m);
+        expect(d1).toBe(m);
+        expect(d2).toBe(m);
+
+        expect(c1).toBe(c2);
+        expect(c1).not.toBe(c0);
+    });
+
 });
 
 
