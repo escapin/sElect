@@ -17,9 +17,15 @@ var verif = crypto.verifsig;
 //////////////////////////////////////////////////////////////////////////////////////////
 // Parameters and keys
 
-var electionID = '1441';
+console.log('************ Initialisation');
+
+var electionID = 'eeee';
 var NMixServ = 5;
-var voters = ["a@ema.il", "b@ema.il", "c@ema.il", "d@ema.il"];
+var NVoters = 1000;
+var voters = new Array(NVoters);
+for (var i=0; i<NVoters; ++i) {
+    voters[i] = 'aa' + crypto.int32ToHexString(i);
+}
 
 // Keys
 var colServerKeys = crypto.sig_keygen();
@@ -35,122 +41,91 @@ var votersSet = {};
 for(var i=0; i<voters.length; i++)
 	votersSet[voters[i]] = true;
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// Utils
-
-function splitter(msg, callback) {
-    if (msg.length !== 0)  {
-        var p = crypto.deconcatenate(msg);
-        callback(p.first);
-        splitter(p.second, callback);
-    }
-}
+console.log('************ Initialisation done');
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Test cases
 
 describe( 'Voting process', function()
 {
-    it( 'works correctly', function()
-    {  	
-        // Create the collecting server (core)
-        var cs = csCore.create(electionID, votersSet, colServerKeys.signingKey);
+    var cs = csCore.create(electionID, votersSet, colServerKeys.signingKey);
+    var receipts = new Array(voters.length);
 
-        // VOTING PHASE. Create voters and submit ballots:
-        var receipt = new Array(voters.length);
-    	for(i=0; i<voters.length;++i){
+    it( 'Voting phase works as expected', function()
+    {  	
+        console.log('************ Testing the voting phase');
+
+    	for(i=voters.length-1; i>=0; --i){
             // create a new voter object
             var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys);
             // create ballot (a receipt containing a ballot); i-th voter votes for i-th candidate:
-    		receipt[i] = voter.createBallot(i);
-    		expect (receipt[i].choice) .toBe(i);
+    		receipts[i] = voter.createBallot(i);
+    		expect (receipts[i].choice) .toBe(i);
             
             // submit the ballot
-        	var csReply = cs.collectBallot(voters[i], receipt[i].ballot);
+        	var csReply = cs.collectBallot(voters[i], receipts[i].ballot);
         	expect (csReply.ok).toBe(true);
 
             // check the acknowledgement (signature)
-            receipt[i].signature = csReply.data;
-            var receiptOK = voter.validateReceipt(receipt[i]);
+            receipts[i].signature = csReply.data;
+            var receiptOK = voter.validateReceipt(receipts[i]);
             expect(receiptOK).toBe(true);
     	}
     });
-});
 
+    it( 'The collecting server produces correct list of voters', function()
+    {
+        console.log('************ Checking the list of voters');
 
-xdescribe( 'Cs core', function ()
-{
-	it( 'get the Ballots', function()
-	{  	
-		var signedBallots = cs.getResult();
-		var p = unpair(signedBallots);
-		var tag_elID_ballots = p.first;
-		var signature = p.second;
-		expect(verif(colServVerifKey, tag_elID_ballots, signature)) .toBe(true);
-		p = unpair(tag_elID_ballots);
-		var tag = p.first;
-		var elID_ballots = p.second;
-		expect(tag) .toBe(TAG_BALLOTS);
-		p = unpair(elID_ballots);
-		var elID = p.first;
-		var ballotsAsAMessage = p.second;
-		expect(elID) .toBe(electionID);
-		var result = [];
-		//console.log();
-		splitter(ballotsAsAMessage, function (item) {
-			// FIXME: don't we require any conversion of the data we process?
-			//item = (new Buffer(item, 'hex')).toString('utf8');
-			result.push(item);
-			//console.log(item);
-		});
-		var expectedBallots = [];
-		for(i=0; i<receipt.length; ++i) {
-			expectedBallots[i] = receipt[i].ballot;
-		}	
-		expect(result.length) .toBe(expectedBallots.length);
-		
-		expectedBallots.sort();
-		//console.log();
-		for(i=0; i<result.length; ++i) {
-			expect(result[i]) .toBe(expectedBallots[i]);
-			//console.log(expectedBallots[i]);
-		}
-	});
-});
-	
-xdescribe( 'Cs core', function ()
-{
-	it( 'get the Voters\' list', function()
-	{
 		var signedVotersList = cs.getVotersList();
 		var p = unpair(signedVotersList);
-		var tag_elID_voters = p.first;
+		var data = p.first; // tag,elID,voters
 		var signature = p.second;
-		expect(verif(colServVerifKey, tag_elID_voters, signature)) .toBe(true);
-		p = unpair(tag_elID_voters);
-		var tag = p.first;
-		var elID_voters = p.second;
-		expect(tag) .toBe(TAG_VOTERS);
-		p = unpair(elID_voters);
-		var elID = p.first;
-		var votersAsAMessage = p.second;
-		expect(elID) .toBe(electionID);
-		votersList = [];
-		console.log();
-		splitter(votersAsAMessage, function (item) {
-			//item = (new Buffer(item, 'hex')).toString('utf8');
-			votersList.push(item);
-			//console.log(item);
-		});
-		expect(votersList.length) .toBe(voters.length);
-		
-		voters.sort();
-		//console.log();
-		for(i=0; i<votersList.length; ++i) {
-			expect(votersList[i]) .toBe(voters[i]);
-			//console.log(voters[i]);
+        // check the signature
+		expect(verif(colServVerifKey, data, signature)) .toBe(true);
+       
+        var data = crypto.splitter(data);
+
+		expect(data.nextMessage()) .toBe(TAG_VOTERS); // check the tag
+		expect(data.nextMessage()) .toBe(electionID); // check the election id
+        // The rest of data is a list of voter id-s.
+        // It should correspond to the initial list 'voters' (which was sorted)
+        for (var i=0; !data.empty(); ++i) {
+            expect(data.nextMessage()).toBe(voters[i]);
+        }
+    });
+
+    it( 'The collecting server produces correct list of ballots', function()
+    {  	
+        console.log('************ Checking the list of ballots');
+
+		var signedBallots = cs.getResult();
+		var p = unpair(signedBallots);
+		var data = p.first; // tag,elID,voters
+		var signature = p.second;
+        // check the signature
+		expect(verif(colServVerifKey, data, signature)) .toBe(true);
+       
+        var data = crypto.splitter(data);
+
+		expect(data.nextMessage()) .toBe(TAG_BALLOTS); // expected the tag
+		expect(data.nextMessage()) .toBe(electionID);  // expected the election id
+
+        // The rest of data is a list of ballots 
+        // Lets take this list
+        var ballotsInResult = [];
+        for (var i=0; !data.empty(); ++i) {
+            ballotsInResult.push(data.nextMessage());
+        }
+        // It should be equal to the sorted list of cast ballots
+        var castBallots = receipts.map(function(rec){ return rec.ballot }).sort();
+		expect(castBallots.length).toBe(ballotsInResult.length);
+		for(i=0; i<castBallots.length; ++i) {
+			expect(ballotsInResult[i]).toBe(castBallots[i]);
 		}
-		
-	});
+
+    });
+
 });
+	
 
