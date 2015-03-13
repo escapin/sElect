@@ -15,7 +15,7 @@ function save_jsonObj(file, jsonObj) {
     });
 }
 
-var ek = crypto.rsa_keygen();
+var ek = crypto.pke_keygen();
 var sk = crypto.sig_keygen();
 var keys = 	{ 	encryption_key: ek.encryptionKey,
              	decryption_key: ek.decryptionKey,

@@ -1,6 +1,6 @@
 var crypto = require('cryptofunc');
 
-var ek = crypto.rsa_keygen();
+var ek = crypto.pke_keygen();
 
 // console.log(enckeys);
 
