@@ -8,6 +8,8 @@ var resultReady = false;
 if (fs.existsSync(config.RESULT_FILE))
     resultReady = true;
 
+var chainIndex = server.chainIndex;
+
 function saveResult(innerBallots) {
 	fs.writeFile(config.RESULT_FILE, innerBallots, function (err) {
         if (err)
@@ -55,7 +57,7 @@ if (config.ignore_fin_serv_cert)
 // Send result to the next mix server, if it is listed in the manifest.
 // Print only a message error, otherwise.
 function sendResultToNextMix(innerBallots) {
-	var nextIndex 	= config.chainIndex+1;
+	var nextIndex 	= chainIndex+1;
 	if(nextIndex >= manifest.mixServers.length)
 		console.log('Warning: result not sent. No other mix servers.');
 	else {
@@ -87,7 +89,7 @@ exports.process = function process(req, res)
     var data = req.body.data;
     console.log('Ballots coming. Processing...');
     // process the ballots and ...
-    if(config.chainIndex+1 >= manifest.mixServers.length) // ... no other mix servers
+    if(chainIndex+1 >= manifest.mixServers.length) // ... no other mix servers
     	processBallots(data, res);
     else // ... send the result to the next mix server
     	processBallots(data, res, sendResultToNextMix);
