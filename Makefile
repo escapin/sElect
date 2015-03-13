@@ -149,6 +149,7 @@ testconfigs:
           src/tests/*.java
     
 	cd node_modules/cryptofunc; npm install
+	cd CollectingServer; npm install
 	cd tests; npm install
 
 testrun:
@@ -156,7 +157,7 @@ testrun:
 	@echo     [RUN] tests: java
 	cd bin; java -cp ".:../lib/*" tests.RunTestSuite
 	@echo
-	@echo     [RUN] tests: node.js
+	@echo     [RUN] tests: nodejs
 	./tests/node_modules/.bin/jasmine-node tests
 
 

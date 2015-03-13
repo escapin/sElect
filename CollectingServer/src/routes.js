@@ -317,7 +317,7 @@ function sendResult(result) {
     var ballotsAsAMessage = p.first;
     var votersAsAMessage = p.second;
 
-    // what the mix servers expect: SIGN_cs[tag, elID, ballotsAsAMessage]
+    // what the mix server expects: SIGN_cs[tag, elID, ballotsAsAMessage]
     var elID_ballots = crypto.concatenate(elID, ballotsAsAMessage);
     var tag_elID_ballots = crypto.concatenate(tag, elID_ballots);
     var signatureOnResult = crypto.sign(config.signing_key, tag_elID_ballots);
