@@ -44,7 +44,7 @@ describe( 'Cs core', function()
     		expect (voterReply[i].choice) .toBe(i);
         	var csReply = cs.collectBallot(voters[i], voterReply[i].ballot);
         	expect (csReply.ok) .toBe(true);
-        	// FIXME: the cs replies only with the signature
+        	// FIXME: the cs replies only with the signature, is it correct?
         	var receipt = {	electionID: voterReply[i].electionID, ballot: voterReply[i].ballot, 
 					signature: csReply.data};
         	var receipt_correct = voter.validateReceipt(receipt);
@@ -87,14 +87,14 @@ describe( 'Cs core', function ()
 			//console.log(item);
 		});
 		var expectedBallots = [];
-		for(i=0; i<voterReply.length; ++i) {
+		for(var i=0; i<voterReply.length; ++i) {
 			expectedBallots[i] = voterReply[i].ballot;
 		}	
 		expect(result.length) .toBe(expectedBallots.length);
 		
 		expectedBallots.sort();
 		//console.log();
-		for(i=0; i<result.length; ++i) {
+		for(var i=0; i<result.length; ++i) {
 			expect(result[i]) .toBe(expectedBallots[i]);
 			//console.log(expectedBallots[i]);
 		}
@@ -129,7 +129,7 @@ describe( 'Cs core', function ()
 		
 		voters.sort();
 		//console.log();
-		for(i=0; i<votersList.length; ++i) {
+		for(var i=0; i<votersList.length; ++i) {
 			expect(votersList[i]) .toBe(voters[i]);
 			//console.log(voters[i]);
 		}
