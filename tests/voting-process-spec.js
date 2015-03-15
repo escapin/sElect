@@ -21,7 +21,7 @@ console.log('************ Initialisation');
 
 var electionID = 'eeee';
 var NMixServ = 5;
-var NVoters = 1000;
+var NVoters = 100;
 var voters = new Array(NVoters);
 for (var i=0; i<NVoters; ++i) {
     voters[i] = 'aa' + crypto.int32ToHexString(i);
@@ -35,11 +35,7 @@ for(var i=0; i<NMixServ; i++)
 	mixServKeys[i] = crypto.pke_keygen();
 var mixServEncKeys = mixServKeys.map(function(k){ return k.encryptionKey; });
 
-// create the set of eligible voters
-// TODO remove this; csCore.create should accept list of eligible voters (not a set)
-var votersSet = {};
-for(var i=0; i<voters.length; i++)
-	votersSet[voters[i]] = true;
+
 
 console.log('************ Initialisation done');
 
@@ -48,7 +44,7 @@ console.log('************ Initialisation done');
 
 describe( 'Voting process', function()
 {
-    var cs = csCore.create(electionID, votersSet, colServerKeys.signingKey);
+    var cs = csCore.create(electionID, voters, colServerKeys.signingKey);
     var receipts = new Array(voters.length);
 
     it( 'Voting phase works as expected', function()

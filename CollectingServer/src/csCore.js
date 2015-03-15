@@ -15,23 +15,20 @@ var unpair = crypto.deconcatenate;
 var sign = crypto.sign;
 
 // return a new csCore instance
-exports.create = function(electionID, eligibleVoters, colSerSigKey)
+exports.create = function(electionID, listOfEligibleVoters, colSerSigKey)
 {
 	// PRIVATE FIELDS
 	var storedBallots = new HashMap();
 	
-//	// PUBLIC FIELDS 
-//	
-//	var listOfEligibleVoters = [];
-//	var eligibleVoters = {};
-//	
-//	// CONSTRUCTOR
-//	//Create the list (map) of eligible voters. Usage if (eligibleVoters[v]) ...
-//	for( var i=0; i<manifest.voters.length; ++i ) {
-//		var voter_id = manifest.voters[i].email;
-//		eligibleVoters[voter_id] = true;
-//		//listOfEligibleVoters.push(voter_id);
-//	}
+	// PUBLIC FIELDS 
+	var eligibleVoters = {};
+	
+	//Create the list (map) of eligible voters. Usage if (eligibleVoters[v]) ...
+	// CONSTRUCTOR
+	for( var i=0; i<listOfEligibleVoters.length; ++i ) {
+		var voter_id = listOfEligibleVoters[i];
+		eligibleVoters[voter_id] = true;
+	}
 	
 	
 	// 'ballot': the n-time encrypted ballot
@@ -91,7 +88,7 @@ exports.create = function(electionID, eligibleVoters, colSerSigKey)
 		return result;
 	}
 
-	return {collectBallot: collectBallot, getResult: getResult, getVotersList: getVotersList};
+	return {eligibleVoters: eligibleVoters, collectBallot: collectBallot, getResult: getResult, getVotersList: getVotersList};
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
