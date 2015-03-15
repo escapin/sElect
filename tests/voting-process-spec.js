@@ -1,3 +1,5 @@
+var fs = require('fs');
+var path = require('path');
 var crypto = require('cryptofunc');
 var voterClient = require('voterClient');
 var csCore = require('../CollectingServer/src/csCore.js');
@@ -40,8 +42,6 @@ for(var i=0; i<NMixServ; i++) {
 }
 var mixServEncKeys = mixServPkeKeys.map(function(k){ return k.encryptionKey; });
 
-
-
 console.log('************ Initialisation done');
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -52,8 +52,18 @@ describe( 'Voting process', function()
 
 	var cs = csCore.create(electionID, voters, colServerKeys.signingKey);
     var receipts = new Array(voters.length);
-
-    var class_paths = ["../bin", "../lib/bcprov-jdk16-1.46.jar"]; // for java in MixServer
+    
+    //console.log('Test: Current directory --> ' + process.cwd());
+    
+    ///////////////////////////////////////////////////////////////
+    // FIXME: just a quick fix for when we execute the test from the root dir --> to be optimize
+    var class_path = ["bin", "lib/bcprov-jdk16-1.46.jar"]; // for java in MixServer
+    for(var i=0;i<class_path.length; ++i)
+    		if(!fs.existsSync(class_path[i]))
+    			class_path[i] = path.join("../", class_path[i]);
+    // console.log(class_path);
+    /////////////////////////////////////////////////////////////
+    
     var mixServer = new Array(NMixServ);
     var precServVerifKey = colServVerifKey;
     for(var i=0; i<mixServer.length; ++i) {
@@ -62,7 +72,7 @@ describe( 'Voting process', function()
     									mixServSigKeys[i].verificationKey,
     									mixServSigKeys[i].signingKey,
     									precServVerifKey, electionID,
-    									voters.length, class_paths);
+    									voters.length, class_path);
     	// console.log(mixServer[i].verifKey);
     	precServVerifKey = mixServer[i].verifKey;
     }

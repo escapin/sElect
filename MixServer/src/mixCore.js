@@ -5,14 +5,13 @@ var exports = {};
 var java = require("java");
 
 exports.create = function(encKey, decKey, verifKey, signKey, precServVerifKey, 
-		electionID, numberOfVoters, class_paths)
+		electionID, numberOfVoters, class_path)
 {
+	//console.log('Mix: Current directory --> ' + process.cwd());
 	// CONSTRUCTOR 
-	// Add (java) class paths, as specified in the config:
-	for (var i=0; i<class_paths.length; ++i) {
-	    var path = class_paths[i];
-	    java.classpath.push(path);
-	}
+	// Add (java) class paths
+	for (var i=0; i<class_path.length; ++i)
+	    java.classpath.push(class_path[i]);
 //	var chainIndex = -1
 //	for(var i=0; i<manifest.mixServers.length; ++i)
 //		if(manifest.mixServers[i].encryption_key === config.encryption_key &&
