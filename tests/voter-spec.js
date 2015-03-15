@@ -35,7 +35,7 @@ describe( 'Voter Client', function()
         var message = pair(TAG_ACCEPTED, pair(electionID, receipt.ballot));
         var signature = crypto.sign(colServerKey.signingKey, message);
 
-        // Coplete the receipt by the signature
+        // Complete the receipt by the signature
         receipt.signature = signature;
 
         // Verify the receipt
@@ -51,7 +51,7 @@ describe( 'Voter Client', function()
             expect(x).toBe(receipt.ciphertexts[i]);
         }
 
-        // Fake the decryption prosess (done by the mix servers)
+        // Fake the decryption process (done by the mix servers)
         x = receipt.ballot;
         for (var i=0; i<N; ++i) {
             expect(x).toBe(receipt.ciphertexts[i]);
