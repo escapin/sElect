@@ -14,6 +14,7 @@
     "nodemailer-smtp-transport": "~0.1.13",
     "request-json": "~0.4.13",
     "winston": "^0.8.3",
+    "java" : "^0.4.6",
     "hashmap": "^2.0.1"
   }
 }
