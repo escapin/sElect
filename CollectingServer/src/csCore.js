@@ -15,12 +15,10 @@ var unpair = crypto.deconcatenate;
 var sign = crypto.sign;
 
 // return a new csCore instance
-exports.create = function(electionID, listOfEligibleVoters, colSerSigKey)
+exports.create = function(electionID, listOfEligibleVoters, signKey)
 {
 	// PRIVATE FIELDS
 	var storedBallots = new HashMap();
-	
-	// PUBLIC FIELDS 
 	var eligibleVoters = {};
 	
 	//Create the list (map) of eligible voters. Usage if (eligibleVoters[v]) ...
@@ -45,7 +43,7 @@ exports.create = function(electionID, listOfEligibleVoters, colSerSigKey)
 
 		// generate the receipt
 		var tag_elID_ballot = pair(TAG_ACCEPTED, pair(electionID, ballot));
-		var signature = sign(colSerSigKey, tag_elID_ballot);
+		var signature = sign(signKey, tag_elID_ballot);
 		
 		return {ok: true, data: signature};
 	}
@@ -56,7 +54,7 @@ exports.create = function(electionID, listOfEligibleVoters, colSerSigKey)
 		var listOfBallots = storedBallots.values();
 		var ballotsAsAMessage = array2sortedMsgWithDuplicateElimination(listOfBallots);
 		var tag_elID_ballots = pair(TAG_BALLOTS, pair(electionID, ballotsAsAMessage));
-		var signature = sign(colSerSigKey, tag_elID_ballots);
+		var signature = sign(signKey, tag_elID_ballots);
 		var signedResult = pair(tag_elID_ballots, signature);
 		return signedResult;
 	}
@@ -67,7 +65,7 @@ exports.create = function(electionID, listOfEligibleVoters, colSerSigKey)
 		var listOfVoters = storedBallots.keys();
 		var votersAsAMessage = array2sortedMsgWithDuplicateElimination(listOfVoters);
 		var tag_elID_voters = pair(TAG_VOTERS, pair(electionID, votersAsAMessage));
-		var signature = sign(colSerSigKey, tag_elID_voters);
+		var signature = sign(signKey, tag_elID_voters);
 		var signedResult = pair(tag_elID_voters, signature);
 		return signedResult;
 	}
@@ -87,7 +85,10 @@ exports.create = function(electionID, listOfEligibleVoters, colSerSigKey)
 		return result;
 	}
 	
-	return {eligibleVoters: eligibleVoters, collectBallot: collectBallot, getResult: getResult, getVotersList: getVotersList};
+	
+	return {electionID: electionID, listOfEligibleVoters: listOfEligibleVoters,
+			signKey: signKey, eligibleVoters: eligibleVoters,
+			collectBallot: collectBallot, getResult: getResult, getVotersList: getVotersList};
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

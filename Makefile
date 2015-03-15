@@ -145,10 +145,12 @@ testconfigs:
 	javac -sourcepath src \
           -classpath "lib/*" \
           -d bin \
-          src/tests/*.java
+          src/tests/*.java \
+          src/selectvoting/system/wrappers/*.java
     
 	cd node_modules/cryptofunc; npm install
 	cd CollectingServer; npm install
+	cd MixServer; npm install
 	cd tests; npm install
 
 testrun:

@@ -1,6 +1,7 @@
 var crypto = require('cryptofunc');
 var voterClient = require('voterClient');
 var csCore = require('../CollectingServer/src/csCore.js');
+var mixCore = require('../MixServer/src/mixCore.js');
 
 var TAG_ACCEPTED = '00';  // (hex encoded) tag
 var TAG_BALLOTS = '01';
@@ -30,10 +31,14 @@ for (var i=0; i<NVoters; ++i) {
 // Keys
 var colServerKeys = crypto.sig_keygen();
 var colServVerifKey = colServerKeys.verificationKey;
-var mixServKeys = new Array(NMixServ);
-for(var i=0; i<NMixServ; i++)
-	mixServKeys[i] = crypto.pke_keygen();
-var mixServEncKeys = mixServKeys.map(function(k){ return k.encryptionKey; });
+
+var mixServPkeKeys = new Array(NMixServ);
+var mixServSigKeys = new Array(NMixServ);
+for(var i=0; i<NMixServ; i++) {
+	mixServPkeKeys[i] = crypto.pke_keygen();
+	mixServSigKeys[i] = crypto.sig_keygen();
+}
+var mixServEncKeys = mixServPkeKeys.map(function(k){ return k.encryptionKey; });
 
 
 
@@ -44,19 +49,33 @@ console.log('************ Initialisation done');
 
 describe( 'Voting process', function()
 {
-    var cs = csCore.create(electionID, voters, colServerKeys.signingKey);
+
+	var cs = csCore.create(electionID, voters, colServerKeys.signingKey);
     var receipts = new Array(voters.length);
 
+    var class_paths = ["../bin", "../lib/bcprov-jdk16-1.46.jar"]; // for java in MixServer
+    var mixServer = new Array(NMixServ);
+    var precServVerifKey = colServVerifKey;
+    for(var i=0; i<mixServer.length; ++i) {
+    	mixServer[i] = mixCore.create(	mixServPkeKeys[i].encryptionKey,
+    									mixServPkeKeys[i].decryptionKey,
+    									mixServSigKeys[i].verificationKey,
+    									mixServSigKeys[i].signingKey,
+    									precServVerifKey, electionID,
+    									voters.length, class_paths);
+    	// console.log(mixServer[i].verifKey);
+    	precServVerifKey = mixServer[i].verifKey;
+    }
 
     it ( 'eligibleVoters field works as expected', function()
     {
-    	//console.log(cs.eligibleVoters);
     	var listElVoters = Object.keys(cs.eligibleVoters);
-    	listElVoters.sort();
-    	voters.sort();
-    	for(var i=0; i<listElVoters.length; ++i){
-    		expect(listElVoters[i]) .toBe(voters[i]);
-    	}
+    	expect(bijection(listElVoters, voters)).toBe(true);
+//    	listElVoters.sort();
+//    	voters.sort();
+//    	for(var i=0; i<listElVoters.length; ++i){
+//    		expect(listElVoters[i]) .toBe(voters[i]);
+//    	}
     });
     
     
@@ -134,7 +153,73 @@ describe( 'Voting process', function()
 		}
 
     });
+    
+    it( 'The mix servers process the data correctly', function()
+    {
+    	console.log('************ Testing the mix servers');
 
+    	var signedBallots = cs.getResult();
+
+    	// result to the first mix server
+    	var result=mixServer[0].processBallots(signedBallots);
+    	expect(result.ok) .toBe(true);
+    	
+    	// let's give him trash
+    	result=mixServer[0].processBallots(crypto.nonce(2000));
+    	expect(result.ok) .toBe(false);
+    	expect(result.data) .toBe("Wrong signature");
+    	
+    	// let's test the whole chain now
+    	var inputData = signedBallots;
+    	for(var i=0; i<mixServer.length; ++i){
+    		result = mixServer[i].processBallots(inputData);
+    		expect(result.ok) .toBe(true);
+    		inputData = result.data;
+    	}
+    	var finalResult = result.data;
+    	
+    	var p = unpair(finalResult);
+    	var tag_elID_ballots = p.first; 	// [tag, elID, ballotsAsAMessage]
+		var signature = p.second;
+        // check the signature
+		expect(verif(mixServer[mixServer.length-1].verifKey, tag_elID_ballots, signature)) .toBe(true);
+       
+        var data = crypto.splitter(tag_elID_ballots);
+
+		expect(data.nextMessage()) .toBe(TAG_BALLOTS); // expected the tag
+		expect(data.nextMessage()) .toBe(electionID);  // expected the election id
+        
+
+        // The rest of data is a list of (electionID, receiptID,choice)
+        // Lets take this list
+        var receiptIDs = [];
+        var choices = [];
+        for (var i=0; !data.empty(); ++i) {
+        	p = unpair(data.nextMessage());
+        	expect(p.first).toBe(electionID);
+        	var receipt_choice = p.second;
+        	p = unpair(receipt_choice);
+        	var receiptID = p.first;
+        	var choice = crypto.hexStringToInt(p.second);
+        	//console.log(receipt + "\t" + choice);
+        	receiptIDs.push(receiptID);
+            choices.push(choice);
+        }
+        originalReceiptIDs = receipts.map(function(rec){ return rec.receiptIDs });
+        originalChoices = receipts.map(function(rec){ return rec.receiptID});
+        
+        expect(bijection(originalReceiptIDs, receiptIDs)) .toBe(true);
+        expect(bijection(originalChoices, choices)) .toBe(true);
+    });
 });
-	
 
+function bijection(arr1, arr2){
+	if(!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length!=arr2.length)
+		return false;
+	arr1.sort();
+	arr2.sort();
+	for(var i=0; i<arr1.sort(); ++i)
+		if(arr1[i] === arr2[i])
+			return false;
+	return true;
+}
