@@ -21,7 +21,7 @@ console.log('************ Initialisation');
 
 var electionID = 'eeee';
 var NMixServ = 5;
-var NVoters = 100;
+var NVoters = 1000;
 var voters = new Array(NVoters);
 for (var i=0; i<NVoters; ++i) {
     voters[i] = 'aa' + crypto.int32ToHexString(i);
@@ -47,6 +47,19 @@ describe( 'Voting process', function()
     var cs = csCore.create(electionID, voters, colServerKeys.signingKey);
     var receipts = new Array(voters.length);
 
+
+    it ( 'eligibleVoters field works as expected', function()
+    {
+    	//console.log(cs.eligibleVoters);
+    	var listElVoters = Object.keys(cs.eligibleVoters);
+    	listElVoters.sort();
+    	voters.sort();
+    	for(var i=0; i<listElVoters.length; ++i){
+    		expect(listElVoters[i]) .toBe(voters[i]);
+    	}
+    });
+    
+    
     it( 'Voting phase works as expected', function()
     {  	
         console.log('************ Testing the voting phase');

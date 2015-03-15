@@ -30,7 +30,6 @@ exports.create = function(electionID, listOfEligibleVoters, colSerSigKey)
 		eligibleVoters[voter_id] = true;
 	}
 	
-	
 	// 'ballot': the n-time encrypted ballot
 	// 'receipt' format: signatureOf[TAG_ACCEPTED, electionID, ballot]
 	function collectBallot(voterID, ballot) {
@@ -87,7 +86,7 @@ exports.create = function(electionID, listOfEligibleVoters, colSerSigKey)
 		}
 		return result;
 	}
-
+	
 	return {eligibleVoters: eligibleVoters, collectBallot: collectBallot, getResult: getResult, getVotersList: getVotersList};
 }
 
