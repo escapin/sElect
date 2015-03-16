@@ -1,10 +1,7 @@
+var java = require("java");
 var crypto = require('cryptofunc');
 var voterClient = require('voterClient');
 var csCore = require('../CollectingServer/src/csCore.js');
-
-var TAG_ACCEPTED = '00';  // (hex encoded) tag
-var TAG_BALLOTS = '01';
-var TAG_VOTERS = '10';
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Shortcuts
@@ -15,14 +12,26 @@ var sign = crypto.sign;
 var verif = crypto.verifsig;
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// Configuration
+
+java.classpath.push('../bin');
+java.classpath.push('../lib/bcprov-jdk16-1.46.jar');
+
+//////////////////////////////////////////////////////////////////////////////////////////
 // Parameters and keys
+
+var TAG_ACCEPTED = '00';  // (hex encoded) tag
+var TAG_BALLOTS = '01';
+var TAG_VOTERS = '10';
+
+var electionID = 'eeee';
+var NMixServ = 3;
+var NVoters = 100;
+var voters = new Array(NVoters);
 
 console.log('************ Initialisation');
 
-var electionID = 'eeee';
-var NMixServ = 5;
-var NVoters = 1000;
-var voters = new Array(NVoters);
+// voters identifiers
 for (var i=0; i<NVoters; ++i) {
     voters[i] = 'aa' + crypto.int32ToHexString(i);
 }
@@ -31,8 +40,11 @@ for (var i=0; i<NVoters; ++i) {
 var colServerKeys = crypto.sig_keygen();
 var colServVerifKey = colServerKeys.verificationKey;
 var mixServKeys = new Array(NMixServ);
-for(var i=0; i<NMixServ; i++)
+var mixServSigKeys = new Array(NMixServ);
+for(var i=0; i<NMixServ; i++) {
 	mixServKeys[i] = crypto.pke_keygen();
+    mixServSigKeys[i] = crypto.sig_keygen();
+}
 var mixServEncKeys = mixServKeys.map(function(k){ return k.encryptionKey; });
 
 // create the set of eligible voters
@@ -41,7 +53,22 @@ var votersSet = {};
 for(var i=0; i<voters.length; i++)
 	votersSet[voters[i]] = true;
 
-console.log('************ Initialisation done');
+
+
+// Create mix servers
+var mixServers = new Array(NMixServ);
+for (i=0; i<NMixServ; ++i) {
+    var precServVerifKey = (i==0 ? colServVerifKey : mixServSigKeys[i-1].verificationKey );
+    mixServers[i] = java.newInstanceSync("selectvoting.system.wrappers.MixServerWrapper",
+                              mixServKeys[i].encryptionKey, 
+                              mixServKeys[i].decryptionKey, 
+                              mixServSigKeys[i].verificationKey,
+                              mixServSigKeys[i].signingKey,
+                              precServVerifKey,
+                              electionID, NVoters);
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Test cases
@@ -50,18 +77,23 @@ describe( 'Voting process', function()
 {
     var cs = csCore.create(electionID, votersSet, colServerKeys.signingKey);
     var receipts = new Array(voters.length);
+    var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys);
 
-    it( 'Voting phase works as expected', function()
-    {  	
-        console.log('************ Testing the voting phase');
-
+    it( 'Ballot creation works as expected', function()
+    {
+        console.log('************ Ballot creation');
     	for(i=voters.length-1; i>=0; --i){
-            // create a new voter object
-            var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys);
             // create ballot (a receipt containing a ballot); i-th voter votes for i-th candidate:
     		receipts[i] = voter.createBallot(i);
     		expect (receipts[i].choice) .toBe(i);
-            
+        }
+    });
+
+    it( 'Ballot casting works as expected', function()
+    {
+        console.log('************ Ballot casting');
+
+        for(i=voters.length-1; i>=0; --i){
             // submit the ballot
         	var csReply = cs.collectBallot(voters[i], receipts[i].ballot);
         	expect (csReply.ok).toBe(true);
@@ -123,8 +155,39 @@ describe( 'Voting process', function()
 		for(i=0; i<castBallots.length; ++i) {
 			expect(ballotsInResult[i]).toBe(castBallots[i]);
 		}
-
     });
+
+
+    function mix(i, inputData, done) {
+        if (i >= NMixServ)  {
+            done();
+            return;
+        }
+
+        console.log('************ Mixing', i);
+
+        mixServers[i].processBallots(inputData, function (err, result) {
+            if (err) {
+                console.log('UNEXPECTED ERROR', err);
+                done(err);
+            }
+            else if (!result.ok) {
+                console.log('ERROR:', result.data);
+                done()
+            }
+            else { // mixing completed successfuly; call the next mix server
+                mixServers[i].result = result.data;
+                mix(i+1, result.data, done);
+            }
+        });
+    }
+
+
+    it( 'Mixing works as expected', function(done)
+    {  	
+        var data = cs.getResult();
+        mix(0, data, done);
+    }, 100000);
 
 });
 	
