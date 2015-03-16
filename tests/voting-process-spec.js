@@ -20,13 +20,11 @@ java.classpath.push('../lib/bcprov-jdk16-1.46.jar');
 //////////////////////////////////////////////////////////////////////////////////////////
 // Parameters and keys
 
-var TAG_ACCEPTED = '00';  // (hex encoded) tag
-var TAG_BALLOTS = '01';
 var TAG_VOTERS = '10';
 
 var electionID = 'eeee';
 var NMixServ = 3;
-var NVoters = 100;
+var NVoters = 2000;
 var voters = new Array(NVoters);
 
 console.log('************ Initialisation');
@@ -46,6 +44,7 @@ for(var i=0; i<NMixServ; i++) {
     mixServSigKeys[i] = crypto.sig_keygen();
 }
 var mixServEncKeys = mixServKeys.map(function(k){ return k.encryptionKey; });
+var mixServVerifKeys = mixServSigKeys.map(function(k){ return k.verificationKey; });
 
 // create the set of eligible voters
 // TODO remove this; csCore.create should accept list of eligible voters (not a set)
@@ -77,7 +76,7 @@ describe( 'Voting process', function()
 {
     var cs = csCore.create(electionID, votersSet, colServerKeys.signingKey);
     var receipts = new Array(voters.length);
-    var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys);
+    var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
 
     it( 'Ballot creation works as expected', function()
     {
@@ -140,7 +139,7 @@ describe( 'Voting process', function()
        
         var data = crypto.splitter(data);
 
-		expect(data.nextMessage()) .toBe(TAG_BALLOTS); // expected the tag
+		expect(data.nextMessage()) .toBe(voterClient.TAG_BALLOTS); // expected the tag
 		expect(data.nextMessage()) .toBe(electionID);  // expected the election id
 
         // The rest of data is a list of ballots 
@@ -189,6 +188,37 @@ describe( 'Voting process', function()
         mix(0, data, done);
     }, 100000);
 
+    it( 'Voter verification works as expected', function()
+    {  	
+        console.log('************ Verification');
+
+        // Voter who cast his ballot should verify that
+        // everything went fine:
+        var n = 1; // the index of the voter to check result
+        var res = voter.checkColServerResult(cs.getResult(), receipts[n]);
+        expect(res.ok).toBe(true);
+        for (var i=0; i<NMixServ; ++i) {
+            var res = voter.checkMixServerResult(i, mixServers[i].result, receipts[n]);
+            expect(res.ok).toBe(true);
+        }
+
+        // The same, but now for wrong data:
+        res = voter.checkColServerResult(mixServers[0].result, receipts[n]);
+        expect(res.ok).toBe(false);
+        expect(res.descr).toBe('Wrong signature');
+
+        // Let us now take a voter whose ballot was ignored (was
+        // not cast):
+        var rec = voter.createBallot(i);
+        var res = voter.checkColServerResult(cs.getResult(), rec);
+        expect(res.ok).toBe(false);
+        expect(res.descr).toBe('Ballot not found');
+        for (var i=0; i<NMixServ; ++i) {
+            var res = voter.checkMixServerResult(i, mixServers[i].result, rec);
+            expect(res.ok).toBe(false);
+            expect(res.descr).toBe('Ballot not found');
+        }
+    });
 });
 	
 
