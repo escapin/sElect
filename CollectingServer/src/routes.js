@@ -4,7 +4,7 @@ var request = require('request-json');
 var winston = require('winston');
 var config = require('../config');
 var manifest = require('./manifest');
-var server = require('./server');
+var csCore = require('./csCore.js');
 var sendEmail = require('./sendEmail');
 var crypto = require('cryptofunc');
 var selectUtils = require('selectUtils');
@@ -15,6 +15,10 @@ var selectUtils = require('selectUtils');
 var otp_store = {};
 var mail_timestamp = {};
 
+var electionID = manifest.hash;
+var listOfEligibleVoters = manifest.voters.map(function(k){ return k.email; });
+var colSerSigKey = config.signing_key;
+var cs = csCore.create(electionID, listOfEligibleVoters, colSerSigKey);
 
 //  status and opening/closing time
 var resultReady = fs.existsSync(config.RESULT_FILE);
@@ -28,7 +32,7 @@ if (!resultReady && fs.existsSync(config.ACCEPTED_BALLOTS_LOG_FILE)) {
         if (entry==='') return;
         entry = JSON.parse(entry);
         console.log('  - processing a ballot of', entry.email);
-        server.collectBallotSync(entry.email, entry.ballot);
+        cs.collectBallot(entry.email, entry.ballot);
     });
 }
 
@@ -129,7 +133,7 @@ exports.otp = function otp(req, res)
     }
 
     if (email) {
-        if (!server.eligibleVoters[email]) // not eligible voter
+        if (!cs.eligibleVoters[email]) // not eligible voter
         {
             winston.info('OTP request (%s) ERROR: Voter not eligible', email);
             res.send({ ok: false, descr: 'Invalid voter identifier (e-mail)' });
@@ -209,26 +213,25 @@ exports.cast = function cast(req, res)
     // Check the OTP (and, implicitly, the identifier)
     if (otp_store[email] === otp) {
         // Cast the ballot:
-        server.collectBallot(email, ballot, function(err, response) {
-            if (err) {
-                winston.info('Cast request (%s/%s) INTERNAL ERROR %s', email, otp, err.toString());
-                res.send({ ok: false, descr: 'Internal error' }); 
-            }
-            else if (!response.ok) {
-                winston.info('Cast request (%s/%s) BALLOT REJECTED. Response = %s', email, otp, response.data);
-                res.send({ ok: false, descr: response.data }); 
-            }
-            else { // everything ok
-                winston.info('Cast request (%s/%s) accepted', email, otp);
-                res.send({ ok: true, receipt: response.data }); 
-                // log the accepted ballot
-                log.write(JSON.stringify({ email:email, ballot:ballot })+'\n', null,
-                          function whenFlushed(e,r) {
+    	var response = cs.collectBallot(email, ballot); 
+//    	if (err) {
+//    		winston.info('Cast request (%s/%s) INTERNAL ERROR %s', email, otp, err.toString());
+//    		res.send({ ok: false, descr: 'Internal error' }); 
+//    	}
+    	if (!response.ok) {
+    		winston.info('Cast request (%s/%s) BALLOT REJECTED. Response = %s', email, otp, response.data);
+    		res.send({ ok: false, descr: response.data }); 
+    	}
+    	else { // everything ok
+    		winston.info('Cast request (%s/%s) accepted', email, otp);
+    		res.send({ ok: true, receipt: response.data }); 
+    		// log the accepted ballot
+    		log.write(JSON.stringify({ email:email, ballot:ballot })+'\n', null,
+    				function whenFlushed(e,r) {
                     winston.info('Ballot for %s logged', email);
-                });
-                // TODO: how to make sure that this stream is flushed right away
-            }
-        });
+    		});
+    		// TODO: how to make sure that this stream is flushed right away
+    	}
     }
     else // OTP not correct
     {
@@ -279,81 +282,6 @@ exports.controlPanel = function info(req, res)  {
 ///////////////////////////////////////////////////////////////////////////////////////
 // ROUTE close
 //
-
-var mixserv_options = {};
-if (config.ignore_fin_serv_cert)
-    mixserv_options = {rejectUnauthorized: false};
-
-
-// Save result in a file
-function saveResult(result) {
-    fs.writeFile(config.RESULT_FILE, result, function (err) {
-        if (err) 
-            winston.info('Problems with saving result', config.RESULT_FILE);
-        else {
-            winston.info('Result saved in', config.RESULT_FILE);
-            resultReady = true;
-        }
-    });
-}
-
-
-// Send result to the first mix server
-function sendResult(result) {
-	// since the result contains also 'votersAsAMessage' we must remove it
-	// FIXME: it will change anyway when we get rid of the CollectingServer.java
-		// result: SIGN_cs[tag_ballot, electionID, ballotsAsAMessage, votersAsAMessage]
-	var p = crypto.deconcatenate(result);
-    var tag_elID_ballots_voters = p.first;
-    var signature = p.second;
-	// we assume the signature is correct
-    var p = crypto.deconcatenate(tag_elID_ballots_voters);
-    var tag = p.first;
-    var elID_ballots_voters = p.second;
-    var p = crypto.deconcatenate(elID_ballots_voters);
-    var elID = p.first;
-    var ballots_voters = p.second;
-    var p = crypto.deconcatenate(ballots_voters);
-    var ballotsAsAMessage = p.first;
-    var votersAsAMessage = p.second;
-
-    // what the mix server expects: SIGN_cs[tag, elID, ballotsAsAMessage]
-    var elID_ballots = crypto.concatenate(elID, ballotsAsAMessage);
-    var tag_elID_ballots = crypto.concatenate(tag, elID_ballots);
-    var signatureOnResult = crypto.sign(config.signing_key, tag_elID_ballots);
-    var signedResult = crypto.concatenate(tag_elID_ballots, signatureOnResult);
-
-    winston.info('Sending result to the first mix server');
-    var mixServ = request.newClient(manifest.mixServers[0].URI, mixserv_options);
-    var data = {data: signedResult}
-    // one could add something like {timeout:10000} to the request below, after 'data'
-    mixServ.post('data', data, function(err, otp_res, body) {
-        if (err) {
-            winston.info(' ...Error: Cannot send the result to the first mix server: ', err);
-        }
-        else {
-            winston.info(' ...Result sent to the first mix server.');
-            winston.info(' ...Response:', body);
-        }
-    });
-}
-
-function closeElection() {
-    if (status.isClosed()) return;
-    status.close();
-    winston.info('CLOSING ELECTION.');
-    // get the result, send it to the final server, and save it.
-    server.getResult(function(err, result) {
-        if (err) {
-            winston.info(' ...INTERNAL ERROR. Cannot fetch the result: ', err);
-        }
-        else { 
-            sendResult(result);
-            saveResult(result);
-        }
-    });
-}
-
 exports.close = function close(req, res)  {
     if (status.isClosed()) {
         res.send({ ok: false, info: "election already closed" }); 
@@ -363,6 +291,58 @@ exports.close = function close(req, res)  {
         closeElection();
     }
 }
+
+
+var mixserv_options = {};
+if (config.ignore_fin_serv_cert)
+    mixserv_options = {rejectUnauthorized: false};
+
+function closeElection() {
+    if (status.isClosed()) return;
+    status.close();
+    winston.info('CLOSING ELECTION.');
+    // get the result, send it to the first mix server, and save it.
+    var result = cs.getResult();
+    // send the result to the first mixserver
+    sendData(result, manifest.mixServers[0].URI, mixserv_options);
+    saveData(result, config.RESULT_FILE);
+    
+    // FIXME TO BE DONE: send the voters' list to the Bulletin Board
+}
+
+// Send data to the server with that URI
+// The last parameter is *optional*
+function sendData(data, URI, destserv_options) {
+	winston.info("Sending data to '%s'", URI);
+	if(destserv_options)
+		var destServ = request.newClient(URI, destserv_options);
+	else
+		var destServ = request.newClient(URI);
+    var toBeSent = {data: data};
+    // one could add something like {timeout:10000} to the request below, after 'toBeSent'
+    destServ.post('data', toBeSent, function(err, otp_res, body) {
+        if (err) {
+            winston.info(" ...Error: Cannot send the result to '%s': ", URI, err);
+        }
+        else {
+            winston.info(" ...Result sent to '%s'", URI);
+            winston.info(" ...Response: ", body);
+        }
+    });
+}
+
+// Save data in a file
+function saveData(data, file) {
+    fs.writeFile(file, data, function (err) {
+        if (err) 
+            winston.info('Problems with saving data', data);
+        else {
+            winston.info('Result saved in', data);
+            resultReady = true;
+        }
+    });
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // Serve a particular static file
