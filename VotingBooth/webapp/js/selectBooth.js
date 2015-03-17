@@ -26,13 +26,14 @@ function selectBooth() {
 
     var electionID = manifest.hash;
     var shortenedElectionID = electionID.slice(0,6) + '...';
-    var colServEncKey = manifest.collectingServer.encryption_key;
     var colServVerifKey = manifest.collectingServer.verification_key;
-    var mixServEncKeys = [];
-    // retrieve the encryption keys of the mix servers from the manifest
-    for(i=0; i<manifest.mixServers.length; ++i)
-    	mixServEncKeys.push(manifest.mixServers[i].encryption_key);
-    var voter = voterClient.create(electionID, colServEncKey, colServVerifKey, mixServEncKeys);
+    // retrieve the encryption and verification keys of the mix servers from the manifest
+    var mixServEncKeys = manifest.mixServers.map(function (ms) { return ms.encryption_key; })
+    var mixServVerifKeys = manifest.mixServers.map(function (ms) { return ms.verification_key; })
+    // create the voter object
+    var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
+ // var voter = voterClient.create(electionID, colServEncKey, colServVerifKey, mixServEncKeys);
+
 
 
     //////////////////////////////////////////////////////////////////////////////
@@ -52,7 +53,6 @@ function selectBooth() {
             options += slabel;
             options += sinput;
         }
-        console.log(options);
         return options;
     }
 
@@ -144,12 +144,12 @@ function selectBooth() {
 
             // Create the ballot
             console.log('CREATING BALLOT FOR:', email, otp, choice);
-            var ballotInfo = voter.createBallot(choice);
-            console.log('BALLOT_INFO:', ballotInfo);
+            var receipt = voter.createBallot(choice);
+            console.log('RECEIPT:', receipt);
 
             showProgressIcon();
             // Make an (ajax) cast request:
-            $.post(manifest.collectingServer.URI+"/cast", {'email': email, 'otp': otp, 'ballot': ballotInfo.ballot})
+            $.post(manifest.collectingServer.URI+"/cast", {'email': email, 'otp': otp, 'ballot': receipt.ballot})
              .fail(function otpRequestFailed() {  // request failed
                 showError('Cannot connect with the server');
               })
@@ -161,12 +161,17 @@ function selectBooth() {
                     showError("Server's responce: " + result.descr);
                 }
                 else {
-                    // Ballot accepted. Verify the receipt
-                    var receiptValid = voter.validateReceipt(result.receipt, ballotInfo.innerBallot); 
+                    // Ballot accepted (result.ok is true). Verify the receipt.
+                    // Add the obtained signature to the receipt
+                    receipt.signature = result.receipt;
+                    // and validate it
+                    var receiptValid = voter.validateReceipt(receipt); 
                     if (receiptValid) {
+                        // TODO Save the receipt
+
                         // show the "ballot accepted" tab
                         showTab('#result');
-                        $('#receipt-id').text(ballotInfo.nonce.toUpperCase());
+                        $('#receipt-id').text(receipt.nonce.toUpperCase());
                     }
                     else { // receipt not valid
                         showError('Invalid receipt');
