@@ -5,6 +5,7 @@ var config = require('../config');
 // var wrapper = require('./wrapper');
 var crypto = require('cryptofunc');
 
+var TAG_VOTERS = '10';
 var TAG_BALLOTS = '01';
 
 exports.result = null;  // this is where the result is stored (when ready)
@@ -20,45 +21,53 @@ function splitter(msg, callback) {
     }
 }
 
-function parsePartialResult(signedFinalResult) {
-    var p = crypto.deconcatenate(signedFinalResult);
-    var result = p.first;
-    var signature = p.second;
+function parseVotersList(signedVotersList) {
+	var p = crypto.deconcatenate(signedVotersList);
+	var data = p.first; // tag,elID,voters
+	var signature = p.second;
     
     // Verify the signature
-    var sig_ok = crypto.verifsig(manifest.collectingServer.verification_key, result, signature);
+    var sig_ok = crypto.verifsig(manifest.collectingServer.verification_key, data, signature);
     if (!sig_ok) {
         console.log('ERROR: Wrong signature');
         return;
     }
     
+    var data = crypto.splitter(data);
+    
     // Check the tag:
-    p = crypto.deconcatenate(result);
-    if (p.first !== TAG_BALLOTS) {
+    if (data.nextMessage() !== TAG_VOTERS) {
         console.log('ERROR: Wrong tag');
         return;
     }
-    var payload = p.second;
-
-    // Check the election id
-    p = crypto.deconcatenate(payload);
-    if (manifest.hash.toUpperCase() !== p.first.toUpperCase()) {
+    if (data.nextMessage().toUpperCase() !== manifest.hash.toUpperCase()) {
         console.log('ERROR: Wrong election ID');
         return;
     }
 
-    // Get the voters as a message
-    p = crypto.deconcatenate(p.second); 
-    votersMsg = p.second;
-    // And collect them
+    // The rest of data is a list of voterIDs.
     var t = [];
-    console.log("Fetching the list of voters.");
-    splitter(votersMsg, function (item) {
-        item = (new Buffer(item, 'hex')).toString('utf8');
-        t.push(item);
-        console.log("\t" + item);
-    });
+	console.log("Fetching the list of voters.");
+    for (var i=0; !data.empty(); ++i) {
+    	var voterID = new Buffer(data.nextMessage(), 'hex').toString('utf8');
+    	//var voterID = data.nextMessage();
+    	t.push(voterID);
+    	console.log("\t" + voterID);	
+    }
     exports.voters = t;
+    
+//    // Get the voters as a message
+//    p = crypto.deconcatenate(p.second); 
+//    votersMsg = p.second;
+//    // And collect them
+//    
+
+//    splitter(votersMsg, function (item) {
+//        item = (new Buffer(item, 'hex')).toString('utf8');
+//        t.push(item);
+
+//    });
+//    exports.voters = t;
 }
 
 // expected data format:
@@ -66,45 +75,50 @@ function parsePartialResult(signedFinalResult) {
 //
 function parseFinalResult(signedFinalResult) {
     var p = crypto.deconcatenate(signedFinalResult);
-    var result = p.first;
-    var signature = p.second;
+    var tag_elID_ballots = p.first; 	// [tag, elID, ballotsAsAMessage]
+	var signature = p.second;
     
     // Verify the signature
-    var sig_ok = crypto.verifsig(manifest.mixServers[manifest.mixServers.length-1].verification_key, result, signature);
+    var sig_ok = crypto.verifsig(manifest.mixServers[manifest.mixServers.length-1].verification_key, tag_elID_ballots, signature);
     if (!sig_ok) {
         console.log('ERROR: Wrong signature');
         return;
     }
-
-    p = crypto.deconcatenate(result);
+    
+    var data = crypto.splitter(tag_elID_ballots);
+    
     // Check the tag:
-    if (p.first !== TAG_BALLOTS) {
+    if (data.nextMessage() !== TAG_BALLOTS) {
         console.log('ERROR: Wrong tag');
         return;
     }
     
-    var elID_entriesAsAMessage = p.second;
     // Check the election id
-    p = crypto.deconcatenate(elID_entriesAsAMessage);
-    if (manifest.hash.toUpperCase() !== p.first.toUpperCase()) {
-        console.log('ERROR: Wrong election ID');
+    if(data.nextMessage().toUpperCase() !== manifest.hash.toUpperCase()) {
+    	console.log('ERROR: Wrong election ID');
         return;
     }
-
-    // Get the [nonce,choice] pairs
+    
     var t = [];
     var ccount = manifest.choices.map(function(x) {return 0;}); // initialize the counters for choices with 0's
     console.log("Fetching the voters' choices.");
-    splitter(p.second, function(item) {
-        p = crypto.deconcatenate(item);
-        var choice = +p.second
-        // add the [nonce,choice] pair to the list of votes
-        t.push({nonce: p.first, vote: manifest.choices[choice]});
-        console.log("\tnonce: " + p.first + "\tvote: " + manifest.choices[choice]);
-        // add one vote for choice 
+    for (var i=0; !data.empty(); ++i) {
+    	p = crypto.deconcatenate(data.nextMessage());
+    	// Check the election id
+    	if(p.first.toUpperCase() !== manifest.hash.toUpperCase()) {
+        	console.log('ERROR: Wrong election ID');
+            return;
+        }
+    	var receipt_nonce = p.second;
+    	p = crypto.deconcatenate(receipt_nonce);
+    	var receiptID = p.first;
+    	var choice = crypto.hexStringToInt(p.second);
+    	t.push({receiptID: receiptID, vote: manifest.choices[choice]});
+    	console.log("\t" + receiptID + "\t" + choice);
+    	// add one vote for choice 
         ++ccount[choice];
-    });
-
+    }
+    
     // format the summary (number votes for different candidates) 
     var summary = [];
     for (var i=0; i<ccount.length; ++i) {
@@ -152,19 +166,19 @@ function fetchData(url, cont) {
 
 exports.loadResult = function () {
 
-    // Load /parse the result from the collecting server
+    // Load /parse the voters list from the collecting server
     if (exports.voters === null) {
-        fetchData(manifest.collectingServer.URI + '/result.msg', function (err, data) {
+        fetchData(manifest.collectingServer.URI + '/votersList.msg', function (err, data) {
             if (!err) {
-                console.log('PARTIAL RESULT FILE FETCHED');
-                parsePartialResult(data); 
+                console.log('VOTERS LIST FILE FETCHED');
+                parseVotersList(data); 
             }
         });
     }
 
     // Load /parse the final result (from the last mix server)
     if (exports.result === null) {
-        fetchData(manifest.mixServers[+manifest.mixServers.length-1].URI + '/result.msg', function (err, data) {
+        fetchData(manifest.mixServers[manifest.mixServers.length-1].URI + '/result.msg', function (err, data) {
             if (!err) {
                 console.log('FINAL RESULT FILE FETCHED');
                 parseFinalResult(data); 
@@ -180,7 +194,7 @@ exports.loadResult = function () {
 
     // load /parse the partial result
     if (exports.voters === null) {
-        loadFileAndContinue(config.PARTIAL_RESULT_FILE, parsePartialResult);
+        loadFileAndContinue(config.PARTIAL_RESULT_FILE, parseVotersList);
     }
     */
 }
