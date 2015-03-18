@@ -27,8 +27,8 @@ var TAG_VOTERS = '10';
 var TAG_BALLOTS = '01';
 
 var electionID = 'eeee';
-var NMixServ = 5;
-var NVoters = 2000;
+var NMixServ = 3;
+var NVoters = 10;
 var voters = new Array(NVoters);
 
 console.log('************ Initialisation');
