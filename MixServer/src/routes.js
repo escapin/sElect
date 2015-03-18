@@ -8,7 +8,16 @@ var resultReady = false;
 if (fs.existsSync(config.RESULT_FILE))
     resultReady = true;
 
-var chainIndex = server.chainIndex;
+function retreiveChainIndex(){
+	for(var i=0; i<manifest.mixServers.length; ++i)
+		if(manifest.mixServers[i].encryption_key === config.encryption_key &&
+			manifest.mixServers[i].verification_key === config.verification_key)
+			return i;
+	return -1;
+}
+
+var chainIndex = retreiveChainIndex();
+exports.chainIndex = chainIndex;
 
 function saveResult(innerBallots) {
 	fs.writeFile(config.RESULT_FILE, innerBallots, function (err) {

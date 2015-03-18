@@ -11,17 +11,15 @@ for (var i=0; i<config.class_paths.length; ++i) {
 
 var chainIndex =	retreiveChainIndex();
 exports.chainIndex = chainIndex;
+console.log("Chain INDEX: ", chainIndex);
 
 //resume the index in the chain of mix servers
 function retreiveChainIndex(){
-	var index = -1;
 	for(var i=0; i<manifest.mixServers.length; ++i)
 		if(manifest.mixServers[i].encryption_key === config.encryption_key &&
-			manifest.mixServers[i].verification_key === config.verification_key){
-			index = i;
-			break;
-		}
-	return index;
+			manifest.mixServers[i].verification_key === config.verification_key)
+			return i;
+	return -1;
 }
 
 if (chainIndex<0 || chainIndex >= +manifest.mixServers.length) {
