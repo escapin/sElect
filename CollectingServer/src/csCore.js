@@ -34,13 +34,11 @@ exports.create = function(electionID, listOfEligibleVoters, signKey)
 		if(!eligibleVoters[voterID])
 			return {ok: false, data: "Wrong voter ID"};
 		
-		var ballotAlreadyStored = storedBallots.get(voterID);
-		if(ballotAlreadyStored === ballot)
+		if(storedBallots.has(voterID))
 			return {ok: false, data: "Voter already voted"};
-	
-		if(ballotAlreadyStored === undefined || ballotAlreadyStored.lenght==0)
+		else
 			storedBallots.set(voterID, ballot);
-
+		
 		// generate the receipt
 		var tag_elID_ballot = pair(TAG_ACCEPTED, pair(electionID, ballot));
 		var signature = sign(signKey, tag_elID_ballot);
