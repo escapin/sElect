@@ -335,9 +335,9 @@ function sendData(data, URI, destserv_options) {
 function saveData(data, file) {
     fs.writeFile(file, data, function (err) {
         if (err) 
-            winston.info('Problems with saving data', data);
+            winston.info('Problems with saving the data:\n', data);
         else {
-            winston.info('Result saved in', file);
+            winston.info('Result saved in: ', file);
             resultReady = true;
         }
     });
