@@ -337,7 +337,7 @@ function saveData(data, file) {
         if (err) 
             winston.info('Problems with saving data', data);
         else {
-            winston.info('Result saved in', data);
+            winston.info('Result saved in', file);
             resultReady = true;
         }
     });
