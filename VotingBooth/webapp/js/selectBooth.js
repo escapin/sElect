@@ -16,7 +16,7 @@ function selectBooth() {
 
     // Manifest
     var manifest = JSON.parse(electionManifestRaw);
-    manifest.hash = cryptofunc.hash(electionManifestRaw).toUpperCase();
+    manifest.hash = cryptofunc.hash(electionManifestRaw).toLowerCase();
     console.log('Election hash =', manifest.hash);
 
     // Voter and status
@@ -54,6 +54,82 @@ function selectBooth() {
             options += sinput;
         }
         return options;
+    }
+
+
+    function saveReceipt(receipt) {
+        console.log('Save receipt');
+        if ( localStorage.getItem('receipt') !== null ) {
+            console.log('There already exists a saved receipt (we are overwriting it anyway)');
+        }
+        var receiptJSON = JSON.stringify(receipt);
+        localStorage.setItem('receipt', receiptJSON);
+    }
+
+    function getReceipt() {
+        var receiptJSON = localStorage.getItem('receipt');
+        if (receiptJSON === null)
+            return null;
+        else 
+            return JSON.parse(receiptJSON);
+    }
+
+    // callback(err, data)
+    function fetchData(url, callback) {
+        console.log('Fetching data from', url);
+        $.get(url)
+         .done(function(data) {
+             callback(null, data);
+         })
+         .fail(function(err) {
+             callback(err);
+         });
+    }
+
+    function checkCollectingServer(receipt) {
+        console.log('CHECK COLLECTING SERVER');
+        fetchData(manifest.collectingServer.URI+'/result.msg', function (err,data) {
+            if (err) {
+                console.log('Error:', err);
+            }
+            else {
+                console.log('Done:', data);
+                console.log('Verifying the data');
+                var res = voter.checkColServerResult(data, receipt)
+                console.log('Result:', res);
+            }
+        });
+    }
+
+    function checkMixServer(i, receipt) {
+        console.log('CHECK MIX SERVER' , i);
+        fetchData(manifest.mixServers[i].URI+'/result.msg', function (err,data) {
+            if (err) {
+                console.log('Error:', err);
+            }
+            else {
+                console.log('Done:', data);
+                console.log('Verifying the data');
+                var res = voter.checkMixServerResult(i, data, receipt)
+                console.log('Result:', res);
+            }
+        });
+    }
+
+    function verify(receipt) {
+        checkCollectingServer(receipt);
+        // checkMixServer(2, receipt);
+        //for (var i=0; i<manifest.mixServers.length; ++i) {
+            //checkMixServer(i, receipt);
+        //}
+    }
+
+    function doVerification() {
+        var receipt = getReceipt();
+        if (receipt !== null) {
+            console.log('A receipt found. Doing verification:', receipt);
+            verify(receipt);
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -168,10 +244,11 @@ function selectBooth() {
                     var receiptValid = voter.validateReceipt(receipt); 
                     if (receiptValid) {
                         // TODO Save the receipt
+                        saveReceipt(receipt);
 
                         // show the "ballot accepted" tab
                         showTab('#result');
-                        $('#receipt-id').text(receipt.nonce.toUpperCase());
+                        $('#receipt-id').text(receipt.receiptID.toUpperCase());
                     }
                     else { // receipt not valid
                         showError('Invalid receipt');
@@ -244,5 +321,7 @@ function selectBooth() {
     
     // Focus on the email input
     $('#inp-email').focus();
+
+    doVerification();
 }
 
