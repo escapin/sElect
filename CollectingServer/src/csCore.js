@@ -61,6 +61,7 @@ exports.create = function(electionID, listOfEligibleVoters, signKey)
 	//return format: Sign[TAG_VOTERS, electionID, votersAsAMessage]
 	function getVotersList(){
 		var listOfVoters = storedBallots.keys();
+		// FIXME: wrong data type: it's string and not messages
 		var votersAsAMessage = array2sortedMsgWithDuplicateElimination(listOfVoters);
 		var tag_elID_voters = pair(TAG_VOTERS, pair(electionID, votersAsAMessage));
 		var signature = sign(signKey, tag_elID_voters);

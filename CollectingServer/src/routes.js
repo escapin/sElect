@@ -308,6 +308,8 @@ function closeElection() {
     saveData(result, config.RESULT_FILE);
     
     // FIXME TO BE DONE: send the voters' list to the Bulletin Board
+    var signedVotersList = cs.getVotersList();
+    saveData(signedVotersList, config.VOTERSLIST_FILE);
 }
 
 // Send data to the server with that URI
