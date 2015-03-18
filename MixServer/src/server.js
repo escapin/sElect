@@ -11,7 +11,6 @@ for (var i=0; i<config.class_paths.length; ++i) {
 
 var chainIndex =	retreiveChainIndex();
 exports.chainIndex = chainIndex;
-console.log("Chain INDEX: ", chainIndex);
 
 //resume the index in the chain of mix servers
 function retreiveChainIndex(){
