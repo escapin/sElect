@@ -4,6 +4,7 @@ var manifest = require('./manifest');
 var config = require('../config');
 // var wrapper = require('./wrapper');
 var crypto = require('cryptofunc');
+var cryptoUtils = require('cryptoUtils');
 
 var TAG_VOTERS = '10';
 var TAG_BALLOTS = '01';
@@ -49,7 +50,7 @@ function parseVotersList(signedVotersList) {
     var t = [];
 	console.log("Fetching the list of voters.");
     for (var i=0; !data.empty(); ++i) {
-    	var voterID = new Buffer(data.nextMessage(), 'hex').toString('utf8');
+    	var voterID = cryptoUtils.messageToString(data.nextMessage());
     	//var voterID = data.nextMessage();
     	t.push(voterID);
     	console.log("\t" + voterID);	

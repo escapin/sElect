@@ -307,9 +307,10 @@ function closeElection() {
     sendData(result, manifest.mixServers[0].URI, mixserv_options);
     saveData(result, config.RESULT_FILE);
     
-    // FIXME TO BE DONE: send the voters' list to the Bulletin Board
     var signedVotersList = cs.getVotersList();
     saveData(signedVotersList, config.VOTERSLIST_FILE);
+    // FIXME TO BE DONE: send the voters' list to the Bulletin Board
+    
 }
 
 // Send data to the server with that URI

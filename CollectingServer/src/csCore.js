@@ -4,6 +4,7 @@ var exports = {};
 
 var HashMap = require('hashmap');
 var crypto = require('cryptofunc');
+var cryptoUtils = require('cryptoUtils');
 
 var TAG_ACCEPTED = '00';  // (hex encoded) tag
 var TAG_BALLOTS = '01';
@@ -60,9 +61,8 @@ exports.create = function(electionID, listOfEligibleVoters, signKey)
 	// the list of sorted voters
 	//return format: Sign[TAG_VOTERS, electionID, votersAsAMessage]
 	function getVotersList(){
-		var listOfVoters = storedBallots.keys();
-		// FIXME: wrong data type: it's string and not messages
-		var votersAsAMessage = array2sortedMsgWithDuplicateElimination(listOfVoters);
+		var listOfVotersMsg = storedBallots.keys().map(function(v) {return cryptoUtils.stringToMessage(v);});
+		var votersAsAMessage = array2sortedMsgWithDuplicateElimination(listOfVotersMsg);
 		var tag_elID_voters = pair(TAG_VOTERS, pair(electionID, votersAsAMessage));
 		var signature = sign(signKey, tag_elID_voters);
 		var signedResult = pair(tag_elID_voters, signature);
