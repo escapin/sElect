@@ -16,7 +16,7 @@ function selectBooth() {
 
     // Manifest
     var manifest = JSON.parse(electionManifestRaw);
-    manifest.hash = cryptofunc.hash(electionManifestRaw).toUpperCase();
+    manifest.hash = cryptofunc.hash(electionManifestRaw).toLowerCase();
     console.log('Election hash =', manifest.hash);
 
     // Voter and status
@@ -55,6 +55,230 @@ function selectBooth() {
         }
         return options;
     }
+
+    // Returns a promise of the data from the given url.
+    //
+    function fetchData(url) {
+        return new Promise(function (resolve, reject) {
+            console.log('Fetching data from', url);
+            $.get(url).done(resolve).fail(reject);
+        });
+    }
+
+    // Runs tasks (functions creating promises) sequentially.
+    // More precisely, composes the promises and returns the
+    // sequential promise.
+    function sequentially(tasks) {
+        return tasks.reduce(
+                  function (promise, task) { return promise.then(task); }, 
+                  Promise.accept(null) // the initial (null) promise
+               );
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    /// INITIATE BOOTH
+
+    function initiateBooth() {
+        // Detemine the status of the system: (not-yet) open/closed, 
+        // by quering the final mix server.
+        // Depending on the state, either the voting tab or the
+        // verification tab will be opened.
+        //
+        // The state is detemined in a (too?) simple way, by
+        // checking if the final server has ready result.
+        //
+        resultOfFinalServerReady()
+        .then(function (resultReady) {  
+            if (resultReady) {
+                console.log('Result ready. We should verify now');
+                doVerification();
+            }
+            else {
+                console.log('Result not ready. Go to the voting.');
+                showTab('#welcome');
+            }
+        })
+        .catch(function (err) {
+            console.log('Problem with the final server:', err)
+            // TODO: what to do in this case (the final server is
+            // done or it works for a different election ID)
+            showTab('#welcome'); // for now, we just go to voting
+        });
+
+    }
+
+
+    // Returns a promise of the state of the final mix server
+    // The promise resolves to true if the result is ready and
+    // to false otherwise.
+    // The promise is rejected if the final server is down of
+    // works for a different election.
+    //
+    function resultOfFinalServerReady() {
+        return new Promise(function (resolve, reject) {
+            var url = manifest.mixServers[manifest.mixServers.length-1].URI+'/status';
+            $.get(url)
+             .fail(function () { 
+                reject('Server down');
+              })
+             .done(function (result) {  // we have some response
+                if (result.electionID.toUpperCase() !== electionID.toUpperCase()) 
+                    reject('Wrong election ID')
+                else resolve (result.status==='result ready');
+              });
+        });
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////
+    /// RECEIPTS
+
+    // Saves receipt in the local storage. If there are already
+    // some receipt stored, it adds the new receipt to these.
+    //
+    function storeReceipt(receipt) {
+        console.log('Save receipt');
+        var receipts, receiptsJSON;
+
+        if ( localStorage.getItem('receipts') !== null ) {
+            receiptsJSON = localStorage.getItem('receipts');
+            receipts = JSON.parse(receiptsJSON);
+            console.log('Old:', receipts);
+            receipts.push(receipt);
+        }
+        else
+            receipts = [receipt];
+        receiptsJSON = JSON.stringify(receipts);
+        console.log('Saving:', receiptsJSON);
+        localStorage.setItem('receipts', receiptsJSON);
+    }
+
+    // Get the list of receipts (from the local storage)
+    // Receipts with different election id are filtered out.
+    function getReceipts() {
+        var receiptJSON = localStorage.getItem('receipts');
+        if (receiptJSON === null)
+            return [];
+        else {
+            var rr = JSON.parse(receiptJSON);
+            return rr.filter(function(r){ return r.electionID===electionID; });
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    /// VERIFICATION
+
+    // Does the verification of all the stored receipts.
+    //
+    function doVerification() {
+        // Get the receipts
+        var receipts = getReceipts();
+        console.log('There is/are', receipts.length, 'receipts to verify:');
+        for (var i=0; i<receipts.length; ++i) {
+            console.log('  ', receipts[i].receiptID);
+        }
+
+        // If there is no receipts, there is nothing to do
+        if (receipts.length == 0) { 
+            console.log('No receipts, nothing to verify.');
+            return;
+        }
+
+        // Fetch the result of the final mix server and run the
+        // verification procedure on it
+        var nlast = manifest.mixServers.length - 1;
+        var url = manifest.mixServers[nlast].URI+'/result.msg';
+        fetchData(url)
+        .catch(function (err) {
+            console.log('Cannot get the result from the final server:', err);
+        })
+        .then(function (data) {
+            console.log('Result of the final mix server fetched:');
+            verifyReceiptsAgainstFinalServer(receipts, data);
+        });
+    }
+
+    // Check if the result of the final server contains is
+    // correct w.r.t. all the receipts. If not, the blaming
+    // procedure is initiated.
+    function verifyReceiptsAgainstFinalServer(receipts, finalServResult) {
+        var k = manifest.mixServers.length-1; // the index of the final sever
+        var ok = true;
+        for (var i=0; i<receipts.length; ++i) {
+            var res = voter.checkMixServerResult(k, finalServResult, receipts[i]);
+            if (res.ok) {
+                console.log('Receipt', i, 'verified successfully.')
+            }
+            else {
+                console.log('WARNING: Receipt', i, 'not verified:', res.descr);
+                ok =false;
+            }
+        }
+
+        if (!ok) { // Something went wrong. Assign the blame.
+            blame(receipts);
+        }
+    }
+
+    // Checks which server is to blame.
+    //
+    function blame(receipts) {
+        console.log('BLAME');
+        checkCollectingServer(receipts)
+        .then(function() {
+            checkMixServers(receipts);
+        });
+    }
+
+
+    function checkCollectingServer(receipts) {
+        console.log('CHECK COLLECTING SERVER');
+        return fetchData(manifest.collectingServer.URI+'/result.msg').then(function (data) {
+                console.log('The result of the collecting server fetched.');
+                console.log('Verifying the result');
+                for (var i=0; i<receipts.length; ++i) {
+                    var res = voter.checkColServerResult(data, receipts[i])
+                    console.log('Result for', receipts[i].receiptID, ':', res.descr);
+                    // TODO: produce blaming info
+                }
+            })
+            .catch(function (err) {
+                console.log('Cannot fetch the result of the collecting server:', err);
+            });
+    }
+
+    function checkMixServers(receipts) {
+        // For each mix server create a task, which is a function
+        // that creates a promise of the result of verification
+        // of the i-th mix server 
+        var tasks = manifest.mixServers.map(function (ms,i) { 
+            return function () { return checkMixServer(i, receipts); } 
+        });        
+        sequentially(tasks); // run the tasks sequentially
+    }
+
+
+    // Returns a promise of the result of verification of the
+    // k-th mix server.
+    function checkMixServer(k, receipts) {
+        console.log('CHECK MIX SERVER' , k);
+        return fetchData(manifest.mixServers[k].URI+'/result.msg')
+        .then(function (data) {
+            console.log('The result of the mixing server fetched.');
+            console.log('Verifying the result');
+            for (var i=0; i<receipts.length; ++i) {
+                var res = voter.checkMixServerResult(k, data, receipts[i])
+                console.log('Result for', receipts[i].receiptID, ':', res.descr);
+                // TODO: produce blaming info
+            }
+        })
+        .catch(function (err) {
+            console.log('Cannot fetch the result of the mixing server:', err);
+        });
+    }
+
+
+
 
     //////////////////////////////////////////////////////////////////////////////
     /// HANDLERS FOR SUMBITTING DATA 
@@ -168,10 +392,11 @@ function selectBooth() {
                     var receiptValid = voter.validateReceipt(receipt); 
                     if (receiptValid) {
                         // TODO Save the receipt
+                        storeReceipt(receipt);
 
                         // show the "ballot accepted" tab
                         showTab('#result');
-                        $('#receipt-id').text(receipt.nonce.toUpperCase());
+                        $('#receipt-id').text(receipt.receiptID.toUpperCase());
                     }
                     else { // receipt not valid
                         showError('Invalid receipt');
@@ -244,5 +469,7 @@ function selectBooth() {
     
     // Focus on the email input
     $('#inp-email').focus();
+
+    initiateBooth(); // checks the status and opens the voting or verification tab
 }
 
