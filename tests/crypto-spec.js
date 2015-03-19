@@ -1,5 +1,6 @@
 var forge = require('node-forge');
 var crypto = require('cryptofunc');
+var cryptoUtils = require('cryptoUtils');
 
 var hexToBytes = forge.util.hexToBytes;
 var bytesToHex = forge.util.bytesToHex;
@@ -13,6 +14,16 @@ describe( 'Int/hex conversion', function()
         var r = crypto.hexStringToInt(hex);
         expect (r).toBe(n);
     });
+});
+
+
+describe( 'Msg/Str conversion', function(){
+	it( 'works as expected', function(){
+		var str = "TH(m3!0e_sadas@gfjgfd.IRI;%)m";
+		var msg = cryptoUtils.stringToMessage(str);
+		var strBack = cryptoUtils.messageToString(msg);
+		expect (str) .toBe(strBack);
+	});
 });
 
 

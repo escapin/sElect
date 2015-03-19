@@ -67,7 +67,7 @@ describe( 'Voter Client', function()
         p = crypto.deconcatenate(p.second);
         expect(crypto.hexStringToInt(p.second)).toBe(3);
 
-        console.log(receipt);
+        //console.log(receipt);
     });
 });
 

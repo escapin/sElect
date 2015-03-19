@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 // var java = require("java");
 var crypto = require('cryptofunc');
+var cryptoUtils = require('cryptoUtils');
 var voterClient = require('voterClient');
 var csCore = require('../CollectingServer/src/csCore.js');
 var mixCore = require('../MixServer/src/mixCore.js');
@@ -34,8 +35,8 @@ var voters = new Array(NVoters);
 console.log('************ Initialisation');
 
 // voters identifiers
-for (var i=0; i<NVoters; ++i) {
-    voters[i] = 'aa' + crypto.int32ToHexString(i);
+for (var i=NVoters-1; i>=0; --i) {
+    voters[i] = 'abc'  + i + '@ema.il';
 }
 
 // Keys
@@ -93,7 +94,7 @@ describe( 'Voting process', function()
     	expect(bijection(listElVoters, voters)).toBe(true);
     });
     
-
+    
     it( 'Ballot creation works as expected', function()
     {
         console.log('************ Ballot creation');
@@ -136,10 +137,12 @@ describe( 'Voting process', function()
 		expect(data.nextMessage()) .toBe(TAG_VOTERS); // check the tag
 		expect(data.nextMessage()) .toBe(electionID); // check the election id
         // The rest of data is a list of voterIDs.
-        // It should correspond to the initial list 'voters' (which was sorted)
+        var votersBack = new Array(NVoters);
         for (var i=0; !data.empty(); ++i) {
-            expect(data.nextMessage()).toBe(voters[i]);
+        	votersBack[i] = cryptoUtils.messageToString(data.nextMessage());
+        	//console.log('\t' + votersBack[i]);
         }
+        expect(bijection(votersBack, voters)).toBe(true);
     });
 
     it( 'The collecting server produces correct list of ballots', function()
