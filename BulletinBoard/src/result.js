@@ -52,7 +52,7 @@ function parseVotersList(signedVotersList) {
 
     // The rest of data is a list of voterIDs.
     var t = [];
-	console.log("Fetching the list of voters.");
+	console.log("*** Parsing the list of voters.");
     for (var i=0; !data.empty(); ++i) {
     	var voterID = cryptoUtils.messageToString(data.nextMessage());
     	//var voterID = data.nextMessage();
@@ -106,7 +106,7 @@ function parseFinalResult(signedFinalResult) {
     
     var t = [];
     var ccount = manifest.choices.map(function(x) {return 0;}); // initialize the counters for choices with 0's
-    console.log("Fetching the voters' choices.");
+    console.log("*** Parsing the voters' choices.");
     for (var i=0; !data.empty(); ++i) {
     	p = crypto.deconcatenate(data.nextMessage());
     	// Check the election id
@@ -152,9 +152,9 @@ function fetchData(url, cont) {
 function saveData(data, file) {
     fs.writeFile(file, data, function (err) {
         if (err) 
-            winston.info('Problems with saving the data:\n', data);
+            console.log('Problems with saving the data:\n', data);
         else {
-            winston.info('Result saved in: ', file);
+            console.log('Result saved in: ', file);
             resultReady = true;
         }
     });
@@ -168,7 +168,7 @@ exports.fetchAndSaveData = function() {
 			// fetch the votersList from the Collecting Server
 			fetchData(manifest.collectingServer.URI + '/votersList.msg', function (err, data) {
 		        if (!err) {
-		            console.log('VOTERS LIST FILE FETCHED');
+		            console.log('** I) \t voters list fetched');
 		            saveData(data, config.VOTERSLIST_FILE);
 		            if (exports.voters === null)
 		            	parseVotersList(data);
@@ -179,7 +179,7 @@ exports.fetchAndSaveData = function() {
 	// results mix servers
 	for(var i=NMixServers-1; i>=0; --i) {
 		var mixServer_path = config.RESULTMIX_FILE.replace('%d', i);
-		//console.log(mixServer_path);
+		// console.log(mixServer_path);
 		fs.exists(mixServer_path, function(j){
 		      return function(exists){
 		    	  if(!exists){
@@ -187,7 +187,10 @@ exports.fetchAndSaveData = function() {
 		    		  fetchData(manifest.mixServers[j].URI + '/result.msg', function(k){
 		    			  return function (err, data) {
 		    				  if (!err) {
-		    					  console.log('RESULT OF THE #%s-th MIX SERVER FETCHED', k);
+		    					  console.log('** II) \t results of the #%s-th mix server fetched', k);
+		    					  // recreate the path where to save the result because the for loop could be
+		    					  // in a different iteration than the callback
+		    					  var mixServer_path = config.RESULTMIX_FILE.replace('%d', k);
 		    					  saveData(data, mixServer_path);
 		    					  if(k===NMixServers-1 && exports.finalResult === null) // the final results
 		    						  parseFinalResult(data);
@@ -205,7 +208,7 @@ exports.fetchAndSaveData = function() {
 			// fetch the results form the Collecting Server
 			fetchData(manifest.collectingServer.URI + '/result.msg', function (err, data) {
 				if (!err) {
-					console.log('RESULT OF THE CS FETCHED');
+					console.log('** III) \t results of the Collecting Server fetched');
 					saveData(data, config.RESULTCS_FILE);
 				}
 			});
