@@ -8,10 +8,11 @@ var cryptoUtils = require('cryptoUtils');
 
 var TAG_VOTERS = '10';
 var TAG_BALLOTS = '01';
+var NMixServers = manifest.mixServers.length;
 
-exports.result = null;  // this is where the result is stored (when ready)
-exports.voters = null;  // this is where the list of voters is stored
-exports.summary = null; // the summary of the election
+exports.finalResult = null;	// this is where the result is stored (when ready)
+exports.voters = null;		// this is where the list of voters is stored
+exports.summary = null;		// the summary of the election
 
 
 function splitter(msg, callback) {
@@ -22,6 +23,9 @@ function splitter(msg, callback) {
     }
 }
 
+// expected data format:
+// 		SIGN_collectinServer[electionID, receiptID, votersList]
+//
 function parseVotersList(signedVotersList) {
 	var p = crypto.deconcatenate(signedVotersList);
 	var data = p.first; // tag,elID,voters
@@ -72,7 +76,7 @@ function parseVotersList(signedVotersList) {
 }
 
 // expected data format:
-//		SIGN_lastMixServer[elID, nonce, choice]
+//		SIGN_lastMixServer[electionID, receiptID, ballotsAsAMsg]
 //
 function parseFinalResult(signedFinalResult) {
     var p = crypto.deconcatenate(signedFinalResult);
@@ -127,12 +131,91 @@ function parseFinalResult(signedFinalResult) {
     }
 
     exports.summary = summary;
-    exports.result = t;
+    exports.finalResult = t;
 }
 
-var fileProcessed = false;
 
-// Check whether there is the final result file and, if so, parse it
+//var fileProcessed = false;
+
+function fetchData(url, cont) {
+    request(url, function (err, response, body) {
+        if (!err && response.statusCode == 200) {
+            cont(null, body);
+        }
+        else {
+            cont('Cannot fetch the page');
+        }
+    });
+
+}
+//Save data in a file
+function saveData(data, file) {
+    fs.writeFile(file, data, function (err) {
+        if (err) 
+            winston.info('Problems with saving the data:\n', data);
+        else {
+            winston.info('Result saved in: ', file);
+            resultReady = true;
+        }
+    });
+}
+
+exports.fetchAndSaveData = function() {
+	// FETCH THE DATA IN PRIORITY ORDER
+	// votersList
+	fs.exists(config.VOTERSLIST_FILE, function (exists) {
+		if(!exists){
+			// fetch the votersList from the Collecting Server
+			fetchData(manifest.collectingServer.URI + '/votersList.msg', function (err, data) {
+		        if (!err) {
+		            console.log('VOTERS LIST FILE FETCHED');
+		            saveData(data, config.VOTERSLIST_FILE);
+		            if (exports.voters === null)
+		            	parseVotersList(data);
+		        }
+		    });
+		}
+	});
+	// results mix servers
+	for(var i=NMixServers-1; i>=0; --i) {
+		var mixServer_path = config.RESULTMIX_FILE.replace('%d', i);
+		//console.log(mixServer_path);
+		fs.exists(mixServer_path, function(j){
+		      return function(exists){
+		    	  if(!exists){
+		    		  // fetch the results from the i-th mix server
+		    		  fetchData(manifest.mixServers[j].URI + '/result.msg', function(k){
+		    			  return function (err, data) {
+		    				  if (!err) {
+		    					  console.log('RESULT OF THE #%s-th MIX SERVER FETCHED', k);
+		    					  saveData(data, mixServer_path);
+		    					  if(k===NMixServers-1 && exports.finalResult === null) // the final results
+		    						  parseFinalResult(data);
+		    				  }
+		    			  }
+		    		  }(j));
+		    	  }
+		      }
+		}(i));
+	}
+
+	// results collecting server
+	fs.exists(config.RESULTCS_FILE, function (exists) {
+		if(!exists){
+			// fetch the results form the Collecting Server
+			fetchData(manifest.collectingServer.URI + '/result.msg', function (err, data) {
+				if (!err) {
+					console.log('RESULT OF THE CS FETCHED');
+					saveData(data, config.RESULTCS_FILE);
+				}
+			});
+		}
+	});
+}
+
+
+/////////////////////////////////////////////
+//Check whether there is the file and, if so, parse it
 function loadFileAndContinue(filename, cont) {
     console.log('Looking for file',  filename);
     fs.exists(filename, function(exists) {
@@ -152,52 +235,40 @@ function loadFileAndContinue(filename, cont) {
     });
 }
 
-
-function fetchData(url, cont) {
-    request(url, function (err, response, body) {
-        if (!err && response.statusCode == 200) {
-            cont(null, body);
-        }
-        else {
-            cont('Cannot fetch the page');
-        }
-    });
-
-}
-
 exports.loadResult = function () {
-
-    // Load /parse the voters list from the collecting server
+	
+	// Load /parse the voters list from the file
     if (exports.voters === null) {
-        fetchData(manifest.collectingServer.URI + '/votersList.msg', function (err, data) {
-            if (!err) {
-                console.log('VOTERS LIST FILE FETCHED');
-                parseVotersList(data); 
-            }
-        });
+        loadFileAndContinue("" + config.FILE_FOLDER + config.VOTERSLIST + config.EXT, 
+        		parseVotersList);
+    }
+	
+    // load / parse the final result from the file
+    if (exports.finalResult === null) {
+        loadFileAndContinue("" + config.FILE_FOLDER + config.RESULTMIX + (NMixServers-1) + config.EXT, 
+        		parseFinalResult);
     }
 
-    // Load /parse the final result (from the last mix server)
-    if (exports.result === null) {
-        fetchData(manifest.mixServers[manifest.mixServers.length-1].URI + '/result.msg', function (err, data) {
-            if (!err) {
-                console.log('FINAL RESULT FILE FETCHED');
-                parseFinalResult(data); 
-            }
-        });
-    }
+//    // Load /parse the voters list from the collecting server
+//    if (exports.voters === null) {
+//        fetchData(manifest.collectingServer.URI + '/votersList.msg', function (err, data) {
+//            if (!err) {
+//                console.log('VOTERS LIST FILE FETCHED');
+//                parseVotersList(data); 
+//            }
+//        });
+//    }
+//
+//    // Load /parse the final result (from the last mix server)
+//    if (exports.finalResult === null) {
+//        fetchData(manifest.mixServers[manifest.mixServers.length-1].URI + '/result.msg', function (err, data) {
+//            if (!err) {
+//                console.log('FINAL RESULT FILE FETCHED');
+//                parseFinalResult(data); 
+//            }
+//        });
+//    }
 
-    /*
-    // load / parse the final result
-    if (exports.result === null) {
-        loadFileAndContinue(config.RESULT_FILE, parseFinalResult);
-    }
-
-    // load /parse the partial result
-    if (exports.voters === null) {
-        loadFileAndContinue(config.PARTIAL_RESULT_FILE, parseVotersList);
-    }
-    */
 }
 
 
