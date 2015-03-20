@@ -111,6 +111,7 @@ bbclean:
 	-rm BulletinBoard/public/pure/pure-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-old-ie-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-min.css
+	-rm -r BulletinBoard/data
 
 configfilesclean:
 	-rm -r tmp
@@ -128,7 +129,7 @@ cleanElection:
 	-rm tmp/*.msg
 	-rm tmp/*.log
 	-rm CollectingServer/log.txt
-
+	-rm -r BulletinBoard/data
 
 
 test: testdownload testconfigs testrun
