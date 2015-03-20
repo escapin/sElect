@@ -1,4 +1,9 @@
 {
     "port" : 3111,
-    "MANIFEST_FILE" : "../tmp/ElectionManifest.json"
+    "MANIFEST_FILE" : "../tmp/ElectionManifest.json",
+    
+    "DATA_FOLDER": "./data",
+    "VOTERSLIST_FILE": "./data/votersList.msg",
+    "RESULTCS_FILE" : "./data/resultCS.msg",
+    "RESULTMIX_FILE": "./data/resultMIX%d.msg"
 }
