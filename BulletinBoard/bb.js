@@ -1,7 +1,8 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var errorHandler = require('errorhandler')
-var morgan = require('morgan')
+var errorHandler = require('errorhandler');
+var morgan = require('morgan');
+var mkdirp = require('mkdirp');
 
 var config = require('./config');
 var manifest = require('./src/manifest');
@@ -18,6 +19,15 @@ app.use(express.static('./public')); // static content // was: __dirname + '/pub
 app.use(errorHandler({ dumpExceptions: true, showStack: true })); // error handling (not for production)
 app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
 
+// create the folder where the data coming from the other servers will be stored
+mkdirp(config.DATA_FOLDER, function (err) {
+    if (err) 
+    	console.error("Error: ", err);
+//    else 
+//    	console.log("Folder '" + config.DATA_FOLDER + "' created.");
+});
+
+
 // ROUTES
 app.get('/', routes.summary);
 app.get('/summary', routes.summary);
@@ -27,12 +37,24 @@ app.get('/details', routes.details);
 
 app.get('/SignedFinalResult', routes.serveFile(config.RESULT_FILE));
 app.get('/SignedPartialResult', routes.serveFile(config.PARTIAL_RESULT_FILE));
-app.get('/ElectionManifest.json', routes.serveFile(config.MANIFEST_FILE));
 
-// SET THE BACKROUD CHECK FOR THE RESULT FILE
-setInterval( result.loadResult, 5000);
-result.loadResult();
-// TODO: 
+
+app.get('/ElectionManifest.json', routes.serveFile(config.MANIFEST_FILE));
+app.get('/VotersList', routes.serveFile(config.VOTERSLIST_FILE));
+app.get('/ResultsCollectingServer', routes.serveFile(config.RESULTCS_FILE));
+for(i=0; i<manifest.mixServers.length; ++i){
+	var resource = '/ResultsMixServer' + i;
+	var file = config.RESULTMIX_FILE.replace('%d', i);
+	app.get(resource, routes.serveFile(file));
+}
+
+
+// SET THE BACKGROUD CHECK FOR THE RESULT FILE
+//setInterval( result.loadResult, 5000);
+//result.loadResult();
+setInterval(result.fetchAndSaveData, 5000);
+result.fetchAndSaveData();
+// TODO:
 // (1) We could make sure that this is alive on every request (just in case)
 // (2) Remove this when the result is read.
 
