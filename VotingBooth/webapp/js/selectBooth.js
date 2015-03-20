@@ -66,12 +66,12 @@ function selectBooth() {
     }
 
     // Runs tasks (functions creating promises) sequentially.
-    // More precisely, composes the promises and returns the
-    // sequential promise.
-    function sequentially(tasks) {
+    // More precisely, composes the promises starting with
+    // inputPromise and using .then method for the elements in tasks.
+    function sequentially(inputPromise, tasks) {
         return tasks.reduce(
                   function (promise, task) { return promise.then(task); }, 
-                  Promise.accept(null) // the initial (null) promise
+                  inputPromise // the initial promise
                );
     }
 
@@ -91,6 +91,7 @@ function selectBooth() {
         .then(function (resultReady) {  
             if (resultReady) {
                 console.log('Result ready. We should verify now');
+                showTab('#verification');
                 doVerification();
             }
             else {
@@ -191,6 +192,8 @@ function selectBooth() {
         fetchData(url)
         .catch(function (err) {
             console.log('Cannot get the result from the final server:', err);
+            verwriter.writee('Cannot get the final result of the election.', err);
+            verwriter.writep('Please, visit (reopen) this web page again later.', err);
         })
         .then(function (data) {
             console.log('Result of the final mix server fetched:');
@@ -211,6 +214,7 @@ function selectBooth() {
             }
             else {
                 console.log('WARNING: Receipt', i, 'not verified:', res.descr);
+                verwriter.writee('VERIFICATION FAILED: ballot with receipt ID', receipts[i].receiptID, 'dropped!');
                 ok =false;
             }
         }
@@ -225,8 +229,9 @@ function selectBooth() {
     function blame(receipts) {
         console.log('BLAME');
         checkCollectingServer(receipts)
-        .then(function() {
-            checkMixServers(receipts);
+        .then(function(cont) {
+            if (cont)
+                checkMixServers(receipts);
         });
     }
 
@@ -236,14 +241,21 @@ function selectBooth() {
         return fetchData(manifest.collectingServer.URI+'/result.msg').then(function (data) {
                 console.log('The result of the collecting server fetched.');
                 console.log('Verifying the result');
+                var ok = true;
                 for (var i=0; i<receipts.length; ++i) {
                     var res = voter.checkColServerResult(data, receipts[i])
                     console.log('Result for', receipts[i].receiptID, ':', res.descr);
+                    if (!res.ok)
+                        verwriter.writee('Ballot', receipts[i].receiptID, 'has been dropped by the collecting server');
                     // TODO: produce blaming info
+                    ok = false;
                 }
+                return ok;
             })
             .catch(function (err) {
                 console.log('Cannot fetch the result of the collecting server:', err);
+                verwriter.writee('Cannot fetch the result of the collecting server.');
+                return false;
             });
     }
 
@@ -252,9 +264,12 @@ function selectBooth() {
         // that creates a promise of the result of verification
         // of the i-th mix server 
         var tasks = manifest.mixServers.map(function (ms,i) { 
-            return function () { return checkMixServer(i, receipts); } 
+            return function (cont) { 
+                if (!cont) return false;
+                else return checkMixServer(i, receipts); 
+            } 
         });        
-        sequentially(tasks); // run the tasks sequentially
+        sequentially(Promise.accept(true), tasks);
     }
 
 
@@ -266,19 +281,42 @@ function selectBooth() {
         .then(function (data) {
             console.log('The result of the mixing server fetched.');
             console.log('Verifying the result');
+            var ok = true;
             for (var i=0; i<receipts.length; ++i) {
                 var res = voter.checkMixServerResult(k, data, receipts[i])
                 console.log('Result for', receipts[i].receiptID, ':', res.descr);
+                verwriter.writee('Ballot', receipts[i].receiptID, 'has been dropped by mix server nr', k);
                 // TODO: produce blaming info
+                ok = false;
             }
+            return ok;
         })
         .catch(function (err) {
             console.log('Cannot fetch the result of the mixing server:', err);
+            verwriter.writep('Cannot fetch the result of the mixing server.');
+            return false;
         });
     }
 
+    // Creates a writer to a jquery object.
+    function newWriter(object) {
+        function merge(t) {
+            // return t.reduce(function(x,y) {return x+y}, '');
+            var r = '';
+            for (var i=0; i<t.length; ++i) { 
+                r += t[i] + ' '; 
+            }
+            return r;
+        }
+        return {
+                write  : function() { object.append(merge(arguments)); },
+                writep : function() { object.append('<p>' + merge(arguments) + '</p>'); },
+                writee : function() { object.append('<p class="error">' + merge(arguments) + '</p>'); }
+        };
+    }
 
-
+    // Writer tor the verification object
+    var verwriter = newWriter($('#verif-info'));
 
     //////////////////////////////////////////////////////////////////////////////
     /// HANDLERS FOR SUMBITTING DATA 
@@ -421,6 +459,11 @@ function selectBooth() {
         return false; // prevents any further submit action
     }
 
+    function goToBB(event) {
+        console.log('GO TO BB -- TO BE DONE!');
+        return false;
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     /// OTHER HANDLERS 
 
@@ -465,10 +508,13 @@ function selectBooth() {
     $('#error form').submit(onSubmitError);
     $('#inp-email').on('input', enableWhenNotEmpty($('#submit-email'), $('#inp-email')));
     $('#inp-otp').on('input', enableWhenNotEmpty($('#submit-otp'), $('#inp-otp')));
+    $('#verification form').submit(goToBB);
     $('input[name="choice"]').change(whenChoiceChanges);
     
+
     // Focus on the email input
     $('#inp-email').focus();
+
 
     initiateBooth(); // checks the status and opens the voting or verification tab
 }
