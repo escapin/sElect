@@ -174,15 +174,17 @@ function selectBooth() {
     function doVerification() {
         // Get the receipts
         var receipts = getReceipts();
-        console.log('There is/are', receipts.length, 'receipts to verify:');
-        for (var i=0; i<receipts.length; ++i) {
-            console.log('  ', receipts[i].receiptID);
-        }
 
         // If there is no receipts, there is nothing to do
         if (receipts.length == 0) { 
             console.log('No receipts, nothing to verify.');
             return;
+        }
+
+        // Some receipts to verify
+        console.log('Receipts to verify:');
+        for (var i=0; i<receipts.length; ++i) {
+            console.log('  ', receipts[i].receiptID);
         }
 
         // Fetch the result of the final mix server and run the
@@ -227,7 +229,6 @@ function selectBooth() {
     // Checks which server is to blame.
     //
     function blame(receipts) {
-        console.log('BLAME');
         checkCollectingServer(receipts)
         .then(function(cont) {
             if (cont)
@@ -239,7 +240,6 @@ function selectBooth() {
     function checkCollectingServer(receipts) {
         console.log('CHECK COLLECTING SERVER');
         return fetchData(manifest.collectingServer.URI+'/result.msg').then(function (data) {
-                console.log('The result of the collecting server fetched.');
                 console.log('Verifying the result');
                 var ok = true;
                 for (var i=0; i<receipts.length; ++i) {
@@ -279,7 +279,6 @@ function selectBooth() {
         console.log('CHECK MIX SERVER' , k);
         return fetchData(manifest.mixServers[k].URI+'/result.msg')
         .then(function (data) {
-            console.log('The result of the mixing server fetched.');
             console.log('Verifying the result');
             var ok = true;
             for (var i=0; i<receipts.length; ++i) {
