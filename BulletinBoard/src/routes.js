@@ -19,6 +19,9 @@ exports.serveFile = function serveFile(path) {
     }
 }
 
+// Retrieve the files containing the partial results of the MixServers
+// export.retrieveMixDataFiles = function retrieveMixDataFiles
+
 //////////////////////////////////////////////////////////////
 
 var openingTime = new Date(manifest.startTime);
@@ -27,7 +30,7 @@ console.log(manifest.startTime);
 console.log(manifest.endTime);
 
 exports.summary = function(req, res) {
-    var ready = result.result !== null;
+    var ready = result.finalResult !== null;
     console.log(ready);
     var summary = null;
     if (ready)
@@ -41,17 +44,17 @@ exports.summary = function(req, res) {
 };
 
 exports.votes = function(req, res) {
-    var ready = result.result !== null;
+    var ready = result.finalResult !== null;
     res.render('votes', {
             manifest: manifest,
             ready: ready,
-            result: result.result,
+            result: result.finalResult,
             closingTime: closingTime,
         });
 }
 
 exports.voters = function(req, res) {
-    var ready = (result.result !== null);
+    var ready = (result.finalResult !== null);
     var partialResultReady = (result.voters !== null);
     console.log(result.voters);
     res.render('voters', {
@@ -64,7 +67,7 @@ exports.voters = function(req, res) {
 }
 
 exports.details = function(req, res) {
-    var ready = result.result !== null;
+    var ready = result.finalResult !== null;
     res.render('details', {
             manifest: manifest,
             ready: ready,
