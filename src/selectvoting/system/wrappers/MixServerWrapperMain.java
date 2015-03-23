@@ -1,5 +1,8 @@
 package selectvoting.system.wrappers;
 
+import java.nio.file.*;
+import java.io.*;
+
 import de.unitrier.infsec.functionalities.digsig.Signer;
 import de.unitrier.infsec.functionalities.digsig.Verifier;
 import de.unitrier.infsec.functionalities.pkenc.Decryptor;
@@ -52,7 +55,7 @@ public class MixServerWrapperMain {
 			System.exit(ex.errCode);
 			//return new Result(false, ex.description);
 		}
-	}	
+	}
 	
 //	public MixServerWrapper(String encKey, String decKey, String verifKey, String signKey, String precServVerifKey, String elId, int numberOfVoters) {
 //		Decryptor decryptor = new Decryptor(message(encKey), message(decKey));
@@ -78,11 +81,21 @@ public class MixServerWrapperMain {
 //		}
 //	}
 	
-	private static byte[] dataFromFile(String path){
-		return null;
+	private static byte[] dataFromFile(String path) throws IOException {
+		Path file = Paths.get(path);
+		byte[] data = Files.readAllBytes(file);
+		return data;
 	}
 	
-	private static void storeAsFile(byte[] data , String path){
+	private static void storeAsFile(byte[] data , String path) throws IOException {
+		if(data==null)
+			return;
+		Path file = Paths.get(path);
+		/* default options:  CREATE, TRUNCATE_EXISTING, and WRITE
+		 * it opens the file for writing, creating the file if it doesn't exist, 
+		 * or initially truncating an existing regular-file to a size of 0
+		 */
+		Files.write(file, data);
 	}
 	
 	
