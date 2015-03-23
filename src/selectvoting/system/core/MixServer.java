@@ -22,8 +22,10 @@ public class MixServer
 	 */
 	@SuppressWarnings("serial")
 	public static class MalformedData extends Exception {
+		public int errCode;
 		public String description;
-		public MalformedData(String description) {
+		public MalformedData(int errCode, String description) {
+			this.errCode = errCode;
 			this.description = description;
 		}
 		public String toString() {
@@ -32,8 +34,10 @@ public class MixServer
 	}
 	@SuppressWarnings("serial")
 	public static class ServerMisbehavior extends Exception {
+		public int errCode;
 		public String description;
-		public ServerMisbehavior(String description) {
+		public ServerMisbehavior(int errCode, String description) {
+			this.errCode = errCode;
 			this.description = description;
 		}
 		public String toString() {
@@ -61,25 +65,25 @@ public class MixServer
 	 * 			SIGN_prec[tag, elID, ballotsAsAMessage]
 	 * where, each ballot:
 	 * 			ENC_curr[elID, innerBallot] 
-	 *   
+	 * 
 	 */
 	public byte[] processBallots(byte[] data) throws MalformedData, ServerMisbehavior {
 		// verify the signature of previous server
 		byte[] tagged_payload = MessageTools.first(data);
 		byte[] signature = MessageTools.second(data);
 		if (!precServVerif.verify(signature, tagged_payload))
-			throw new MalformedData("Wrong signature");
+			throw new MalformedData(1, "Wrong signature");
 		
 		// check the tag
 		byte[] tag = MessageTools.first(tagged_payload);
 		if (!MessageTools.equal(tag, Tag.BALLOTS))
-			throw new MalformedData("Wrong tag");		
+			throw new MalformedData(2, "Wrong tag");		
 		byte[] payload = MessageTools.second(tagged_payload);
 		
 		// check the election id 
 		byte[] el_id = MessageTools.first(payload);
 		if (!MessageTools.equal(el_id, electionID))
-			throw new MalformedData("Wrong election ID");
+			throw new MalformedData(3, "Wrong election ID");
 		
 		// retrieve and process ballots (store decrypted entries in 'entries')
 		byte[] ballotsAsAMessage = MessageTools.second(payload);
@@ -93,12 +97,12 @@ public class MixServer
 		// It should be re-implemented.
 		for( MessageSplitIter iter = new MessageSplitIter(ballotsAsAMessage); iter.notEmpty(); iter.next() ) {
 			if (numberOfEntries > numberOfVoters) // too many entries
-				throw new ServerMisbehavior("Too many entries");
+				throw new ServerMisbehavior(-1, "Too many entries");
 			byte[] current = iter.current();
 			if (last!=null && Utils.compare(last, current)>0)
-				throw new ServerMisbehavior("Ballots not sorted.");
+				throw new ServerMisbehavior(-2, "Ballots not sorted");
 			if (last!=null && Utils.compare(last, current)==0)
-				throw new ServerMisbehavior("Duplicate ballots."); 
+				throw new ServerMisbehavior(-3, "Duplicate ballots"); 
 			last = current;
 			byte[] decryptedBallot = decryptor.decrypt(current); // decrypt the current ballot
 			if (decryptedBallot == null){

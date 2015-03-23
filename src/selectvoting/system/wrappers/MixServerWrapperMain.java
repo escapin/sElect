@@ -36,10 +36,20 @@ public class MixServerWrapperMain {
 			byte[] result = mixServ.processBallots(input);
 			storeAsFile(result, outputFile_path);			
 		} catch(MixServer.MalformedData ex) {
-			// FIXME: write to stdout
+		/* 		errCode	*&*		description
+		 * 			1	-->		 Wrong signature	
+		 *   		2	-->		 Wrong tag
+		 *   		3	-->		 Wrong election ID
+		 */
+			System.exit(ex.errCode);
 			//return new Result(false, ex.description);
 		} catch(MixServer.ServerMisbehavior ex) {
-			// FIXME: write to stdout
+		/*  	errCode	*&*		description
+		 *  		-1	-->		 Too many entries
+		 *  		-2	-->		 Ballots not sorted
+		 *  		-3	-->		 Duplicate ballots
+		 */
+			System.exit(ex.errCode);
 			//return new Result(false, ex.description);
 		}
 	}	
