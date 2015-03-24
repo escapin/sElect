@@ -4,7 +4,7 @@ body {
     background: #eee;
     font-family: 'Roboto', sans-serif;
     font-size: 12pt;
-    font-weight: 400;
+    font-weight: 300;
 }
 
 h1, h2 {
@@ -32,6 +32,11 @@ h1 {
 h1.error {
     color: #a00;
     text-shadow: 0px 0px 2px #f66;
+}
+
+p.error {
+    color: #a00;
+    font-weight: bold;
 }
 
 
@@ -103,6 +108,10 @@ div.body {
     -border: solid 0px #ccc;
     border-radius: 6px;
     box-shadow: 0px 1px 12px 3px #ddd;
+}
+
+div.info {
+    font-weight: 300;
 }
 
 .toright {
