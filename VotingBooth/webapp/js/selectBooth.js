@@ -460,6 +460,9 @@ function selectBooth() {
 
     function goToBB(event) {
         console.log('GO TO BB -- TO BE DONE!');
+        var url = manifest.bulletinBoards[0].URI; // FIXME
+        console.log(url);
+        window.open(url, '_blank').focus();
         return false;
     }
 
