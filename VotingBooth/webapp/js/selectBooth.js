@@ -217,7 +217,7 @@ function selectBooth() {
             else {
                 console.log('WARNING: Receipt', i, 'not verified:', res.descr);
                 verwriter.writee('VERIFICATION FAILED: ballot with receipt ID', receipts[i].receiptID, 'dropped!');
-                ok =false;
+                ok = false;
             }
         }
 
@@ -239,23 +239,28 @@ function selectBooth() {
 
     function checkCollectingServer(receipts) {
         console.log('CHECK COLLECTING SERVER');
-        return fetchData(manifest.collectingServer.URI+'/result.msg').then(function (data) {
+        return fetchData(manifest.collectingServer.URI+'/result.msg')
+            .catch(function (err) {
+                console.log('Cannot fetch the result of the collecting server:', err);
+                verwriter.writee('Cannot fetch the result of the collecting server.');
+                return false;
+            })
+            .then(function (data) {
                 console.log('Verifying the result');
                 var ok = true;
                 for (var i=0; i<receipts.length; ++i) {
                     var res = voter.checkColServerResult(data, receipts[i])
                     console.log('Result for', receipts[i].receiptID, ':', res.descr);
-                    if (!res.ok)
+                    if (!res.ok) {
+                        ok = false;
                         verwriter.writee('Ballot', receipts[i].receiptID, 'has been dropped by the collecting server');
-                    // TODO: produce blaming info
-                    ok = false;
+                        console.log('Blaming data:', res.blamingData);
+                        verwriter.writep('The following data contains information necessary to hold the misbehaving party accountable. Please copy it and provide to the voting authorities.');
+                        verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
+                    }
                 }
+                ok = true;
                 return ok;
-            })
-            .catch(function (err) {
-                console.log('Cannot fetch the result of the collecting server:', err);
-                verwriter.writee('Cannot fetch the result of the collecting server.');
-                return false;
             });
     }
 
@@ -284,9 +289,13 @@ function selectBooth() {
             for (var i=0; i<receipts.length; ++i) {
                 var res = voter.checkMixServerResult(k, data, receipts[i])
                 console.log('Result for', receipts[i].receiptID, ':', res.descr);
-                verwriter.writee('Ballot', receipts[i].receiptID, 'has been dropped by mix server nr', k);
-                // TODO: produce blaming info
-                ok = false;
+                if (!res.ok) {
+                    ok = false;
+                    verwriter.writee('Ballot', receipts[i].receiptID, 'has been dropped by mix server nr', k);
+                    console.log('Blaming data:', res.blamingData);
+                    verwriter.writep('The following data contains information necessary to hold the misbehaving party accountable. Please copy it and provide to the voting authorities.');
+                    verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
+                }
             }
             return ok;
         })

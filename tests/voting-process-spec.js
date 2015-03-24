@@ -41,17 +41,6 @@ for (var i=0; i<NVoters; ++i) {
 // Keys
 var colServSigKeys = crypto.sig_keygen();
 var colServVerifKey = colServSigKeys.verificationKey;
-//<<<<<<< HEAD
-//=======
-//var mixServKeys = new Array(NMixServ);
-//var mixServSigKeys = new Array(NMixServ);
-//for(var i=0; i<NMixServ; i++) {
-//	mixServKeys[i] = crypto.pke_keygen();
-//    mixServSigKeys[i] = crypto.sig_keygen();
-//}
-//var mixServEncKeys = mixServKeys.map(function(k){ return k.encryptionKey; });
-//
-//>>>>>>> verif
 
 var mixServPkeKeys = new Array(NMixServ);
 var mixServSigKeys = new Array(NMixServ);
@@ -95,13 +84,6 @@ describe( 'Voting process', function()
     									mixServSigKeys[i].signingKey,
     									precServVerifKey, electionID,
     									NVoters, class_path);
-//        mixServer[i] = java.newInstanceSync("selectvoting.system.wrappers.MixServerWrapper",
-//                                  mixServKeys[i].encryptionKey, 
-//                                  mixServKeys[i].decryptionKey, 
-//                                  mixServSigKeys[i].verificationKey,
-//                                  mixServSigKeys[i].signingKey,
-//                                  precServVerifKey,
-//                                  electionID, NVoters);
     }
     var intermediateResult = new Array(NMixServ);
     
@@ -109,20 +91,7 @@ describe( 'Voting process', function()
     {
     	var listElVoters = Object.keys(cs.eligibleVoters);
     	expect(bijection(listElVoters, voters)).toBe(true);
-//    	listElVoters.sort();
-//    	voters.sort();
-//    	for(var i=0; i<listElVoters.length; ++i){
-//    		expect(listElVoters[i]) .toBe(voters[i]);
-//    	}
     });
-    
-    
-//    it( 'Voting phase works as expected', function()
-//    {  	
-//        console.log('************ Testing the voting phase');
-//
-//    var cs = csCore.create(electionID, votersSet, colServSigKeys.signingKey);
-//    var receipts = new Array(voters.length);
     
 
     it( 'Ballot creation works as expected', function()
@@ -328,10 +297,16 @@ describe( 'Voting process', function()
         var res = voter.checkColServerResult(cs.getResult(), rec);
         expect(res.ok).toBe(false);
         expect(res.descr).toBe('Ballot not found');
+        console.log(res.blamingData);
+        expect(res.blamingData).not.toBe(undefined);
+        expect(res.blame).toBe(true);
         for (var i=0; i<NMixServ; ++i) {
             var res = voter.checkMixServerResult(i, intermediateResult[i], rec);
             expect(res.ok).toBe(false);
             expect(res.descr).toBe('Ballot not found');
+            console.log(res.blamingData);
+            expect(res.blame).toBe(true);
+            expect(res.blamingData).not.toBe(undefined);
         }
     });
 
