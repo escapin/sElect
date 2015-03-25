@@ -2,61 +2,64 @@ var mixCore = function() {
 var exports = {};
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-var java = require("java");
 
 exports.create = function(encKey, decKey, verifKey, signKey, precServVerifKey, 
-		electionID, numberOfVoters, class_path)
+		electionID, numberOfVoters)
 {
-	//console.log('Mix: Current directory --> ' + process.cwd());
-	// CONSTRUCTOR 
-	// Add (java) class paths
-	for (var i=0; i<class_path.length; ++i)
-	    java.classpath.push(class_path[i]);
-//	var chainIndex = -1
-//	for(var i=0; i<manifest.mixServers.length; ++i)
-//		if(manifest.mixServers[i].encryption_key === config.encryption_key &&
-//			manifest.mixServers[i].verification_key === config.verification_key){
-//			chainIndex = i;
-//			break;
-//		}
-	// exports.chainIndex = chainIndex;
 	
-//	// Cryptographic Keys:
-//	var encKey      = manifest.mixServers[chainIndex].encryption_key;
-//	var decKey      = config.decryption_key;
-//	var verifKey    = manifest.mixServers[chainIndex].verification_key;
-//	var signKey     = config.signing_key;
-//	if (chainIndex == 0)
-//		var precServVerifKey  = manifest.collectingServer.verification_key;
-//	else
-//		var precServVerifKey  = manifest.mixServers[chainIndex-1].verification_key;
-	
-	// Create the list (map) of eligible voters. Usage if (eligibleVoters[v]) ...
-	//	var numberOfVoters = manifest.voters.length;
-	
-	
-//	console.log("encKey:\n" + encKey + "\n\n" + 
-//			"decKey:\n" +  decKey + "\n\n" + 
-//			"verifKey:\n" + verifKey + "\n\n" + 
-//			"signKey:\n" + signKey + "\n\n" + 
-//			"precServVerifKey:\n" + precServVerifKey + "\n\n" + 
-//			"electionID:\t" + electionID + "\n\n" + 
-//			"numberOfVoters:\t" + numberOfVoters + "\n\n\n");
-	
-	function processBallots(data) {
-		// WARN: if the wrapper is created outside the function a fatal error happens
-		// Create an instance of MixServerWrapper:
-		var mixServWrapper = java.newInstanceSync("selectvoting.system.wrappers.MixServerWrapper",
-			                                      encKey, decKey, verifKey, signKey, precServVerifKey,
-			                                      electionID, numberOfVoters);
-		// module.exports = mixServWrapper;
-		// since we are using the sync method, an exception 
-		// will be throw if an error occurs
-		var result = java.callMethodSync(mixServWrapper, "processBallots", data);
-		return result;
+	function processBallots(inputFile_path, outputFile_path) {
+		var spawn = require('child_process').spawn,
+			mixServer = spawn('java', ['-cp', '.:../lib/*',
+			                           'selectvoting.system.wrappers.MixServerWrapperMain',
+			                           encKey, decrKey, verifKey, signKey, precServVerifKey,
+			                           electionID, numberOfVoters, inputFile_path, outputFile_path
+			                           ],
+			                           {cwd: '../../bin/', 	// the working dir of the process: java bin
+										env: process.env});
+		mixServer.on('close', function (code) {
+			if (code !== 0) {
+			    console.log('[mixCore.js] MixWrapper process exited with code ' + code);
+			    process.stdout.write('[mixCore.js] This error code corresponds to:\t');
+			    switch(code){
+			    	case 10:
+			    		console.log('***MixServerWrapper*** \t Wrong Number of Arguments');
+			    		break;
+				    case 11:
+				    	console.log('***MixServerWrapper*** \t [IOException] reading the file');
+				    	break;
+				    case 12:
+				    	console.log('***MixServerWrapper*** \t [IOException] writing the file');
+				    	break;
+				    case 1:
+				    	console.log('***MalformedData*** \t Wrong signature');
+				    	break;
+				    case 2:
+				    	console.log('***MalformedData*** \t Wrong tag');
+				    	break;
+				    case 3:
+				    	console.log('***MalformedData*** \t Wrong election ID');
+				    	break;
+				    case -1:
+				    	console.log('***ServerMisbehavior*** \t Too many entries');
+				    	break;
+				    case -2:
+				    	console.log('***ServerMisbehavior*** \t Ballots not sorted');
+				    	break;
+				    case -3:
+				    	console.log('***ServerMisbehavior*** \t Duplicate ballots');
+				    	break;
+				    	// FIXME: should we do something else if a ServerMisbehavior occurs?
+				    default:
+				    	console.log('***Unknown Errror***');
+			    }
+			    process.exit(code);
+			 }
+			console.log('[mixCore.js] MixWrapper process ended correctly');
+		});
 	}
 	
-	return {encKey : encKey, verifKey : verifKey, electionID : electionID, 
+	return {encKey : encKey, verifKey : verifKey, precServVerifKey: precServVerifKey,
+			electionID : electionID, numberOfVoters: numberOfVoters,
 			processBallots: processBallots};
 }
 
