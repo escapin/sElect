@@ -1,11 +1,11 @@
 var fs = require('fs');
 var path = require('path');
-// var java = require("java");
 var crypto = require('cryptofunc');
 var cryptoUtils = require('cryptoUtils');
 var voterClient = require('voterClient');
 var csCore = require('../CollectingServer/src/csCore.js');
 var mixCore = require('../MixServer/src/mixCore.js');
+var mkdirp = require('mkdirp');
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Shortcuts
@@ -15,22 +15,22 @@ var unpair = crypto.deconcatenate;
 var sign = crypto.sign;
 var verif = crypto.verifsig;
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// Configuration
-
-// java.classpath.push('../bin');
-// java.classpath.push('../lib/bcprov-jdk16-1.46.jar');
 
 //////////////////////////////////////////////////////////////////////////////////////////
+
 // Parameters and keys
 
 var TAG_VOTERS = '10';
 var TAG_BALLOTS = '01';
+//console.log('CWD:\t' + process.cwd());
+var PARTIALRESULT_template = process.cwd() + '/data/partialResults';
+var TIMEOUT = 100000;
 
 var electionID = 'eeee';
-var NMixServ = 3;
+var NMixServ = 5;
 var NVoters = 10;
 var voters = new Array(NVoters);
+
 
 console.log('************ Initialisation');
 
@@ -66,14 +66,15 @@ describe( 'Voting process', function()
     
     //console.log('Test: Current directory --> ' + process.cwd());
     
-    ///////////////////////////////////////////////////////////////
-    // FIXME: just a quick fix for when we execute the test from the root dir --> to be optimize
-    var class_path = ["bin", "lib/bcprov-jdk16-1.46.jar"]; // for java in MixServer
-    for(var i=0;i<class_path.length; ++i)
-    		if(!fs.existsSync(class_path[i]))
-    			class_path[i] = path.join("../", class_path[i]);
-    // console.log(class_path);
-    /////////////////////////////////////////////////////////////
+    // create the folder where the data processed 
+    // by the mix servers will be stored 
+    mkdirp('./data', function (err) {
+        if (err) 
+        	console.error("Error: ", err);
+//		else 
+//        	console.log("Folder '" + config.DATA_FOLDER + "' created.");
+    });
+
     
     // Create mix servers
     var mixServer = new Array(NMixServ);
@@ -84,7 +85,7 @@ describe( 'Voting process', function()
     									mixServSigKeys[i].verificationKey,
     									mixServSigKeys[i].signingKey,
     									precServVerifKey, electionID,
-    									NVoters, class_path);
+    									NVoters);
     }
     var intermediateResult = new Array(NMixServ);
     
@@ -177,36 +178,62 @@ describe( 'Voting process', function()
     
     it( 'The first mix server process the data correctly', function()
     {
-    	console.log('************ Testing the mix servers');
+    	console.log('************ Testing a mix server with trash');
 
-    	var signedBallots = cs.getResult();
-
-    	// result to the first mix server
-    	var result=mixServer[0].processBallots(signedBallots);
-    	expect(result.ok) .toBe(true);
+    	// let's first give him trash
+    	var signedBallots = crypto.nonce(2000); 
+    	var inputFile_path = PARTIALRESULT_template + 'CRAP_input.msg'; 
+    	dataToFile(signedBallots, inputFile_path);
+    	var outputFile_path = PARTIALRESULT_template + 'CRAP_output.msg';
+    	mixServer[0].processBallots(inputFile_path, outputFile_path,
+    		function(err, stdout, stderr){
+				expect (err===null) .toBe(false);
+				expect (err.code) .toBe(1); // wrong signature
+			},
+			function (code) {
+				expect (code) .toBe (1); // wrong signature
+				//console.log("Program exited with code " + code);
+			});
     	
-    	// let's give him trash
-    	result=mixServer[0].processBallots(crypto.nonce(2000));
-    	expect(result.ok) .toBe(false);
-    	expect(result.data) .toBe("Wrong signature");
-    	
-    });
+    }, TIMEOUT);
     
-    //	var signedBallots = cs.getResult();
-	// let's test the whole chain now
-    //	var inputData = signedBallots;
-    //	for(var i=0; i<mixServer.length; ++i){
-    //		result = mixServer[i].processBallots(inputData);
-    //		expect(result.ok) .toBe(true);
-    //		inputData = result.data;
-    //	}
-    // var finalResult = result.data;
+    it( 'The first mix server process the data correctly', function()
+    {
+    	console.log('************ Testing a mix server with correct data');
+    	// now seriously
+    	var signedBallots = cs.getResult();
+    	// write the result on a file
+    	var inputFile_path = PARTIALRESULT_template + '00_input.msg'; 
+    	dataToFile(signedBallots, inputFile_path);
+    	var outputFile_path = PARTIALRESULT_template + '00_output.msg';
+    	
+    	// result to the first mix server
+    	mixServer[0].processBallots(inputFile_path, outputFile_path,
+    		function(err, stdout, stderr){
+    			console.log(stdout);
+    			console.log(stderr);
+    			//console.log(outputFile_path);
+    			dataFromFile(outputFile_path, function (err, data) {
+    				if (err){ 
+    		        	console.log('Problems with reading data from ', path);
+    		            console.log('Error: ', err); 
+    		            return; 
+    		        }
+    		        //console.log(data);
+    		    });
+    		},
+    		function (code) {
+    			expect (code) .toBe (0);
+    			//console.log("Program exited with code " + code);
+    		});
+    }, TIMEOUT);
     
     it( 'Mixing works as expected', function(done)
     {  	
+    	console.log('************ Testing a mix servers\' chain');
     	var data = cs.getResult();
     	mix(0, data, done);
-    }, 100000); // timeout in ms
+    }, TIMEOUT); // timeout in ms
     
     function mix(i, inputData, done) {
         if (i >= NMixServ)  {
@@ -215,26 +242,22 @@ describe( 'Voting process', function()
         }
 
         console.log('************ Mixing', i);
-
-        var result = mixServer[i].processBallots(inputData);
-        expect(result.ok) .toBe(true);
-        intermediateResult[i] = result.data;
-        mix(i+1, result.data, done);
-//        mixServer[i].processBallots(inputData, function (err, result) {
-//            if (err) {
-//                console.log('UNEXPECTED ERROR', err);
-//                done(err);
-//            }
-//            else if (!result.ok) {
-//                console.log('ERROR:', result.data);
-//                done()
-//            }
-//            else { // mixing completed successfully; call the next mix server
-//            	expect(result.ok) .toBe(true);
-//            	intermediateResult[i] = result.data;
-//                mix(i+1, result.data, done);
-//            }
-//        });
+        
+        var inputFile_path = PARTIALRESULT_template + '0' + i + '_input.msg'; 
+    	dataToFile(inputData, inputFile_path);
+    	var outputFile_path = PARTIALRESULT_template + '0' + i + '_output.msg';
+    	
+    	mixServer[i].processBallots(inputFile_path, outputFile_path, 
+        	function(err, stdout, stderr){
+				console.log(stdout);
+				console.log(stderr);
+			},
+			function(code){
+				expect(code) .toBe(0);
+				intermediateResult[i] = dataFromFile(outputFile_path);
+				//console.log(intermediateResult[i]);
+				mix(i+1, intermediateResult[i], done);
+			});
     }
     	
     it( 'Final results as expected', function()
@@ -307,8 +330,37 @@ describe( 'Voting process', function()
         }
     });
 
-
 });
+
+
+/* no callback: syncronous version */
+function dataFromFile(path, callback){
+	if(callback)
+		fs.readFile(path, {encoding:'ascii'}, callback);
+	/* function (err, data) {
+	 * 		if (err) throw err;
+	 *		  	console.log(data);
+	 *	});
+	 */
+	else
+		return fs.readFileSync(path, {encoding:'ascii'});
+}
+
+/* no callback: syncronous version */
+function dataToFile(data, path, callback){
+	if (callback)
+		fs.writeFile(path, data, callback);
+	/* 	function (err) {
+     *   if (err)
+     *       console.log('Problems with saving data in ', path);
+     *   else
+     *       console.log('Data written in ', path);
+     *	});
+     */
+	else
+		fs.writeFileSync(path, data);
+	
+}
 
 function bijection(arr1, arr2){
 	//if(!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length!=arr2.length)
