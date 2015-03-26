@@ -333,23 +333,23 @@ describe( 'Voting process', function()
 });
 
 
-/* no callback: syncronous version */
+/* no callback: synchronous version */
 function dataFromFile(path, callback){
 	if(callback)
-		fs.readFile(path, {encoding:'ascii'}, callback);
+		fs.readFile(path, {encoding:'utf8'}, callback);
 	/* function (err, data) {
 	 * 		if (err) throw err;
 	 *		  	console.log(data);
 	 *	});
 	 */
 	else
-		return fs.readFileSync(path, {encoding:'ascii'});
+		return fs.readFileSync(path, {encoding:'utf8'});
 }
 
-/* no callback: syncronous version */
+/* no callback: synchronous version */
 function dataToFile(data, path, callback){
 	if (callback)
-		fs.writeFile(path, data, callback);
+		fs.writeFile(path, data, {encoding:'utf8'}, callback);
 	/* 	function (err) {
      *   if (err)
      *       console.log('Problems with saving data in ', path);
@@ -358,8 +358,7 @@ function dataToFile(data, path, callback){
      *	});
      */
 	else
-		fs.writeFileSync(path, data);
-	
+		fs.writeFileSync(path, data, {encoding:'utf8'});
 }
 
 function bijection(arr1, arr2){
