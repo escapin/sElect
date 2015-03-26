@@ -4,9 +4,28 @@ var config = require('../config');
 var manifest = require('./manifest');
 var server = require('./server');
 
+///////////////////////////////////////////////////////////////////////////////////////
+//State
+ 
 var resultReady = false;
-if (fs.existsSync(config.RESULT_FILE))
+if (fs.existsSync(config.OUTPUT_FILE))
     resultReady = true;
+
+var chainIndex = retreiveChainIndex();
+exports.chainIndex = chainIndex;
+
+var encKey      = manifest.mixServers[chainIndex].encryption_key;
+var decKey      = config.decryption_key;
+var verifKey    = manifest.mixServers[chainIndex].verification_key;
+var signKey     = config.signing_key;
+var precServVerifKey = (chainIndex === 0)? 
+			manifest.collectingServer.verification_key :
+			manifest.mixServers[chainIndex-1].verification_key;
+var numberOfVoters = manifest.voters.length;
+var mix = mixCore.create(encKey, decKey, verifKey, signKey, 
+		precServVerifKey, manifest.hash, numberOfVoters);
+
+//////////////////////////////////////////////////////////////////////////////////////
 
 function retreiveChainIndex(){
 	for(var i=0; i<manifest.mixServers.length; ++i)
@@ -16,47 +35,101 @@ function retreiveChainIndex(){
 	return -1;
 }
 
-var chainIndex = retreiveChainIndex();
-exports.chainIndex = chainIndex;
-
-function saveResult(innerBallots) {
-	fs.writeFile(config.RESULT_FILE, innerBallots, function (err) {
-        if (err)
-            console.log('Problems with saving result', config.RESULT_FILE);
-        else {
-            console.log('Result saved in', config.RESULT_FILE);
-            resultReady = true;
-        }
-    });
-}
-
 // Processes the ballots
 // Parameter 'res' is optional. If present, the summary
 // (success/failure) will be sent to it.
 // Function 'sendResult' is optional. If present, it will
 // send the innerBallots to the next server.
 //
-function processBallots(data, res, sendResult) {
-    server.processBallots(data, function (err, result) {
-        if (err) {
-            console.log(' ...INTERNAL ERROR. Cannot process the ballots: ', err);
-            console.log('RESULT NOT SAVED');
-            if (res) res.send({ ok: false, info: 'INTERNAL ERROR' });
-        }
-        else if (!result.ok) {
-            console.log('ERROR:', result.data);
-            console.log('RESULT NOT SAVED');
-            if (res) res.send({ ok: false, info: result.data });
-        }
-        else {
-            var innerBallots = result.data;
-            // save the  inner ballots
-            saveResult(innerBallots);
-            if (res) res.send({ ok: true, info: 'Data accepted'});
-            // send the inner ballots to the next server, if it exists
-            if (sendResult) sendResult(innerBallots);
-        }
-    });
+function processBallots(inputFile_path, outputFile_path, res, sendResult) {
+    mix.processBallots(inputFile_path, outputFile_path, 
+    		function(err, stdout, stderr){
+				console.log(stdout);
+				console.log(stderr);
+				if(err){
+					console.log(' ...INTERNAL ERROR. Cannot process the ballots: ', err);
+		            console.log('RESULT NOT SAVED');
+		            if (res) res.send({ ok: false, info: 'INTERNAL ERROR' });
+				}
+	    	},
+	    	function (code) {
+	    		console.log("[MixServer.routes] MixServer.java exited with code " + code);
+	    		if(code!==0){
+	    			var info, out;
+	    			switch(code){
+	    				case 10:
+	    					out='***MixServerWrapper*** \t Wrong Number of Arguments';
+	    					break;
+	    				case 11:
+	    					out='***MixServerWrapper*** \t [IOException] reading the file';
+	    					break;
+	    				case 12:
+	    					out='***MixServerWrapper*** \t [IOException] writing the file';
+	    					break;
+	    				case 1:
+	    					info='MalformedData: Wrong signature';
+	    					break;
+	    				case 2:
+	    					info='MalformedData: Wrong tag';
+	    					break;
+	    				case 3:
+	    					info='MalformedData: Wrong election ID';
+	    					break;
+	    				case -1:
+	    					info='ServerMisbehavior: Too many entries';
+	    					break;
+	    				case -2:
+	    					info='ServerMisbehavior: Ballots not sorted';
+	    					break;
+	    				case -3:
+	    					info='ServerMisbehavior: Duplicate ballots';
+	    					break;
+	    				default:
+	    					info='Unknown Error';
+	    			}
+	    			if(out){
+	    				console.log(out);
+	    				if (res) res.send({ ok: false, info: 'INTERNAL ERROR' });
+	    			}
+	    			if(info) {
+	    				console.log(info);
+	    				if (res) res.send({ ok: false, info: info });
+	    			}			
+	    		} else { // code === 0 --> everything went fine
+	    			if (res) res.send({ ok: true, info: 'Data accepted'});
+	    			if(sendResult){
+	    				// retrieve the results from the file
+	    				var innerBallots = dataFromFile(config.OUTPUT_FILE);
+	    				sendResult(innerBallots);
+	    			}
+	    		}	
+	    	});
+    
+//    function (err, result) {
+//        if (err) {
+//            
+//        }
+//        else if (!result.ok) {
+//            console.log('ERROR:', result.data);
+//            console.log('RESULT NOT SAVED');
+//            if (res) res.send({ ok: false, info: result.data });
+//        }
+//        else {
+//            var innerBallots = result.data;
+//            // save the  inner ballots
+//            dataToFile(innerBallots, config.OUTPUT_FILE, function (err) {
+//            	if (err)
+//            		console.log('Problems with saving result in ', config.OUTPUT_FILE);
+//            	else {
+//            		console.log('Result saved in', config.OUTPUT_FILE);
+//            		resultReady = true;
+//            	}
+//            });
+//            if (res) res.send({ ok: true, info: 'Data accepted'});
+//            // send the inner ballots to the next server, if it exists
+//            if (sendResultToNextMix) sendResult(innerBallots);
+//        }
+//    });
 }
 
 var mixserv_options = {};
@@ -86,6 +159,48 @@ function sendResultToNextMix(innerBallots) {
 }
 
 
+//function saveResult(innerBallots) {
+//	fs.writeFile(config.OUTPUT_FILE, innerBallots, function (err) {
+//        if (err)
+//            console.log('Problems with saving result', config.OUTPUT_FILE);
+//        else {
+//            console.log('Result saved in', config.OUTPUT_FILE);
+//            resultReady = true;
+//        }
+//    });
+//}
+
+
+/* no callback: synchronous version */
+function dataFromFile(path, callback){
+	if(callback)
+		fs.readFile(path, {encoding:'utf8'}, callback);
+	/* function (err, data) {
+	 * 		if (err) throw err;
+	 *		  	console.log(data);
+	 *	});
+	 */
+	else
+		return fs.readFileSync(path, {encoding:'utf8'});
+}
+
+/* no callback: synchronous version */
+function dataToFile(data, path, callback){
+	if (callback)
+		fs.writeFile(path, data, {encoding:'utf8'}, callback);
+	/* 	function (err) {
+     *   if (err)
+     *       console.log('Problems with saving data in ', path);
+     *   else
+     *       console.log('Data written in ', path);
+     *	});
+     */
+	else
+		fs.writeFileSync(path, data, {encoding:'utf8'});
+	
+}
+
+
 // Get the data (in 'req'), processes it as the ballots,
 // and send it to the next mix server
 exports.process = function process(req, res)
@@ -97,6 +212,8 @@ exports.process = function process(req, res)
     }
     var data = req.body.data;
     console.log('Ballots coming. Processing...');
+    // save the ballots in the input file
+    dataToFile(data, config.INPUT_FILE);
     // process the ballots and ...
     if(chainIndex+1 >= manifest.mixServers.length) // ... no other mix servers
     	processBallots(data, res);
@@ -107,7 +224,7 @@ exports.process = function process(req, res)
 // Reads data from the given file and  processes it as the ballots
 exports.processFile = function processFile(dataFileName) {
     console.log('Processing the file ', dataFileName);
-    var data = fs.readFileSync(dataFileName, {encoding:'utf8'});
+    var data = dataFromFile(dataFileName);
     processBallots(data);
 }
 
@@ -116,6 +233,7 @@ exports.statusPage = function statusPage(req, res) {
     var status = resultReady ? 'result ready' : 'waiting for data';
     res.send({electionID : manifest.hash, status : status });
 }
+
 
 // Serve a particular static file
 exports.serveFile = function serveFile(path) {

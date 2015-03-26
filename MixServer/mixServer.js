@@ -19,9 +19,9 @@ function error(info) {
 
 // CHECK IF THE RESULT ALREADY EXISTS
 var cmdlineOption = process.argv[2];
-var resultFileExists = fs.existsSync(config.RESULT_FILE);
+var resultFileExists = fs.existsSync(config.OUTPUT_FILE);
 if (resultFileExists && cmdlineOption !== '--serveResult') {
-    error('The file with result (' +config.RESULT_FILE+ ') already exists.\nRemove this file or run the server with --serveResult option.');
+    error('The file with result (' +config.OUTPUT_FILE+ ') already exists.\nRemove this file or run the server with --serveResult option.');
 }
 if (cmdlineOption === '--serveResult' && !resultFileExists) {
     error('The file with result does not exist.');
@@ -56,7 +56,7 @@ app.get('/', routes.statusPage);
 app.get('/status', routes.statusPage);
 app.post('/data', routes.process);
 app.get('/manifest', routes.serveFile(config.MANIFEST_FILE));
-app.get('/result.msg', routes.serveFile(config.RESULT_FILE));
+app.get('/result.msg', routes.serveFile(config.OUTPUT_FILE));
 
 // STARTING THE SERVER
 if (config.useTLS) {
