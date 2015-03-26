@@ -4,7 +4,8 @@
     "TLS_KEY_FILE": "../tmp/server_key.pem",
     "TLS_CERT_FILE": "../tmp/server_cert.pem",
     "useTLS": false,
-    "RESULT_FILE": "../tmp/innerBallots02.msg",
+    "INPUT_FILE": "../tmp/ballots02_input.msg",
+    "OUTPUT_FILE": "../tmp/ballots02_output.msg",
     "class_paths": [
         "../bin",
         "../lib/bcprov-jdk16-1.46.jar"
