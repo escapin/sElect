@@ -5,6 +5,7 @@ import static java.nio.file.StandardOpenOption.*;
 import java.nio.file.*;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import de.unitrier.infsec.functionalities.digsig.Signer;
 import de.unitrier.infsec.functionalities.digsig.Verifier;
@@ -52,15 +53,14 @@ public class MixServerWrapperMain {
 		Decryptor decryptor = new Decryptor(encKey, decKey);
 		Signer signer = new Signer(verifKey, signKey);
 		Verifier precServVerif = new Verifier(precServVerifKey);
-		//System.out.print("[MixServerWrapper] Creating the MixServer...");
 		mixServ = new MixServer(decryptor, signer, precServVerif, elId, numberOfVoters);
-		//System.out.println("OK!");
 		String sInput = null;
 		try {
 			sInput = dataFromFile(inputFile_path);
 		} catch (IOException e) {
 			System.out.println("[MixServerWrapper] \t ***IOException*** \t reading the file: " + inputFile_path);
-			System.out.println("\t\t" + e.getMessage());
+			System.out.print("\t\t");
+			e.printStackTrace();
 			System.exit(11);
 		} 
 		System.out.println("[MixServerWrapper] Ballots read from the file: \t" + inputFile_path);
@@ -82,10 +82,11 @@ public class MixServerWrapperMain {
 		System.out.println("done!");
 		//System.out.println("\n" + string(result) + "\n");
 		try{
-			storeAsFile(string(result), outputFile_path);
+			dataToFile(string(result), outputFile_path);
 		} catch (IOException e) {
 			System.out.println("[MixServerWrapper] ***IOException*** \t writing the file: " + outputFile_path);
-			System.out.println("\t\t" + e.getMessage());
+			System.out.print("\t\t");
+			e.printStackTrace();
 			System.exit(12);
 		}
 		System.out.println("[MixServerWrapper] Results stored in: \t\t" + outputFile_path);
@@ -93,24 +94,27 @@ public class MixServerWrapperMain {
 	
 	private static String dataFromFile(String path) throws IOException {
 		Path file = Paths.get(path);
-		BufferedReader reader = Files.newBufferedReader(file, Charset.defaultCharset()); 
+		BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8);
 		StringBuilder sb = new StringBuilder();
-		String line;
-		while ((line = reader.readLine()) != null) {
-			/* WARN: the string in the var 'line' doesn't include any 
-			 * line-termination characters: line feed ('\n'), a carriage return 
-			 * ('\r'), or a carriage return followed immediately by a linefeed
-			 */
-			sb.append(line);
+		for(int c=reader.read(); c>=0; c=reader.read()){
+			if (c >= 65535) throw new IOException("Not a character");
+			sb.append((char)c);
 		}
 		reader.close();
 		return sb.toString();
 	}
 	
-	private static void storeAsFile(String data, String path) throws IOException {
+	private static void dataToFile(String data, String path) throws IOException {
 		Path file = Paths.get(path);
-		InputStream is = new ByteArrayInputStream(data.getBytes());
-	    Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
+		BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8, 
+				StandardOpenOption.CREATE,				// create a file if it doesn't exist
+				StandardOpenOption.TRUNCATE_EXISTING,	// or initially truncating an existing regular-file to a size of 0
+				StandardOpenOption.WRITE); 				// open the file for writing
+//		for(int i=0;i<data.length(); ++i)
+//			writer.write(data.charAt(i));
+		writer.write(data, 0, data.length());
+		writer.flush();
+		writer.close();
 	}
 }
 
@@ -122,7 +126,7 @@ public class MixServerWrapperMain {
 //	return data;
 //}	
 	
-//	private static void storeAsFile(byte[] data , String path) throws IOException {
+//	private static void dataToFile(byte[] data , String path) throws IOException {
 //		if(data==null)
 //			return;
 //		Path file = Paths.get(path);
