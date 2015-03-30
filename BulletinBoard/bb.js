@@ -9,6 +9,14 @@ var manifest = require('./src/manifest');
 var routes = require('./src/routes');
 var result = require('./src/result');
 
+//create the folder where the data coming from the other servers will be stored
+mkdirp(config.DATA_FOLDER, function (err) {
+    if (err) 
+    	console.error("Error: ", err);
+//    else 
+//    	console.log("Folder '" + config.DATA_FOLDER + "' created.");
+});
+
 // CREATE AND CONFIGURE THE APP
 var app = express();
 
@@ -18,14 +26,6 @@ app.use(bodyParser.urlencoded({ extended: true })); // body parser (important fo
 app.use(express.static('./public')); // static content // was: __dirname + '/public'
 app.use(errorHandler({ dumpExceptions: true, showStack: true })); // error handling (not for production)
 app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
-
-// create the folder where the data coming from the other servers will be stored
-mkdirp(config.DATA_FOLDER, function (err) {
-    if (err) 
-    	console.error("Error: ", err);
-//    else 
-//    	console.log("Folder '" + config.DATA_FOLDER + "' created.");
-});
 
 
 // ROUTES
