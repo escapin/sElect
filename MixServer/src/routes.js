@@ -2,7 +2,7 @@ var fs = require('fs');
 var request = require('request-json');
 var config = require('../config');
 var manifest = require('./manifest');
-var server = require('./server');
+var mixCore = require('./mixCore');
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //State
@@ -87,14 +87,14 @@ function processBallots(inputFile_path, outputFile_path, res, sendResult) {
 	    				default:
 	    					info='Unknown Error';
 	    			}
-	    			if(out){
-	    				console.log(out);
-	    				if (res) res.send({ ok: false, info: 'INTERNAL ERROR' });
-	    			}
 	    			if(info) {
 	    				console.log(info);
 	    				if (res) res.send({ ok: false, info: info });
-	    			}			
+	    			}
+	    			else if(out){
+	    				console.log(out);
+	    				if (res) res.send({ ok: false, info: 'INTERNAL ERROR' });
+	    			}	
 	    		} else { // code === 0 --> everything went fine
 	    			if (res) res.send({ ok: true, info: 'Data accepted'});
 	    			if(sendResult){
@@ -216,16 +216,16 @@ exports.process = function process(req, res)
     dataToFile(data, config.INPUT_FILE);
     // process the ballots and ...
     if(chainIndex+1 >= manifest.mixServers.length) // ... no other mix servers
-    	processBallots(data, res);
+    	processBallots(config.INPUT_FILE, config.OUTPUT_FILE, res);
     else // ... send the result to the next mix server
-    	processBallots(data, res, sendResultToNextMix);
+    	processBallots(config.INPUT_FILE, config.OUTPUT_FILE, res, sendResultToNextMix);
 }
 
 // Reads data from the given file and  processes it as the ballots
 exports.processFile = function processFile(dataFileName) {
     console.log('Processing the file ', dataFileName);
-    var data = dataFromFile(dataFileName);
-    processBallots(data);
+    //var data = dataFromFile(dataFileName);
+    processBallots(dataFileName, config.OUTPUT_FILE);
 }
 
 
