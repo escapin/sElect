@@ -4,11 +4,19 @@ var https = require('https');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var fs = require('fs');
+var mkdirp = require('mkdirp');
 
 var config = require('./config');
 var manifest = require('./src/manifest')
 var routes = require('./src/routes');
 
+//create the folder where the data will be stored
+mkdirp(config.DATA_FOLDER, function (err) {
+    if (err) 
+    	console.error("Error: ", err);
+//    else 
+//    	console.log("Folder '" + config.DATA_FOLDER + "' created.");
+});
 
 // Display the error message and halt the process.
 function error(info) {
