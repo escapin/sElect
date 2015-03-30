@@ -6,9 +6,20 @@ var morgan = require('morgan'); // logging
 var winston = require('winston');
 var basicAuth = require('basic-auth-connect');
 var fs = require('fs');
+var mkdirp = require('mkdirp');
 
 var config = require('./config');
 var manifest = require('./src/manifest')
+
+
+// create the folder where the data will be stored
+mkdirp(config.DATA_FOLDER, function (err) {
+    if (err) 
+    	console.error("Error: ", err);
+//    else 
+//    	console.log("Folder '" + config.DATA_FOLDER + "' created.");
+});
+
 
 // LOGGING (to a file in addition to the console)
 winston.add(winston.transports.File, { filename: config.LOG_FILE });
