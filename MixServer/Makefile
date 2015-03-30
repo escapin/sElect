@@ -1,5 +1,5 @@
 
-build: java_compile npm_install config
+build: java_compile npm_install
 
 java_compile:
 	-mkdir -p ../bin
@@ -16,3 +16,7 @@ clean:
 	-rm -r ../bin
 	-rm -r node_modules
 	-rm -r ../node_modules/cryptofunc/node_modules
+	
+	
+cleanElection:
+	-rm -r ../PartialResults

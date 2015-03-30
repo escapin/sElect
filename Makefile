@@ -85,7 +85,7 @@ libdownload:
 
 
 
-devclean: javaclean npmclean votingboothclean bbclean configfilesclean mixdirsclean logclean
+devclean: cleanElection javaclean npmclean votingboothclean bbclean configfilesclean mixdirsclean logclean
 
 
 javaclean:	
@@ -127,9 +127,9 @@ logclean:
 
 
 cleanElection:
-	-rm tmp/*.msg
-	-rm tmp/*.log
+	-rm -r CollectingServer/data
 	-rm CollectingServer/log.txt
+	-rm -r PartialResults
 	-rm -r BulletinBoard/data
 
 

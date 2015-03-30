@@ -16,3 +16,8 @@ clean:
 	-rm -r ../bin
 	-rm -r node_modules
 	-rm -r ../node_modules/cryptofunc/node_modules
+
+	
+cleanElection:
+	-rm CollectingServer/log.txt
+	-rm -r data
