@@ -127,10 +127,10 @@ logclean:
 
 
 cleanElection:
-	-rm -r CollectingServer/data
+	-rm -r CollectingServer/_data_
 	-rm CollectingServer/log.txt
-	-rm -r PartialResults
-	-rm -r BulletinBoard/data
+	-rm -r _data_PartialResults
+	-rm -r BulletinBoard/_data_
 
 
 test: testdownload testconfigs testrun

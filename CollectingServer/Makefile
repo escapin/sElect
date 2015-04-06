@@ -20,4 +20,4 @@ clean:
 	
 cleanElection:
 	-rm CollectingServer/log.txt
-	-rm -r data
+	-rm -r _data_

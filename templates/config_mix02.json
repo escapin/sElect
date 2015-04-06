@@ -4,9 +4,9 @@
     "TLS_KEY_FILE": "../tmp/server_key.pem",
     "TLS_CERT_FILE": "../tmp/server_cert.pem",
     "useTLS": false,
-    "DATA_FOLDER": "../PartialResults",
-    "INPUT_FILE": "../PartialResults/ballots02_input.msg",
-    "OUTPUT_FILE": "../PartialResults/ballots02_output.msg",
+    "DATA_FOLDER": "../_data_PartialResults",
+    "INPUT_FILE": "../_data_PartialResults/ballots02_input.msg",
+    "OUTPUT_FILE": "../_data_PartialResults/ballots02_output.msg",
     "class_paths": [
         "../bin",
         "../lib/bcprov-jdk16-1.46.jar"

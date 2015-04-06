@@ -19,4 +19,4 @@ clean:
 	
 	
 cleanElection:
-	-rm -r ../PartialResults
+	-rm -r ../_data_PartialResults
