@@ -23,7 +23,7 @@ var verif = crypto.verifsig;
 var TAG_VOTERS = '10';
 var TAG_BALLOTS = '01';
 //console.log('CWD:\t' + process.cwd());
-var PARTIALRESULT_template = process.cwd() + '/data/partialResults';
+var PARTIALRESULT_dir = path.join(process.cwd(), '_data_Test');
 var TIMEOUT = 100000;
 
 var electionID = 'eeee';
@@ -68,7 +68,7 @@ describe( 'Voting process', function()
     
     // create the folder where the data processed 
     // by the mix servers will be stored 
-    mkdirp('./data', function (err) {
+    mkdirp(PARTIALRESULT_dir, function (err) {
         if (err) 
         	console.error("Error: ", err);
 //		else 
@@ -95,7 +95,7 @@ describe( 'Voting process', function()
     	expect(bijection(listElVoters, voters)).toBe(true);
     });
     
-    
+
     it( 'Ballot creation works as expected', function()
     {
         console.log('************ Ballot creation');
@@ -182,9 +182,9 @@ describe( 'Voting process', function()
 
     	// let's first give him trash
     	var signedBallots = crypto.nonce(2000); 
-    	var inputFile_path = PARTIALRESULT_template + 'CRAP_input.msg'; 
+    	var inputFile_path = path.join(PARTIALRESULT_dir, 'partialResultCRAP_input.msg'); 
     	dataToFile(signedBallots, inputFile_path);
-    	var outputFile_path = PARTIALRESULT_template + 'CRAP_output.msg';
+    	var outputFile_path = path.join(PARTIALRESULT_dir, 'partialResultCRAP_output.msg');
     	mixServer[0].processBallots(inputFile_path, outputFile_path,
     		function(err, stdout, stderr){
 				expect (err===null) .toBe(false);
@@ -203,9 +203,9 @@ describe( 'Voting process', function()
     	// now seriously
     	var signedBallots = cs.getResult();
     	// write the result on a file
-    	var inputFile_path = PARTIALRESULT_template + '00_input.msg'; 
+    	var inputFile_path = path.join(PARTIALRESULT_dir, 'partialResult00_input.msg'); 
     	dataToFile(signedBallots, inputFile_path);
-    	var outputFile_path = PARTIALRESULT_template + '00_output.msg';
+    	var outputFile_path = path.join(PARTIALRESULT_dir, 'partialResult00_output.msg');
     	
     	// result to the first mix server
     	mixServer[0].processBallots(inputFile_path, outputFile_path,
@@ -215,7 +215,7 @@ describe( 'Voting process', function()
     			//console.log(outputFile_path);
     			dataFromFile(outputFile_path, function (err, data) {
     				if (err){ 
-    		        	console.log('Problems with reading data from ', path);
+    		        	console.log('Problems with reading data from ', outputFile_path);
     		            console.log('Error: ', err); 
     		            return; 
     		        }
@@ -243,9 +243,9 @@ describe( 'Voting process', function()
 
         console.log('************ Mixing', i);
         
-        var inputFile_path = PARTIALRESULT_template + '0' + i + '_input.msg'; 
+        var inputFile_path = path.join(PARTIALRESULT_dir,'partialResult0' + i + '_input.msg'); 
     	dataToFile(inputData, inputFile_path);
-    	var outputFile_path = PARTIALRESULT_template + '0' + i + '_output.msg';
+    	var outputFile_path = path.join(PARTIALRESULT_dir, 'partialResult0' + i + '_output.msg');
     	
     	mixServer[i].processBallots(inputFile_path, outputFile_path, 
         	function(err, stdout, stderr){
@@ -323,10 +323,16 @@ describe( 'Voting process', function()
         var res = voter.checkColServerResult(cs.getResult(), rec);
         expect(res.ok).toBe(false);
         expect(res.descr).toBe('Ballot not found');
+        console.log(res.blamingData);
+        expect(res.blamingData).not.toBe(undefined);
+        expect(res.blame).toBe(true);
         for (var i=0; i<NMixServ; ++i) {
             var res = voter.checkMixServerResult(i, intermediateResult[i], rec);
             expect(res.ok).toBe(false);
             expect(res.descr).toBe('Ballot not found');
+            console.log(res.blamingData);
+            expect(res.blame).toBe(true);
+            expect(res.blamingData).not.toBe(undefined);
         }
     });
 

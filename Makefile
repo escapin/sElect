@@ -162,12 +162,13 @@ testrun:
 	cd bin; java -cp ".:../lib/*" tests.RunTestSuite
 	@echo
 	@echo     [RUN] tests: nodejs
-	./tests/node_modules/.bin/jasmine-node tests
+	cd tests; ./node_modules/.bin/jasmine-node .
 
 
 
 testclean:
 	-rm -r bin/selectvoting/tests/
 	-rm -r tests/node_modules
+	-rm -r _data_Test
 
 
