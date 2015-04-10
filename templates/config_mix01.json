@@ -1,8 +1,8 @@
 {
     "port": 3301,
     "MANIFEST_FILE": "../_configFiles_/ElectionManifest.json",
-    "TLS_KEY_FILE": "../_configFiles_/select.uni-trier.de.key",
-    "TLS_CERT_FILE": "../_configFiles_/select.uni-trier.de.crt",
+    "TLS_KEY_FILE": "../_configFiles_/select.key",
+    "TLS_CERT_FILE": "../_configFiles_/select.crt",
     "useTLS": false,
     "DATA_FOLDER": "../_data_PartialResults",
     "INPUT_FILE": "../_data_PartialResults/ballots01_input.msg",
