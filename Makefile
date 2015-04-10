@@ -50,7 +50,7 @@ configs: filesconfigs mixconfigs
 
 filesconfigs: 
 	-mkdir -p _configFiles_
-	cp templates/*.pem _configFiles_/
+	cp templates/select.uni-trier.de.* _configFiles_/
 	cp templates/ElectionManifest.json _configFiles_/
 	cp templates/config_bb.json BulletinBoard/config.json
 	cp templates/config_cs.json CollectingServer/config.json
