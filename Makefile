@@ -85,7 +85,7 @@ libdownload:
 
 
 
-devclean: cleanElection javaclean npmclean votingboothclean bbclean configsclean logclean
+devclean: cleanElection javaclean npmclean votingboothclean bbclean configsclean
 
 
 javaclean:	
