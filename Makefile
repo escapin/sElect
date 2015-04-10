@@ -20,16 +20,16 @@ updatecryptokeys_cs:
 updatecryptokeys_mix:
 	cd node_modules/cryptofunc; npm install
 	cd templates; python updateMixServersCryptoKeys.py
-	
 
 
-devenv: javadownload javabuild npminstall configs filescopy libdownload
+
+devenv: javabuild npminstall configs filescopy libdownload
 
 javadownload:
 	-mkdir -p lib
 	wget -P lib -nc http://central.maven.org/maven2/org/bouncycastle/bcprov-${BCPROV_t}/${BCPROV_v}/bcprov-${BCPROV_t}-${BCPROV_v}.jar
 
-javabuild:
+javabuild: javadownload
 	-mkdir -p bin
 	javac -sourcepath src \
           -classpath "lib/*" \
@@ -56,7 +56,7 @@ filesconfigs:
 	cp templates/config_cs.json CollectingServer/config.json
 	cp templates/config_mix.json MixServer/config.json
 	node tools/manifest2js.js templates/ElectionManifest.json > VotingBooth/webapp/ElectionManifest.js
-	
+
 mixconfigs:
 	python configMixServers.py
 
@@ -90,14 +90,14 @@ devclean: cleanElection javaclean npmclean votingboothclean bbclean configsclean
 
 javaclean:	
 	-rm -r bin
-	
+
 npmclean:
 	-rm -r BulletinBoard/node_modules
 	-rm -r CollectingServer/node_modules
 	-rm -r MixServer/node_modules
 	-rm -r VotingBooth/node_modules
 	-rm -r node_modules/cryptofunc/node_modules
-	
+
 votingboothclean:
 	-rm VotingBooth/webapp/js/voterClient.js
 	-rm VotingBooth/webapp/js/cryptofunc.js
@@ -112,11 +112,8 @@ bbclean:
 	-rm BulletinBoard/public/pure/pure-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-old-ie-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-min.css
-	-rm -r BulletinBoard/data
 
-configsclean:
-	configfilesclean
-	mixdirsclean
+configsclean: configfilesclean mixdirsclean
 
 configfilesclean:
 	-rm -r _configFiles_
@@ -153,7 +150,7 @@ testconfigs:
           -d bin \
           src/tests/*.java \
           src/selectvoting/system/wrappers/*.java
-    
+
 	cd node_modules/cryptofunc; npm install
 	cd CollectingServer; npm install
 	cd MixServer; npm install
