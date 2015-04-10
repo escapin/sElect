@@ -181,6 +181,8 @@ function selectBooth() {
             return;
         }
 
+        verwriter.writep('Independently, an automatic verification procedure is being carried out to check that your ballot has been properly counted.');
+
         // Some receipts to verify
         console.log('Receipts to verify:');
         for (var i=0; i<receipts.length; ++i) {
@@ -216,7 +218,8 @@ function selectBooth() {
             }
             else {
                 console.log('WARNING: Receipt', i, 'not verified:', res.descr);
-                verwriter.writee('VERIFICATION FAILED: ballot with receipt ID', receipts[i].receiptID, 'dropped!');
+                verwriter.writee('VERIFICATION FAILED: ballot with receipt ID', receipts[i].receiptID, 'missing!');
+                verwriter.writep('Looking for the misbehaving party.')
                 ok = false;
             }
         }
@@ -251,13 +254,15 @@ function selectBooth() {
                 for (var i=0; i<receipts.length; ++i) {
                     var res = voter.checkColServerResult(data, receipts[i])
                     console.log('Result for', receipts[i].receiptID, ':', res.descr);
-                    if (!res.ok) {
+                    if (!res.ok && res.blame) {
                         ok = false;
                         verwriter.writee('Ballot', receipts[i].receiptID, 'has been dropped by the collecting server');
                         console.log('Blaming data:', res.blamingData);
                         verwriter.writep('The following data contains information necessary to hold the misbehaving party accountable. Please copy it and provide to the voting authorities.');
                         verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
                     }
+                    // TODO The case if the result (data) is invalid (wrong signature, wrong tag, etc.)
+                    // Such a situation is not blamable. 
                 }
                 ok = true;
                 return ok;
@@ -289,13 +294,14 @@ function selectBooth() {
             for (var i=0; i<receipts.length; ++i) {
                 var res = voter.checkMixServerResult(k, data, receipts[i])
                 console.log('Result for', receipts[i].receiptID, ':', res.descr);
-                if (!res.ok) {
+                if (!res.ok && res.blame) {
                     ok = false;
                     verwriter.writee('Ballot', receipts[i].receiptID, 'has been dropped by mix server nr', k);
                     console.log('Blaming data:', res.blamingData);
                     verwriter.writep('The following data contains information necessary to hold the misbehaving party accountable. Please copy it and provide to the voting authorities.');
                     verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
                 }
+                // TODO: As above: deal with not blamable problems.
             }
             return ok;
         })
