@@ -49,9 +49,9 @@ configs: filesconfigs mixconfigs
 
 
 filesconfigs: 
-	-mkdir -p tmp
-	cp templates/*.pem tmp/
-	cp templates/ElectionManifest.json tmp/
+	-mkdir -p _configFiles_
+	cp templates/*.pem _configFiles_/
+	cp templates/ElectionManifest.json _configFiles_/
 	cp templates/config_bb.json BulletinBoard/config.json
 	cp templates/config_cs.json CollectingServer/config.json
 	cp templates/config_mix.json MixServer/config.json
@@ -85,7 +85,7 @@ libdownload:
 
 
 
-devclean: cleanElection javaclean npmclean votingboothclean bbclean configfilesclean mixdirsclean logclean
+devclean: cleanElection javaclean npmclean votingboothclean bbclean configsclean logclean
 
 
 javaclean:	
@@ -114,16 +114,20 @@ bbclean:
 	-rm BulletinBoard/public/pure/grids-responsive-min.css
 	-rm -r BulletinBoard/data
 
+configsclean:
+	configfilesclean
+	mixdirsclean
+
 configfilesclean:
-	-rm -r tmp
+	-rm -r _configFiles_
 
 mixdirsclean:
 	@echo   Removing: 	$(shell ls | egrep "MixServer[0-9]+")
 	$(shell ls | egrep "MixServer[0-9]+" | xargs rm -r)
 
+
 logclean:
 	-rm CollectingServer/log.txt
-
 
 
 cleanElection:

@@ -10,3 +10,5 @@ config.json
 .pydevproject
 /MixServer*/
 !/MixServer/
+_data_*
+_configFiles_/
