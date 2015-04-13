@@ -68,11 +68,45 @@ app.get('/result.msg', routes.serveFile(config.OUTPUT_FILE));
 
 // STARTING THE SERVER
 if (config.useTLS) {
-    var tls_options = {
-        key:  fs.readFileSync(config.TLS_KEY_FILE),
-        cert: fs.readFileSync(config.TLS_CERT_FILE)
-    };
-    app = https.createServer(tls_options, app)
+	// The file containing the chain of trust is optional:
+	// if this is omitted several well known "root" CAs will 
+	// be used, like VeriSign
+	ca = [];
+	try{
+		chain = fs.readFileSync(config.TLS_CHAINTRUST_FILE, 'utf8');		
+		chain = chain.split("\n");
+		cert = [];
+		for (line in chain){
+			if(line.length!==0)
+				cert.push(line);
+			if (line === "/-END CERTIFICATE-/"){
+				ca.push(cert.join("\n"));
+				cert = [];
+			}
+		}
+	} catch(err){
+//		winston.info("Problems opening the file. " + config.TLS_CHAINTRUST_FILE +
+//				"\n\tSince this file is optional, probably it does not exist." +
+//				"\n\t" + err);
+		console.log("WARNING: The file '" + config.TLS_CHAINTRUST_FILE + 
+				"' containg the chain of trust is not present.");
+				
+	}
+	
+	key = fs.readFileSync(config.TLS_KEY_FILE, 'utf8');
+	cert = fs.readFileSync(config.TLS_CERT_FILE, 'utf8');
+	if(ca.length!==0)
+		var tls_options = {
+			ca: ca,
+			key:  key,
+			cert: cert
+    	};
+	else
+		var tls_options = {
+			key:  key,
+			cert: cert
+    	};
+	app = https.createServer(tls_options, app)
 }
 
 var server = app.listen(config.port, function() {
