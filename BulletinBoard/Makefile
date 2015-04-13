@@ -18,4 +18,7 @@ clean:
 	-rm public/pure/pure-min.css
 	-rm public/pure/grids-responsive-old-ie-min.css
 	-rm public/pure/grids-responsive-min.css
+
+
+cleanElection:
 	-rm -r _data_
