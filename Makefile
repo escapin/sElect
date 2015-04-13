@@ -49,9 +49,9 @@ configs: filesconfigs mixconfigs
 
 
 filesconfigs: 
-	-mkdir -p _configFiles_
-	cp templates/select.* _configFiles_/
-	cp templates/ElectionManifest.json _configFiles_/
+	-mkdir -p ../_sElectConfigFiles_/
+	cp templates/select.* ../_sElectConfigFiles_/
+	cp templates/ElectionManifest.json ../_sElectConfigFiles_/
 	cp templates/config_bb.json BulletinBoard/config.json
 	cp templates/config_cs.json CollectingServer/config.json
 	cp templates/config_mix.json MixServer/config.json
@@ -116,7 +116,7 @@ bbclean:
 configsclean: configfilesclean mixdirsclean
 
 configfilesclean:
-	-rm -r _configFiles_
+	-rm -r ../_sElectConfigFiles_/
 
 mixdirsclean:
 	@echo   Removing: 	$(shell ls | egrep "MixServer[0-9]+")
@@ -169,6 +169,6 @@ testrun:
 testclean:
 	-rm -r bin/selectvoting/tests/
 	-rm -r tests/node_modules
-	-rm -r _data_Test
+	-rm -r tests/_data_Test
 
 

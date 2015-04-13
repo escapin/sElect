@@ -1,6 +1,6 @@
 {
     "port" : 3111,
-    "MANIFEST_FILE" : "../_configFiles_/ElectionManifest.json",
+    "MANIFEST_FILE" : "../../_sElectConfigFiles_/ElectionManifest.json",
     
     "DATA_FOLDER": "./_data_",
     "VOTERSLIST_FILE": "./_data_/votersList.msg",

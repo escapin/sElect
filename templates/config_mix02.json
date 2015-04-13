@@ -1,9 +1,9 @@
 {
     "port": 3302,
-    "MANIFEST_FILE": "../_configFiles_/ElectionManifest.json",
-    "TLS_KEY_FILE": "../_configFiles_/select.key",
-    "TLS_CERT_FILE": "../_configFiles_/select.crt",
-    "TLS_CHAINTRUST_FILE": "../_configFiles_/select.chain",
+    "MANIFEST_FILE": "../../_sElectConfigFiles_/ElectionManifest.json",
+    "TLS_KEY_FILE": "../../_sElectConfigFiles_/select.key",
+    "TLS_CERT_FILE": "../../_sElectConfigFiles_/select.crt",
+    "TLS_CHAINTRUST_FILE": "../../_sElectConfigFiles_/select.chain",
     "useTLS": false,
     "DATA_FOLDER": "../_data_PartialResults",
     "INPUT_FILE": "../_data_PartialResults/ballots02_input.msg",
