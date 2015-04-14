@@ -1,5 +1,7 @@
+BCPROV_t=jdk16
+BCPROV_v=1.46
 
-build: java_compile npm_install
+build: javadownload java_compile npm_install
 
 java_compile:
 	-mkdir -p ../bin
@@ -7,6 +9,10 @@ java_compile:
           -classpath "lib/*" \
           -d bin \
           src/selectvoting/system/wrappers/*.java 
+
+javadownload:
+	-mkdir -p ../lib
+	cd .. ; wget -P lib -nc http://central.maven.org/maven2/org/bouncycastle/bcprov-${BCPROV_t}/${BCPROV_v}/bcprov-${BCPROV_t}-${BCPROV_v}.jar
 
 npm_install:
 	npm install

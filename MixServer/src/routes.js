@@ -1,6 +1,6 @@
 var fs = require('fs');
 var request = require('request-json');
-var config = require('../config');
+var config = require('./config');
 var manifest = require('./manifest');
 var mixCore = require('./mixCore');
 
