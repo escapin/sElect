@@ -1,5 +1,5 @@
 var fs = require('fs');
-var config = require('../config.json')
+var config = require('./config')
 var crypto = require('cryptofunc')
 var selectUtils = require('selectUtils');
 

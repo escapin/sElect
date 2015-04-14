@@ -6,7 +6,7 @@ var morgan = require('morgan');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
 
-var config = require('./config');
+var config = require('./src/config');
 var manifest = require('./src/manifest')
 var routes = require('./src/routes');
 
