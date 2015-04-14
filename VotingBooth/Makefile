@@ -10,7 +10,6 @@ build:
 	cd webapp/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-old-ie-min.css
 	-rm webapp/pure/grids-responsive-min.css
 	cd webapp/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css 
-	node ../tools/manifest2js.js ../templates/ElectionManifest.json > webapp/ElectionManifest.js
 
 clean:
 	-rm -r node_modules
