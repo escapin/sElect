@@ -7,9 +7,13 @@ JUNIT_v=4.12
 HARMCRESTCORE_v=1.3
 
 default:
-	@echo Specify the goal: devenv OR  devclean OR cleanElection OR updateCryptoKeys
+	@echo Specify the goal: devenv OR devclean OR cleanElection OR updateCryptoKeys OR prod
 
-
+prod:
+	cd VotingBooth ; make
+	cd CollectingServer ; make
+	cd MixServer ; make
+	cd BulletinBoard ; make
 
 updateCryptoKeys: updatecryptokeys_cs updatecryptokeys_mix
 
