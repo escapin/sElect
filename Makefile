@@ -53,9 +53,9 @@ configs: filesconfigs mixconfigs
 
 
 filesconfigs: 
-	-mkdir -p ../_sElectConfigFiles_/
-	cp templates/select.* ../_sElectConfigFiles_/
-	cp templates/ElectionManifest.json ../_sElectConfigFiles_/
+	-mkdir -p _sElectConfigFiles_
+	cp templates/select.* _sElectConfigFiles_
+	cp templates/ElectionManifest.json _sElectConfigFiles_
 	cp templates/config_bb.json BulletinBoard/config.json
 	cp templates/config_cs.json CollectingServer/config.json
 	cp templates/config_mix.json MixServer/config.json
@@ -120,7 +120,7 @@ bbclean:
 configsclean: configfilesclean mixdirsclean
 
 configfilesclean:
-	-rm -r ../_sElectConfigFiles_/
+	-rm -r _sElectConfigFiles_
 
 mixdirsclean:
 	@echo   Removing: 	$(shell ls | egrep "MixServer[0-9]+")
@@ -134,7 +134,7 @@ logclean:
 cleanElection:
 	-rm -r CollectingServer/_data_
 	-rm CollectingServer/log.txt
-	-rm -r _data_PartialResults
+	-rm -r MixServer*/_data_
 	-rm -r BulletinBoard/_data_
 
 

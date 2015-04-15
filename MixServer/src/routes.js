@@ -1,8 +1,12 @@
 var fs = require('fs');
 var request = require('request-json');
+var path = require('path');
 var config = require('./config');
 var manifest = require('./manifest');
 var mixCore = require('./mixCore');
+
+
+var CURRENT_DIR = process.cwd();
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //State
@@ -23,7 +27,7 @@ var precServVerifKey = (chainIndex === 0)?
 			manifest.mixServers[chainIndex-1].verification_key;
 var numberOfVoters = manifest.voters.length;
 var mix = mixCore.create(encKey, decKey, verifKey, signKey, 
-		precServVerifKey, manifest.hash, numberOfVoters);
+		precServVerifKey, manifest.hash, numberOfVoters, config.class_paths);
 
 //////////////////////////////////////////////////////////////////////////////////////
 

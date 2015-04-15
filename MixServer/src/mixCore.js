@@ -5,8 +5,15 @@ var exports = {};
 var child_process = require('child_process');
 
 exports.create = function(encKey, decKey, verifKey, signKey, precServVerifKey, 
-		electionID, numberOfVoters)
+		electionID, numberOfVoters, classpaths)
 {
+	
+	var classpathString = '"';
+	for (var i in classpaths){
+		classpathString += classpaths[i] + ':';
+	}
+	classpathString+='"';
+	
 	
 	function processBallots(inputFile_path, outputFile_path, callbackExec, onClose) {
 //		console.log('\n\n\n\t\t\t' + encKey + '\n\n\n');
@@ -29,13 +36,22 @@ exports.create = function(encKey, decKey, verifKey, signKey, precServVerifKey,
 //			console.log('stdout: ' + data);
 //		});
 		
-		mixServer = child_process.execFile('java', ['-cp', '.:../lib/*',
-		                'selectvoting.system.wrappers.MixServerWrapperMain',
-		                encKey, decKey, verifKey, signKey, precServVerifKey ,
-		                electionID, numberOfVoters, inputFile_path, outputFile_path
-		                ],
-				        {cwd: '../bin'}, // the working dir of the process: java bin
-				        callbackExec);
+		
+		mixServer = child_process.exec('java -cp ' + classpathString + " " +
+ 		                    		                'selectvoting.system.wrappers.MixServerWrapperMain' + " " +
+		                    		                encKey + " " + decKey + " " + verifKey + " " + signKey + " " + precServVerifKey  
+		                    		                + " " + electionID + " " + numberOfVoters + " " + inputFile_path + " " + outputFile_path, 
+		                    		                	callbackExec);
+		
+//FIME: why doesn't this version work?
+//		mixServer = child_process.execFile('java', ['-cp', classpathString,
+//		                'selectvoting.system.wrappers.MixServerWrapperMain',
+//		                encKey, decKey, verifKey, signKey, precServVerifKey ,
+//		                electionID, numberOfVoters, inputFile_path, outputFile_path
+//		                ],
+//		                {},
+//		                // {cwd: '../bin'}, // the working dir of the process: java bin
+//				        callbackExec);
 		if(onClose)
 			mixServer.on('close', onClose);
 		

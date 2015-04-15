@@ -52,7 +52,7 @@ for(var i=0; i<NMixServ; i++) {
 var mixServEncKeys = mixServPkeKeys.map(function(k){ return k.encryptionKey; });
 var mixServVerifKeys = mixServSigKeys.map(function(k){ return k.verificationKey; });
 
-
+var classpaths = ["../bin", "../lib/*"];
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Test cases
@@ -85,7 +85,7 @@ describe( 'Voting process', function()
     									mixServSigKeys[i].verificationKey,
     									mixServSigKeys[i].signingKey,
     									precServVerifKey, electionID,
-    									NVoters);
+    									NVoters, classpaths);
     }
     var intermediateResult = new Array(NMixServ);
     
