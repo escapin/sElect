@@ -1,8 +1,7 @@
-var config = require('./config.json')
 var express = require('express');
 var morgan = require('morgan');
 
-var port = config.port;
+var port = 3333;ZZ
 var path = 'webapp/';
 
 var app = express();
