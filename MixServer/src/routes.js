@@ -100,6 +100,8 @@ function processBallots(inputFile_path, outputFile_path, res, sendResult) {
 	    				if (res) res.send({ ok: false, info: 'INTERNAL ERROR' });
 	    			}	
 	    		} else { // code === 0 --> everything went fine
+                    console.log('RESULTREADY IS SET TO TRUE')
+                    resultReady = true;
 	    			if (res) res.send({ ok: true, info: 'Data accepted'});
 	    			if(sendResult){
 	    				// retrieve the results from the file

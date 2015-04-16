@@ -136,7 +136,7 @@ cleanElection:
 	-rm CollectingServer/log.txt
 	-rm -r MixServer*/_data_
 	-rm -r BulletinBoard/_data_
-
+	-rm -r _data_PartialResults
 
 test: testdownload testconfigs testrun
 
