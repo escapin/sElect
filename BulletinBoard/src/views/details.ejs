@@ -32,17 +32,20 @@
                         <td><a href="<%= manifest.collectingServer.URI %>/status"><%= manifest.collectingServer.URI %></a> </td>
                     </tr>
                     <tr>
-                        <td>Collecting server's status:</td>
+                        <td></td>
                         <td> <span id="cs-status">?</span> </td>
                     </tr>
+                    
+                    <% for(var j=0; j<manifest.mixServers.length; ++j) { %>
                     <tr>
-                        <td>Final server:</td>
-                        <td> <a href="<%= manifest.mixServers[manifest.mixServers.length-1].URI %>"><%= manifest.mixServers[manifest.mixServers.length-1].URI %></a> </td>
+                        <td> Mix server <%= j %> </td>
+                        <td><a href="<%= manifest.mixServers[j].URI %>/status"><%= manifest.mixServers[j].URI %></a> </td>
+                    </tr><tr>
+                        <td></td>
+                        <td> <span id="ms<%= j %>-status">?</span> </td>
                     </tr>
-                    <tr>
-                        <td>Final server's status:</td>
-                        <td> <span id="fs-status">?</span> </td>
-                    </tr>
+                    <% } %>
+
                     <tr>
                         <td>Full election manifest:</td>
                         <td> <a href="ElectionManifest.json">ElectionManifest.json</a> </td>
@@ -58,7 +61,6 @@
     <script type="text/javascript">
         $(document).ready(function(){
             var electionID = '<%= manifest.hash %>';
-
             var csURI = '<%= manifest.collectingServer.URI %>';
             var csStatusURI = csURI + '/status';
             $.get(csStatusURI)
@@ -77,24 +79,27 @@
                 }
               });
 
-            var fsURI = '<%= manifest.mixServers[manifest.mixServers.length-1].URI %>';
-            var fsStatusURI = fsURI+'/status';
-            $.get(fsStatusURI)
-             .fail(function otpRequestFailed() { 
-                $("#fs-status").addClass('error').text('does not respond');
-              })
-             .done(function castRequestDone(result) {  // we have some response
-                if (result.electionID.toUpperCase() === electionID) {
-                    var status = result.status;
-                    if (status==='result ready')
-                        status += ' (<a href="' +fsURI+ '/result.msg">signed result</a>)'
-                    $("#fs-status").html(status);
-                }
-                else {
-                    $("#fs-status").addClass('error').text('NOT MATCHING ELECTION ID');
-                }
-              });
-
+              <% for (var j=0; j<manifest.mixServers.length; ++j) { %>
+                var fsURI = '<%= manifest.mixServers[j].URI %>';
+                var fsStatusURI = fsURI+'/status';
+                $.get(fsStatusURI)
+                 .fail(function otpRequestFailed() { 
+                    var statusElemIdent = '#ms<%=j%>-status';
+                    $(statusElemIdent).addClass('error').text('does not respond');
+                  })
+                 .done(function castRequestDone(result) {  // we have some response
+                    var statusElemIdent = '#ms<%=j%>-status';
+                    if (result.electionID.toUpperCase() === electionID) {
+                        var status = result.status;
+                        if (status==='result ready')
+                            status += ' (<a href="' +fsURI+ '/result.msg">signed result</a>)'
+                        $(statusElemIdent).html(status);
+                    }
+                    else {
+                        $(statusElemIdent).addClass('error').text('NOT MATCHING ELECTION ID');
+                    }
+                  });
+              <% } %>
         });
     </script>
 <% include footer %>
