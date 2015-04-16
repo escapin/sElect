@@ -143,7 +143,7 @@ function fetchData(url, cont) {
             cont(null, body);
         }
         else {
-            cont('Cannot fetch the page: ', url);
+            cont('Cannot fetch the page: %s', url);
         }
     });
 
