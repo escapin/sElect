@@ -143,7 +143,7 @@ function fetchData(url, cont) {
             cont(null, body);
         }
         else {
-        	var info = 'Cannot fetch the page: ' + url + '\n\t\t\t' + err;
+        	var info = 'Cannot fetch the page: ' + url + '\t\(' + err + ')';
             cont(info);
         }
     });
@@ -169,13 +169,13 @@ exports.fetchAndSaveData = function() {
 			// fetch the votersList from the Collecting Server
 			fetchData(manifest.collectingServer.URI + '/votersList.msg', function (err, data) {
 		        if (!err) {
-		            console.log('** I) \t voters list fetched');
+		            console.log('** I) \t Voters list fetched');
 		            saveData(data, config.VOTERSLIST_FILE);
 		            if (exports.voters === null)
 		            	parseVotersList(data);
 		        }
 		        else {
-		        	console.log("** I) \t Couldn\'t fetch the voters list: \n\t\t" + err);
+		        	console.log("** I) \t" + err);
 		        }
 		    });
 		}
@@ -191,7 +191,7 @@ exports.fetchAndSaveData = function() {
 		    		  fetchData(manifest.mixServers[j].URI + '/result.msg', function(k){
 		    			  return function (err, data) {
 		    				  if (!err) {
-		    					  console.log('** II) \t results of the #%s-th mix server fetched', k);
+		    					  console.log('** II) \t Results of the #%s-th mix server fetched', k);
 		    					  // recreate the path where to save the result because the for loop could be
 		    					  // in a different iteration than the callback
 		    					  var mixServer_path = config.RESULTMIX_FILE.replace('%d', k);
@@ -200,8 +200,7 @@ exports.fetchAndSaveData = function() {
 		    						  parseFinalResult(data);
 		    				  }
 		    				  else {
-		    					console.log("** II) \tCouldn\'t fetch the results of " +
-		    							"the #%s-th mix server: \n\t\t %s", k, err);
+		    					console.log("** II) \t" + err);
 		    				  }
 		    			  }
 		    		  }(j));
@@ -216,11 +215,11 @@ exports.fetchAndSaveData = function() {
 			// fetch the results form the Collecting Server
 			fetchData(manifest.collectingServer.URI + '/result.msg', function (err, data) {
 				if (!err) {
-					console.log('** III) \t results of the Collecting Server fetched');
+					console.log('** III)\tResults of the Collecting Server fetched');
 					saveData(data, config.RESULTCS_FILE);
 				}
 				else {
-					console.log("** III)\tCouldn\'t fetch the results of the Collecting Server: \n\t\t" + err);
+					console.log("** III)\t" + err);
 				}
 			});
 		}
