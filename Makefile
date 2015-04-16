@@ -123,8 +123,8 @@ configfilesclean:
 	-rm -r _sElectConfigFiles_
 
 mixdirsclean:
-	@echo   Removing: 	$(shell ls | egrep "MixServer[0-9]+")
-	$(shell ls | egrep "MixServer[0-9]+" | xargs rm -r)
+	@echo   Removing: 	$(shell ls MixServer | egrep "mix[0-9]+")
+	rm -r mix
 
 
 logclean:
@@ -134,9 +134,8 @@ logclean:
 cleanElection:
 	-rm -r CollectingServer/_data_
 	-rm CollectingServer/log.txt
-	-rm -r MixServer*/_data_
+	-rm -r mix/*/_data_
 	-rm -r BulletinBoard/_data_
-	-rm -r _data_PartialResults
 
 test: testdownload testconfigs testrun
 
