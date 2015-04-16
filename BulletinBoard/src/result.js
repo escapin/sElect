@@ -143,7 +143,7 @@ function fetchData(url, cont) {
             cont(null, body);
         }
         else {
-        	var info = 'Cannot fetch the page: ' + url;
+        	var info = 'Cannot fetch the page: ' + url + '\n\t\t\t' + err;
             cont(info);
         }
     });
@@ -175,8 +175,7 @@ exports.fetchAndSaveData = function() {
 		            	parseVotersList(data);
 		        }
 		        else {
-		        	console.log("** I) \t Couldn\'t fetch the voters list.");
-		        	console.log("\t\t" + err);
+		        	console.log("** I) \t Couldn\'t fetch the voters list: \n\t\t" + err);
 		        }
 		    });
 		}
@@ -201,8 +200,8 @@ exports.fetchAndSaveData = function() {
 		    						  parseFinalResult(data);
 		    				  }
 		    				  else {
-		    					console.log("** II) \t Couldn\'t fetch the results of the #%s-th mix server.", k);
-		    			        console.log("\t\t" + err);
+		    					console.log("** II) \tCouldn\'t fetch the results of " +
+		    							"the #%s-th mix server: \n\t\t %s", k, err);
 		    				  }
 		    			  }
 		    		  }(j));
@@ -221,8 +220,7 @@ exports.fetchAndSaveData = function() {
 					saveData(data, config.RESULTCS_FILE);
 				}
 				else {
-					console.log("** III) \t Couldn\'t fetch the results of the Collecting Server.");
-		        	console.log("\t\t" + err);
+					console.log("** III)\tCouldn\'t fetch the results of the Collecting Server: \n\t\t" + err);
 				}
 			});
 		}
