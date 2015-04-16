@@ -12,7 +12,8 @@ function selectBooth() {
 
 
     // For navigation
-    var activeTabId = "#welcome";
+    var activeTabId = null;
+    // var activeTabId = "#welcome";
 
     // Manifest
     var manifest = JSON.parse(electionManifestRaw);
@@ -102,7 +103,7 @@ function selectBooth() {
         .catch(function (err) {
             console.log('Problem with the final server:', err)
             // TODO: what to do in this case (the final server is
-            // done or it works for a different election ID)
+            // down or it works for a different election ID)
             showTab('#welcome'); // for now, we just go to voting
         });
 
@@ -120,11 +121,11 @@ function selectBooth() {
             var url = manifest.mixServers[manifest.mixServers.length-1].URI+'/status';
             $.get(url)
              .fail(function () { 
-                reject('Server down');
+                reject('The final server is down');
               })
              .done(function (result) {  // we have some response
                 if (result.electionID.toUpperCase() !== electionID.toUpperCase()) 
-                    reject('Wrong election ID')
+                    reject('The final server uses a wrong election ID')
                 else resolve (result.status==='result ready');
               });
         });
@@ -443,7 +444,6 @@ function selectBooth() {
                     // and validate it
                     var receiptValid = voter.validateReceipt(receipt); 
                     if (receiptValid) {
-                        // TODO Save the receipt
                         storeReceipt(receipt);
 
                         // show the "ballot accepted" tab
@@ -475,7 +475,9 @@ function selectBooth() {
 
     function goToBB(event) {
         console.log('GO TO BB -- TO BE DONE!');
-        var url = manifest.bulletinBoards[0].URI; // FIXME
+        var url = manifest.bulletinBoards[0].URI;
+        // TODO: above we always take the first bulletin board.
+        // We may need a better policy.
         console.log(url);
         window.open(url, '_blank').focus();
         return false;
