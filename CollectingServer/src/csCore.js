@@ -6,7 +6,8 @@ var HashMap = require('hashmap');
 var crypto = require('cryptofunc');
 var cryptoUtils = require('cryptoUtils');
 
-var TAG_ACCEPTED = '00';  // (hex encoded) tag
+// (hex encoded) tags
+var TAG_ACCEPTED = '00'; 
 var TAG_BALLOTS = '01';
 var TAG_VOTERS = '10';
 
@@ -28,6 +29,10 @@ exports.create = function(electionID, listOfEligibleVoters, signKey)
 		var voter_id = listOfEligibleVoters[i];
 		eligibleVoters[voter_id] = true;
 	}
+    // TODO: this is not done correctly. Now, for example
+    // if (eligibleVoters['toString']) { ... } 
+    // will execute ...
+    
 	
 	// 'ballot': the n-time encrypted ballot
 	// 'receipt' format: signatureOf[TAG_ACCEPTED, electionID, ballot]
@@ -74,6 +79,7 @@ exports.create = function(electionID, listOfEligibleVoters, signKey)
 		msgArray.sort(); // lexicographic order
 		var result = '';
 		var last;
+        // TODO: reimplement it in a more efficent way (the cryptofunc module has means for it)
 		for(var i=msgArray.length-1; i>=0; --i){
 		// inverse order necessary to make the implementation of crypto.concatenate work
 			var current = msgArray[i];
@@ -85,9 +91,13 @@ exports.create = function(electionID, listOfEligibleVoters, signKey)
 	}
 	
 	
-	return {electionID: electionID, listOfEligibleVoters: listOfEligibleVoters,
-			signKey: signKey, eligibleVoters: eligibleVoters,
-			collectBallot: collectBallot, getResult: getResult, getVotersList: getVotersList};
+	return { electionID: electionID, 
+             listOfEligibleVoters: listOfEligibleVoters,
+			 signKey: signKey, 
+             eligibleVoters: eligibleVoters,
+			 collectBallot: collectBallot, 
+             getResult: getResult, 
+             getVotersList: getVotersList };
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

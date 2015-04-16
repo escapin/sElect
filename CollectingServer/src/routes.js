@@ -250,7 +250,7 @@ exports.info = function info(req, res)  {
     var timeToOpen  = selectUtils.timeDelta2String(startTime - now);
     var timeToClose = selectUtils.timeDelta2String(endTime - now);
     var openingTime = util.format('Time to open:  %s (%s)', selectUtils.timeDelta2String(timeToOpen), startTime);
-    var closingTime =     util.format('Time to close: %s (%s)', selectUtils.timeDelta2String(timeToClose), endTime);
+    var closingTime = util.format('Time to close: %s (%s)', selectUtils.timeDelta2String(timeToClose), endTime);
 
     res.send({
         electionID : manifest.hash,
@@ -309,8 +309,6 @@ function closeElection() {
     
     var signedVotersList = cs.getVotersList();
     saveData(signedVotersList, config.VOTERSLIST_FILE);
-    // FIXME TO BE DONE: send the voters' list to the Bulletin Board
-    
 }
 
 // Send data to the server with that URI
