@@ -173,6 +173,10 @@ exports.fetchAndSaveData = function() {
 		            if (exports.voters === null)
 		            	parseVotersList(data);
 		        }
+		        else {
+		        	console.log("** I) \t Couldn\'t fetch the voters list.");
+		        	console.log("\t\t" + err);
+		        }
 		    });
 		}
 	});
@@ -195,6 +199,10 @@ exports.fetchAndSaveData = function() {
 		    					  if(k===NMixServers-1 && exports.finalResult === null) // the final results
 		    						  parseFinalResult(data);
 		    				  }
+		    				  else {
+		    					console.log("** II) \t Couldn\'t fetch the results of the #%s-th mix server.", k);
+		    			        console.log("\t\t" + err);
+		    				  }
 		    			  }
 		    		  }(j));
 		    	  }
@@ -210,6 +218,10 @@ exports.fetchAndSaveData = function() {
 				if (!err) {
 					console.log('** III) \t results of the Collecting Server fetched');
 					saveData(data, config.RESULTCS_FILE);
+				}
+				else {
+					console.log("** III) \t Couldn\'t fetch the results of the Collecting Server.");
+		        	console.log("\t\t" + err);
 				}
 			});
 		}
