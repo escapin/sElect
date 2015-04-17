@@ -26,7 +26,7 @@ function selectBooth() {
     var choice = null;
 
     var electionID = manifest.hash;
-    var shortenedElectionID = electionID.slice(0,6) + '...';
+    var shortenedElectionID =  electionID.toUpperCase(); // electionID.slice(0,6) + '...';
     var colServVerifKey = manifest.collectingServer.verification_key;
     // retrieve the encryption and verification keys of the mix servers from the manifest
     var mixServEncKeys = manifest.mixServers.map(function (ms) { return ms.encryption_key; })
@@ -405,7 +405,7 @@ function selectBooth() {
         var o = $('#inp-otp').val();
         if( !o || o==='' ) // it should not happen
             return false;
-        otp = o;
+        otp = o.trim();
 
         $('#otp').fadeOut(FADE_TIME, function() {
             showTab('#choice');
