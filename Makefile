@@ -59,7 +59,7 @@ filesconfigs:
 	cp templates/config_bb.json BulletinBoard/config.json
 	cp templates/config_cs.json CollectingServer/config.json
 	cp templates/config_mix.json MixServer/config.json
-	node tools/manifest2js.js templates/ElectionManifest.json > VotingBooth/webapp/ElectionManifest.js
+	ln -s ../templates/ElectionManifest.json VotingBooth/
 
 mixconfigs:
 	python configMixServers.py
@@ -103,6 +103,7 @@ npmclean:
 	-rm -r node_modules/cryptofunc/node_modules
 
 votingboothclean:
+	-rm VotingBooth/ElectionManifest.json
 	-rm VotingBooth/webapp/js/voterClient.js
 	-rm VotingBooth/webapp/js/cryptofunc.js
 	-rm VotingBooth/webapp/ElectionManifest.js

@@ -1,6 +1,9 @@
 .classpath
 .project
+/mix/
+/_sElectConfigFiles_/
 /lib/
+/VotingBooth/ElectionManifest.json
 bin/
 tmp/
 # all 'node_modules' directories except for that in the root dir
@@ -8,7 +11,5 @@ tmp/
 *.swp
 config.json
 .pydevproject
-/MixServer*/
-!/MixServer/
 _data_*
 _configFiles_/
