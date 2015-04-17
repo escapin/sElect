@@ -28,6 +28,10 @@
                         <td> <%= closingTime %> </td>
                     </tr>
                     <tr>
+                        <td>Full election manifest:</td>
+                        <td> <a href="ElectionManifest.json">ElectionManifest.json</a> </td>
+                    </tr>
+                    <tr>
                         <td>Collecting server:</td>
                         <td><a href="<%= manifest.collectingServer.URI %>/status"><%= manifest.collectingServer.URI %></a> </td>
                     </tr>
@@ -46,10 +50,6 @@
                     </tr>
                     <% } %>
 
-                    <tr>
-                        <td>Full election manifest:</td>
-                        <td> <a href="ElectionManifest.json">ElectionManifest.json</a> </td>
-                    </tr>
                 </tbody>
             </table>
             <div class="toright">
@@ -88,6 +88,7 @@
                     $(statusElemIdent).addClass('error').text('does not respond');
                   })
                  .done(function castRequestDone(result) {  // we have some response
+                    var fsURI = '<%= manifest.mixServers[j].URI %>';
                     var statusElemIdent = '#ms<%=j%>-status';
                     if (result.electionID.toUpperCase() === electionID) {
                         var status = result.status;
