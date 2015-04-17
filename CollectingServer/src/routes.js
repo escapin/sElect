@@ -195,14 +195,22 @@ exports.cast = function cast(req, res)
     var email = req.body.email;
     var otp = req.body.otp;
     var ballot = req.body.ballot;
-
+    var reqElID = req.body.electionID;
+    
     // make sure that we have all the pieces:
-    if (!email || !otp || !ballot ) {
+    if (!email || !otp || !ballot || !reqElID) {
         winston.info('Cast request (%s) ERROR: Invalid request', email)
         res.send({ ok: false, descr: 'Invalid request' });
         return;
     }
 
+    // do the election ID's match?
+    if (electionID !== reqElID) {
+        winston.info('Cast request (%s) BALLOT REJECTED - WRONG ELECTION ID', email);
+        res.send({ ok: false, descr: 'Wrong election ID' }); 
+        return;    
+    }
+    
     // is the server active?
     if (!status.isActive()) {
         var descr = (status.isClosed() ? 'Election closed' : 'Election not opened yet');

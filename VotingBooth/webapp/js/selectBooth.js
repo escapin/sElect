@@ -431,7 +431,7 @@ function selectBooth() {
 
             showProgressIcon();
             // Make an (ajax) cast request:
-            $.post(manifest.collectingServer.URI+"/cast", {'email': email, 'otp': otp, 'ballot': receipt.ballot})
+            $.post(manifest.collectingServer.URI+"/cast", {'email': email, 'otp': otp, 'electionID': electionID, 'ballot': receipt.ballot})
              .fail(function otpRequestFailed() {  // request failed
                 showError('Cannot connect with the server');
               })
