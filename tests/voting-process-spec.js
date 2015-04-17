@@ -323,14 +323,12 @@ describe( 'Voting process', function()
         var res = voter.checkColServerResult(cs.getResult(), rec);
         expect(res.ok).toBe(false);
         expect(res.descr).toBe('Ballot not found');
-        console.log(res.blamingData);
         expect(res.blamingData).not.toBe(undefined);
         expect(res.blame).toBe(true);
         for (var i=0; i<NMixServ; ++i) {
             var res = voter.checkMixServerResult(i, intermediateResult[i], rec);
             expect(res.ok).toBe(false);
             expect(res.descr).toBe('Ballot not found');
-            console.log(res.blamingData);
             expect(res.blame).toBe(true);
             expect(res.blamingData).not.toBe(undefined);
         }
