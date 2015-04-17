@@ -478,7 +478,6 @@ function selectBooth() {
     }
 
     function goToBB(event) {
-        console.log('GO TO BB -- TO BE DONE!');
         var url = manifest.bulletinBoards[0].URI;
         // TODO: above we always take the first bulletin board.
         // We may need a better policy.
