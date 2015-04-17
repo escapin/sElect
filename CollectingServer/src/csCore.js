@@ -79,7 +79,7 @@ exports.create = function(electionID, listOfEligibleVoters, signKey)
 		msgArray.sort(); // lexicographic order
 		var result = '';
 		var last;
-        // TODO: reimplement it in a more efficent way (the cryptofunc module has means for it)
+        // TODO: (if this is visibly slow) reimplement it in a more efficent way
 		for(var i=msgArray.length-1; i>=0; --i){
 		// inverse order necessary to make the implementation of crypto.concatenate work
 			var current = msgArray[i];
