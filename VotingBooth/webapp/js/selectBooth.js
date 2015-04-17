@@ -265,7 +265,6 @@ function selectBooth() {
                     // TODO The case if the result (data) is invalid (wrong signature, wrong tag, etc.)
                     // Such a situation is not blamable. 
                 }
-                ok = true;
                 return ok;
             });
     }
@@ -347,6 +346,13 @@ function selectBooth() {
         $('#processing').hide();
         activeTabId = tabId;
         $(tabId).fadeIn(FADE_TIME);
+        // Focus
+        switch (tabId) {
+            case '#welcome':
+                $('#inp-email').focus(); break;
+            case '#otp':
+                $('#inp-otp').focus(); break;
+        }
     }
 
     function showProgressIcon() {
@@ -382,7 +388,6 @@ function selectBooth() {
                     // Show the next window (OTP)
                     $('#inp-otp').val(''); // emtpy the otp input field
                     showTab('#otp');
-                    $('#inp-otp').focus();
                 }
               })
              .fail(function otpRequestFailed() {
@@ -467,7 +472,6 @@ function selectBooth() {
         // make the active tab disappear
         $('#error').fadeOut(FADE_TIME, function() {
             // show the welcome tab
-            $('#inp-email').focus();
             showTab('#welcome');
         });
         return false; // prevents any further submit action
@@ -530,10 +534,6 @@ function selectBooth() {
     $('#verification form').submit(goToBB);
     $('input[name="choice"]').change(whenChoiceChanges);
     
-
-    // Focus on the email input
-    $('#inp-email').focus();
-
 
     initiateBooth(); // checks the status and opens the voting or verification tab
 }
