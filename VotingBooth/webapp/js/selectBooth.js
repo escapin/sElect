@@ -376,7 +376,7 @@ function selectBooth() {
             // show processing icon
             showProgressIcon();
             // Make an (ajax) otp request:
-            $.post(manifest.collectingServer.URI+"/otp", {'email': email})
+            $.post(manifest.collectingServer.URI+"/otp", {'electionID': electionID, 'email': email})
              .done(function otpRequestDone(result) {
                 if (!result) {
                     showError('Unexpected error');

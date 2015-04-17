@@ -124,65 +124,73 @@ var log = fs.createWriteStream(config.ACCEPTED_BALLOTS_LOG_FILE, {flags:'a', enc
 exports.otp = function otp(req, res) 
 {
     var email = req.body.email;
+    var reqElId = req.body.electionID;
 
     if (!status.isActive()) { // if the status is not active, reject the request
         var descr = (status.isClosed() ? 'Election closed' : 'Election not opened yet');
-        winston.info('OTP request (%s) ERROR: %s.', email, descr)
+        winston.info('OTP request (%s) ERROR: %s.', email, descr);
         res.send({ ok: false, descr: descr }); 
         return;
     }
 
-    if (email) {
-        if (!cs.eligibleVoters[email]) // not eligible voter
-        {
-            winston.info('OTP request (%s) ERROR: Voter not eligible', email);
-            res.send({ ok: false, descr: 'Invalid voter identifier (e-mail)' });
-        }
-        else // voter is eligible; create a fresh OTP and send it
-        {
-            // Generate OTP (if not generated yet):
-        	if (otp_store[email]==null) { // OTP not generated yet (for the given voter)
-        		// generate store the OTP under the voter id (email)
-        		otp_store[email] = crypto.nonce().slice(0,10); // an OTP will have 5 bytes
-        		winston.info('OTP request (%s) accepted. Fresh OTP = %s', email, otp_store[email]);
-        	}
-        	else // OTP already generated
-        		winston.info('OTP request (%s) accepted. Already stored OTP = %s', email, otp_store[email]);
+    if (!email || !reqElId) {
+        winston.info('OTP request (%s) ERROR: Malformed request', email);
+        res.send({ ok: false, descr: 'Malformed request' }); 
+        return;
+    }
 
-            // Send email:
-            if (config.sendEmail) {
-                var now = new Date();
-                var sentRecently = mail_timestamp[email] != null
-                                   && (now - mail_timestamp[email]) < config.timespanEmail*60000; // timespan is specified in minutes (in the config file)
-                if (!sentRecently) {
-                    // Sent an e-mail with the OTP
-                    winston.info('Sending an email to \'%s\' with OTP  ', email, otp_store[email]);
-                    var emailContent = "This e-mail contains your one time password (OTP) for the sElect voting system. \n\n";
-                    emailContent += 'Election title: ' + manifest.title + '\n\nOne time password: ' + otp_store[email] + '\n';
-                    sendEmail(email, 'Your One Time Password for sElect', emailContent, function (err,info) {
-                        if (err) {
-                            winston.info(' ...Error:', err);
-                            // TODO: what to do if we are here (the e-mail has not been sent)?
-                            res.send({ ok: false, descr: 'Problems in sending the E-mail.' });
-                        } else {
-                            winston.info(' ...E-mail sent: ' + info.response);
-                            mail_timestamp[email] = new Date(); // now
-                            res.send({ ok: true });
-                        }
-                    });
-                }
-                else { // otp was sent recently
-                    winston.info('E-mail to \'%s\' was sent recently (not sent this time).', email );
-                    res.send({ ok: true });
-                }
+    if (reqElId !== electionID) {
+        winston.info('OTP request (%s) ERROR: Wrong election id', email);
+        res.send({ ok: false, descr: 'Wrong election ID' }); 
+        return;
+    }
+
+    if (!cs.eligibleVoters[email]) // not eligible voter
+    {
+        winston.info('OTP request (%s) ERROR: Voter not eligible', email);
+        res.send({ ok: false, descr: 'Invalid voter identifier (e-mail)' });
+    }
+    else // voter is eligible; create a fresh OTP and send it
+    {
+        // Generate OTP (if not generated yet):
+        if (otp_store[email]==null) { // OTP not generated yet (for the given voter)
+            // generate store the OTP under the voter id (email)
+            otp_store[email] = crypto.nonce().slice(0,10); // an OTP will have 5 bytes
+            winston.info('OTP request (%s) accepted. Fresh OTP = %s', email, otp_store[email]);
+        }
+        else // OTP already generated
+            winston.info('OTP request (%s) accepted. Already stored OTP = %s', email, otp_store[email]);
+
+        // Send email:
+        if (config.sendEmail) {
+            var now = new Date();
+            var sentRecently = mail_timestamp[email] != null
+                               && (now - mail_timestamp[email]) < config.timespanEmail*60000; // timespan is specified in minutes (in the config file)
+            if (!sentRecently) {
+                // Sent an e-mail with the OTP
+                winston.info('Sending an email to \'%s\' with OTP  ', email, otp_store[email]);
+                var emailContent = "This e-mail contains your one time password (OTP) for the sElect voting system. \n\n";
+                emailContent += 'Election title: ' + manifest.title + '\n\nOne time password: ' + otp_store[email] + '\n';
+                sendEmail(email, 'Your One Time Password for sElect', emailContent, function (err,info) {
+                    if (err) {
+                        winston.info(' ...Error:', err);
+                        // TODO: what to do if we are here (the e-mail has not been sent)?
+                        res.send({ ok: false, descr: 'Problems in sending the E-mail.' });
+                    } else {
+                        winston.info(' ...E-mail sent: ' + info.response);
+                        mail_timestamp[email] = new Date(); // now
+                        res.send({ ok: true });
+                    }
+                });
             }
-            else { // ! config.sentEmail
+            else { // otp was sent recently
+                winston.info('E-mail to \'%s\' was sent recently (not sent this time).', email );
                 res.send({ ok: true });
             }
         }
-    }
-    else {
-        res.send({ ok: false, descr: 'Empty e-mail address' }); 
+        else { // ! config.sentEmail
+            res.send({ ok: true });
+        }
     }
 };
 
