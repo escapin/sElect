@@ -182,13 +182,16 @@ function selectBooth() {
             return;
         }
 
-        verwriter.writep('Independently, an automatic verification procedure is being carried out to check that your ballot has been properly counted.');
-
         // Some receipts to verify
-        console.log('Receipts to verify:');
-        for (var i=0; i<receipts.length; ++i) {
-            console.log('  ', receipts[i].receiptID);
+        var recIDs = receipts.map(function (rec) {return rec.receiptID}).join(', ') + '.';
+        if (receipts.length > 1) {
+            verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
+                             'that the ballots with the following receipt identifiers have been properly counted:', recIDs)
+        } else {
+            verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
+                             'that the ballot with the following receipt identifier has been properly counted:', recIDs)
         }
+        console.log('Receipts to verify:', recIDs);
 
         // Fetch the result of the final mix server and run the
         // verification procedure on it
@@ -225,7 +228,10 @@ function selectBooth() {
             }
         }
 
-        if (!ok) { // Something went wrong. Assign the blame.
+        if (ok) { // verification succedded
+            verwriter.writes('Verification successful <font size=7>&#x2713;</font>');
+        }
+        else  { // Something went wrong. Assign the blame.
             blame(receipts);
         }
     }
@@ -325,7 +331,8 @@ function selectBooth() {
         return {
                 write  : function() { object.append(merge(arguments)); },
                 writep : function() { object.append('<p>' + merge(arguments) + '</p>'); },
-                writee : function() { object.append('<p class="error">' + merge(arguments) + '</p>'); }
+                writee : function() { object.append('<p class="error">' + merge(arguments) + '</p>'); },
+                writes : function() { object.append('<p class="success">' + merge(arguments) + '</p>'); }
         };
     }
 

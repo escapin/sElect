@@ -39,6 +39,11 @@ p.error {
     font-weight: bold;
 }
 
+p.success {
+    color: #080;
+    font-weight: bold;
+}
+
 div.scrollable {
     width: auto;
     overflow: auto;
