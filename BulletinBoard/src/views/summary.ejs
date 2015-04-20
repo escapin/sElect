@@ -5,12 +5,12 @@
             <% if (!ready) { %>
                 <li class="pure-menu-selected"><a href="summary">Summary</a></li>
                 <li class="pure-menu-disabled"><a href="#">Verification Codes</a></li>
-                <li class="pure-menu-disabled"><a href="#">List of Voters</a></li>
+         <!--   <li class="pure-menu-disabled"><a href="#">List of Voters</a></li> -->   
                 <li><a href="details">Additional Details</a></li>
             <% } else { %>
                 <li class="pure-menu-selected"><a href="summary">Summary</a></li>
                 <li><a href="votes">Verification Codes</a></li>
-                <li><a href="voters">List of Voters</a></li>
+           <!-- <li><a href="voters">List of Voters</a></li>      -->  
                 <li><a href="details">Additional Details</a></li>
             <% }  %>
             </ul>
@@ -58,7 +58,8 @@
                         </p>
                     </div>
                 </div>
-                <div class="pure-u-1 pure-u-md-1-2">
+<!--                 
+				<div class="pure-u-1 pure-u-md-1-2">
                     <div class="extrainfo">
                         If you want to check who have voted, you can
                         <p>
@@ -66,7 +67,8 @@
                         </p>
                         (If you have not voted, your identifier should not be listed there.)
                     </div>
-                </div>
+                </div> 
+-->
             </div>
 
         <% }  %>
