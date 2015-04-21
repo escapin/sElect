@@ -139,19 +139,16 @@ function selectBooth() {
     // some receipt stored, it adds the new receipt to these.
     //
     function storeReceipt(receipt) {
-        console.log('Save receipt');
         var receipts, receiptsJSON;
 
         if ( localStorage.getItem('receipts') !== null ) {
             receiptsJSON = localStorage.getItem('receipts');
             receipts = JSON.parse(receiptsJSON);
-            console.log('Old:', receipts);
             receipts.push(receipt);
         }
         else
             receipts = [receipt];
         receiptsJSON = JSON.stringify(receipts);
-        console.log('Saving:', receiptsJSON);
         localStorage.setItem('receipts', receiptsJSON);
     }
 
@@ -183,7 +180,7 @@ function selectBooth() {
         }
 
         // Some receipts to verify
-        var recIDs = receipts.map(function (rec) {return rec.receiptID}).join(', ') + '.';
+        var recIDs = receipts.map(function (rec) {return rec.receiptID}).join(', ');
         if (receipts.length > 1) {
             verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
                              'that the ballots with the following receipt identifiers have been properly counted:', recIDs)
@@ -434,7 +431,7 @@ function selectBooth() {
             // Create the ballot
             console.log('CREATING BALLOT FOR:', email, otp, choice);
             var receipt = voter.createBallot(choice);
-            console.log('RECEIPT:', receipt);
+            // console.log('RECEIPT:', receipt);
 
             showProgressIcon();
             // Make an (ajax) cast request:
@@ -488,7 +485,6 @@ function selectBooth() {
         var url = manifest.bulletinBoards[0].URI;
         // TODO: above we always take the first bulletin board.
         // We may need a better policy.
-        console.log(url);
         window.open(url, '_blank').focus();
         return false;
     }
