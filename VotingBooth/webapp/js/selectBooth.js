@@ -86,7 +86,6 @@ function selectBooth() {
     /// INITIATE BOOTH
 
     function initiateBooth() {
-        logger({action:'init booth', elid:electionID});
         // Detemine the status of the system: (not-yet) open/closed, 
         // by quering the final mix server.
         // Depending on the state, either the voting tab or the
