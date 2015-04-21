@@ -41,7 +41,7 @@ function selectBooth() {
     //////////////////////////////////////////////////////////////////////////////
     /// AUXILIARY FUNCTIONS
 
-    var loggerAddr = 'https://select.uni-trier.de/logger';
+    var loggerAddr = 'https://select.uni-trier.de/logger/log';
     function logger(json) {
         $.post(loggerAddr, json);
     }
