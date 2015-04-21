@@ -24,6 +24,7 @@ function selectBooth() {
     var email = null;
     var otp = null;
     var choice = null;
+    var receiptIdentifiers = null;
 
     var electionID = manifest.hash;
     var shortenedElectionID =  electionID.toUpperCase(); // electionID.slice(0,6) + '...';
@@ -39,6 +40,11 @@ function selectBooth() {
 
     //////////////////////////////////////////////////////////////////////////////
     /// AUXILIARY FUNCTIONS
+
+    var loggerAddr = 'https://select.uni-trier.de/logger';
+    function logger(json) {
+        $.post(loggerAddr, json);
+    }
 
     function optionsAsHTML() {
         var options = '';
@@ -80,6 +86,7 @@ function selectBooth() {
     /// INITIATE BOOTH
 
     function initiateBooth() {
+        logger({action:'init booth', elid:electionID});
         // Detemine the status of the system: (not-yet) open/closed, 
         // by quering the final mix server.
         // Depending on the state, either the voting tab or the
@@ -176,11 +183,15 @@ function selectBooth() {
         // If there is no receipts, there is nothing to do
         if (receipts.length == 0) { 
             console.log('No receipts, nothing to verify.');
+            logger({action:'no receipts', elid:electionID, receipts:recIDs});
+            receiptIdentifiers = '';
             return;
         }
 
         // Some receipts to verify
         var recIDs = receipts.map(function (rec) {return rec.receiptID}).join(', ');
+        receiptIdentifiers = recIDs;
+        logger({action:'verify', elid:electionID, receipts:recIDs});
         if (receipts.length > 1) {
             verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
                              'that the ballots with the following receipt identifiers have been properly counted:', recIDs)
@@ -216,9 +227,11 @@ function selectBooth() {
             var res = voter.checkMixServerResult(k, finalServResult, receipts[i]);
             if (res.ok) {
                 console.log('Receipt', i, 'verified successfully.')
+                logger({action:'verified', receipt:receipts[i].receiptID, elid:electionID});
             }
             else {
                 console.log('WARNING: Receipt', i, 'not verified:', res.descr);
+                logger({action:'missing ballot detected', receipt:receipts[i].receiptID, elid:electionID});
                 verwriter.writee('VERIFICATION FAILED: ballot with receipt ID', receipts[i].receiptID, 'missing!');
                 verwriter.writep('Looking for the misbehaving party.')
                 ok = false;
@@ -249,6 +262,7 @@ function selectBooth() {
         return fetchData(manifest.collectingServer.URI+'/result.msg')
             .catch(function (err) {
                 console.log('Cannot fetch the result of the collecting server:', err);
+                logger({action:'problem', description:'cannot fetch the result of the collecting server', elid:electionID});
                 verwriter.writee('Cannot fetch the result of the collecting server.');
                 return false;
             })
@@ -262,6 +276,7 @@ function selectBooth() {
                         ok = false;
                         verwriter.writee('Ballot', receipts[i].receiptID, 'has been dropped by the collecting server');
                         console.log('Blaming data:', res.blamingData);
+                        logger({action:'blame', receipt:receipts[i].receiptID, who:'CS', elid:electionID});
                         verwriter.writep('The following data contains information necessary to hold the misbehaving party accountable. Please copy it and provide to the voting authorities.');
                         verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
                     }
@@ -301,6 +316,7 @@ function selectBooth() {
                     ok = false;
                     verwriter.writee('Ballot', receipts[i].receiptID, 'has been dropped by mix server nr', k);
                     console.log('Blaming data:', res.blamingData);
+                    logger({action:'blame', receipt:receipts[i].receiptID, who:'MS', ms:k, elid:electionID});
                     verwriter.writep('The following data contains information necessary to hold the misbehaving party accountable. Please copy it and provide to the voting authorities.');
                     verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
                 }
@@ -310,6 +326,7 @@ function selectBooth() {
         })
         .catch(function (err) {
             console.log('Cannot fetch the result of the mixing server:', err);
+            logger({action:'problem', description:'cannot fetch the result of the mix server', ms:k, elid:electionID});
             verwriter.writep('Cannot fetch the result of the mixing server.');
             return false;
         });
@@ -384,9 +401,11 @@ function selectBooth() {
              .done(function otpRequestDone(result) {
                 if (!result) {
                     showError('Unexpected error');
+                    logger({action:'login error', description:'Unexpected error on an OTP request', elid:electionID});
                 }
                 else if (!result.ok) {
                     showError("Server's responce: " + result.descr);
+                    logger({action:'login error', serverResponse:result.descr, elid:electionID});
                 }
                 else {
                     // Show the next window (OTP)
@@ -396,6 +415,7 @@ function selectBooth() {
               })
              .fail(function otpRequestFailed() {
                 showError('Cannot connect with the server');
+                logger({action:'login error', description:'Cannot connect with the collecting server', elid:electionID});
               });
         });
         return false; // prevents any further submit action
@@ -438,13 +458,16 @@ function selectBooth() {
             $.post(manifest.collectingServer.URI+"/cast", {'email': email, 'otp': otp, 'electionID': electionID, 'ballot': receipt.ballot})
              .fail(function otpRequestFailed() {  // request failed
                 showError('Cannot connect with the server');
+                logger({action:'cast error', description:'Cannot connect with the collecting server', elid:electionID});
               })
              .done(function castRequestDone(result) {  // we have some response
                 if (!result) {  // but for some reason this is not set!
                     showError('Unexpected error');
+                    logger({action:'cast error', description:'Unexpected error on cast', elid:electionID});
                 }
                 else if (!result.ok) {  // server has not accepted the ballot
                     showError("Server's responce: " + result.descr);
+                    logger({action:'cast error', serverResponse:result.descr, elid:electionID});
                 }
                 else {
                     // Ballot accepted (result.ok is true). Verify the receipt.
@@ -456,11 +479,13 @@ function selectBooth() {
                         storeReceipt(receipt);
 
                         // show the "ballot accepted" tab
+                        logger({action:'ballot cast', email:email, receiptID:receipt.receiptID, elid:electionID});
                         showTab('#result');
                         $('#receipt-id').text(receipt.receiptID.toUpperCase());
                     }
                     else { // receipt not valid
                         showError('Invalid receipt');
+                        logger({action:'cast error', description:'Invalid receipt', elid:electionID});
                     }
                 }
               });
@@ -485,6 +510,7 @@ function selectBooth() {
         var url = manifest.bulletinBoards[0].URI;
         // TODO: above we always take the first bulletin board.
         // We may need a better policy.
+        logger({action:'go to BB', receiptIdentifiers:receiptIdentifiers, elid:electionID});
         window.open(url, '_blank').focus();
         return false;
     }
