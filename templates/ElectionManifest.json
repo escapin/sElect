@@ -17,6 +17,7 @@
             "email": "d@ema.il"
         }
     ],
+    "publishListOfVoters": true,
     "choices": [
         "Candidate 1",
         "Candidate 2",

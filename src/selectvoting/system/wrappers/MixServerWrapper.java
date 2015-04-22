@@ -11,11 +11,11 @@ public class MixServerWrapper {
 	private static byte[] message(String str)    { return Utilities.hexStringToByteArray(str); }
 	private MixServer mixServ;
 	
-	public MixServerWrapper(String encKey, String decKey, String verifKey, String signKey, String precServVerifKey, String elId, int numberOfVoters) {
+	public MixServerWrapper(String encKey, String decKey, String verifKey, String signKey, String precServVerifKey, String elId) {
 		Decryptor decryptor = new Decryptor(message(encKey), message(decKey));
 		Signer signer = new Signer(message(verifKey), message(signKey));
 		Verifier colServVerif = new Verifier(message(precServVerifKey));
-		mixServ = new MixServer(decryptor, signer, colServVerif, message(elId), numberOfVoters);
+		mixServ = new MixServer(decryptor, signer, colServVerif, message(elId));
 	}
 	
 	public class Result {

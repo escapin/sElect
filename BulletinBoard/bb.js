@@ -32,15 +32,15 @@ app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
 app.get('/', routes.summary);
 app.get('/summary', routes.summary);
 app.get('/votes', routes.votes);
-app.get('/voters', routes.voters);
+if (manifest.publishListOfVoters)
+    app.get('/voters', routes.voters);
 app.get('/details', routes.details);
 
-app.get('/SignedFinalResult', routes.serveFile(config.RESULT_FILE));
-app.get('/SignedPartialResult', routes.serveFile(config.PARTIAL_RESULT_FILE));
-
-
 app.get('/ElectionManifest.json', routes.serveFile(config.MANIFEST_FILE));
-app.get('/VotersList', routes.serveFile(config.VOTERSLIST_FILE));
+app.get('/SignedFinalResult', routes.serveFile(config.RESULT_FILE));
+// app.get('/SignedPartialResult', routes.serveFile(config.PARTIAL_RESULT_FILE));
+if (manifest.publishListOfVoters)
+    app.get('/VotersList', routes.serveFile(config.VOTERSLIST_FILE));
 app.get('/ResultsCollectingServer', routes.serveFile(config.RESULTCS_FILE));
 for(i=0; i<manifest.mixServers.length; ++i){
 	var resource = '/ResultsMixServer' + i;

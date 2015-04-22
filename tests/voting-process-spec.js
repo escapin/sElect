@@ -28,7 +28,7 @@ var TIMEOUT = 100000;
 
 var electionID = 'eeee';
 var NMixServ = 5;
-var NVoters = 10;
+var NVoters = 50;
 var voters = new Array(NVoters);
 
 
@@ -60,7 +60,7 @@ var classpaths = ["../bin", "../lib/*"];
 describe( 'Voting process', function()
 {
 
-	var cs = csCore.create(electionID, voters, colServSigKeys.signingKey);
+	var cs = csCore.create(electionID, colServSigKeys.signingKey);
     var receipts = new Array(voters.length);
     var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
     
@@ -85,17 +85,10 @@ describe( 'Voting process', function()
     									mixServSigKeys[i].verificationKey,
     									mixServSigKeys[i].signingKey,
     									precServVerifKey, electionID,
-    									NVoters, classpaths);
+    									classpaths);
     }
     var intermediateResult = new Array(NMixServ);
     
-    it ( 'eligibleVoters field works as expected', function()
-    {
-    	var listElVoters = Object.keys(cs.eligibleVoters);
-    	expect(bijection(listElVoters, voters)).toBe(true);
-    });
-    
-
     it( 'Ballot creation works as expected', function()
     {
         console.log('************ Ballot creation');

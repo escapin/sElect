@@ -16,9 +16,21 @@ var otp_store = {};
 var mail_timestamp = {};
 
 var electionID = manifest.hash;
-var listOfEligibleVoters = manifest.voters.map(function(k){ return k.email; });
 var colSerSigKey = config.signing_key;
-var cs = csCore.create(electionID, listOfEligibleVoters, colSerSigKey);
+var cs = csCore.create(electionID, colSerSigKey);
+var openElection = (manifest.voters.length === 0); // emtpy list of voters means that the election is open (everybody can vote)
+if (openElection)
+    console.log('Empty list of voters => election is open (it ballots from everybody)')
+var listOfEligibleVoters = manifest.voters.map(function(k){ return k.email; });
+
+// Map of eligible voters
+var eligibleVoters = {};
+for (var i=0; i<listOfEligibleVoters.length; ++i) eligibleVoters[listOfEligibleVoters[i]] = true;
+
+// Checks if the voter is eligible. In an election is open, then every voter is eligible.
+function isEligibleVoter(voter) {
+    return  openElection || (eligibleVoters.hasOwnProperty(voter) && eligibleVoters[voter]===true);
+}
 
 //  status and opening/closing time
 var resultReady = fs.existsSync(config.RESULT_FILE);
@@ -145,12 +157,12 @@ exports.otp = function otp(req, res)
         return;
     }
 
-    if (!cs.eligibleVoters[email]) // not eligible voter
+    if (!isEligibleVoter(email)) // not eligible voter
     {
         winston.info('OTP request (%s) ERROR: Voter not eligible', email);
         res.send({ ok: false, descr: 'Invalid voter identifier (e-mail)' });
     }
-    else // voter is eligible; create a fresh OTP and send it
+    else // voter is eligible; create of retrieve an OTP and send it to the voter
     {
         // Generate OTP (if not generated yet):
         if (otp_store[email]==null) { // OTP not generated yet (for the given voter)
@@ -170,7 +182,8 @@ exports.otp = function otp(req, res)
                 // Sent an e-mail with the OTP
                 winston.info('Sending an email to \'%s\' with OTP  ', email, otp_store[email]);
                 var emailContent = "This e-mail contains your one time password (OTP) for the sElect voting system. \n\n";
-                emailContent += 'Election title: ' + manifest.title + '\n\nOne time password: ' + otp_store[email] + '\n';
+                emailContent += 'Election title: ' + manifest.title + '\n\nOne time password: ' + otp_store[email] + '\n\n';
+                emailContent += 'If you have not logged in to the sElect voting system using this e-mail address, pleas ignore this e-mail.\n';
                 sendEmail(email, 'Your One Time Password for sElect', emailContent, function (err,info) {
                     if (err) {
                         winston.info(' ...Error:', err);
@@ -231,10 +244,6 @@ exports.cast = function cast(req, res)
     if (otp_store[email] === otp) {
         // Cast the ballot:
     	var response = cs.collectBallot(email, ballot); 
-//    	if (err) {
-//    		winston.info('Cast request (%s/%s) INTERNAL ERROR %s', email, otp, err.toString());
-//    		res.send({ ok: false, descr: 'Internal error' }); 
-//    	}
     	if (!response.ok) {
     		winston.info('Cast request (%s/%s) BALLOT REJECTED. Response = %s', email, otp, response.data);
     		res.send({ ok: false, descr: response.data }); 
@@ -247,7 +256,7 @@ exports.cast = function cast(req, res)
     				function whenFlushed(e,r) {
                     winston.info('Ballot for %s logged', email);
     		});
-    		// TODO: how to make sure that this stream is flushed right away
+    		// TODO: how to make sure that this stream is flushed right away?
     	}
     }
     else // OTP not correct
@@ -324,8 +333,10 @@ function closeElection() {
     sendData(result, manifest.mixServers[0].URI, mixserv_options);
     saveData(result, config.RESULT_FILE);
     
-    var signedVotersList = cs.getVotersList();
-    saveData(signedVotersList, config.VOTERSLIST_FILE);
+    if (manifest.publishListOfVoters) {
+        var signedVotersList = cs.getVotersList();
+        saveData(signedVotersList, config.VOTERSLIST_FILE);
+    }
 }
 
 // Send data to the server with that URI
