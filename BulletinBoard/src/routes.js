@@ -2,6 +2,7 @@ var fs = require('fs');
 var manifest = require('./manifest');
 var config = require('../config');
 var result = require('./result');
+var printableElID = makeBreakable(manifest.hash);
 
 manifest.shortHash = manifest.hash.slice(0,6) + '...';
 
@@ -18,6 +19,17 @@ exports.serveFile = function serveFile(path) {
         });
     }
 }
+
+//////////////////////////////////////////////////////////////
+function makeBreakable(str) {
+    var r = '', n = Math.ceil(str.length/4);
+    for (i=0; i<n; ++i) {
+        r += str.slice(4*i,4*(i+1));
+        if (i+1<n) r += ' '; // '<wbr>';
+    }
+    return r;
+}
+
 
 // Retrieve the files containing the partial results of the MixServers
 // export.retrieveMixDataFiles = function retrieveMixDataFiles
@@ -36,6 +48,7 @@ exports.summary = function(req, res) {
     if (ready)
         summary = result.summary;
     res.render('summary', {
+            printableElID: printableElID,
             manifest: manifest,
             ready: ready,
             closingTime: closingTime,
@@ -46,6 +59,7 @@ exports.summary = function(req, res) {
 exports.votes = function(req, res) {
     var ready = result.finalResult !== null;
     res.render('votes', {
+            printableElID: printableElID,
             manifest: manifest,
             ready: ready,
             result: result.finalResult,
@@ -58,6 +72,7 @@ exports.voters = function(req, res) {
     var partialResultReady = (result.voters !== null);
     console.log(result.voters);
     res.render('voters', {
+            printableElID: printableElID,
             manifest: manifest,
             ready: ready,
             partialResultReady: partialResultReady,
@@ -69,6 +84,7 @@ exports.voters = function(req, res) {
 exports.details = function(req, res) {
     var ready = result.finalResult !== null;
     res.render('details', {
+            printableElID: printableElID,
             manifest: manifest,
             ready: ready,
             closingTime: closingTime,
