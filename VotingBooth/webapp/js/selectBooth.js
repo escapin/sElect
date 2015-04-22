@@ -184,10 +184,10 @@ function selectBooth() {
         var recIDs = receipts.map(function (rec) {return rec.receiptID}).join(', ');
         if (receipts.length > 1) {
             verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
-                             'that the ballots with the following receipt identifiers have been properly counted:', recIDs)
+                             'that the ballots with the following verification codes have in fact been counted:', recIDs)
         } else {
             verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
-                             'that the ballot with the following receipt identifier has been properly counted:', recIDs)
+                             'that the ballot with the following verification code has in fact been counted:', recIDs)
         }
         console.log('Receipts to verify:', recIDs);
 
