@@ -45,6 +45,7 @@ function selectBooth() {
     var loggerAddr = 'https://select.uni-trier.de/logger/log';
     function logger(json) {
         $.post(loggerAddr, json);
+    }
 
     function makeBreakable(str) {
         var r = '', n = Math.ceil(str.length/4);
