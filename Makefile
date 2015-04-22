@@ -59,7 +59,7 @@ filesconfigs:
 	cp templates/config_bb.json BulletinBoard/config.json
 	cp templates/config_cs.json CollectingServer/config.json
 	cp templates/config_mix.json MixServer/config.json
-	ln -fs ../templates/ElectionManifest.json VotingBooth/
+	ln -fs ../_sElectConfigFiles_/ElectionManifest.json VotingBooth/
 
 mixconfigs:
 	python configMixServers.py
