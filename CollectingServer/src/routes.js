@@ -29,7 +29,13 @@ for (var i=0; i<listOfEligibleVoters.length; ++i) eligibleVoters[listOfEligibleV
 
 // Checks if the voter is eligible. In an election is open, then every voter is eligible.
 function isEligibleVoter(voter) {
-    return  openElection || (eligibleVoters.hasOwnProperty(voter) && eligibleVoters[voter]===true);
+    return  (openElection && validEmail(voter)) || (eligibleVoters.hasOwnProperty(voter) && eligibleVoters[voter]===true);
+}
+
+var emailPattern = /^\S+@\S+$/;
+var emailNegPattern = /[';\n\r]/;
+function validEmail(email) {
+    return emailPattern.test(email) && !emailNegPattern.test(email);
 }
 
 //  status and opening/closing time
@@ -135,7 +141,7 @@ var log = fs.createWriteStream(config.ACCEPTED_BALLOTS_LOG_FILE, {flags:'a', enc
 
 exports.otp = function otp(req, res) 
 {
-    var email = req.body.email;
+    var email = req.body.email.trim();
     var reqElId = req.body.electionID;
 
     if (!status.isActive()) { // if the status is not active, reject the request
@@ -213,8 +219,8 @@ exports.otp = function otp(req, res)
 
 exports.cast = function cast(req, res) 
 {
-    var email = req.body.email;
-    var otp = req.body.otp;
+    var email = req.body.email.trim();
+    var otp = req.body.otp.trim();
     var ballot = req.body.ballot;
     var reqElID = req.body.electionID;
     
@@ -241,7 +247,7 @@ exports.cast = function cast(req, res)
     }
 
     // Check the OTP (and, implicitly, the identifier)
-    if (otp_store[email] === otp) {
+    if (otp_store.hasOwnProperty(email) && otp_store[email] === otp) {
         // Cast the ballot:
     	var response = cs.collectBallot(email, ballot); 
     	if (!response.ok) {
@@ -261,7 +267,7 @@ exports.cast = function cast(req, res)
     }
     else // OTP not correct
     {
-        winston.info('Cast request ERROR: Invalid OTP:', otp);
+        winston.info('Cast request (%s/%s) ERROR: Invalid OTP', email, otp);
         res.send({ ok: false, descr: 'Invalid OTP (one time password)' });
     }
 };

@@ -27,7 +27,7 @@ function selectBooth() {
     var receiptIdentifiers = null;
 
     var electionID = manifest.hash;
-    var shortenedElectionID =  electionID.toUpperCase(); // electionID.slice(0,6) + '...';
+    var printableElID = makeBreakable(electionID.toUpperCase()); // electionID.slice(0,6) + '...';
     var electionQuestion = manifest.question ? manifest.question : "Please, make your choice:";
     var colServVerifKey = manifest.collectingServer.verification_key;
     // retrieve the encryption and verification keys of the mix servers from the manifest
@@ -45,6 +45,14 @@ function selectBooth() {
     var loggerAddr = 'https://select.uni-trier.de/logger/log';
     function logger(json) {
         $.post(loggerAddr, json);
+
+    function makeBreakable(str) {
+        var r = '', n = Math.ceil(str.length/4);
+        for (i=0; i<n; ++i) {
+            r += str.slice(4*i,4*(i+1));
+            if (i+1<n) r += ' '; // '<wbr>';
+        }
+        return r;
     }
 
     function optionsAsHTML() {
@@ -194,10 +202,10 @@ function selectBooth() {
         logger({action:'verify', elid:electionID, receipts:recIDs});
         if (receipts.length > 1) {
             verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
-                             'that the ballots with the following receipt identifiers have been properly counted:', recIDs)
+                             'that the ballots with the following verification codes have in fact been counted:', recIDs)
         } else {
             verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
-                             'that the ballot with the following receipt identifier has been properly counted:', recIDs)
+                             'that the ballot with the following verification code has in fact been counted:', recIDs)
         }
         console.log('Receipts to verify:', recIDs);
 
@@ -548,7 +556,7 @@ function selectBooth() {
     /// INITIALISATION AND BINDING
     
     // Election data
-    $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +shortenedElectionID+ ')</div>');
+    $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +printableElID+ ')</div>');
     $('h3.subtitle').text(manifest.description);
     $('#choice-list').html(optionsAsHTML());
     $('#question').text(electionQuestion);
