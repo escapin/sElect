@@ -28,6 +28,7 @@ function selectBooth() {
 
     var electionID = manifest.hash;
     var shortenedElectionID =  electionID.toUpperCase(); // electionID.slice(0,6) + '...';
+    var electionQuestion = manifest.question ? manifest.question : "Please, make your choice:";
     var colServVerifKey = manifest.collectingServer.verification_key;
     // retrieve the encryption and verification keys of the mix servers from the manifest
     var mixServEncKeys = manifest.mixServers.map(function (ms) { return ms.encryption_key; })
@@ -550,6 +551,7 @@ function selectBooth() {
     $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +shortenedElectionID+ ')</div>');
     $('h3.subtitle').text(manifest.description);
     $('#choice-list').html(optionsAsHTML());
+    $('#question').text(electionQuestion);
 
     // Event handlers binding
     $('#welcome form').submit(onSubmitWelcome);
