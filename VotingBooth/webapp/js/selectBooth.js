@@ -562,6 +562,7 @@ function selectBooth() {
     $('input[name="choice"]').change(whenChoiceChanges);
     
 
+    showProgressIcon();
     initiateBooth(); // checks the status and opens the voting or verification tab
 }
 
