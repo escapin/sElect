@@ -1,10 +1,7 @@
 package selectvoting.system.wrappers;
 
-import static java.nio.file.StandardOpenOption.*;
-
 import java.nio.file.*;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import de.unitrier.infsec.functionalities.digsig.Signer;
@@ -35,7 +32,7 @@ public class MixServerWrapperMain {
 	 */
 	public static void main(String[] args){
 		// 9 args: 7 to create MixServerWrapper + 2 path file
-		if(args.length!=9){
+		if(args.length!=8){
 			System.out.println("[MixServerWrapper] Wrong Number of Arguments");
 			System.exit(10);
 		}
@@ -45,15 +42,14 @@ public class MixServerWrapperMain {
 		byte[] signKey = message(args[3]);
 		byte[] precServVerifKey = message(args[4]);
 		byte[] elId = message(args[5]);
-		int numberOfVoters = Integer.parseInt(args[6]);
 		
-		String inputFile_path = args[7];
-		String outputFile_path = args[8];
+		String inputFile_path = args[6];
+		String outputFile_path = args[7];
 		
 		Decryptor decryptor = new Decryptor(encKey, decKey);
 		Signer signer = new Signer(verifKey, signKey);
 		Verifier precServVerif = new Verifier(precServVerifKey);
-		mixServ = new MixServer(decryptor, signer, precServVerif, elId, numberOfVoters);
+		mixServ = new MixServer(decryptor, signer, precServVerif, elId);
 		String sInput = null;
 		try {
 			sInput = dataFromFile(inputFile_path);

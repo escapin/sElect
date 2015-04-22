@@ -1,5 +1,7 @@
 package selectvoting.system.core;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import de.unitrier.infsec.functionalities.digsig.Signer;
 import de.unitrier.infsec.functionalities.digsig.Verifier;
 import de.unitrier.infsec.functionalities.pkenc.Decryptor;
@@ -14,7 +16,7 @@ public class MixServer
 	private final Decryptor decryptor;
 	private final Verifier precServVerif;
 	private final byte[] electionID;
-	private final int numberOfVoters;
+	// private final int numberOfVoters;
 	
 	// PUBLIC CLASSES
 	/**
@@ -47,10 +49,9 @@ public class MixServer
 	
 	// CONSTRUCTORS
 	
-	public MixServer(Decryptor decryptor, Signer signer, Verifier precServVerif, byte[] electionID, int numberOfVoters) {
+	public MixServer(Decryptor decryptor, Signer signer, Verifier precServVerif, byte[] electionID) {
 		this.signer = signer;
 		this.decryptor = decryptor;
-		this.numberOfVoters = numberOfVoters;
 		this.electionID = electionID;
 		this.precServVerif = precServVerif;
 	}
@@ -88,7 +89,8 @@ public class MixServer
 		// retrieve and process ballots (store decrypted entries in 'entries')
 		byte[] ballotsAsAMessage = MessageTools.second(payload);
 		
-		byte[][] entries = new byte[numberOfVoters][];
+		// byte[][] entries = new byte[numberOfVoters][];
+		ArrayList<byte[]> entries = new ArrayList<byte[]>();
 
 		// Loop over the input entries 
 		byte[] last = null;
@@ -96,8 +98,6 @@ public class MixServer
 		// TODO: the implementation of messages and of MessageSplitIter in particular is enormously inefficient.
 		// It should be re-implemented.
 		for( MessageSplitIter iter = new MessageSplitIter(ballotsAsAMessage); iter.notEmpty(); iter.next() ) {
-			if (numberOfEntries > numberOfVoters) // too many entries
-				throw new ServerMisbehavior(-1, "Too many entries");
 			byte[] current = iter.current();
 			if (last!=null && Utils.compare(last, current)>0)
 				throw new ServerMisbehavior(-2, "Ballots not sorted");
@@ -111,17 +111,23 @@ public class MixServer
 			}
 			byte[] elID = MessageTools.first(decryptedBallot);
 			if (elID!=null || MessageTools.equal(elID, electionID)) // otherwise ballot is invalid and we ignore it
-				entries[numberOfEntries++] = MessageTools.second(decryptedBallot);
+				entries.add(MessageTools.second(decryptedBallot));
 			else
 				System.out.println("[MixServer.java] Ballot #" + numberOfEntries + " invalid");
+			++numberOfEntries;
 		}
 		
 		// sort the entries
-		Utils.sort(entries, 0, numberOfEntries);
+		byte[][] entr_arr = new byte[entries.size()][];
+		entries.toArray(entr_arr);
+		// Utils.sort(entries, 0, numberOfEntries);
+		// TODO: we could use Collections.sort(entries,...)
+		Utils.sort(entr_arr, 0, numberOfEntries);
 		
 		// format entries as one message
 		// TODO: as above, message concatenation is very inefficient
-		byte[] entriesAsAMessage = Utils.concatenateMessageArray(entries, numberOfEntries);
+		byte[] entriesAsAMessage = Utils.concatenateMessageArray(entr_arr, numberOfEntries);
+		
 		
 		// add election id, tag and sign
 		byte[] elID_entriesAsAMessage = MessageTools.concatenate(electionID, entriesAsAMessage);

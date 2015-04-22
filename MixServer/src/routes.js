@@ -27,7 +27,7 @@ var precServVerifKey = (chainIndex === 0)?
 			manifest.mixServers[chainIndex-1].verification_key;
 var numberOfVoters = manifest.voters.length;
 var mix = mixCore.create(encKey, decKey, verifKey, signKey, 
-		precServVerifKey, manifest.hash, numberOfVoters, config.class_paths);
+		precServVerifKey, manifest.hash, config.class_paths);
 
 //////////////////////////////////////////////////////////////////////////////////////
 

@@ -17,33 +17,19 @@ var unpair = crypto.deconcatenate;
 var sign = crypto.sign;
 
 // return a new csCore instance
-exports.create = function(electionID, listOfEligibleVoters, signKey)
+exports.create = function(electionID, signKey)
 {
 	// PRIVATE FIELDS
 	var storedBallots = new HashMap();
-	var eligibleVoters = {};
-	
-	//Create the list (map) of eligible voters. Usage if (eligibleVoters[v]) ...
-	// CONSTRUCTOR
-	for( var i=0; i<listOfEligibleVoters.length; ++i ) {
-		var voter_id = listOfEligibleVoters[i];
-		eligibleVoters[voter_id] = true;
-	}
-    // TODO: this is not done correctly. Now, for example
-    // if (eligibleVoters['toString']) { ... } 
-    // will execute ...
-    
 	
 	// 'ballot': the n-time encrypted ballot
 	// 'receipt' format: signatureOf[TAG_ACCEPTED, electionID, ballot]
 	function collectBallot(voterID, ballot) {
-		if(!eligibleVoters[voterID])
-			return {ok: false, data: "Wrong voter ID"};
-		
 		if(storedBallots.has(voterID))
 			return {ok: false, data: "Voter already voted"};
-		else
-			storedBallots.set(voterID, ballot);
+
+        // store the ballot
+        storedBallots.set(voterID, ballot);
 		
 		// generate the receipt
 		var tag_elID_ballot = pair(TAG_ACCEPTED, pair(electionID, ballot));
@@ -92,9 +78,7 @@ exports.create = function(electionID, listOfEligibleVoters, signKey)
 	
 	
 	return { electionID: electionID, 
-             listOfEligibleVoters: listOfEligibleVoters,
 			 signKey: signKey, 
-             eligibleVoters: eligibleVoters,
 			 collectBallot: collectBallot, 
              getResult: getResult, 
              getVotersList: getVotersList };

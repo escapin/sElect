@@ -5,12 +5,16 @@
             <% if (!ready) { %>
                 <li class="pure-menu-selected"><a href="summary">Summary</a></li>
                 <li class="pure-menu-disabled"><a href="#">Verification Codes</a></li>
-         <!--   <li class="pure-menu-disabled"><a href="#">List of Voters</a></li> -->   
+                <% if (manifest.publishListOfVoters) { %>
+                    <li class="pure-menu-disabled"><a href="#">List of Voters</a></li>   
+                <% } %>
                 <li><a href="details">Additional Details</a></li>
             <% } else { %>
                 <li class="pure-menu-selected"><a href="summary">Summary</a></li>
                 <li><a href="votes">Verification Codes</a></li>
-           <!-- <li><a href="voters">List of Voters</a></li>      -->  
+                <% if (manifest.publishListOfVoters) { %>
+                    <li><a href="voters">List of Voters</a></li>
+                <% } %>
                 <li><a href="details">Additional Details</a></li>
             <% }  %>
             </ul>
@@ -47,7 +51,7 @@
             </table>
 
             <div class="pure-g extrainfobox">
-                <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-u-1 pure-u-md-1-1">
                     <div class="extrainfo">
                         If you have your verification code and want to check
                         that your vote has been counted, go to the list of
