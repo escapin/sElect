@@ -18,6 +18,7 @@
         }
     ],
     "publishListOfVoters": true,
+    "question": "Who is Your Favorite Candidate?",
     "choices": [
         "Candidate 1",
         "Candidate 2",
