@@ -43,6 +43,7 @@ function parseLog(logData){
 //        	console.log(line);
 //		}
 		var obj = JSON.parse(line);
+		
 		logArray.push(obj);
         i++;
     });
