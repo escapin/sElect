@@ -13,7 +13,7 @@ dataLogArray=[json.loads(line) for line in dataLog.split("\n")]
 actions = {"verify":"receipts", "verified":"receipt", "go to BB":"receiptIdentifiers"}
 report = {}
 for el in dataLogArray:
-    print el
+    # print el
     if el["action"] == "ballot cast":
         report[el["receiptID"]] = {x:False for x in actions.keys()} 
         report[el["receiptID"]]["email"] = el["email"]
@@ -23,7 +23,7 @@ for el in dataLogArray:
             continue
         for key in keys.split(", "):
             if not key in report:
-                print "No ballot cast for %s for %s" %(el["action"], key)
+                print "\t Warn: No ballot cast for action '%s' with receiptID '%s'" %(el["action"], key)
                 continue 
             report[key][el["action"]] = True
     
@@ -32,4 +32,5 @@ with open(report_filename, 'w') as outfile:
     wr.writeheader()
     for receiptID, content in report.items(): 
         wr.writerow(content)
+    print "Report generated in '%s'" %(report_filename)
         
