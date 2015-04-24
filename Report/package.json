@@ -1,0 +1,10 @@
+{
+  "name": "Report",
+  "description": "report from log",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "fs": "0.0.2",
+    "request": "^2.55.0"
+  }
+}
