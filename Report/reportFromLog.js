@@ -1,5 +1,6 @@
 var fs = require('fs');
 var request = require('request');
+var hashmap = require('hashmap');
 
 var logURL = "https://select.uni-trier.de/logger/fullLog.log";
 var logFile = "fullLog.log";
@@ -32,8 +33,19 @@ function saveData(data, file) {
 
 
 function parseLog(logData){
+	var toBeParsed = logData.substring(0, logData.length-1); // rm EOF
 	//console.log(logData);
-	
+	var logArray=[];
+	var i=0;
+	toBeParsed.split(/\r?\n/).forEach(function (line) {
+//		if(i==267){
+//			console.log("%j", logArray[i-1]);
+//        	console.log(line);
+//		}
+		var obj = JSON.parse(line);
+		logArray.push(obj);
+        i++;
+    });
 }
 
 
