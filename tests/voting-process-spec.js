@@ -108,8 +108,17 @@ describe( 'Voting process', function()
         	var csReply = cs.collectBallot(voters[i], receipts[i].ballot);
         	expect (csReply.ok).toBe(true);
 
-            // check the acknowledgement (signature)
+            // store the acknowledgement (signature) in the receipt
             receipts[i].signature = csReply.data;
+    	}
+    });
+
+    it( 'Acknowledge verification works as expected', function()
+    {
+        console.log('************ Ballot casting');
+
+        for(i=voters.length-1; i>=0; --i){
+            // check the acknowledgement (signature in the receipt)
             var receiptOK = voter.validateReceipt(receipts[i]);
             expect(receiptOK).toBe(true);
     	}
