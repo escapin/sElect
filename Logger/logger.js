@@ -25,9 +25,9 @@ app.get('/fullLog.log', serveFile(config.logFile));
 // logging:
 app.post('/log', function (req, res) {
     var body = req.body;
-    body.time = (new Date).toTimeString();
-    body.ip = req.ip;
-    body.userAgent = req.headers['user-agent']
+    body.time = (new Date).toString();
+    body.ip = req.connection.remoteAddress;
+    body.userAgent = req.headers['user-agent'];
 
     // Logging onto the console
     console.log(body);

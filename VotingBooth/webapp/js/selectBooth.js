@@ -192,6 +192,7 @@ function selectBooth() {
         // If there is no receipts, there is nothing to do
         if (receipts.length == 0) { 
             console.log('No receipts, nothing to verify.');
+            logger({action:'No receipts', elid:electionID});
             logger({action:'no receipts', elid:electionID, receipts:recIDs});
             receiptIdentifiers = '';
             return;
