@@ -70,6 +70,12 @@ function selectBooth() {
         $.post(loggerAddr, json);
     }
 
+    // Check if the user agent is IE
+    function isIE(userAgent) {
+        userAgent = userAgent || navigator.userAgent;
+        return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
+    }
+
     function makeBreakable(str) {
         var r = '', n = Math.ceil(str.length/4);
         for (i=0; i<n; ++i) {
@@ -598,7 +604,9 @@ function selectBooth() {
     $('#verification form').submit(goToBB);
     $('input[name="choice"]').change(whenChoiceChanges);
     
-
+    if (isIE()) {
+        $('#verCodeLink').hide();
+    }
     showProgressIcon();
     initiateBooth(); // checks the status and opens the voting or verification tab
 }
