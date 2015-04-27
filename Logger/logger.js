@@ -8,6 +8,7 @@ var config = require('./config');
 
 // CREATE AND CONFIGURE THE APP
 var app = express();
+app.enable('trust proxy');
 app.use(cors()); // enable all CORS request
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
@@ -26,7 +27,7 @@ app.get('/fullLog.log', serveFile(config.logFile));
 app.post('/log', function (req, res) {
     var body = req.body;
     body.time = (new Date).toString();
-    body.ip = req.connection.remoteAddress;
+    body.ip = req.ip;
     body.userAgent = req.headers['user-agent'];
 
     // Logging onto the console
