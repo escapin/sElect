@@ -58,7 +58,7 @@ function selectBooth() {
         ctx.font = "24px helvetica";
         ctx.fillText('Verification Code: '+verificationCode, 10, 80);
         // encode the canvas picture as a data URL and return it
-        return  verCodeCanvas.toDataURL();
+        return  verCodeCanvas.toDataURL('image/png');
     }
 
 
