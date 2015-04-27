@@ -37,6 +37,29 @@ function selectBooth() {
  // var voter = voterClient.create(electionID, colServEncKey, colServVerifKey, mixServEncKeys);
 
 
+    //////////////////////////////////////////////////////////////////////////////
+    /// Verification code picture saving
+
+    // Create a new canvas element (not attached to the document)
+    var verCodeCanvas = document.createElement('canvas');
+    verCodeCanvas.setAttribute('width', '480');
+    verCodeCanvas.setAttribute('height', '100');
+
+    function verificationCode2DataURL(verificationCode, elID) {
+        // draw the verification code:
+        var ctx = verCodeCanvas.getContext('2d');
+        ctx.fillStyle = "white";
+        ctx.fillRect(0,0,600,100);
+        ctx.fillStyle = "black";
+        ctx.font = "14px helvetica";
+        ctx.fillText('sElect verification code', 10, 25);
+        ctx.fillText('Election ID: '+elID, 10, 45);
+        ctx.font = "24px helvetica";
+        ctx.fillText('Verification Code: '+verificationCode, 10, 80);
+        // encode the canvas picture as a data URL and return it
+        return  verCodeCanvas.toDataURL();
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////
     /// AUXILIARY FUNCTIONS
@@ -465,9 +488,12 @@ function selectBooth() {
                     if (receiptValid) {
                         storeReceipt(receipt);
 
-                        // show the "ballot accepted" tab
+                        // prepare and show the "ballot accepted" tab
+                        var recid = receipt.receiptID.toUpperCase();
+                        var durl = verificationCode2DataURL(recid, printableElID);
+                        $('#verCodeLink').attr('href', durl);
+                        $('#receipt-id').text(recid);
                         showTab('#result');
-                        $('#receipt-id').text(receipt.receiptID.toUpperCase());
                     }
                     else { // receipt not valid
                         showError('Invalid receipt');
