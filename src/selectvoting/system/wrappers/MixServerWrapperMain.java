@@ -31,7 +31,7 @@ public class MixServerWrapperMain {
 	 *		12		-->		Wrapper: [IOException] writing the file
 	 */
 	public static void main(String[] args){
-		// 9 args: 7 to create MixServerWrapper + 2 path file
+		// 8 args: 6 to create MixServerWrapper + 2 path file
 		if(args.length!=8){
 			System.out.println("[MixServerWrapper] Wrong Number of Arguments");
 			System.exit(10);

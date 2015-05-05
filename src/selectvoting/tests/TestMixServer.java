@@ -49,7 +49,7 @@ public class TestMixServer extends TestCase
 		for(int i=0;i<num;++i){
 			Decryptor decr=new Decryptor();
 			Signer sign=new Signer();
-			mixServ[i]=new MixServer(decr, sign, precServVerif, electionID, numberOfVoters);
+			mixServ[i]=new MixServer(decr, sign, precServVerif, electionID);
 			precServVerif=sign.getVerifier();
 		}
 	}
