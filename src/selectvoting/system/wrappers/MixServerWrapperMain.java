@@ -59,10 +59,10 @@ public class MixServerWrapperMain {
 			e.printStackTrace();
 			System.exit(11);
 		} 
-		System.out.println("[MixServerWrapper] Ballots read from the file: \t" + inputFile_path);
+		//System.out.println("[MixServerWrapper] Ballots read from the file: \t" + inputFile_path);
 		//System.out.println("\n" + sInput + "\n");
 
-		System.out.print("[MixServerWrapper] Processing the ballots...");
+		//System.out.print("[MixServerWrapper] Processing the ballots...");
 		byte[] input = message(sInput);
 		byte[] result = null;
 		try {
@@ -75,7 +75,7 @@ public class MixServerWrapperMain {
 			System.exit(ex.errCode);
 		}
 		
-		System.out.println("done!");
+		//System.out.println("done!");
 		//System.out.println("\n" + string(result) + "\n");
 		try{
 			dataToFile(string(result), outputFile_path);
@@ -85,7 +85,7 @@ public class MixServerWrapperMain {
 			e.printStackTrace();
 			System.exit(12);
 		}
-		System.out.println("[MixServerWrapper] Results stored in: \t\t" + outputFile_path);
+		//System.out.println("[MixServerWrapper] Results stored in: \t\t" + outputFile_path);
 	}
 	
 	private static String dataFromFile(String path) throws IOException {
