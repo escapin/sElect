@@ -43,14 +43,14 @@ var mixServVerifKeys = mixServSigKeys.map(function(k){ return k.verificationKey;
 var classpaths = ["../bin", "../lib/*"];
 
 
+var cs = csCore.create(electionID, colServSigKeys.signingKey);
 var mixServer = new Array(NMixServ);
 var intermediateResult = new Array(NMixServ);
 
-
 // compiled/called before the test loop 
 // we create the ballots and we submit them to the collecting Server
-function setup(){
-	console.log('****** SET UP PHASE');
+function onStart(){
+	console.log('****** STARTING PHASE');
 	
 	
 	console.log('************ Set up the voters');
@@ -62,11 +62,8 @@ function setup(){
 	var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
 	
 	
-	console.log('************ Set up the Collecting and the Mix Servers');
-	// THE COLLECTING SERVER
-	cs = csCore.create(electionID, colServSigKeys.signingKey); // *global var*
+	console.log('************ Set up the ' + NMixServ + '  Mix Servers');
 	// THE MIX SERVERS
-	
 	for (i=0; i<NMixServ; ++i) {
 	    var precServVerifKey = (i==0 ? colServVerifKey : mixServSigKeys[i-1].verificationKey );
 		mixServer[i] = mixCore.create(	mixServPkeKeys[i].encryptionKey,
@@ -147,8 +144,9 @@ function mix(i, inputData) {
 	
 	mixServer[i].processBallots(inputFile_path, outputFile_path, 
     	function(err, stdout, stderr){
-			console.log(stdout);
-			console.log(stderr);
+			//console.log("Test")
+			//console.log(stdout);
+			//console.log(stderr);
 		},
 		function(code){
 			if(code!==0){
@@ -203,7 +201,7 @@ var bench = new Benchmark('fromClosingElection', fromClosingElection, {
   //'id': 'xyz',
 
   // called when the benchmark starts running
-  //'onStart': onStart,
+  'onStart': onStart(),
 
   // called after each run cycle
   //'onCycle': function() { console.log('************** \n Cycle '); },
@@ -218,23 +216,19 @@ var bench = new Benchmark('fromClosingElection', fromClosingElection, {
   //'onReset': onReset,
 
   // called when the benchmark completes running
-//  'onComplete': function() {
-//	  	var times = this.times;
-//	  	console.log(times);
-//	  	console.log('Time elapsed: ' + times.elapsed);
-//	  },
+  'onComplete': function() { console.log(this.times); }
 
   // compiled/called before the test loop
-  'setup': setup(),
+  // 'setup': setup,
   
 
-  // compiled/called after the test loop
-  'teardown': function() {
-	  	console.log(this.times);
-	  }
+//  // compiled/called after the test loop
+//  'teardown': function() {
+//	  	console.log(this.times);
+//	  }
 })
-.run({ 'async': true });
-
+//.run({ 'async': true });
+.run();
 
 function deleteFolderRecursive(path) {
   if( fs.existsSync(path) ) {
