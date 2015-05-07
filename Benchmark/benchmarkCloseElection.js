@@ -125,15 +125,16 @@ function onStart(){
 
 // the test to benchmark:
 // from closing the election 'till the last mix server processed all the ballots
-function fromClosingElection(){
+function fromClosingElection(deferred){
 	//console.log('************ Get the partial result from the collecting server');
 	var signedBallots = cs.getResult();
-	finalResult = mix(0, signedBallots); // *global var*
+	mix(0, signedBallots, deferred);
 }
 
-function mix(i, inputData) {
+function mix(i, inputData, deferred) {
     if (i >= NMixServ) {
-        return inputData;
+    	deferred.resolve();
+        return;
     }
 
     //console.log('\n************ Mixing', i);
@@ -187,7 +188,7 @@ function mix(i, inputData) {
 						break;
 					default:
 						console.log('***Unknown Errror***');
-				}
+				}	
 				console.log("\tAborting the whole process...");
 	        	process.exit(-1);
 			}
@@ -195,54 +196,52 @@ function mix(i, inputData) {
 			//console.log(intermediateResult[i]);
 			//console.log("Submitting to the next mix server");
 			
-			mix(i+1, intermediateResult[i]);
+			mix(i+1, intermediateResult[i], deferred);
 		});
 }
 
 
 
 var nCycles = 0;
-var bench = new Benchmark('fromClosingElection', fromClosingElection, {
+var bench = new Benchmark('fromClosingElection', {
 
-  // displayed by Benchmark#toString if `name` is not available
-  //'id': 'xyz',
+	// a flag to indicate the benchmark is deferred
+	'defer': true,
+	
+	'fn': function(deferred) {
+		fromClosingElection(deferred);
+	 },
 
-  // called when the benchmark starts running
-  'onStart': onStart(),
+	// called when the benchmark starts running
+	'onStart': onStart(),
 
-  // called after each run cycle
-  'onCycle': function() {
+	// called after each run cycle
+	'onCycle':  function() {
 	  ++nCycles;
 	  process.stdout.write('\r>>> Cycles: ' + nCycles );
-	  //console.log('*** Cycle: ', ++nCycles);
-  },
+  	},
 
-  // called when aborted
-  'onAbort': function() { console.log('Process Aborted!'); },
+  	// called when aborted
+  	'onAbort': function() { console.log('Process Aborted!'); },
 
-  // called when a test errors
-  //'onError': onError,
+  	// called when a test errors
+  	'onError': function() { console.log('Test Error!'); },
 
-  // called when reset
-  //'onReset': onReset,
-
-  // called when the benchmark completes running
-  'onComplete': function() { 
+  	// called when the benchmark completes running
+  	'onComplete': function() { 
 	  console.log("\n****** BENCHMARK COMPLETED");
 	  console.log("\n************* Times *************");
-	  console.log(bench.times);
-	  //console.log(this.times);
-  }
+	  console.log(this.times);
+  	}
 
-  // compiled/called before the test loop
-  // 'setup': setup,
+  	// compiled/called before the test loop
+  	// 'setup': setup,
   
+  	//  compiled/called after the test loop
+  	//'teardown': function() { console.log("\n"); }
+});
 
-  //  compiled/called after the test loop
-  //'teardown': function() { console.log("\n"); }
-})
-
-// bench.run({ 'async': true });
+//bench.run({ 'async': true });
 bench.run();
 
 // console.log("\n************* Times *************");
