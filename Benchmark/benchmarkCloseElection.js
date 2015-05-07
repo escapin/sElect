@@ -128,16 +128,15 @@ function onStart(){
 function fromClosingElection(){
 	//console.log('************ Get the partial result from the collecting server');
 	var signedBallots = cs.getResult();
-	
 	finalResult = mix(0, signedBallots); // *global var*
 }
 
 function mix(i, inputData) {
-    if (i >= NMixServ)  {
+    if (i >= NMixServ) {
         return inputData;
     }
 
-    //console.log('************ Mixing', i);
+    //console.log('\n************ Mixing', i);
     
     var nonce = crypto.nonce(5);
     
@@ -145,7 +144,7 @@ function mix(i, inputData) {
 	dataToFile(inputData, inputFile_path);
 	var outputFile_path = path.join(PARTIALRESULT_dir, 'partialResult0' + i + '_' + nonce + '_output.msg');
 	
-	mixServer[i].processBallots(inputFile_path, outputFile_path, true,
+	mixServer[i].processBallots(inputFile_path, outputFile_path, 
     	function(err, stdout, stderr){
 			//console.log(stdout);
 			if(err){
@@ -194,6 +193,8 @@ function mix(i, inputData) {
 			}
 			intermediateResult[i] = dataFromFile(outputFile_path);
 			//console.log(intermediateResult[i]);
+			//console.log("Submitting to the next mix server");
+			
 			mix(i+1, intermediateResult[i]);
 		});
 }
@@ -226,7 +227,12 @@ var bench = new Benchmark('fromClosingElection', fromClosingElection, {
   //'onReset': onReset,
 
   // called when the benchmark completes running
-  'onComplete': function() { console.log("\n****** BENCHMARK COMPLETED"); }
+  'onComplete': function() { 
+	  console.log("\n****** BENCHMARK COMPLETED");
+	  console.log("\n************* Times *************");
+	  console.log(bench.times);
+	  //console.log(this.times);
+  }
 
   // compiled/called before the test loop
   // 'setup': setup,
@@ -235,10 +241,12 @@ var bench = new Benchmark('fromClosingElection', fromClosingElection, {
   //  compiled/called after the test loop
   //'teardown': function() { console.log("\n"); }
 })
-.run();
 
-console.log("\n************* Times *************");
-console.log(bench.times);
+// bench.run({ 'async': true });
+bench.run();
+
+// console.log("\n************* Times *************");
+// console.log(bench.times);
 
 
 
