@@ -50,7 +50,7 @@ var intermediateResult = new Array(NMixServ);
 // compiled/called before the test loop 
 // we create the ballots and we submit them to the collecting Server
 function onStart(){
-	console.log('****** STARTING PHASE');
+	console.log('****** SETUP THE BENCHMARK');
 	
 	
 	console.log('************ Set up the voters');
@@ -118,6 +118,9 @@ function onStart(){
         	process.exit(-1);
         }
 	}
+    
+    console.log();
+    console.log('****** STARTING THE BENCHMARK');
 }
 
 // the test to benchmark:
@@ -142,11 +145,14 @@ function mix(i, inputData) {
 	dataToFile(inputData, inputFile_path);
 	var outputFile_path = path.join(PARTIALRESULT_dir, 'partialResult0' + i + '_' + nonce + '_output.msg');
 	
-	mixServer[i].processBallots(inputFile_path, outputFile_path, 
+	mixServer[i].processBallots(inputFile_path, outputFile_path, true,
     	function(err, stdout, stderr){
-			//console.log("Test")
 			//console.log(stdout);
-			//console.log(stderr);
+			if(err){
+				console.log(' ...INTERNAL ERROR. Cannot process the ballots: ', err);
+				console.log('RESULT NOT SAVED');
+				console.log(stderr);
+			}
 		},
 		function(code){
 			if(code!==0){
@@ -194,7 +200,7 @@ function mix(i, inputData) {
 
 
 
-
+var nCycles = 0;
 var bench = new Benchmark('fromClosingElection', fromClosingElection, {
 
   // displayed by Benchmark#toString if `name` is not available
@@ -204,7 +210,11 @@ var bench = new Benchmark('fromClosingElection', fromClosingElection, {
   'onStart': onStart(),
 
   // called after each run cycle
-  //'onCycle': function() { console.log('************** \n Cycle '); },
+  'onCycle': function() {
+	  ++nCycles;
+	  process.stdout.write('\r>>> Cycles: ' + nCycles );
+	  //console.log('*** Cycle: ', ++nCycles);
+  },
 
   // called when aborted
   'onAbort': function() { console.log('Process Aborted!'); },
@@ -216,19 +226,23 @@ var bench = new Benchmark('fromClosingElection', fromClosingElection, {
   //'onReset': onReset,
 
   // called when the benchmark completes running
-  'onComplete': function() { console.log(this.times); }
+  'onComplete': function() { console.log("\n****** BENCHMARK COMPLETED"); }
 
   // compiled/called before the test loop
   // 'setup': setup,
   
 
-//  // compiled/called after the test loop
-//  'teardown': function() {
-//	  	console.log(this.times);
-//	  }
+  //  compiled/called after the test loop
+  //'teardown': function() { console.log("\n"); }
 })
-//.run({ 'async': true });
 .run();
+
+console.log("\n************* Times *************");
+console.log(bench.times);
+
+
+
+
 
 function deleteFolderRecursive(path) {
   if( fs.existsSync(path) ) {
