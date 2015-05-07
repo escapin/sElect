@@ -32,7 +32,8 @@ public class MixServerWrapperMain {
 	 */
 	public static void main(String[] args){
 		// 8 args: 6 to create MixServerWrapper + 2 path file
-		if(args.length!=8){
+		// optional 9-th arg : log flag ON
+		if(args.length<8 || args.length>9){
 			System.out.println("[MixServerWrapper] Wrong Number of Arguments");
 			System.exit(10);
 		}
@@ -45,6 +46,8 @@ public class MixServerWrapperMain {
 		
 		String inputFile_path = args[6];
 		String outputFile_path = args[7];
+		
+		boolean logFlag = args.length==9;
 		
 		Decryptor decryptor = new Decryptor(encKey, decKey);
 		Signer signer = new Signer(verifKey, signKey);
@@ -59,10 +62,11 @@ public class MixServerWrapperMain {
 			e.printStackTrace();
 			System.exit(11);
 		} 
-		//System.out.println("[MixServerWrapper] Ballots read from the file: \t" + inputFile_path);
-		//System.out.println("\n" + sInput + "\n");
-
-		//System.out.print("[MixServerWrapper] Processing the ballots...");
+		if(logFlag)
+			System.out.println("[MixServerWrapper] Ballots read from the file: \t" + inputFile_path);
+		
+		if(logFlag)
+			System.out.print("[MixServerWrapper] Processing the ballots...");
 		byte[] input = message(sInput);
 		byte[] result = null;
 		try {
@@ -75,8 +79,9 @@ public class MixServerWrapperMain {
 			System.exit(ex.errCode);
 		}
 		
-		//System.out.println("done!");
-		//System.out.println("\n" + string(result) + "\n");
+		if(logFlag)
+			System.out.println("done!");
+		
 		try{
 			dataToFile(string(result), outputFile_path);
 		} catch (IOException e) {
@@ -85,7 +90,8 @@ public class MixServerWrapperMain {
 			e.printStackTrace();
 			System.exit(12);
 		}
-		//System.out.println("[MixServerWrapper] Results stored in: \t\t" + outputFile_path);
+		if(logFlag)
+			System.out.println("[MixServerWrapper] Results stored in: \t\t" + outputFile_path);
 	}
 	
 	private static String dataFromFile(String path) throws IOException {
@@ -106,8 +112,6 @@ public class MixServerWrapperMain {
 				StandardOpenOption.CREATE,				// create a file if it doesn't exist
 				StandardOpenOption.TRUNCATE_EXISTING,	// or initially truncating an existing regular-file to a size of 0
 				StandardOpenOption.WRITE); 				// open the file for writing
-//		for(int i=0;i<data.length(); ++i)
-//			writer.write(data.charAt(i));
 		writer.write(data, 0, data.length());
 		writer.flush();
 		writer.close();
