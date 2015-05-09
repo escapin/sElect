@@ -125,7 +125,7 @@ function onStart(){
 
 // the test to benchmark:
 // from closing the election 'till the last mix server processed all the ballots
-function fromClosingElection(deferred){
+function mixPhase(deferred){
 	//console.log('************ Get the partial result from the collecting server');
 	var signedBallots = cs.getResult();
 	mix(0, signedBallots, deferred);
@@ -200,16 +200,14 @@ function mix(i, inputData, deferred) {
 		});
 }
 
-
-
 var nCycles = 0;
-var bench = new Benchmark('fromClosingElection', {
+var bench = new Benchmark('mixPhase', {
 
 	// a flag to indicate the benchmark is deferred
 	'defer': true,
 	
 	'fn': function(deferred) {
-		fromClosingElection(deferred);
+		mixPhase(deferred);
 	 },
 
 	// called when the benchmark starts running
@@ -228,11 +226,7 @@ var bench = new Benchmark('fromClosingElection', {
   	'onError': function() { console.log('Test Error!'); },
 
   	// called when the benchmark completes running
-  	'onComplete': function() { 
-	  console.log("\n****** BENCHMARK COMPLETED");
-	  console.log("\n************* Times *************");
-	  console.log(this.times);
-  	}
+  	'onComplete': onComplete,
 
   	// compiled/called before the test loop
   	// 'setup': setup,
@@ -244,10 +238,36 @@ var bench = new Benchmark('fromClosingElection', {
 //bench.run({ 'async': true });
 bench.run();
 
-// console.log("\n************* Times *************");
-// console.log(bench.times);
 
 
+function onComplete(){
+	console.log("\n****** BENCHMARK COMPLETED");
+	
+	/**********************************	
+	 *  cycle: 		time taken to complete the last cycle (secs)
+	 *	elapsed:	the time taken to complete the benchmark (secs)
+	 *	period:		the time taken to execute the test once (secs)
+	 *	timeStamp:	a timestamp of when the benchmark started (ms)
+	**********************************/
+	console.log();
+	console.log(	'***********************************\n' +
+		'* TIMES:\n' +
+		'*  - time taken to complete the last cycle \t-->\t cycle (secs):\t\t' + bench.times.cycle + '\n' +
+		'*  - time taken to complete the benchmark \t-->\t elapsed (secs):\t' + bench.times.elapsed + '\n' +
+		'*  - the time taken to execute the test once \t-->\t period (secs):\t\t' + bench.times.period + '\n' +
+		'*  - timestamp of when the benchmark started \t-->\t timeStamp (ms):\t' + bench.times.timeStamp + '\n' +
+					'***********************************');
+	
+	
+	console.log("\n************* Times as a JSON Object *************");
+	console.log(JSON.stringify(bench.times));
+}
+
+
+
+
+//console.log("\n************* Times *************");
+//console.log(bench.times);
 
 
 
