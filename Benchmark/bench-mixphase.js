@@ -9,14 +9,25 @@ var mixCore = require('../MixServer/src/mixCore.js');
 var mkdirp = require('mkdirp');
 var Benchmark = require('benchmark');
 
-
-
 ////////////////////////////////////////
 // PARAMETERS OF THE TEST
-var NMixServ = 3;
-var NVoters = 50;
-////////////////////////////////////////
 
+var params = {	NVoters: 50, 
+				NMixServ: 3}; // default params
+
+if(process.argv.length!==2 && process.argv.length!==4){ 
+	console.log("ERROR in command line.\n" +
+			"Usage: \n" +
+			"\t node bench-mixphase.js \n" +
+			"\t node bench-mixphase.js NVoters NMixServ");
+	process.exit(-1);
+}
+else if (process.argv.length===4){ // custom parameters 
+	params.NVoters = process.argv[2];
+	params.NMixServ = process.argv[3];
+}
+//console.log(JSON.stringify(params));
+////////////////////////////////////////
 
 
 var TAG_VOTERS = '10';
@@ -31,9 +42,9 @@ var electionID = 'eeee';
 var colServSigKeys = crypto.sig_keygen();
 var colServVerifKey = colServSigKeys.verificationKey;
 
-var mixServPkeKeys = new Array(NMixServ);
-var mixServSigKeys = new Array(NMixServ);
-for(var i=0; i<NMixServ; i++) {
+var mixServPkeKeys = new Array(params.NMixServ);
+var mixServSigKeys = new Array(params.NMixServ);
+for(var i=0; i<params.NMixServ; i++) {
 	mixServPkeKeys[i] = crypto.pke_keygen();
 	mixServSigKeys[i] = crypto.sig_keygen();
 }
@@ -44,8 +55,8 @@ var classpaths = ["../bin", "../lib/*"];
 
 
 var cs = csCore.create(electionID, colServSigKeys.signingKey);
-var mixServer = new Array(NMixServ);
-var intermediateResult = new Array(NMixServ);
+var mixServer = new Array(params.NMixServ);
+var intermediateResult = new Array(params.NMixServ);
 
 // compiled/called before the test loop 
 // we create the ballots and we submit them to the collecting Server
@@ -54,17 +65,17 @@ function onStart(){
 	
 	
 	console.log('************ Set up the voters');
-	var voters = new Array(NVoters);
-	for (var i=NVoters-1; i>=0; --i) {
+	var voters = new Array(params.NVoters);
+	for (var i=params.NVoters-1; i>=0; --i) {
 	    voters[i] = 'abc'  + i + '@ema.il';
 	}
 	// the object performing the voting 
 	var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
 	
 	
-	console.log('************ Set up the ' + NMixServ + '  Mix Servers');
+	console.log('************ Set up the ' + params.NMixServ + '  Mix Servers');
 	// THE MIX SERVERS
-	for (i=0; i<NMixServ; ++i) {
+	for (i=0; i<params.NMixServ; ++i) {
 	    var precServVerifKey = (i==0 ? colServVerifKey : mixServSigKeys[i-1].verificationKey );
 		mixServer[i] = mixCore.create(	mixServPkeKeys[i].encryptionKey,
 										mixServPkeKeys[i].decryptionKey,
@@ -132,7 +143,7 @@ function mixPhase(deferred){
 }
 
 function mix(i, inputData, deferred) {
-    if (i >= NMixServ) {
+    if (i >= params.NMixServ) {
     	deferred.resolve();
         return;
     }
@@ -242,14 +253,20 @@ bench.run();
 
 function onComplete(){
 	console.log("\n****** BENCHMARK COMPLETED");
+	console.log();
 	
+	console.log('***********************************\n' +
+			'* PARAMETER:\n' +
+			'*  - Number of voters:\t\t ' + params.NVoters + '\n' +
+			'*  - Number of mix servers:\t ' + params.NMixServ);
+
 	/**********************************	
 	 *  cycle: 		time taken to complete the last cycle (secs)
 	 *	elapsed:	the time taken to complete the benchmark (secs)
 	 *	period:		the time taken to execute the test once (secs)
 	 *	timeStamp:	a timestamp of when the benchmark started (ms)
 	**********************************/
-	console.log();
+	
 	console.log(	'***********************************\n' +
 		'* TIMES:\n' +
 		'*  - time taken to complete the last cycle \t-->\t cycle (secs):\t\t' + bench.times.cycle + '\n' +
@@ -259,17 +276,20 @@ function onComplete(){
 					'***********************************');
 	
 	
-	console.log("\n************* Times as a JSON Object *************");
-	console.log(JSON.stringify(bench.times));
+	console.log("\n************* As a JSON Object *************");
+	output={};
+	output=jsonConcat(output, params);
+	output=jsonConcat(output, bench.times);
+	console.log(JSON.stringify(output));
 }
 
 
-
-
-//console.log("\n************* Times *************");
-//console.log(bench.times);
-
-
+function jsonConcat(output, toBeConcat) {
+ for (var key in toBeConcat) {
+	 output[key] = toBeConcat[key];
+ }
+ return output;
+}
 
 function deleteFolderRecursive(path) {
   if( fs.existsSync(path) ) {
