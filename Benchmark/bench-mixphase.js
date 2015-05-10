@@ -35,35 +35,40 @@ var TAG_BALLOTS = '01';
 //console.log('CWD:\t' + process.cwd());
 var PARTIALRESULT_dir = path.join(process.cwd(), '_data_Test');
 
-
-
 var electionID = 'eeee';
-// keys
-var colServSigKeys = crypto.sig_keygen();
-var colServVerifKey = colServSigKeys.verificationKey;
-
-var mixServPkeKeys = new Array(params.NMixServ);
-var mixServSigKeys = new Array(params.NMixServ);
-for(var i=0; i<params.NMixServ; i++) {
-	mixServPkeKeys[i] = crypto.pke_keygen();
-	mixServSigKeys[i] = crypto.sig_keygen();
-}
-var mixServEncKeys = mixServPkeKeys.map(function(k){ return k.encryptionKey; });
-var mixServVerifKeys = mixServSigKeys.map(function(k){ return k.verificationKey; });
-// java classpaths for mix server
 var classpaths = ["../bin", "../lib/*"];
 
+var cs;
+var mixServer;
 
-var cs = csCore.create(electionID, colServSigKeys.signingKey);
-var mixServer = new Array(params.NMixServ);
-var intermediateResult = new Array(params.NMixServ);
 
 // compiled/called before the test loop 
 // we create the ballots and we submit them to the collecting Server
 function onStart(){
-	console.log('****** SETUP THE BENCHMARK');
+	console.log('****** SETUP PHASE');
+	
+	console.log('************ Set up the keys');
+	// keys
+	var colServSigKeys = crypto.sig_keygen();
+	var colServVerifKey = colServSigKeys.verificationKey;
+
+	var mixServPkeKeys = new Array(params.NMixServ);
+	var mixServSigKeys = new Array(params.NMixServ);
+	for(var i=0; i<params.NMixServ; i++) {
+		mixServPkeKeys[i] = crypto.pke_keygen();
+		mixServSigKeys[i] = crypto.sig_keygen();
+	}
+	var mixServEncKeys = mixServPkeKeys.map(function(k){ return k.encryptionKey; });
+	var mixServVerifKeys = mixServSigKeys.map(function(k){ return k.verificationKey; });
+	// java classpaths for mix server
+	
+	
+	console.log('************ Set up the Collecting Server');
+	cs = csCore.create(electionID, colServSigKeys.signingKey);
+	
 	
 	console.log('************ Set up the ' + params.NMixServ + '  Mix Servers');
+	mixServer = new Array(params.NMixServ);
 	// THE MIX SERVERS
 	for (i=0; i<params.NMixServ; ++i) {
 	    var precServVerifKey = (i==0 ? colServVerifKey : mixServSigKeys[i-1].verificationKey );
@@ -84,49 +89,20 @@ function onStart(){
         //	console.log("\tFolder '" + PARTIALRESULT_dir + "' created.");
     });
 	
+    console.log();
+    console.log('****** VOTING PHASE');
     
-    console.log('************ Set up the voters');
-	var voters = new Array(params.NVoters);
-	for (var i=params.NVoters-1; i>=0; --i) {
-	    voters[i] = 'abc'  + i + '@ema.il';
+    var voterObj = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
+	for (var i=0; i<params.NVoters; ++i) {
+	    var voter = 'abc'  + i + '@ema.il';
+	    var receipt = voterObj.createBallot(i);
+	    var csReply = cs.collectBallot(voter, receipt.ballot); // cast the vote
+	    process.stdout.write('\r>>> Ballot #' + (i+1) + ' casted');
 	}
-	// the object performing the voting 
-	var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
-    
-    console.log('************ Create and cast the ballots');
-    var receipts = new Array(voters.length);
-    for(i=0; i<voters.length; ++i){
-        // create ballot (a receipt containing a ballot); i-th voter votes for i-th candidate:
-		receipts[i] = voter.createBallot(i);
-		if(receipts[i].choice!==i){
-			console.log();
-        	console.log("\tSomething wrong with the receipt of the " + i + "-th voter");
-        	console.log("\tAborting the whole process...");
-        	process.exit(-1);
-        }
-		// submit the ballot
-    	var csReply = cs.collectBallot(voters[i], receipts[i].ballot);
-        // store the acknowledgement (signature) in the receipt
-        receipts[i].signature = csReply.data;
-        
-		process.stdout.write('\r>>> Ballot #' + (i+1) + ' casted');
-    }
-	console.log();
-    
-    
-//    console.log('************ Check the acknowledgment in the receipt');
-//    for(i=0; i<voters.length; ++i){
-//        // check the acknowledgement (signature in the receipt)
-//        var receiptOK = voter.validateReceipt(receipts[i]);
-//        if(receiptOK===false) {
-//        	console.log("\tSomething wrong with the receipt of the " + i + "-th voter");
-//        	console.log("\tAborting the whole process...");
-//        	process.exit(-1);
-//        }
-//	}
+    console.log();
     
     console.log();
-    console.log('****** STARTING THE BENCHMARK');
+    console.log('****** MIXING PHASE: starting the benchmark');
 }
 
 // the test to benchmark:
@@ -198,11 +174,11 @@ function mix(i, inputData, deferred) {
 				console.log("\tAborting the whole process...");
 	        	process.exit(-1);
 			}
-			intermediateResult[i] = dataFromFile(outputFile_path);
-			//console.log(intermediateResult[i]);
+			var intermediateResult = dataFromFile(outputFile_path);
+			//console.log(intermediateResult);
 			//console.log("Submitting to the next mix server");
 			
-			mix(i+1, intermediateResult[i], deferred);
+			mix(i+1, intermediateResult, deferred);
 		});
 }
 
