@@ -63,16 +63,6 @@ var intermediateResult = new Array(params.NMixServ);
 function onStart(){
 	console.log('****** SETUP THE BENCHMARK');
 	
-	
-	console.log('************ Set up the voters');
-	var voters = new Array(params.NVoters);
-	for (var i=params.NVoters-1; i>=0; --i) {
-	    voters[i] = 'abc'  + i + '@ema.il';
-	}
-	// the object performing the voting 
-	var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
-	
-	
 	console.log('************ Set up the ' + params.NMixServ + '  Mix Servers');
 	// THE MIX SERVERS
 	for (i=0; i<params.NMixServ; ++i) {
@@ -85,7 +75,6 @@ function onStart(){
 										classpaths);
 	}
 	
-	
 	console.log('************ Create the folder where the partial result will be stored');
 	deleteFolderRecursive(PARTIALRESULT_dir);
     mkdirp(PARTIALRESULT_dir, function (err) {
@@ -96,39 +85,45 @@ function onStart(){
     });
 	
     
-    console.log('************ Create the ballots');
+    console.log('************ Set up the voters');
+	var voters = new Array(params.NVoters);
+	for (var i=params.NVoters-1; i>=0; --i) {
+	    voters[i] = 'abc'  + i + '@ema.il';
+	}
+	// the object performing the voting 
+	var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
+    
+    console.log('************ Create and cast the ballots');
     var receipts = new Array(voters.length);
-    for(i=voters.length-1; i>=0; --i){
+    for(i=0; i<voters.length; ++i){
         // create ballot (a receipt containing a ballot); i-th voter votes for i-th candidate:
 		receipts[i] = voter.createBallot(i);
 		if(receipts[i].choice!==i){
+			console.log();
         	console.log("\tSomething wrong with the receipt of the " + i + "-th voter");
         	console.log("\tAborting the whole process...");
         	process.exit(-1);
         }
-			
-    }
-	
-    
-    console.log('************ Cast the ballots');
-    for(i=voters.length-1; i>=0; --i){
-        // submit the ballot
+		// submit the ballot
     	var csReply = cs.collectBallot(voters[i], receipts[i].ballot);
         // store the acknowledgement (signature) in the receipt
         receipts[i].signature = csReply.data;
-	}
+        
+		process.stdout.write('\r>>> Ballot #' + (i+1) + ' casted');
+    }
+	console.log();
     
     
-    console.log('************ Check the acknowledgment in the receipt');
-    for(i=voters.length-1; i>=0; --i){
-        // check the acknowledgement (signature in the receipt)
-        var receiptOK = voter.validateReceipt(receipts[i]);
-        if(receiptOK===false) {
-        	console.log("\tSomething wrong with the receipt of the " + i + "-th voter");
-        	console.log("\tAborting the whole process...");
-        	process.exit(-1);
-        }
-	}
+//    console.log('************ Check the acknowledgment in the receipt');
+//    for(i=0; i<voters.length; ++i){
+//        // check the acknowledgement (signature in the receipt)
+//        var receiptOK = voter.validateReceipt(receipts[i]);
+//        if(receiptOK===false) {
+//        	console.log("\tSomething wrong with the receipt of the " + i + "-th voter");
+//        	console.log("\tAborting the whole process...");
+//        	process.exit(-1);
+//        }
+//	}
     
     console.log();
     console.log('****** STARTING THE BENCHMARK');
@@ -252,7 +247,8 @@ bench.run();
 
 
 function onComplete(){
-	console.log("\n****** BENCHMARK COMPLETED");
+	console.log(); // new line after the n-th cycle
+	console.log("****** BENCHMARK COMPLETED");
 	console.log();
 	
 	console.log('***********************************\n' +
