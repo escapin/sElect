@@ -40,7 +40,7 @@ var classpaths = ["../bin", "../lib/*"];
 
 var cs;
 var mixServer;
-
+var signedBallots;
 
 // compiled/called before the test loop 
 // we create the ballots and we submit them to the collecting Server
@@ -102,14 +102,16 @@ function onStart(){
     console.log();
     
     console.log();
+    console.log('************ Get the partial results from the Collecting Server');
+    signedBallots = cs.getResult();
+    
+    console.log();
     console.log('****** MIXING PHASE: starting the benchmark');
 }
 
 // the test to benchmark:
 // from closing the election 'till the last mix server processed all the ballots
 function mixPhase(deferred){
-	//console.log('************ Get the partial result from the collecting server');
-	var signedBallots = cs.getResult();
 	mix(0, signedBallots, deferred);
 }
 
@@ -233,7 +235,7 @@ function onComplete(){
 			'*  - Number of mix servers:\t ' + params.NMixServ);
 
 	/**********************************	
-	 *  cycle: 		time taken to complete the last cycle (secs)
+	 *  cycle: 		the time taken to complete the last cycle (secs)
 	 *	elapsed:	the time taken to complete the benchmark (secs)
 	 *	period:		the time taken to execute the test once (secs)
 	 *	timeStamp:	a timestamp of when the benchmark started (ms)
@@ -241,10 +243,10 @@ function onComplete(){
 	
 	console.log(	'***********************************\n' +
 		'* TIMES:\n' +
-		'*  - time taken to complete the last cycle \t-->\t cycle (secs):\t\t' + bench.times.cycle + '\n' +
-		'*  - time taken to complete the benchmark \t-->\t elapsed (secs):\t' + bench.times.elapsed + '\n' +
+		'*  - the time taken to complete the last cycle \t-->\t cycle (secs):\t\t' + bench.times.cycle + '\n' +
+		'*  - the time taken to complete the benchmark \t-->\t elapsed (secs):\t' + bench.times.elapsed + '\n' +
 		'*  - the time taken to execute the test once \t-->\t period (secs):\t\t' + bench.times.period + '\n' +
-		'*  - timestamp of when the benchmark started \t-->\t timeStamp (ms):\t' + bench.times.timeStamp + '\n' +
+		'*  - a timestamp of when the benchmark started \t-->\t timeStamp (ms):\t' + bench.times.timeStamp + '\n' +
 					'***********************************');
 	
 	
