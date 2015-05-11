@@ -90,7 +90,7 @@ function onStart(){
     console.log();
     
     console.log();
-    console.log('************ Create the message with the ballots signed by the Collecting Server');
+    console.log('************ Concatenating the casted ballots as an unique message');
     //signedBallots = cs.getResult();
     var ballotsArray=sortedBallots.toArray();
     var ballotsAsAMessage = '';
@@ -104,6 +104,9 @@ function onStart(){
 		process.stdout.write('\r>>> Ballot #' + (ballotsArray.length-i) + ' processed');
     }
     console.log();
+    
+    console.log();
+    console.log('************ Creating message with the ballots signed as by the Collecting Server');
     var tag_elID_ballots = pair(TAG_BALLOTS, pair(electionID, ballotsAsAMessage));
 	var signature = sign(colServSigKeys.signingKey, tag_elID_ballots);
 	signedBallots = pair(tag_elID_ballots, signature);
