@@ -3,11 +3,18 @@ var path = require('path');
 var crypto = require('cryptofunc');
 var cryptoUtils = require('cryptoUtils');
 var voterClient = require('voterClient');
-var csCore = require('../CollectingServer/src/csCore.js');
+//var csCore = require('../CollectingServer/src/csCore.js');
 var mixCore = require('../MixServer/src/mixCore.js');
 
 var mkdirp = require('mkdirp');
 var Benchmark = require('benchmark');
+var SortedList = require('sortedlist');
+
+
+//SHORTCUTS
+var pair = crypto.concatenate;
+var unpair = crypto.deconcatenate;
+var sign = crypto.sign;
 
 ////////////////////////////////////////
 // PARAMETERS OF THE TEST
@@ -30,15 +37,16 @@ else if (process.argv.length===4){ // custom parameters
 ////////////////////////////////////////
 
 
-var TAG_VOTERS = '10';
+//var TAG_VOTERS = '10';
 var TAG_BALLOTS = '01';
 //console.log('CWD:\t' + process.cwd());
 var PARTIALRESULT_dir = path.join(process.cwd(), '_data_Test');
+var CSRESULTS_dir = path.join(process.cwd(), '_CollectingServer_results');
 
 var electionID = 'eeee';
 var classpaths = ["../bin", "../lib/*"];
 
-var cs;
+//var cs;
 var mixServer;
 var signedBallots;
 
@@ -63,11 +71,56 @@ function onStart(){
 	// java classpaths for mix server
 	
 	
-	console.log('************ Set up the Collecting Server');
-	cs = csCore.create(electionID, colServSigKeys.signingKey);
+	//console.log('************ Set up the Collecting Server');
+	//cs = csCore.create(electionID, colServSigKeys.signingKey);
 	
 	
-	console.log('************ Set up the ' + params.NMixServ + '  Mix Servers');
+	console.log();
+    console.log('****** VOTING PHASE');
+    
+    var voterObj = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
+    var sortedBallots = SortedList.create();
+	for (var i=0; i<params.NVoters; ++i) {
+	    var voter = 'abc'  + i + '@ema.il';
+	    var receipt = voterObj.createBallot(i);
+	    sortedBallots.insertOne(receipt.ballot);
+	    //var csReply = cs.collectBallot(voter, receipt.ballot); // cast the vote
+	    process.stdout.write('\r>>> Ballot #' + (i+1) + ' created');
+	}
+    console.log();
+    
+    console.log();
+    console.log('************ Create the message with the ballots signed by the Collecting Server');
+    //signedBallots = cs.getResult();
+    var ballotsArray=sortedBallots.toArray();
+    var ballotsAsAMessage = '';
+	var last;
+    for(var i=ballotsArray.length-1; i>=0; --i){
+    	// inverse order necessary to make the implementation of crypto.concatenate work
+    	var current = ballotsArray[i];
+    	if(last === undefined || current!==last)
+    		ballotsAsAMessage = pair(current, ballotsAsAMessage);
+		last = current;
+		process.stdout.write('\r>>> Ballot #' + (ballotsArray.length-i) + ' processed');
+    }
+    console.log();
+    var tag_elID_ballots = pair(TAG_BALLOTS, pair(electionID, ballotsAsAMessage));
+	var signature = sign(colServSigKeys.signingKey, tag_elID_ballots);
+	signedBallots = pair(tag_elID_ballots, signature);
+    
+	console.log();
+	var signedBallotsFILE= path.join(CSRESULTS_dir,'signedBallots' + params.NVoters + '.msg');
+	console.log('************ Save the message with the ballots signed by the Collecting Server in \n', signedBallotsFILE);
+	mkdirp(CSRESULTS_dir, function (err) {
+        if (err)
+        	console.error("Error: ", err);
+		//else 
+        //	console.log("\tFolder '" + CSRESULTS_dir + "' created.");
+    });
+	dataToFile(signedBallots, signedBallotsFILE);
+    
+	console.log();
+    console.log('************ Set up the ' + params.NMixServ + '  Mix Servers');
 	mixServer = new Array(params.NMixServ);
 	// THE MIX SERVERS
 	for (i=0; i<params.NMixServ; ++i) {
@@ -88,24 +141,7 @@ function onStart(){
 		//else 
         //	console.log("\tFolder '" + PARTIALRESULT_dir + "' created.");
     });
-	
-    console.log();
-    console.log('****** VOTING PHASE');
     
-    var voterObj = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
-	for (var i=0; i<params.NVoters; ++i) {
-	    var voter = 'abc'  + i + '@ema.il';
-	    var receipt = voterObj.createBallot(i);
-	    var csReply = cs.collectBallot(voter, receipt.ballot); // cast the vote
-	    process.stdout.write('\r>>> Ballot #' + (i+1) + ' casted');
-	}
-    console.log();
-    
-    console.log();
-    console.log('************ Get the partial results from the Collecting Server');
-    signedBallots = cs.getResult();
-    
-    console.log();
     console.log('****** MIXING PHASE: starting the benchmark');
 }
 
