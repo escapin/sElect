@@ -162,11 +162,9 @@ function mix(i, inputData, deferred) {
 
     //console.log('\n************ Mixing', i);
     
-    var nonce = crypto.nonce(5);
-    
-    var inputFile_path = path.join(PARTIALRESULT_dir,'partialResult0' + i + '_' + nonce + '_input.msg'); 
+    var inputFile_path = path.join(PARTIALRESULT_dir,'partialResult0' + i + '_input.msg');
 	dataToFile(inputData, inputFile_path);
-	var outputFile_path = path.join(PARTIALRESULT_dir, 'partialResult0' + i + '_' + nonce + '_output.msg');
+	var outputFile_path = path.join(PARTIALRESULT_dir, 'partialResult0' + i + '_output.msg');
 	
 	mixServer[i].processBallots(inputFile_path, outputFile_path, 
     	function(err, stdout, stderr){
