@@ -109,7 +109,7 @@ function onStart(){
     console.log('************ Creating message with the ballots signed as by the Collecting Server');
     console.log('>>> (TAG, elID, ballotsAsAMessage)');
     var tag_elID_ballots = pair(TAG_BALLOTS, pair(electionID, ballotsAsAMessage));
-    console.log('>>> Generating Signature');
+    console.log('>>> Generating the signature');
     var signature = sign(colServSigKeys.signingKey, tag_elID_ballots);
     console.log('>>> signedBallots=(TAG, elID, ballotsAsAMessage, signature)');
     signedBallots = pair(tag_elID_ballots, signature);
