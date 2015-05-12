@@ -107,9 +107,12 @@ function onStart(){
     
     console.log();
     console.log('************ Creating message with the ballots signed as by the Collecting Server');
+    console.log('>>> (TAG, elID, ballotsAsAMessage)');
     var tag_elID_ballots = pair(TAG_BALLOTS, pair(electionID, ballotsAsAMessage));
-	var signature = sign(colServSigKeys.signingKey, tag_elID_ballots);
-	signedBallots = pair(tag_elID_ballots, signature);
+    console.log('>>> Generating Signature');
+    var signature = sign(colServSigKeys.signingKey, tag_elID_ballots);
+    console.log('>>> signedBallots=(TAG, elID, ballotsAsAMessage, signature)');
+    signedBallots = pair(tag_elID_ballots, signature);
     
 	console.log();
 	var signedBallotsFILE= path.join(CSRESULTS_dir,'signedBallots' + params.NVoters + '.msg');
