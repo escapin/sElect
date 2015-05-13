@@ -10,7 +10,7 @@ sElect is a remote electronic voting system designed to provide
 * Java Cryptography Extension (only for oraclejdk).
 * node.js and npm.
 * wget (used only in the makefiles for getting the proper libraries).
-* python (used only in the root makefile for configuring the mix servers).
+* python (used in the root makefile for configuring the mix servers).
 
 ## The Design
 
@@ -101,6 +101,7 @@ node collectingServer.js
 ```
 
 *Mix server(s)*:
+
 For each 'dir' in 'mix'
 ```
 cd mix/dir
