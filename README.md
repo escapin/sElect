@@ -56,12 +56,12 @@ net_.
 
 ## Security Properties
 
-_Verifiability_ is achieved in a very direct way: once the result
-has been published, every voter can simply check whether her
-verification code is included in the published election result,
-along with the voter's choice. For this mechanism to work, one needs to make
-sure that the client program is honest and indeed uses a randomly
-chosen, and hence unique, verification code.
+_Verifiability_ is achieved in a very direct way: once the result has
+been published, every voter can simply check whether her verification
+code is included in the published election result, along with the
+voter's choice. For this mechanism to work, one needs to make sure that
+the client program is honest and indeed uses a randomly chosen, and
+hence unique, verification code.
 
 Furthermore, sElect also provides a
 reasonable level of _accountability_: when a voter has a signed
@@ -97,7 +97,7 @@ be started in the following way.
 *Collecting server*:
 ```
 cd CollectingServer
-node collectingServer.js
+./run.sh
 ```
 
 *Mix server(s)*:
@@ -105,18 +105,21 @@ node collectingServer.js
 for each 'dir' in the 'mix' folder,
 ```
 cd mix/dir
-node mixServer.js
+./run.sh
 ```
 
 *Bulletin board*:
 ```
 cd BulletinBoard
-node bb.js
+./run.sh
 ```
 
 *Voting booth*:
+```
+cd VotingBooth
+./run.sh
+```
 
-Simply open VotingBooth/webapp/votingBooth.html in your browser.
 
 The files created during the voting process (including logs and partial 
 and final results) can be removed with
@@ -125,13 +128,12 @@ make cleanElection
 ```
 
 **Remark.**
-In the development version, one-time passwords are not sent to
-voters via e-mail; they are logged on the console by the
-collecting server and must be copied from there. Also, the
-collecting server, as of now, ignores the opening and closing
-times. The server needs to be triggered manually to close the
-election, which can be done through the status page served by
-this server.
+In the development version, one-time passwords are not sent to voters
+via e-mail; they are logged on the console by the collecting server and
+must be copied from there.  Also, the closing time of the collecting
+server is far away in the future (Nov 10, 2018). The server needs to be
+triggered manually to close the election, which can be done through the
+status page served by this server.
 
 **Unit Testing.**
 To run the test suite, type
