@@ -102,7 +102,7 @@ node collectingServer.js
 
 *Mix server(s)*:
 
-For each 'dir' in 'mix'
+for each 'dir' in the 'mix' folder,
 ```
 cd mix/dir
 node mixServer.js
