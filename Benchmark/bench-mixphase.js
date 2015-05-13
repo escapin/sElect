@@ -104,6 +104,8 @@ function onStart(){
 		process.stdout.write('\r>>> Ballot #' + (ballotsArray.length-i) + ' processed');
     }
     console.log();
+    console.log();
+    console.log("Length of the one ballot: " + ballotsArray[ballotsArray.length-1].length + " byte.");
     
     console.log();
     console.log('************ Creating message with the ballots signed as by the Collecting Server');
