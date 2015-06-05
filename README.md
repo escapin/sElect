@@ -78,7 +78,7 @@ can link the ballot of a given voter to his/her choice-identifier-pair
 in the final output.
 
 
-## Development Environment (under construction)
+## Development Environment
 
 The development environment can be created with
 
@@ -127,7 +127,8 @@ and final results) can be removed with
 make cleanElection
 ```
 
-**Remark.** In the development version, one-time passwords are not sent
+**Remark.**
+In the development version, one-time passwords are not sent
 to voters via e-mail; they are logged on the console by the collecting
 server and must be copied from there.  The list of the valid voters'
 emails can be found in the file 'ElectionManifest.json' of the folder
