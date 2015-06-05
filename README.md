@@ -127,13 +127,14 @@ and final results) can be removed with
 make cleanElection
 ```
 
-**Remark.**
-In the development version, one-time passwords are not sent to voters
-via e-mail; they are logged on the console by the collecting server and
-must be copied from there.  Also, the closing time of the collecting
-server is far away in the future (Nov 10, 2018). The server needs to be
-triggered manually to close the election, which can be done through the
-status page served by this server.
+**Remark.** In the development version, one-time passwords are not sent
+to voters via e-mail; they are logged on the console by the collecting
+server and must be copied from there.  The list of the valid voters'
+emails can be found in the file 'ElectionManifest.json' of the folder
+'template'.  Also, the closing time of the collecting server is far away
+in the future (Nov 10, 2018). The server needs to be triggered manually
+to close the election, which can be done through the status page served
+by this server.
 
 **Unit Testing.**
 To run the test suite, type
