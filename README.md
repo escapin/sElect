@@ -142,3 +142,5 @@ To run the test suite, type
 ```
 make test
 ```
+The created files can be removed by 
+`make testclean`.
