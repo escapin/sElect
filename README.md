@@ -3,12 +3,6 @@
 sElect is a remote electronic voting system designed to provide 
 **privacy** and **verifiability**.
 
-One of our goals is to establish privacy on the
-**implementation level** (code level). The code-level
-verification of the core of the system (implemented in Java) 
-is carried out within the DFG Priority
-Programme *Reliably Secure Software Systems* (RS3)
-(https://www.spp-rs3.de).
 
 ## Dependencies
 
@@ -16,7 +10,7 @@ Programme *Reliably Secure Software Systems* (RS3)
 * Java Cryptography Extension (only for oraclejdk).
 * node.js and npm.
 * wget (used only in the makefiles for getting the proper libraries).
-* python (used only in the root makefile for configuring the mix servers).
+* python (used in the root makefile for configuring the mix servers).
 
 ## The Design
 
@@ -28,38 +22,30 @@ goals). The design is also relatively simple (considering, again,
 the security goals the system is designed to achieve).
 
 There are three core components of the system: the **client
-program**, the **collecting server** and the **final sever** (a
-longer cascade of servers is conceivable in order to further
-increase privacy).  Both servers post data, such as lists of
-voters, intermediate data, and the final result on a publicly
-available bulletin board, for which we also provide a reference
-implementation.
+program**, the **collecting server** and a cascade of **mix severs**.
+All servers post data, such as lists of voters, intermediate results, and 
+the final result on a publicly available bulletin board, 
+for which we also provide a reference implementation.
 
-**Voting phase.** In the voting phase, voters prepare their
-ballots using the client program.  A ballot contains the voter's
-choice (for example, the name of the candidate chosen by the
-voter) and a unique, randomly chosen _verification code_.
-To construct the ballot, first the choice along with the
-verification code is encrypted with the public key of the final
-server. The resulting ciphertext, called an _inner ballot_,
-is then encrypted with the public key of the collecting
-server. Such a (complete) ballot is then submitted to the
-collecting server which authenticates the voter and, if the
-authentication succeeds, replies by sending back a digitally
-signed acknowledgment.
+**Voting phase.** In the voting phase, every voter prepare her ballots
+using the client program.  A ballot contains the voter's choice (for
+example, the name of the candidate chosen by the voter) and a unique,
+randomly chosen verification code.  To construct the ballot, the choice
+along with the verification code is encrypted several times with the
+public key of each mix server, from the last to the first.  Such a
+(complete) ballot is then submitted to the collecting server which
+authenticates the voter and, if the authentication succeeds, replies by
+sending back a digitally signed acknowledgment.
 
-**Tallying phase.** When the voting phase is over, the system
-enters the tallying phase. In this phase, first the collecting
-server performs the following operations. It decrypts the outer
-encryption layer of all the collected ballots and publishes the
-resulting list of inner ballots in alphabetical order. This list
-is digitally signed by the server. The collecting server also
-outputs the list of all the voters who have successfully
-submitted their ballots, again in alphabetical order and
-digitally signed.
+**Mixing phase.** When the voting phase is over, the system enters the
+mixing phase. In this phase, the collecting server outputs the list of
+ciphertexts to the first mix server which decrypts the outer encryption
+layer, shuffles the inner ballots and sends the signed result both to
+the next mix server and to the bulletin board.
 
-Next, the final server reads and decrypts the list of inner ballots
-produced by the collecting server. The server then publishes the
+
+Next, the bulletin board reads the list of (unencrypted) ballots
+produced by the last mix server. It then publishes the
 resulting list containing the voters' choices along with verification
 codes, again in alphabetical order and digitally signed. This
 list constitutes the official result of the election process.
@@ -70,12 +56,12 @@ net_.
 
 ## Security Properties
 
-_Verifiability_ is achieved in a very direct way: once the result
-has been published, every voter can simply check whether her
-verification code is included in the published election result,
-along with the voter's choice. For this mechanism to work, one needs to make
-sure that the client program is honest and indeed uses a randomly
-chosen, and hence unique, verification code.
+_Verifiability_ is achieved in a very direct way: once the result has
+been published, every voter can simply check whether her verification
+code is included in the published election result, along with the
+voter's choice. For this mechanism to work, one needs to make sure that
+the client program is honest and indeed uses a randomly chosen, and
+hence unique, verification code.
 
 Furthermore, sElect also provides a
 reasonable level of _accountability_: when a voter has a signed
@@ -85,15 +71,14 @@ as required), it is possible to tell which of the servers has
 misbehaved and even (by making use of the digital signatures)
 to provide an evidence for this misbehavior.
 
-sElect provides _privacy_ under the assumption that one of the
-servers is honest (the two servers do not collude). The steps
-taken by an honest server, by design, hide the link between its
-input and output entries. Therefore, no one can link the ballot
-of a given voter to his/her choice-identifier-pair in the final
-output.
+sElect provides _privacy_ under the assumption that at least one of the
+mix servers is honest. The steps taken by an honest server, by design,
+hide the link between its input and output entries. Therefore, no one
+can link the ballot of a given voter to his/her choice-identifier-pair
+in the final output.
 
 
-## Development Environment (under construction)
+## Development Environment
 
 The development environment can be created with
 
@@ -112,24 +97,29 @@ be started in the following way.
 *Collecting server*:
 ```
 cd CollectingServer
-node collectingServer.js
+./run.sh
 ```
 
-*Mix server*:
+*Mix server(s)*:
+
+for each 'dir' in the 'mix' folder,
 ```
-cd MixServer
-node mixServer.js
+cd mix/dir
+./run.sh
 ```
 
 *Bulletin board*:
 ```
 cd BulletinBoard
-node bb.js
+./run.sh
 ```
 
 *Voting booth*:
+```
+cd VotingBooth
+./run.sh
+```
 
-Simply open VotingBooth/webapp/votingBooth.html in your browser.
 
 The files created during the voting process (including logs and partial 
 and final results) can be removed with
@@ -138,16 +128,19 @@ make cleanElection
 ```
 
 **Remark.**
-In the development version, one-time passwords are not sent to
-voters via e-mail; they are logged on the console by the
-collecting server and must be copied from there. Also, the
-collecting server, as of now, ignores the opening and closing
-times. The server needs to be triggered manually to close the
-election, which can be done through the status page served by
-this server.
+In the development version, one-time passwords are not sent
+to voters via e-mail; they are logged on the console by the collecting
+server and must be copied from there.  The list of the valid voters'
+emails can be found in the file 'ElectionManifest.json' of the folder
+'template'.  Also, the closing time of the collecting server is far away
+in the future (Nov 10, 2018). The server needs to be triggered manually
+to close the election, which can be done through the status page served
+by this server.
 
 **Unit Testing.**
 To run the test suite, type
 ```
 make test
 ```
+The created files can be removed by 
+`make testclean`.

@@ -42,7 +42,7 @@
 
         <form class="pure-form" action="">
             <fieldset>
-                <legend>Please, provide your e-mail address to continue:</legend>
+                <legend>Please provide your e-mail address to continue:</legend>
                 <div class="pure-g">
                     <div class="pure-u-1 pure-u-md-2-3">
                         <input id='inp-email' class="pure-input-1" type="email" size="50" placeholder="email">
@@ -132,10 +132,13 @@
         <p> When the election is over, you can manually check that your
         ballot is in the final tally. If you want to do this, you
         need to
-        <h3 class="legend"> store/write down the following verification code</h3>
+        <h3 class="legend"> save/write down the following verification code</h3>
         <p> and look it up in the result of the election.</p>
 
-        <p> Your verification code: <b id="receipt-id">??????</b> </p>
+        <p> Your verification code: <b id="receipt-id">??????</b> 
+        &nbsp; <a id='verCodeLink'  class="button-vercode pure-button" href="#"
+            download="sElectVerificationCode.png">&#x21e3 Save as a picture</a>
+        </p>
 
         <p> To check the result, please visit (refresh) this page again,
         when the election is over. </p>
@@ -156,7 +159,7 @@
         <form class="pure-form" action="">
             <fieldset>
                 <button type="submit" class="pure-button
-                pure-button-primary">Start over and try again</button>
+                pure-button-secondary">Start over and try again</button>
             </fieldset>
         </form>
     </div>
@@ -175,7 +178,7 @@
         <form id="go-to-bb-form" class="pure-form" action="">
             <fieldset>
                 <button type="submit" class="pure-button pure-button-primary">
-                    go the the result web page</button>
+                    go to the result web page</button>
             </fieldset>
         </form>
 

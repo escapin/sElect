@@ -60,6 +60,7 @@ public class MixServerWrapperMain {
 			System.exit(11);
 		} 
 		System.out.println("[MixServerWrapper] Ballots read from the file: \t" + inputFile_path);
+		
 		//System.out.println("\n" + sInput + "\n");
 
 		System.out.print("[MixServerWrapper] Processing the ballots...");
@@ -74,8 +75,8 @@ public class MixServerWrapperMain {
 			System.out.println("\n[MixServerWrapper] \t ***ServerMisbehavior*** \t" + ex.description);
 			System.exit(ex.errCode);
 		}
-		
 		System.out.println("done!");
+		
 		//System.out.println("\n" + string(result) + "\n");
 		try{
 			dataToFile(string(result), outputFile_path);
