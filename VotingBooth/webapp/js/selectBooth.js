@@ -23,6 +23,7 @@ function selectBooth() {
     // Voter and status
     var email = null;
     var otp = null;
+    var randomCode = null;
     var choice = null;
 
     var electionID = manifest.hash;
@@ -395,6 +396,8 @@ function selectBooth() {
                 $('#inp-email').focus(); break;
             case '#otp':
                 $('#inp-otp').focus(); break;
+            case '#randomness':
+            	$('#inp-code').focus(); break;
         }
     }
 
@@ -451,7 +454,24 @@ function selectBooth() {
         otp = o.trim();
 
         $('#otp').fadeOut(FADE_TIME, function() {
-            showTab('#choice');
+        	$('#inp-code').val(''); // empty the code input field
+            showTab('#randomness');
+        });
+        return false; // prevents any further submit action
+    }
+    
+    function onSubmitRandomCode(event) {
+    	if(activeTabId!=='#randomness') return false;
+    	activeTabId='';
+    	
+    	// Fetching the inp-randomCode from the form
+    	var r = $('#inp-code').val();
+    	if( !r || r==='') // it should not happen
+            return false;
+        randomCode = r.trim();
+        console.log("Random Code: ", randomCode);
+        $('randomness').fadeOut(FADE_TIME, function() {
+        	showTab('#choice');
         });
         return false; // prevents any further submit action
     }
@@ -572,10 +592,12 @@ function selectBooth() {
     // Event handlers binding
     $('#welcome form').submit(onSubmitWelcome);
     $('#otp form').submit(onSubmitOTP);
+    $('#randomness form').submit(onSubmitRandomCode);
     $('#choice form').submit(onSubmitChoice);
     $('#error form').submit(onSubmitError);
     $('#inp-email').on('input', enableWhenNotEmpty($('#submit-email'), $('#inp-email')));
     $('#inp-otp').on('input', enableWhenNotEmpty($('#submit-otp'), $('#inp-otp')));
+    $('#inp-code').on('input', enableWhenNotEmpty($('#submit-code'), $('#inp-code')));
     $('#verification form').submit(goToBB);
     $('input[name="choice"]').change(whenChoiceChanges);
     
