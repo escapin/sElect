@@ -120,12 +120,12 @@ function selectBooth() {
     /// INITIATE BOOTH
 
     function initiateBooth() {
-        // Detemine the status of the system: (not-yet) open/closed, 
-        // by quering the final mix server.
+        // Determine the status of the system: (not-yet) open/closed, 
+        // by querying the final mix server.
         // Depending on the state, either the voting tab or the
         // verification tab will be opened.
         //
-        // The state is detemined in a (too?) simple way, by
+        // The state is determined in a (too?) simple way, by
         // checking if the final server has ready result.
         //
         resultOfFinalServerReady()
@@ -390,6 +390,8 @@ function selectBooth() {
         $('#processing').hide();
         activeTabId = tabId;
         $(tabId).fadeIn(FADE_TIME);
+        if(tabId !== '#randomness')
+        	$('#randomness').hide();
         // Focus
         switch (tabId) {
             case '#welcome':
@@ -470,7 +472,7 @@ function selectBooth() {
             return false;
         randomCode = r.trim();
         console.log("Random Code: ", randomCode);
-        $('randomness').fadeOut(FADE_TIME, function() {
+        $('#randomness').fadeOut(FADE_TIME, function() {
         	showTab('#choice');
         });
         return false; // prevents any further submit action
