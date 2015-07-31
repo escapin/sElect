@@ -114,12 +114,15 @@ function parseFinalResult(signedFinalResult) {
         	console.log('ERROR: Wrong election ID');
             return;
         }
-    	var receipt_nonce = p.second;
-    	p = crypto.deconcatenate(receipt_nonce);
+    	var userCode_receipt_choice = p.second;
+    	p = crypto.deconcatenate(userCode_receipt_choice);
+    	var userCode = crypto.hexStringToInt(p.first);
+    	var receipt_choice = p.second;
+    	p = crypto.deconcatenate(receipt_choice);
     	var receiptID = p.first;
     	var choice = crypto.hexStringToInt(p.second);
-    	t.push({receiptID: receiptID, vote: manifest.choices[choice]});
-    	console.log("\t" + receiptID + "\t" + choice);
+    	t.push({userCode: userCode, receiptID: receiptID, vote: manifest.choices[choice]});
+    	console.log(userCode + "\t" + receiptID + "\t" + choice);
     	// add one vote for choice 
         ++ccount[choice];
     }
