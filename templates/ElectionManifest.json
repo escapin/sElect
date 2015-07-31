@@ -50,8 +50,6 @@
     ],
     
     "bulletinBoards" : [
-        { "URI": "http://localhost:3111"},
-        { "URI": "http://localhost:3112"},
-        { "URI": "http://localhost:3113"}
+        { "URI": "http://localhost:3111"}
      ]
 }
