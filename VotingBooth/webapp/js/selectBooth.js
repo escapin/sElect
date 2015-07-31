@@ -265,7 +265,7 @@ function selectBooth() {
             }
         }
 
-        if (ok) { // verification succedded
+        if (ok) { // verification succeed
             verwriter.writes('Verification successful <font size=7>&#x2713;</font>');
         }
         else  { // Something went wrong. Assign the blame.
@@ -390,6 +390,8 @@ function selectBooth() {
         $('#processing').hide();
         activeTabId = tabId;
         $(tabId).fadeIn(FADE_TIME);
+        if(tabId !== '#randomness')
+        	$('#randomness').hide();
         // Focus
         switch (tabId) {
             case '#welcome':
@@ -469,8 +471,8 @@ function selectBooth() {
     	if( !r || r==='') // it should not happen
             return false;
         randomCode = r.trim();
-        console.log("Random Code: ", randomCode);
-        $('randomness').fadeOut(FADE_TIME, function() {
+        //console.log("Random Code: ", randomCode);
+        $('#randomness').fadeOut(FADE_TIME, function() {
         	showTab('#choice');
         });
         return false; // prevents any further submit action
@@ -488,7 +490,7 @@ function selectBooth() {
         $('#choice').fadeOut(FADE_TIME, function() {
 
             // Create the ballot
-            console.log('CREATING BALLOT FOR:', email, otp, choice);
+            console.log('CREATING BALLOT FOR:', email, randomCode, otp, choice);
             var receipt = voter.createBallot(choice);
             // console.log('RECEIPT:', receipt);
 
