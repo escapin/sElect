@@ -491,7 +491,7 @@ function selectBooth() {
 
             // Create the ballot
             console.log('CREATING BALLOT FOR:', email, randomCode, otp, choice);
-            var receipt = voter.createBallot(choice);
+            var receipt = voter.createBallot(choice, randomCode);
             // console.log('RECEIPT:', receipt);
 
             showProgressIcon();
