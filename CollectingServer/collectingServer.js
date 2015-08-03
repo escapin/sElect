@@ -17,8 +17,10 @@ winston.add(winston.transports.File, { filename: config.LOG_FILE });
 // create the folder where the data will be stored
 mkdirp.sync(config.DATA_FOLDER);
 
+/*
 // CHECK IF THE RESULT ALREADY EXISTS
 var cmdlineOption = process.argv[2];
+
 var resultFileExists = fs.existsSync(config.RESULT_FILE);
 if (resultFileExists && cmdlineOption !== '--serveResult') {
     console.log('ERROR: The file with result (%s) already exists.', config.RESULT_FILE);
@@ -52,7 +54,7 @@ if (cmdlineOption && cmdlineOption!=='--resume' && cmdlineOption!=='--serveResul
     console.log('SERVER NOT STARTED.');
     process.exit(1);
 }
-
+*/
 
 // CREATE AND CONFIGURE THE APP
 var routes = require('./src/routes');
