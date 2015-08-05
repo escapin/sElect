@@ -28,8 +28,9 @@ describe( 'Voter Client', function()
         // Create the voter
         var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys);
 
-        // Create a ballot: [choice, randomCode]
-        var receipt = voter.createBallot(3, 1212);
+        // Create a ballot: [choice, userCode]
+        var userCode = 1212;
+        var receipt = voter.createBallot(3, userCode);
 
         // Create the signature of the collecting server
         var message = pair(TAG_ACCEPTED, pair(electionID, receipt.ballot));
@@ -44,8 +45,9 @@ describe( 'Voter Client', function()
 
         // Re-create the ballot using the randomness in the receipt:
         var choiceMsg = crypto.int32ToHexString(3);
+        var userCodeMsg = crypto.int32ToHexString(userCode);
         var N = mixServEncKeys.length;
-        var x = pair(electionID, pair(receipt.receiptID, choiceMsg));
+        var x = pair(electionID, pair(userCodeMsg, pair(receipt.receiptID, choiceMsg)));
         for (var i=N-1; i>=0; --i) {
         	x = enc(mixServEncKeys[i], pair(electionID, x), receipt.randomCoins[i]);
             expect(x).toBe(receipt.ciphertexts[i]);
@@ -64,6 +66,8 @@ describe( 'Voter Client', function()
         // Check the plaintexts
         p = crypto.deconcatenate(x);
         expect(p.first).toBe(electionID);
+        p = crypto.deconcatenate(p.second);
+        expect(crypto.hexStringToInt(p.first)).toBe(userCode);
         p = crypto.deconcatenate(p.second);
         expect(crypto.hexStringToInt(p.second)).toBe(3);
 
