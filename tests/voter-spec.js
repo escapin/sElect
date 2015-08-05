@@ -28,8 +28,8 @@ describe( 'Voter Client', function()
         // Create the voter
         var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys);
 
-        // Create a ballot
-        var receipt = voter.createBallot(3);
+        // Create a ballot: [choice, randomCode]
+        var receipt = voter.createBallot(3, 1212);
 
         // Create the signature of the collecting server
         var message = pair(TAG_ACCEPTED, pair(electionID, receipt.ballot));
