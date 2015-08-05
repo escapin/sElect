@@ -1,7 +1,6 @@
 
 function selectBooth() {
 
-
     //////////////////////////////////////////////////////////////////////////////
     /// PARAMETERS
 
@@ -265,7 +264,7 @@ function selectBooth() {
             }
         }
 
-        if (ok) { // verification succedded
+        if (ok) { // verification succeed
             verwriter.writes('Verification successful <font size=7>&#x2713;</font>');
         }
         else  { // Something went wrong. Assign the blame.
@@ -471,7 +470,7 @@ function selectBooth() {
     	if( !r || r==='') // it should not happen
             return false;
         randomCode = r.trim();
-        console.log("Random Code: ", randomCode);
+        //console.log("Random Code: ", randomCode);
         $('#randomness').fadeOut(FADE_TIME, function() {
         	showTab('#choice');
         });
@@ -490,8 +489,8 @@ function selectBooth() {
         $('#choice').fadeOut(FADE_TIME, function() {
 
             // Create the ballot
-            console.log('CREATING BALLOT FOR:', email, otp, choice);
-            var receipt = voter.createBallot(choice);
+            console.log('CREATING BALLOT FOR:', email, randomCode, otp, choice);
+            var receipt = voter.createBallot(choice, randomCode);
             // console.log('RECEIPT:', receipt);
 
             showProgressIcon();
@@ -517,7 +516,7 @@ function selectBooth() {
                         storeReceipt(receipt);
 
                         // prepare and show the "ballot accepted" tab
-                        var recid = receipt.receiptID.toUpperCase();
+                        var recid = receipt.userCode + '.' + receipt.receiptID.toUpperCase();
                         var durl = verificationCode2DataURL(recid, printableElID);
                         $('#verCodeLink').attr('href', durl);
                         $('#receipt-id').text(recid);
