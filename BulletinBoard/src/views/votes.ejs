@@ -33,7 +33,7 @@
                 List of Votes
             </h2>
             <h3>
-                Your choice should be listed next to your verification code
+                Your choice should be listed next to your verification code.                
             </h3>
 
             <table class="pure-table pure-table-horizontal">
@@ -46,7 +46,7 @@
                 <tbody>
                     <% for(var i=0; i<result.length; i++) { %>
                        <tr>
-                           <td> <%= result[i].userCode + '.' + result[i].receiptID.toUpperCase() %> </td>
+                           <td> <%= result[i].userCode.toUpperCase() + '.' + result[i].receiptID.toUpperCase() %> </td>
                            <td> <%= result[i].vote %> </td>
                        </tr>
                     <% } %>

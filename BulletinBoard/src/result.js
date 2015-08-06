@@ -5,6 +5,7 @@ var config = require('../config');
 // var wrapper = require('./wrapper');
 var crypto = require('cryptofunc');
 var cryptoUtils = require('cryptoUtils');
+var strHexConversion = require('strHexConversion');
 
 var TAG_VOTERS = '10';
 var TAG_BALLOTS = '01';
@@ -116,7 +117,7 @@ function parseFinalResult(signedFinalResult) {
         }
     	var userCode_receipt_choice = p.second;
     	p = crypto.deconcatenate(userCode_receipt_choice);
-    	var userCode = crypto.hexStringToInt(p.first);
+    	var userCode = strHexConversion.hexDecode(p.first);
     	var receipt_choice = p.second;
     	p = crypto.deconcatenate(receipt_choice);
     	var receiptID = p.first;

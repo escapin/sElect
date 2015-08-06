@@ -94,8 +94,10 @@ describe( 'Voting process', function()
         console.log('************ Ballot creation');
     	for(i=voters.length-1; i>=0; --i){
             // create ballot (a receipt containing a ballot); i-th voter votes for i-th candidate:
-    		receipts[i] = voter.createBallot(i);
+    		userCode = crypto.nonce().slice(0,6);
+    		receipts[i] = voter.createBallot(i, userCode);
     		expect (receipts[i].choice) .toBe(i);
+    		expect (receipts[i].userCode) .toBe(userCode);
         }
     });
 
@@ -321,7 +323,7 @@ describe( 'Voting process', function()
 
         // Let us now take a voter whose ballot was ignored (was
         // not cast):
-        var rec = voter.createBallot(i);
+        var rec = voter.createBallot(i, crypto.nonce().slice(0,6));
         var res = voter.checkColServerResult(cs.getResult(), rec);
         expect(res.ok).toBe(false);
         expect(res.descr).toBe('Ballot not found');

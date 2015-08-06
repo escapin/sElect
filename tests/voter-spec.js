@@ -1,6 +1,7 @@
 var forge = require('node-forge');
 var crypto = require('cryptofunc');
 var voterClient = require('voterClient');
+var strHexConversion = require('strHexConversion');
 
 var hexToBytes = forge.util.hexToBytes;
 var bytesToHex = forge.util.bytesToHex;
@@ -29,7 +30,7 @@ describe( 'Voter Client', function()
         var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys);
 
         // Create a ballot: [choice, userCode]
-        var userCode = 1212;
+        var userCode = '!@#$%^&*()_+{}?>:"';
         var receipt = voter.createBallot(3, userCode);
 
         // Create the signature of the collecting server
@@ -45,7 +46,7 @@ describe( 'Voter Client', function()
 
         // Re-create the ballot using the randomness in the receipt:
         var choiceMsg = crypto.int32ToHexString(3);
-        var userCodeMsg = crypto.int32ToHexString(userCode);
+        var userCodeMsg = strHexConversion.hexEncode(userCode);
         var N = mixServEncKeys.length;
         var x = pair(electionID, pair(userCodeMsg, pair(receipt.receiptID, choiceMsg)));
         for (var i=N-1; i>=0; --i) {
@@ -67,7 +68,7 @@ describe( 'Voter Client', function()
         p = crypto.deconcatenate(x);
         expect(p.first).toBe(electionID);
         p = crypto.deconcatenate(p.second);
-        expect(crypto.hexStringToInt(p.first)).toBe(userCode);
+        expect(strHexConversion.hexDecode(p.first)).toBe(userCode);
         p = crypto.deconcatenate(p.second);
         expect(crypto.hexStringToInt(p.second)).toBe(3);
 
