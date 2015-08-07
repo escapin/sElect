@@ -516,7 +516,7 @@ function selectBooth() {
                         storeReceipt(receipt);
 
                         // prepare and show the "ballot accepted" tab
-                        var recid = receipt.userCode.toUpperCase() + '.' + receipt.receiptID.toUpperCase();
+                        var recid = receipt.userCode + ' ' + receipt.receiptID.toUpperCase();
                         var durl = verificationCode2DataURL(recid, printableElID);
                         $('#verCodeLink').attr('href', durl);
                         $('#receipt-id').text(recid);
