@@ -187,8 +187,8 @@ function selectBooth() {
         }
         else
             receipts = [receipt];
-        receiptsJSON = JSON.stringify(receipts);
-        localStorage.setItem('receipts', receiptsJSON);
+        	receiptsJSON = JSON.stringify(receipts);
+        	localStorage.setItem('receipts', receiptsJSON);
     }
 
     // Get the list of receipts (from the local storage)
@@ -219,13 +219,13 @@ function selectBooth() {
         }
 
         // Some receipts to verify
-        var recIDs = receipts.map(function (rec) {return rec.receiptID}).join(', ');
+        var recIDs = receipts.map(function (rec) {return rec.userCode + ' ' + rec.receiptID.toUpperCase()}).join(', ');
         if (receipts.length > 1) {
             verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
-                             'that the ballots with the following verification codes have in fact been counted:', recIDs)
+                             'that the ballots with the following verification codes have in fact been counted:<b>', recIDs, '</b>')
         } else {
             verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
-                             'that the ballot with the following verification code has in fact been counted:', recIDs)
+                             'that the ballot with the following verification code has in fact been counted:<b>', recIDs, '</b>')
         }
         console.log('Receipts to verify:', recIDs);
 
@@ -258,7 +258,7 @@ function selectBooth() {
             }
             else {
                 console.log('WARNING: Receipt', i, 'not verified:', res.descr);
-                verwriter.writee('VERIFICATION FAILED: ballot with receipt ID', receipts[i].receiptID, 'missing!');
+                verwriter.writee('VERIFICATION FAILED: ballot with receipt ID', receipts[i].receiptID.toUpperCase(), 'missing!');
                 verwriter.writep('Looking for the misbehaving party.')
                 ok = false;
             }
@@ -296,10 +296,10 @@ function selectBooth() {
                 var ok = true;
                 for (var i=0; i<receipts.length; ++i) {
                     var res = voter.checkColServerResult(data, receipts[i])
-                    console.log('Result for', receipts[i].receiptID, ':', res.descr);
+                    console.log('Result for', receipts[i].receiptID.toUpperCase(), ':', res.descr);
                     if (!res.ok && res.blame) {
                         ok = false;
-                        verwriter.writee('Ballot', receipts[i].receiptID, 'has been dropped by the collecting server');
+                        verwriter.writee('Ballot', receipts[i].receiptID.toUpperCase(), 'has been dropped by the collecting server');
                         console.log('Blaming data:', res.blamingData);
                         verwriter.writep('The following data contains information necessary to hold the misbehaving party accountable. Please copy it and provide to the voting authorities.');
                         verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
