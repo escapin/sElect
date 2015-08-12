@@ -219,7 +219,7 @@ function selectBooth() {
         }
 
         // Some receipts to verify
-        var recIDs = receipts.map(function (rec) {return rec.userCode + ' ' + rec.receiptID.toUpperCase()}).join(', ');
+        var recIDs = receipts.map(function (rec) {return rec.userCode + rec.receiptID.toUpperCase()}).join(', ');
         if (receipts.length > 1) {
             verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
                              'that the ballots with the following verification codes have in fact been counted:<b>', recIDs, '</b>')
@@ -258,7 +258,7 @@ function selectBooth() {
             }
             else {
                 console.log('WARNING: Receipt', i, 'not verified:', res.descr);
-                verwriter.writee('VERIFICATION FAILED: ballot with receipt ID', receipts[i].receiptID.toUpperCase(), 'missing!');
+                verwriter.writee('VERIFICATION FAILED: ballot with verification code ', receipts[i].userCode + receipts[i].receiptID.toUpperCase(),' is missing!');
                 verwriter.writep('Looking for the misbehaving party.')
                 ok = false;
             }
@@ -296,10 +296,10 @@ function selectBooth() {
                 var ok = true;
                 for (var i=0; i<receipts.length; ++i) {
                     var res = voter.checkColServerResult(data, receipts[i])
-                    console.log('Result for', receipts[i].receiptID.toUpperCase(), ':', res.descr);
+                    console.log('Result for', receipts[i].userCode + receipts[i].receiptID.toUpperCase(), ':', res.descr);
                     if (!res.ok && res.blame) {
                         ok = false;
-                        verwriter.writee('Ballot', receipts[i].receiptID.toUpperCase(), 'has been dropped by the collecting server');
+                        verwriter.writee('Ballot', receipts[i].userCode + receipts[i].receiptID.toUpperCase(), 'has been dropped by the collecting server');
                         console.log('Blaming data:', res.blamingData);
                         verwriter.writep('The following data contains information necessary to hold the misbehaving party accountable. Please copy it and provide to the voting authorities.');
                         verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
@@ -335,10 +335,10 @@ function selectBooth() {
             var ok = true;
             for (var i=0; i<receipts.length; ++i) {
                 var res = voter.checkMixServerResult(k, data, receipts[i])
-                console.log('Result for', receipts[i].receiptID, ':', res.descr);
+                console.log('Result for', receipts[i].userCode + receipts[i].receiptID, ':', res.descr);
                 if (!res.ok && res.blame) {
                     ok = false;
-                    verwriter.writee('Ballot', receipts[i].receiptID, 'has been dropped by mix server nr', k);
+                    verwriter.writee('Ballot', receipts[i].userCode + receipts[i].receiptID, 'has been dropped by mix server nr', k);
                     console.log('Blaming data:', res.blamingData);
                     verwriter.writep('The following data contains information necessary to hold the misbehaving party accountable. Please copy it and provide to the voting authorities.');
                     verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
@@ -366,7 +366,7 @@ function selectBooth() {
         }
         return {
                 write  : function() { object.append(merge(arguments)); },
-                writep : function() { object.append('<p>' + merge(arguments) + '</p>'); },
+                writep : function() { object.append('<p class="further-info">' + merge(arguments) + '</p>'); },
                 writee : function() { object.append('<p class="error">' + merge(arguments) + '</p>'); },
                 writes : function() { object.append('<p class="success">' + merge(arguments) + '</p>'); }
         };
@@ -516,7 +516,7 @@ function selectBooth() {
                         storeReceipt(receipt);
 
                         // prepare and show the "ballot accepted" tab
-                        var recid = receipt.userCode + ' ' + receipt.receiptID.toUpperCase();
+                        var recid = receipt.userCode + receipt.receiptID.toUpperCase();
                         var durl = verificationCode2DataURL(recid, printableElID);
                         $('#verCodeLink').attr('href', durl);
                         $('#receipt-id').text(recid);
