@@ -32,7 +32,7 @@
             <h2>
                 List of Votes
             </h2>
-            <h3>
+            <h3 class="subtitle">
             	Please check that your choice is listed next to your 
             	verification code.         
             </h3>
@@ -47,8 +47,8 @@
                 <tbody>
                     <% for(var i=0; i<result.length; i++) { %>
                        <tr>
-                           <td> <%= result[i].userCode + result[i].receiptID.toUpperCase() %> </td>
-                           <td> <%= result[i].vote %> </td>
+                           <td class="verificationCode"> <%= result[i].userCode + result[i].receiptID.toUpperCase() %> </td>
+                           <td class="vote"> <%= result[i].vote %> </td>
                        </tr>
                     <% } %>
                 </tbody>

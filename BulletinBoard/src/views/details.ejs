@@ -24,33 +24,33 @@
             <table class="pure-table pure-table-horizontal">
                 <tbody>
                     <tr>
-                        <td>Opening time:</td>
-                        <td> <%= openingTime %> </td>
+                        <td class="details">Opening time:</td>
+                        <td class="details"> <%= openingTime %> </td>
                     </tr>
                     <tr>
-                        <td>Closing time:</td>
-                        <td> <%= closingTime %> </td>
+                        <td class="details">Closing time:</td>
+                        <td class="details"> <%= closingTime %> </td>
                     </tr>
                     <tr>
-                        <td>Full election manifest:</td>
+                        <td class="details">Full election manifest:</td>
                         <td> <a href="ElectionManifest.json">ElectionManifest.json</a> </td>
                     </tr>
                     <tr>
-                        <td>Collecting server:</td>
+                        <td class="details">Collecting server:</td>
                         <td><a href="<%= manifest.collectingServer.URI %>/status"><%= manifest.collectingServer.URI %></a> </td>
                     </tr>
                     <tr>
                         <td></td>
-                        <td> <span id="cs-status">?</span> </td>
+                        <td class="details"> <span id="cs-status">?</span> </td>
                     </tr>
                     
                     <% for(var j=0; j<manifest.mixServers.length; ++j) { %>
                     <tr>
-                        <td> Mix server <%= j %> </td>
-                        <td><a href="<%= manifest.mixServers[j].URI %>/status"><%= manifest.mixServers[j].URI %></a> </td>
+                        <td class="details"> Mix server <%= j %> </td>
+                        <td class="details"><a href="<%= manifest.mixServers[j].URI %>/status"><%= manifest.mixServers[j].URI %></a> </td>
                     </tr><tr>
                         <td></td>
-                        <td> <span id="ms<%= j %>-status">?</span> </td>
+                        <td class="details"> <span id="ms<%= j %>-status">?</span> </td>
                     </tr>
                     <% } %>
 
