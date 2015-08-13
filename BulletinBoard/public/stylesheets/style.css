@@ -169,3 +169,7 @@ div.body {
     border-radius: 6px;
     box-shadow: 0px 1px 12px 3px #ddd;
 }
+
+span.info {
+	color: black !important;
+}
