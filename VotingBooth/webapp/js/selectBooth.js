@@ -519,7 +519,7 @@ function selectBooth() {
                         var recid = receipt.userCode + receipt.receiptID.toUpperCase();
                         var durl = verificationCode2DataURL(recid, printableElID);
                         $('#verCodeLink').attr('href', durl);
-                        $('#receipt-id').text(recid);
+                        $('#receipt-id').text(recid); // it already escapes the string provided as necessary
                         showTab('#result');
                     }
                     else { // receipt not valid
