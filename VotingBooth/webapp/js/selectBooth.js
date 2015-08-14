@@ -340,7 +340,7 @@ function selectBooth() {
                     ok = false;
                     verwriter.writee('Ballot', receipts[i].userCode + receipts[i].receiptID, 'has been dropped by mix server nr', k);
                     console.log('Blaming data:', res.blamingData);
-                    verwriter.writep('The following data contains information necessary to hold the misbehaving party accountable. Please copy it and provide to the voting authorities.');
+                    verwriter.writep('Please copy the following data and provide it to the voting authority. The data contains information necessary to hold the misbehaving party accountable.');
                     verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
                 }
                 // TODO: As above: deal with not blamable problems.
