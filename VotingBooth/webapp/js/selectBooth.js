@@ -335,10 +335,10 @@ function selectBooth() {
             var ok = true;
             for (var i=0; i<receipts.length; ++i) {
                 var res = voter.checkMixServerResult(k, data, receipts[i])
-                console.log('Result for', receipts[i].userCode + receipts[i].receiptID, ':', res.descr);
+                console.log('Result for', receipts[i].userCode + receipts[i].receiptID.toUpperCase(), ':', res.descr);
                 if (!res.ok && res.blame) {
                     ok = false;
-                    verwriter.writee('Ballot', receipts[i].userCode + receipts[i].receiptID, 'has been dropped by mix server nr', k);
+                    verwriter.writee('Ballot', receipts[i].userCode + receipts[i].receiptID.toUpperCase(), 'has been dropped by mix server nr', k);
                     console.log('Blaming data:', res.blamingData);
                     verwriter.writep('Please copy the following data and provide it to the voting authority. The data contains information necessary to hold the misbehaving party accountable.');
                     verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
