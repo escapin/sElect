@@ -12,6 +12,8 @@ sElect is a remote electronic voting system designed to provide
 * wget (used only in the makefiles for getting the proper libraries).
 * python (used in the root makefile for configuring the mix servers).
 
+The system has been developed and deployed on Ubuntu Server 14.04.2 LTS.
+
 ## The Design
 
 To achieve its security goals (verifiability and privacy), 
