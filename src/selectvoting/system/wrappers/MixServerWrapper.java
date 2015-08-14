@@ -1,9 +1,9 @@
 package selectvoting.system.wrappers;
 
-import de.unitrier.infsec.functionalities.digsig.Signer;
-import de.unitrier.infsec.functionalities.digsig.Verifier;
-import de.unitrier.infsec.functionalities.pkenc.Decryptor;
-import de.unitrier.infsec.utils.Utilities;
+import infsec.utils.Utilities;
+import functionalities.digsig.Signer;
+import functionalities.digsig.Verifier;
+import functionalities.pkenc.Decryptor;
 import selectvoting.system.core.MixServer;
 
 public class MixServerWrapper {

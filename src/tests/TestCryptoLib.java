@@ -1,14 +1,14 @@
-package de.unitrier.infsec.tests;
+package tests;
 
+import infsec.lib.crypto.CryptoLib;
+import infsec.lib.crypto.KeyPair;
+import infsec.utils.Utilities;
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import de.unitrier.infsec.lib.crypto.CryptoLib;
-import de.unitrier.infsec.lib.crypto.KeyPair;
-import de.unitrier.infsec.utils.Utilities;
-import static de.unitrier.infsec.utils.MessageTools.equal;
-import static de.unitrier.infsec.utils.Utilities.hexStringToByteArray;
+import static infsec.utils.MessageTools.equal;
+import static infsec.utils.Utilities.hexStringToByteArray;
 
 
 public class TestCryptoLib extends TestCase {

@@ -1,4 +1,4 @@
-package de.unitrier.infsec.utils;
+package infsec.utils;
 
 
 public class MessageTools {

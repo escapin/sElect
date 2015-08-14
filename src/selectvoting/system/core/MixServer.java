@@ -1,12 +1,14 @@
 package selectvoting.system.core;
 
+import infsec.utils.MessageTools;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import de.unitrier.infsec.functionalities.digsig.Signer;
-import de.unitrier.infsec.functionalities.digsig.Verifier;
-import de.unitrier.infsec.functionalities.pkenc.Decryptor;
-import de.unitrier.infsec.functionalities.pkenc.Encryptor;
-import de.unitrier.infsec.utils.MessageTools;
+
+import functionalities.digsig.Signer;
+import functionalities.digsig.Verifier;
+import functionalities.pkenc.Decryptor;
+import functionalities.pkenc.Encryptor;
 import selectvoting.system.core.Utils.MessageSplitIter;
 
 public class MixServer 

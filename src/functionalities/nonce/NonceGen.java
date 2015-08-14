@@ -1,6 +1,6 @@
-package de.unitrier.infsec.functionalities.nonce;
+package functionalities.nonce;
 
-import de.unitrier.infsec.lib.crypto.CryptoLib;
+import infsec.lib.crypto.CryptoLib;
 
 public class NonceGen {
 	public NonceGen() {

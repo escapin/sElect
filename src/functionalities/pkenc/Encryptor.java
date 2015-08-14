@@ -1,7 +1,7 @@
-package de.unitrier.infsec.functionalities.pkenc;
+package functionalities.pkenc;
 
-import de.unitrier.infsec.lib.crypto.CryptoLib;
-import static de.unitrier.infsec.utils.MessageTools.copyOf;
+import infsec.lib.crypto.CryptoLib;
+import static infsec.utils.MessageTools.copyOf;
 
 /**
  * Real functionality for public-key encryption: Encryptor
