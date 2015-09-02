@@ -9,7 +9,7 @@ sElect is a remote electronic voting system designed to provide
 * Java JDK (tested with both openjdk-7 and oraclejdk-8).
 * Java Cryptography Extension (only for oraclejdk).
 * node.js and npm.
-* wget (used only in the makefiles for getting the proper libraries).
+* wget (used in the makefiles for getting the proper libraries).
 * python (used in the root makefile for configuring the mix servers).
 
 The system has been developed and deployed on Ubuntu Server 14.04.2 LTS.
@@ -31,11 +31,13 @@ for which we also provide a reference implementation.
 
 **Voting phase.** In the voting phase, every voter prepare her ballots
 using the client program.  A ballot contains the voter's choice (for
-example, the name of the candidate chosen by the voter) and a unique,
-randomly chosen verification code.  To construct the ballot, the choice
-along with the verification code is encrypted several times with the
-public key of each mix server, from the last to the first.  Such a
-(complete) ballot is then submitted to the collecting server which
+example, the name of the candidate chosen by the voter) and a 
+verification code, whose first nine characters are inserted by the 
+user, whereas the remaining are randomly chosen by the system.
+To construct the ballot, the choice along with the verification code 
+is encrypted several times with the public key of each mix server, 
+from the last to the first.  
+Such a (complete) ballot is then submitted to the collecting server which
 authenticates the voter and, if the authentication succeeds, replies by
 sending back a digitally signed acknowledgment.
 
