@@ -1,30 +1,20 @@
 {
-    "title": "Coolest Thing Election",
-    "description": "This is the election for the coolest thing in the world",
+    "title": "Your Favorite Superhero Election",
+    "description": "This is the election of the Greatest Superhero Ever.",
     "startTime": "2014.01.01 15:00 GMT+0100",
     "endTime": "2018.11.10 16:00 GMT+0100",
-    "voters": [
-        {
-            "email": "a@ema.il"
-        },
-        {
-            "email": "b@ema.il"
-        },
-        {
-            "email": "c@ema.il"
-        },
-        {
-            "email": "d@ema.il"
-        }
-    ],
+    "voters": [],
     "publishListOfVoters": true,
-    "question": "Who is Your Favorite Candidate?",
+    "question": "Who is Your Favorite Superhero?",
     "choices": [
-        "Candidate 1",
-        "Candidate 2",
-        "Candidate 3",
-        "Candidate 4",
-        "Candidate 5"
+	"Iron Man",
+	"Batman",
+	"Wonder Woman",
+	"Spider Man",
+	"Dr. Manhattan",
+	"Hulk",
+	"Superman",
+	"Bugs Bunny"
     ],
     "collectingServer": {
         "URI": "http://localhost:3299",
@@ -50,8 +40,6 @@
     ],
     
     "bulletinBoards" : [
-        { "URI": "http://localhost:3111"},
-        { "URI": "http://localhost:3112"},
-        { "URI": "http://localhost:3113"}
+        { "URI": "http://localhost:3111"}
      ]
 }
