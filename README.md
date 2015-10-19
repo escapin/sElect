@@ -3,6 +3,10 @@
 sElect is a remote electronic voting system designed to provide 
 **privacy** and **verifiability**.
 
+One of our goals is to establish privacy on the **implementation level**
+(code level). The code-level verification of the core of the system
+(implemented in Java) is carried out within the DFG Priority Programme
+Reliably Secure Software Systems (RS3) (https://www.spp-rs3.de).
 
 ## Dependencies
 
