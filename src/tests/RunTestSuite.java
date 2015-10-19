@@ -7,6 +7,7 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
+import selectvoting.tests.TestCoreSystem;
 
 @SuppressWarnings("rawtypes")
 public class RunTestSuite {	
@@ -15,6 +16,7 @@ public class RunTestSuite {
 
 		//Add test cases
 		testCases.add(de.unitrier.infsec.tests.TestCryptoLib.class);
+		testCases.add(selectvoting.tests.TestCoreSystem.class);
 		testCases.add(selectvoting.tests.TestMixServer.class);
 
 
