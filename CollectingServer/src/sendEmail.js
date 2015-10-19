@@ -17,7 +17,7 @@ var transporter = nodemailer.createTransport(smtpTransport({
 function sendEmail(address, subject, text, callback) 
 {
     var mailOptions = {
-        from: 'sElect <no-reply@select.uni-trier.de>',
+        from: 'sElect <no-reply@select.org>',
         to: address,
         subject: subject,
         text: text
