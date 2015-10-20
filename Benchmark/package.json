@@ -1,0 +1,11 @@
+{
+  "name": "Benchmark",
+  "description": "Benchmark for the sElect voting system",
+  "version": "0.2.0",
+  "private": true,
+  "dependencies": {
+    "benchmark": "^1.0.0",
+    "mkdirp":	"^0.5.0",
+    "sortedlist": "^0.3.1"
+  }
+}
