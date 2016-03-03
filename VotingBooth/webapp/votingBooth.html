@@ -45,7 +45,7 @@
 
         <form class="pure-form" action="">
             <fieldset>
-                <legend>Please provide your e-mail address to continue:</legend>
+                <legend>Please provide your e-mail address to authenticate yourself:</legend>
                 <div class="pure-g">
                     <div class="pure-u-1 pure-u-md-2-3">
                         <input id='inp-email' class="pure-input-1" type="email" size="50" placeholder="email">
@@ -103,10 +103,10 @@
        
         <form class="pure-form" action="">
             <fieldset>
-                <legend>Please enter a code consisting of 9 randomly chosen characters:</legend>
+                <legend>Please enter a code consisting of 10 randomly chosen characters:</legend>
                 <div class="pure-g">
                     <div class="pure-u-1 pure-u-md-2-3">
-                        <input id='inp-code' class="pure-input-1" type="text" size="50" placeholder="code" maxlength=9 pattern="\S{9}" title="Please enter exactly 9 non-white space characters.">
+                        <input id='inp-code' class="pure-input-1" type="text" size="50" placeholder="code" maxlength=10 pattern="\S{10}" title="Please enter exactly 10 non-white space characters.">
                         <div class="extra-info">
                             These code will be part of the verification code which will allow you to check whether your vote has been properly counted.
                         </div>
@@ -169,7 +169,7 @@
             download="sElectVerificationCode.png">&#x21e3 Save as a picture</a>
         </p>
 
-        <p class="further-info"> The first 9 characters are the code you entered, while 
+        <p class="further-info"> The first 10 characters are the code you entered, while 
         	the remaining part was generated randomly by the system. 
         </p>
 
