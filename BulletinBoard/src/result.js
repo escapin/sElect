@@ -9,6 +9,9 @@ var strHexConversion = require('strHexConversion');
 
 var TAG_VOTERS = '10';
 var TAG_BALLOTS = '01';
+var TAG_VERIFCODEAUTO = '02';
+var TAG_VERIFCODEUSER = '03';
+
 var NMixServers = manifest.mixServers.length;
 
 exports.finalResult = null;	// this is where the result is stored (when ready)
@@ -115,15 +118,31 @@ function parseFinalResult(signedFinalResult) {
         	console.log('ERROR: Wrong election ID');
             return;
         }
-    	var userCode_receipt_choice = p.second;
-    	p = crypto.deconcatenate(userCode_receipt_choice);
-    	var userCode = strHexConversion.hexDecode(p.first);
-    	var receipt_choice = p.second;
-    	p = crypto.deconcatenate(receipt_choice);
-    	var receiptID = p.first;
-    	var choice = crypto.hexStringToInt(p.second);
+    	var choice_verifCode = p.second;
+    	p = crypto.deconcatenate(choice_verifCode);
+    	var choice = crypto.hexStringToInt(p.first);
+    	var verificationCode = p.second;
+    	
+    	// Verification code
+    	p = crypto.deconcatenate(verificationCode);
+    	var receiptID;
+    	var userCode='';
+    	if(p.first === TAG_VERIFCODEAUTO)
+    		receiptID = p.second;
+    	else if (p.first === TAG_VERIFCODEUSER){
+    		p = crypto.deconcatenate(p.second)
+    		receiptID = p.first;
+    		userCode = strHexConversion.hexDecode(p.second);
+    	}
+    	else 
+    		console.log('ERROR: Wrong verification code format');
+    	
     	t.push({userCode: userCode, receiptID: receiptID, vote: manifest.choices[choice]});
-    	console.log(userCode + "\t" + receiptID + "\t" + choice);
+    	if(userCode !== '')
+    		console.log(userCode + "\t" + receiptID + "\t" + choice);
+    	else
+    		console.log(receiptID + "\t" + choice);
+    	
     	// add one vote for choice 
         ++ccount[choice];
     }
