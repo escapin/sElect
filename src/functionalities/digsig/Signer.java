@@ -1,8 +1,8 @@
-package de.unitrier.infsec.functionalities.digsig;
+package functionalities.digsig;
 
-import de.unitrier.infsec.lib.crypto.CryptoLib;
-import de.unitrier.infsec.lib.crypto.KeyPair;
-import static de.unitrier.infsec.utils.MessageTools.copyOf;
+import infsec.lib.crypto.CryptoLib;
+import infsec.lib.crypto.KeyPair;
+import static infsec.utils.MessageTools.copyOf;
 
 /**
  * An object encapsulating a signing/verification key pair and allowing a user to

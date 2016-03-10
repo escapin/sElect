@@ -1,15 +1,15 @@
 package selectvoting.tests;
 
 
+import infsec.utils.MessageTools;
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import de.unitrier.infsec.functionalities.digsig.Signer;
-import de.unitrier.infsec.functionalities.digsig.Verifier;
-import de.unitrier.infsec.functionalities.nonce.NonceGen;
-import de.unitrier.infsec.functionalities.pkenc.Decryptor;
-import de.unitrier.infsec.utils.MessageTools;
+import functionalities.digsig.Signer;
+import functionalities.digsig.Verifier;
+import functionalities.nonce.NonceGen;
+import functionalities.pkenc.Decryptor;
 import selectvoting.system.core.MixServer;
 import selectvoting.system.core.Tag;
 import selectvoting.system.core.Utils;

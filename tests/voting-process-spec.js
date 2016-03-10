@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var crypto = require('cryptofunc');
 var cryptoUtils = require('cryptoUtils');
+var strHexConversion = require('strHexConversion');
 var voterClient = require('voterClient');
 var csCore = require('../CollectingServer/src/csCore.js');
 var mixCore = require('../MixServer/src/mixCore.js');
@@ -22,6 +23,9 @@ var verif = crypto.verifsig;
 
 var TAG_VOTERS = '10';
 var TAG_BALLOTS = '01';
+var TAG_VERIFCODEAUTO = '02';
+var TAG_VERIFCODEUSER = '03';
+
 //console.log('CWD:\t' + process.cwd());
 var PARTIALRESULT_dir = path.join(process.cwd(), '_data_Test');
 var TIMEOUT = 100000;
@@ -52,6 +56,9 @@ for(var i=0; i<NMixServ; i++) {
 var mixServEncKeys = mixServPkeKeys.map(function(k){ return k.encryptionKey; });
 var mixServVerifKeys = mixServSigKeys.map(function(k){ return k.verificationKey; });
 
+var receipts = new Array(NMixServ);
+var userCodes = new Array(NMixServ);
+
 var classpaths = ["../bin", "../lib/*"];
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +68,6 @@ describe( 'Voting process', function()
 {
 
 	var cs = csCore.create(electionID, colServSigKeys.signingKey);
-    var receipts = new Array(voters.length);
     var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
     
     //console.log('Test: Current directory --> ' + process.cwd());
@@ -94,8 +100,10 @@ describe( 'Voting process', function()
         console.log('************ Ballot creation');
     	for(i=voters.length-1; i>=0; --i){
             // create ballot (a receipt containing a ballot); i-th voter votes for i-th candidate:
-    		receipts[i] = voter.createBallot(i);
+    		userCodes[i] = "attack vector !@#$%^&*(a 感谢您联系" + crypto.nonce().slice(0,6);
+    		receipts[i] = voter.createBallot(i, userCodes[i]);
     		expect (receipts[i].choice) .toBe(i);
+    		expect (receipts[i].userCode) .toBe(userCodes[i]);
         }
     });
 
@@ -278,26 +286,42 @@ describe( 'Voting process', function()
 		expect(data.nextMessage()) .toBe(TAG_BALLOTS); // expected the tag
 		expect(data.nextMessage()) .toBe(electionID);  // expected the election id
         
-        // The rest of data is a list of (electionID, receiptID,choice)
+        // The rest of data is a list of (electionID, choice, verificationCode)
         // Lets take this list
         var receiptIDs = [];
+        var userCodes = [];
         var choices = [];
         for (var i=0; !data.empty(); ++i) {
         	p = unpair(data.nextMessage());
         	expect(p.first).toBe(electionID);
-        	var receipt_choice = p.second;
-        	p = unpair(receipt_choice);
-        	var receiptID = p.first;
-        	var choice = crypto.hexStringToInt(p.second);
+        	var choice_verifCode = p.second;
+        	p = unpair(choice_verifCode);
+        	var choice = crypto.hexStringToInt(p.first);
+        	var verificationCode = p.second;
+        	p = unpair(verificationCode);
+        	expect(p.first === TAG_VERIFCODEAUTO || p.first === TAG_VERIFCODEUSER).toBe(true);
+        	if(p.first === TAG_VERIFCODEAUTO)
+        		receiptID = p.second;
+        	else if (p.first === TAG_VERIFCODEUSER){
+        		p = unpair(p.second)
+        		receiptID = p.first;
+        		userCode = strHexConversion.hexDecode(p.second);
+        		userCodes.push(userCode);
+        	}
         	//console.log(receipt + "\t" + choice);
         	receiptIDs.push(receiptID);
             choices.push(choice);
         }
-        originalReceiptIDs = receipts.map(function(rec){ return rec.receiptIDs });
         originalChoices = receipts.map(function(rec){ return rec.receiptID});
+        originalReceiptIDs = receipts.map(function(rec){ return rec.receiptIDs });
         
         expect(bijection(originalReceiptIDs, receiptIDs)) .toBe(true);
         expect(bijection(originalChoices, choices)) .toBe(true);
+        
+        if(p.first === TAG_VERIFCODEUSER){
+        	originalUserCode = receipt.map(function(rec){ return rec.userCode});
+        	expect(bijection(originalUserCode, userCodes)) .toBe(true);
+        }
     });
     	
     it( 'Voter verification works as expected', function()
@@ -321,7 +345,7 @@ describe( 'Voting process', function()
 
         // Let us now take a voter whose ballot was ignored (was
         // not cast):
-        var rec = voter.createBallot(i);
+        var rec = voter.createBallot(i, crypto.nonce().slice(0,6));
         var res = voter.checkColServerResult(cs.getResult(), rec);
         expect(res.ok).toBe(false);
         expect(res.descr).toBe('Ballot not found');
