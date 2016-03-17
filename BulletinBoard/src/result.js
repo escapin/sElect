@@ -202,7 +202,7 @@ exports.fetchAndSaveData = function() {
 		    					  var mixServer_path = config.RESULTMIX_FILE.replace('%d', k);
 		    					  saveData(data, mixServer_path);
 		    					  if(k===NMixServers-1 && exports.finalResult === null) // shows the final results
-		    						  parseFinalResult(data);
+		    						  exports.parseFinalResult(data);
 		    				  }
 		    				  else {
 		    					console.log("** I) \t" + err);
@@ -240,7 +240,7 @@ exports.fetchAndSaveData = function() {
 						console.log('** III) \t Voters list fetched');
 						saveData(data, config.VOTERSLIST_FILE);
 						if (exports.voters === null)
-							parseVotersList(data);
+							exports.parseVotersList(data);
 					}
 					else {
 						console.log("** III) \t" + err);

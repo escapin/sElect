@@ -4,6 +4,7 @@ var errorHandler = require('errorhandler');
 var morgan = require('morgan');
 var mkdirp = require('mkdirp');
 var fs = require('fs');
+var efs = require('extfs');
 
 var config = require('./config');
 var manifest = require('./src/manifest');
@@ -14,7 +15,7 @@ var result = require('./src/result');
 //Display the error message and halt the process.
 function error(info) {
     console.log('ERROR:', info);
-    console.log('SERVER NOT STARTED.');
+    console.log('\nSERVER NOT STARTED.');
     process.exit(1);
 }
 
@@ -27,15 +28,15 @@ if (cmdlineOption && cmdlineOption!=='--serveResult') {
 
 var resultDirExists=true;
 try{
-	fs.statSync(config.DATA_FOLDER)
+	var stats=fs.statSync(config.DATA_FOLDER)
 } catch (err) {
-	resultDirExists = (err.code !== 'ENOENT');
+	resultDirExists = !(err.code === 'ENOENT');
 }
 if (!resultDirExists && cmdlineOption === '--serveResult') {
     error('The folder with the result does not exist.\n' +
     		'USAGE: node bb.js');
-} else if (resultDirExists && cmdlineOption !== '--serveResult') {
-    error('The folder with the result (' + config.DATA_FOLDER + ') already exists: ' + 
+} else if (resultDirExists && stats.isDirectory() && !efs.isEmptySync(config.DATA_FOLDER) && cmdlineOption !== '--serveResult') {
+    error('The folder "' + config.DATA_FOLDER + '" with the result of the servers already exists: ' + 
     		'Remove this folder or run the server with "--serveResult" option.\n' +
     		'USAGE: node bb.js --serveResult');
 }
@@ -57,11 +58,11 @@ if(cmdlineOption==='--serveResult'){
 				
 				if(err){
 					if (err.code === 'ENOENT'){
-						console.log("WARN:\tThe file with the last mix server result does not exist.");
+						console.log("WARN:\tThe file with the result of the last mix server does not exist.");
 						console.log("\tIf the last mix server is running, " +
 							"this file is going to be fetched from it.");			
 					} else {
-						console.log("WARN:\tThe file with the last mix server can not be opened.");
+						console.log("WARN:\tThe file with the result of the last mix server can not be opened.");
 						console.log("\tIf the last mix server is running, " +
 							"the bulletin board would fetch this file again once you manually delete it.");
 						console.log("File path:\t" + err.path);
@@ -69,14 +70,13 @@ if(cmdlineOption==='--serveResult'){
 				} 
 				else if(result.finalResult === null){ // show the final results
 					result.parseFinalResult(data);
-					
 				}
 			});
 		} else {
 			fs.exists(mixServer_path, function(j){
 				return function(exists){
 					if(!exists){
-						console.log("WARN:\tThe file with the " + j + "th mix server result does not exist.");
+						console.log("WARN:\tThe file with the result of the " + j + "th mix server does not exist.");
 						console.log("\tIf the " + j + "th mix server is running, " +
 							"this file is going to be fetched from it.");
 					}
@@ -88,7 +88,7 @@ if(cmdlineOption==='--serveResult'){
 	// check collecting server result file
 	fs.exists(config.RESULTCS_FILE, function (exists) {
 		if(!exists){
-			console.log("WARN:\tThe file with the collecting server result does not exist.");
+			console.log("WARN:\tThe file with the result of the collecting server does not exist.");
 			console.log("\tIf the collecting server is running, " +
 				"this file is going to be fetched from it.");
 		}
