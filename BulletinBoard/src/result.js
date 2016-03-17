@@ -30,7 +30,7 @@ function splitter(msg, callback) {
 // expected data format:
 // 		SIGN_collectinServer[electionID, receiptID, votersList]
 //
-function parseVotersList(signedVotersList) {
+exports.parseVotersList = function(signedVotersList) {
 	var p = crypto.deconcatenate(signedVotersList);
 	var data = p.first; // tag,elID,voters
 	var signature = p.second;
@@ -82,7 +82,7 @@ function parseVotersList(signedVotersList) {
 // expected data format:
 //		SIGN_lastMixServer[electionID, receiptID, ballotsAsAMsg]
 //
-function parseFinalResult(signedFinalResult) {
+exports.parseFinalResult = function(signedFinalResult) {
     var p = crypto.deconcatenate(signedFinalResult);
     var tag_elID_ballots = p.first; 	// [tag, elID, ballotsAsAMessage]
 	var signature = p.second;
@@ -185,25 +185,7 @@ function saveData(data, file) {
 }
 
 exports.fetchAndSaveData = function() {
-	// FETCH THE DATA IN PRIORITY ORDER
-	// votersList
-	fs.exists(config.VOTERSLIST_FILE, function (exists) {
-		if(!exists){
-			// fetch the votersList from the Collecting Server
-			fetchData(manifest.collectingServer.URI + '/votersList.msg', function (err, data) {
-		        if (!err) {
-		            console.log('** I) \t Voters list fetched');
-		            saveData(data, config.VOTERSLIST_FILE);
-		            if (exports.voters === null)
-		            	parseVotersList(data);
-		        }
-		        else {
-		        	console.log("** I) \t" + err);
-		        }
-		    });
-		}
-	});
-	// results mix servers
+	// fetch the results of the mix servers
 	for(var i=NMixServers-1; i>=0; --i) {
 		var mixServer_path = config.RESULTMIX_FILE.replace('%d', i);
 		// console.log(mixServer_path);
@@ -214,16 +196,16 @@ exports.fetchAndSaveData = function() {
 		    		  fetchData(manifest.mixServers[j].URI + '/result.msg', function(k){
 		    			  return function (err, data) {
 		    				  if (!err) {
-		    					  console.log('** II) \t Results of the #%s-th mix server fetched', k);
+		    					  console.log('** I) \t Results of the #%s-th mix server fetched', k);
 		    					  // recreate the path where to save the result because the for loop could be
 		    					  // in a different iteration than the callback
 		    					  var mixServer_path = config.RESULTMIX_FILE.replace('%d', k);
 		    					  saveData(data, mixServer_path);
-		    					  if(k===NMixServers-1 && exports.finalResult === null) // the final results
+		    					  if(k===NMixServers-1 && exports.finalResult === null) // shows the final results
 		    						  parseFinalResult(data);
 		    				  }
 		    				  else {
-		    					console.log("** II) \t" + err);
+		    					console.log("** I) \t" + err);
 		    				  }
 		    			  }
 		    		  }(j));
@@ -232,21 +214,41 @@ exports.fetchAndSaveData = function() {
 		}(i));
 	}
 
-	// results collecting server
+	// fetch the results of the collecting server
 	fs.exists(config.RESULTCS_FILE, function (exists) {
 		if(!exists){
 			// fetch the results form the Collecting Server
 			fetchData(manifest.collectingServer.URI + '/result.msg', function (err, data) {
 				if (!err) {
-					console.log('** III)\tResults of the Collecting Server fetched');
+					console.log('** II)\tResults of the Collecting Server fetched');
 					saveData(data, config.RESULTCS_FILE);
 				}
 				else {
-					console.log("** III)\t" + err);
+					console.log("** II)\t" + err);
 				}
 			});
 		}
 	});
+	
+	if(manifest.publishListOfVoters){
+		// fetch the votersList
+		fs.exists(config.VOTERSLIST_FILE, function (exists) {
+			if(!exists){
+				// fetch the votersList from the Collecting Server
+				fetchData(manifest.collectingServer.URI + '/votersList.msg', function (err, data) {
+					if (!err) {
+						console.log('** III) \t Voters list fetched');
+						saveData(data, config.VOTERSLIST_FILE);
+						if (exports.voters === null)
+							parseVotersList(data);
+					}
+					else {
+						console.log("** III) \t" + err);
+					}
+				});
+			}
+		});
+	}
 }
 
 
