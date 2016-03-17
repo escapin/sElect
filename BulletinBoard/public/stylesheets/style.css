@@ -169,3 +169,7 @@ div.body {
     border-radius: 6px;
     box-shadow: 0px 1px 12px 3px #ddd;
 }
+
+h3.subtitle, td.verificationCode, td.vote, td.voters, td.choice, td.voters, td.details, span.descriptionBB {
+	color: black !important;
+}

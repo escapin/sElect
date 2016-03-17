@@ -16,17 +16,20 @@
         var require = function(moduleName) {
             console.log('Module requested:', moduleName);
             return { 'node-forge' : forge,
-                     './cryptofunc' : cryptofunc
+                     './cryptofunc' : cryptofunc,
+                    './strHexConversion': strHexConversion
                    }[moduleName];
         };
     </script>
     <script src="js/bluebird.min.js"></script>
     <script src="js/jquery-1.11.1.min.js"></script>
     <script src="js/forge.min.js"></script>
+    <script src="js/strHexConversion.js"></script> 
     <script src="js/cryptofunc.js"></script>
     <script src="ElectionManifest.js"></script>
     <script src="js/voterClient.js"></script>
     <script src="js/selectBooth.js"></script>
+    
 </head>
 <body class="pure-skin-mine">
     <!-- --------------------------------------------------------------------------------- -->
@@ -42,13 +45,13 @@
 
         <form class="pure-form" action="">
             <fieldset>
-                <legend>Please provide your e-mail address to continue:</legend>
+                <legend>Please provide your e-mail address to authenticate yourself:</legend>
                 <div class="pure-g">
                     <div class="pure-u-1 pure-u-md-2-3">
                         <input id='inp-email' class="pure-input-1" type="email" size="50" placeholder="email">
                         <div class="extra-info"> 
-                            We will send you a (one-time) password to this e-mail address 
-                            (to be used in the next step to cast your vote). 
+                            We will send you a one-time password to this e-mail address, 
+                            which is used to authenticate you in the next step.  
                         </div>
                     </div>
                     <div class="pure-u-1 pure-u-md-1-3 toright">
@@ -67,23 +70,49 @@
     <div class="body">
         <h1 class="title"> TITLE OF THE ELECTION </h1>
 
-        <h3> 
-            An e-mail with a one-time password (OTP) has been sent to you.
+        <h3 class="subtitle"> 
+            An e-mail with a one-time password has been sent to you.
         </h3>
 
         <form class="pure-form" action="">
             <fieldset>
-                <legend>Please copy the OTP from this e-mail and enter it in the field below </legend>
+                <legend>Please copy the one-time password from this e-mail and enter it in the field below </legend>
                 <div class="pure-g">
                     <div class="pure-u-1 pure-u-md-2-3">
                         <input id='inp-otp' class="pure-input-1"
                         type="text" size="50" placeholder="one-time password (sent by e-mail)">
                         <div class="extra-info"> 
-                            If you cannot find an e-mail with an OTP, please check your spam folder.
+                            If you cannot find an e-mail with a one-time password, please check your spam folder.
                         </div>
                     </div>
                     <div class="pure-u-1 pure-u-md-1-3 toright">
                         <button id='submit-otp' type="submit" class="pure-button pure-button-primary" disabled>Continue</button>
+                    </div>
+                </div>    
+            </fieldset>
+        </form>
+    </div>
+    </div>
+    <!-- --------------------------------------------------------------------------------- -->
+    <div class="container" id="randomness">
+    <div class="header">
+        Secure elections powered by <em>sElect</em>
+    </div>
+    <div class="body">
+        <h1 class="title"> TITLE OF THE ELECTION </h1>
+       
+        <form class="pure-form" action="">
+            <fieldset>
+                <legend>Please enter a code consisting of 10 randomly chosen characters:</legend>
+                <div class="pure-g">
+                    <div class="pure-u-1 pure-u-md-2-3">
+                        <input id='inp-code' class="pure-input-1" type="text" size="50" placeholder="code" maxlength=10 pattern="\S{10}" title="Please enter exactly 10 non-white space characters.">
+                        <div class="extra-info">
+                            These code will be part of the verification code which will allow you to check whether your vote has been properly counted.
+                        </div>
+                    </div>
+                    <div class="pure-u-1 pure-u-md-1-3 toright">
+                        <button id='submit-code' type="submit" class="pure-button pure-button-primary" disabled>Continue</button>
                     </div>
                 </div>    
             </fieldset>
@@ -129,19 +158,20 @@
         <p><b>Your ballot has been accepted by the collecting
         server</b>.</p>
 
-        <p> When the election is over, you can manually check that your
+        <p class="further-info"> When the election is over, you can manually check that your
         ballot is in the final tally. If you want to do this, you
-        need to
+        need to</p>
         <h3 class="legend"> save/write down the following verification code</h3>
-        <p> and look it up in the result of the election.</p>
+        <p class="further-info"> and look it up in the result of the election: it should appear next to your choice.</p>
 
-        <p> Your verification code: <b id="receipt-id">??????</b> 
+        <p class="further-info"> Your verification code: <b id="receipt-id">??????</b> 
         &nbsp; <a id='verCodeLink'  class="button-vercode pure-button" href="#"
             download="sElectVerificationCode.png">&#x21e3 Save as a picture</a>
         </p>
 
-        <p> To check the result, please visit (refresh) this page again,
-        when the election is over. </p>
+        <p class="further-info"> The first 10 characters are the code you entered, while 
+        	the remaining part was generated randomly by the system. 
+        </p>
 
         <p><em>Thank you!</em></p>
     </div>
@@ -174,7 +204,7 @@
 
         <h3 class="legend"> The election is closed and the result is ready and available. </h3>
 
-        <p>To see the result and check your verification code, you can now</p>
+        <p class="further-info">To see the result and check your verification code, you can now</p>
         <form id="go-to-bb-form" class="pure-form" action="">
             <fieldset>
                 <button type="submit" class="pure-button pure-button-primary">

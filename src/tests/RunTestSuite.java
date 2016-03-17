@@ -14,7 +14,7 @@ public class RunTestSuite {
 		List<Class> testCases = new ArrayList<Class>();
 
 		//Add test cases
-		testCases.add(de.unitrier.infsec.tests.TestCryptoLib.class);
+		testCases.add(tests.TestCryptoLib.class);
 		testCases.add(selectvoting.tests.TestMixServer.class);
 
 

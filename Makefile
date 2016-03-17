@@ -68,6 +68,7 @@ mixconfigs:
 filescopy:
 	cp node_modules/voterClient.js VotingBooth/webapp/js/voterClient.js
 	cp node_modules/cryptofunc/index.js VotingBooth/webapp/js/cryptofunc.js
+	cp node_modules/strHexConversion.js VotingBooth/webapp/js/strHexConversion.js
 
 libdownload:
 	-rm VotingBooth/webapp/js/jquery-1.11.1.min.js

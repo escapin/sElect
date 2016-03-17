@@ -180,3 +180,6 @@ div.info {
     display:none;
 }
 
+div.electionid,h3.lead,h1.title,h3.subtitle,div.extra-info,p.further-info {
+	color: black !important;
+}

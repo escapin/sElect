@@ -1,5 +1,8 @@
-package de.unitrier.infsec.tests;
+package tests;
 
+
+import infsec.utils.MessageTools;
+import infsec.utils.Utilities;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -8,10 +11,8 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import de.unitrier.infsec.functionalities.nonce.NonceGen;
-import de.unitrier.infsec.functionalities.pkenc.Decryptor;
-import de.unitrier.infsec.utils.MessageTools;
-import de.unitrier.infsec.utils.Utilities;
+import functionalities.nonce.NonceGen;
+import functionalities.pkenc.Decryptor;
 import selectvoting.system.core.Utils;
 
 

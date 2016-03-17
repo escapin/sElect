@@ -1,7 +1,7 @@
-package de.unitrier.infsec.functionalities.digsig;
+package functionalities.digsig;
 
-import static de.unitrier.infsec.utils.MessageTools.copyOf;
-import de.unitrier.infsec.lib.crypto.CryptoLib;
+import static infsec.utils.MessageTools.copyOf;
+import infsec.lib.crypto.CryptoLib;
 
 /**
  * An object encapsulating the verification key and allowing a user to verify
