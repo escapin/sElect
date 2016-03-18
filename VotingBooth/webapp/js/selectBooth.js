@@ -408,8 +408,8 @@ function selectBooth() {
 
     function onSubmitWelcome(event) 
     {
-        if (activeTabId!=='#welcome') return false;
-        activeTabId=''; 
+    	if (activeTabId!=='#welcome') return false;
+    	activeTabId=''; 
 
         // Fetching the email from the form
         var e = $('#inp-email').val();
@@ -430,8 +430,12 @@ function selectBooth() {
                 }
                 else if (!result.ok) {
                     showError("Server's responce: " + result.descr);
+                    if(result.otp)
+                    	console.log('OTP: ' + result.otp);
                 }
                 else {
+                    if(result.otp)
+                    	console.log('OTP: ' + result.otp);
                     // Show the next window (OTP)
                     $('#inp-otp').val(''); // emtpy the otp input field
                     showTab('#otp');

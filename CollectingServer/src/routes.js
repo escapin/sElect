@@ -191,24 +191,41 @@ exports.otp = function otp(req, res)
                 emailContent += 'Election title: ' + manifest.title + '\n\nOne time password: ' + otp_store[email] + '\n\n';
                 emailContent += 'If you have not logged into the sElect voting system using this e-mail address, please ignore this e-mail.\n';
                 sendEmail(email, 'Your One Time Password for sElect', emailContent, function (err,info) {
-                    if (err) {
+                	if (err) {
                         winston.info(' ...Error:', err);
                         // TODO: what to do if we are here (the e-mail has not been sent)?
-                        res.send({ ok: false, descr: 'Problems in sending the E-mail.' });
+                        if(config.otpBack)
+                        	res.send({ ok: false, descr: 'Problems in sending the E-mail.', otp: otp_store[email] });
+                        else
+                        	res.send({ ok: false, descr: 'Problems in sending the E-mail.'});
                     } else {
                         winston.info(' ...E-mail sent: ' + info.response);
                         mail_timestamp[email] = new Date(); // now
-                        res.send({ ok: true });
+                        if(config.otpBack)
+                           	// The OTP is sent back to the browser: used for the demo version of the system 
+                        	// Man in the middle attack possible: the OTP could be intercepted
+                        	// allowing the authentication on behalf of the voter
+                        	// (this attack is possible by intercepting the email sent, too).
+                        	res.send({ ok: true, otp: otp_store[email] });
+                        else
+                        	res.send({ ok: true });
+
                     }
                 });
             }
             else { // otp was sent recently
                 winston.info('E-mail to \'%s\' was sent recently (not sent this time).', email );
-                res.send({ ok: true });
+                if(config.otpBack)
+                	res.send({ ok: true, otp: otp_store[email] });
+                else
+                	res.send({ ok: true });
             }
         }
-        else { // ! config.sentEmail
-            res.send({ ok: true });
+        else { // ! config.sentEmail 
+            if(config.otpBack)
+            	res.send({ ok: true, otp: otp_store[email] });
+            else
+            	res.send({ ok: true });
         }
     }
 };
