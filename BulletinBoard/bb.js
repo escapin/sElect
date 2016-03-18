@@ -99,11 +99,11 @@ if(cmdlineOption==='--serveResult'){
 		fs.readFile(config.VOTERSLIST_FILE, {encoding:'utf8'}, function (err, data) {
 			if(err){
 				if (err.code === 'ENOENT'){
-					console.log("WARN:\tThe file with the voters' list does not exist.");
+					console.log("WARN:\tThe file with the list of voters does not exist.");
 					console.log("\tIf the collecting server is running, " +
 						"this file is going to be fetched from it.");			
 				} else {
-					console.log("WARN:\tThe file with the voters' list can not be opened.");
+					console.log("WARN:\tThe file with the list of voters can not be opened.");
 					console.log("\tIf the collecting server is running, " +
 							"the bulletin board would fetch this file again once you manually delete it.");
 					console.log("File path:\t" + err.path);

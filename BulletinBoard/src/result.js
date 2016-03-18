@@ -196,7 +196,7 @@ exports.fetchAndSaveData = function() {
 		    		  fetchData(manifest.mixServers[j].URI + '/result.msg', function(k){
 		    			  return function (err, data) {
 		    				  if (!err) {
-		    					  console.log('** I) \t Results of the #%s-th mix server fetched', k);
+		    					  console.log('** I) \t Results of the #%sth mix server fetched', k);
 		    					  // recreate the path where to save the result because the for loop could be
 		    					  // in a different iteration than the callback
 		    					  var mixServer_path = config.RESULTMIX_FILE.replace('%d', k);
@@ -205,7 +205,7 @@ exports.fetchAndSaveData = function() {
 		    						  exports.parseFinalResult(data);
 		    				  }
 		    				  else {
-		    					console.log("** I) \t" + err);
+		    					console.log("** I) \t%s  (MixServer #%s)", err, k);
 		    				  }
 		    			  }
 		    		  }(j));
@@ -224,7 +224,7 @@ exports.fetchAndSaveData = function() {
 					saveData(data, config.RESULTCS_FILE);
 				}
 				else {
-					console.log("** II)\t" + err);
+					console.log("** II)\t%s  (Collecting Server: result)", err);
 				}
 			});
 		}
@@ -237,13 +237,13 @@ exports.fetchAndSaveData = function() {
 				// fetch the votersList from the Collecting Server
 				fetchData(manifest.collectingServer.URI + '/votersList.msg', function (err, data) {
 					if (!err) {
-						console.log('** III) \t Voters list fetched');
+						console.log('** III)\t Voters list fetched');
 						saveData(data, config.VOTERSLIST_FILE);
 						if (exports.voters === null)
 							exports.parseVotersList(data);
 					}
 					else {
-						console.log("** III) \t" + err);
+						console.log("** III)\t%s  (Collecting Server: list of voters)", err);
 					}
 				});
 			}
