@@ -78,7 +78,8 @@ app.get('/status', routes.info);
 app.get('/admin/panel', routes.controlPanel);
 app.get('/admin/close', routes.close);
 app.get('/result.msg', routes.serveFile(config.RESULT_FILE));
-app.get('/votersList.msg', routes.serveFile(config.VOTERSLIST_FILE));
+if(manifest.publishListOfVoters)
+	app.get('/votersList.msg', routes.serveFile(config.VOTERSLIST_FILE));
 app.get('/manifest', routes.serveFile(config.MANIFEST_FILE));
 
 // STARTING THE SERVER
