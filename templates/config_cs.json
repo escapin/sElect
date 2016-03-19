@@ -18,7 +18,7 @@
         "../lib/bcprov-jdk16-1.46.jar"
     ],
     "ignore_fin_serv_cert": true,
-    "otpBack": false,
+    "sendOtpBack": false,
     "sendEmail": false,
     "timespanEmail": 10,
     "smtp_host": "my.smtp.server.com",

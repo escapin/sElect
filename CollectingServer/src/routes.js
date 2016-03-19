@@ -194,14 +194,14 @@ exports.otp = function otp(req, res)
                 	if (err) {
                         winston.info(' ...Error:', err);
                         // TODO: what to do if we are here (the e-mail has not been sent)?
-                        if(config.otpBack)
+                        if(config.sendOtpBack)
                         	res.send({ ok: false, descr: 'Problems in sending the E-mail.', otp: otp_store[email] });
                         else
                         	res.send({ ok: false, descr: 'Problems in sending the E-mail.'});
                     } else {
                         winston.info(' ...E-mail sent: ' + info.response);
                         mail_timestamp[email] = new Date(); // now
-                        if(config.otpBack)
+                        if(config.sendOtpBack)
                            	// The OTP is sent back to the browser: used for the demo version of the system 
                         	// Man in the middle attack possible: the OTP could be intercepted
                         	// allowing the authentication on behalf of the voter
@@ -215,14 +215,14 @@ exports.otp = function otp(req, res)
             }
             else { // otp was sent recently
                 winston.info('E-mail to \'%s\' was sent recently (not sent this time).', email );
-                if(config.otpBack)
+                if(config.sendOtpBack)
                 	res.send({ ok: true, otp: otp_store[email] });
                 else
                 	res.send({ ok: true });
             }
         }
         else { // ! config.sentEmail 
-            if(config.otpBack)
+            if(config.sendOtpBack)
             	res.send({ ok: true, otp: otp_store[email] });
             else
             	res.send({ ok: true });
