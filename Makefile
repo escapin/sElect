@@ -56,9 +56,10 @@ filesconfigs:
 	-mkdir -p _sElectConfigFiles_
 	cp templates/select.* _sElectConfigFiles_
 	cp templates/ElectionManifest.json _sElectConfigFiles_
-	cp templates/config_bb.json BulletinBoard/config.json
+	cp templates/config_vb.json VotingBooth/config.json
 	cp templates/config_cs.json CollectingServer/config.json
 	cp templates/config_mix.json MixServer/config.json
+	cp templates/config_bb.json BulletinBoard/config.json
 	ln -fs ../_sElectConfigFiles_/ElectionManifest.json VotingBooth/
 
 mixconfigs:
@@ -126,6 +127,9 @@ configsclean: configfilesclean mixdirsclean
 
 configfilesclean:
 	-rm -r _sElectConfigFiles_
+	-rm VotingBooth/config.json
+	-rm CollectingServer/config.json
+	-rm BulletinBoard/config.json
 
 mixdirsclean:
 	@echo   Removing: 	$(shell ls MixServer | egrep "mix[0-9]+")
