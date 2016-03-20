@@ -129,6 +129,7 @@ configfilesclean:
 	-rm -r _sElectConfigFiles_
 	-rm VotingBooth/config.json
 	-rm CollectingServer/config.json
+	-rm MixServer/config.json
 	-rm BulletinBoard/config.json
 
 mixdirsclean:
