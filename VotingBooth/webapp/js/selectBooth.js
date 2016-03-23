@@ -14,6 +14,8 @@ function selectBooth() {
     var activeTabId = null;
     // var activeTabId = "#welcome";
 
+    // randomness and show OTP stored here
+    var config = JSON.parse(configRaw);
     // Manifest
     var manifest = JSON.parse(electionManifestRaw);
     manifest.hash = cryptofunc.hash(electionManifestRaw).toLowerCase();
@@ -434,11 +436,17 @@ function selectBooth() {
                     	console.log('OTP: ' + result.otp);
                 }
                 else {
-                    if(result.otp)
+                    if(result.otp && config.showOtp){
                     	console.log('OTP: ' + result.otp);
-                    // Show the next window (OTP)
-                    $('#inp-otp').val(''); // emtpy the otp input field
-                    showTab('#otp');
+                    	showTab('#showOTP');
+                		//document.getElementById("disp-otp").value = "";
+                    	$('#disp-otp').val("One time password: "+result.otp);
+                    }
+                    else{
+                    	// Show the next window (OTP)
+                    	$('#inp-otp').val(''); // emtpy the otp input field
+                    	showTab('#otp');
+                    }
                 }
               })
              .fail(function otpRequestFailed() {
@@ -447,6 +455,17 @@ function selectBooth() {
         });
         return false; // prevents any further submit action
     };
+    
+    // after showing the OTP (submit form shows UTF-8 encoding error)
+    $("#go-otp").click(function() {
+    	if (activeTabId!=='#showOTP') return false;
+    	activeTabId=''; 
+    	
+    	$('#showOTP').hide();
+    	showProgressIcon();
+   		// Show the next window (OTP)
+        showTab('#otp');
+    });
 
     function onSubmitOTP(event) {
         if (activeTabId!=='#otp') return false;
@@ -460,7 +479,12 @@ function selectBooth() {
 
         $('#otp').fadeOut(FADE_TIME, function() {
         	$('#inp-code').val(''); // empty the code input field
-            showTab('#randomness');
+        	if(config.userChosenRandomness){
+        		showTab('#randomness');
+        	}
+        	else{
+        		showTab('#choice');
+        	}
         });
         return false; // prevents any further submit action
     }
@@ -605,7 +629,6 @@ function selectBooth() {
     $('#inp-code').on('input', enableWhenNotEmpty($('#submit-code'), $('#inp-code')));
     $('#verification form').submit(goToBB);
     $('input[name="choice"]').change(whenChoiceChanges);
-    
     if (isIE()) {
         $('#verCodeLink').hide();
     }
