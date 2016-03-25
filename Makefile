@@ -92,7 +92,14 @@ libdownload:
 	cd BulletinBoard/public/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-old-ie-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-min.css
 	cd BulletinBoard/public/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css 
-	
+	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/Jzo62I39jc0gQRrbndN6nfesZW2xOQ-xsNqO47m55DA.ttf
+	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/Hgo13k-tfSpn0qi1SFdUfaCWcynf_cDxXwCLxiixG1c.ttf
+	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/zN7GBFwfMP4uA6AR0HCoLQ.ttf
+	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/RxZJdnzeo3R5zSexge8UUaCWcynf_cDxXwCLxiixG1c.ttf
+	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/12mE4jfMSBTmg-81EiS-YS3USBnSvpkopQaUR-2r7iU.ttf
+	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/7m8l7TlFO-S3VkhHuR0at50EAVxt0G0biEntp43Qt6E.ttf
+	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/W4wDsBUluyw0tK3tykhXEfesZW2xOQ-xsNqO47m55DA.ttf
+	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/W4wDsBUluyw0tK3tykhXEfesZW2xOQ-xsNqO47m55DA.ttf
 
 
 
@@ -119,7 +126,7 @@ votingboothclean:
 	-rm VotingBooth/webapp/pure/pure-min.css
 	-rm VotingBooth/webapp/pure/grids-responsive-old-ie-min.css
 	-rm VotingBooth/webapp/pure/grids-responsive-min.css
-	-rm VotingBooth/webapp/pic/2tsd397wLxj96qwHyNIkxPesZW2xOQ-xsNqO47m55DA.woff2
+	-rm webapp/roboto/*.ttf
 	
 
 bbclean:	
