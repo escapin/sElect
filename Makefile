@@ -82,6 +82,8 @@ libdownload:
 	cd VotingBooth/webapp/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-old-ie-min.css
 	-rm VotingBooth/webapp/pure/grids-responsive-min.css
 	cd VotingBooth/webapp/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css 
+	-rm VotingBooth/webapp/pic/2tsd397wLxj96qwHyNIkxPesZW2xOQ-xsNqO47m55DA.woff2
+	cd VotingBooth/webapp/pic; wget https://fonts.gstatic.com/s/roboto/v15/2tsd397wLxj96qwHyNIkxPesZW2xOQ-xsNqO47m55DA.woff2
 	-rm BulletinBoard/public/js/jquery-1.11.1.min.js
 	cd BulletinBoard/public/js; wget http://code.jquery.com/jquery-1.11.1.min.js
 	-rm BulletinBoard/public/pure/pure-min.css
@@ -90,6 +92,7 @@ libdownload:
 	cd BulletinBoard/public/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-old-ie-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-min.css
 	cd BulletinBoard/public/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css 
+	
 
 
 
@@ -116,6 +119,8 @@ votingboothclean:
 	-rm VotingBooth/webapp/pure/pure-min.css
 	-rm VotingBooth/webapp/pure/grids-responsive-old-ie-min.css
 	-rm VotingBooth/webapp/pure/grids-responsive-min.css
+	-rm VotingBooth/webapp/pic/2tsd397wLxj96qwHyNIkxPesZW2xOQ-xsNqO47m55DA.woff2
+	
 
 bbclean:	
 	-rm BulletinBoard/public/js/jquery-1.11.1.min.js
