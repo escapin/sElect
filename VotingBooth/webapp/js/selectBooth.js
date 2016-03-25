@@ -391,8 +391,6 @@ function selectBooth() {
         $('#processing').hide();
         activeTabId = tabId;
         $(tabId).fadeIn(FADE_TIME);
-        if(tabId !== '#randomness')
-        	$('#randomness').hide();
         // Focus
         switch (tabId) {
             case '#welcome':
