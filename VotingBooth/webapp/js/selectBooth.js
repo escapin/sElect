@@ -434,16 +434,20 @@ function selectBooth() {
                     	console.log('OTP: ' + result.otp);
                 }
                 else {
+                    // Show the next window (OTP)
+                    $('#inp-otp').val(''); // emtpy the otp input field
+                    showTab('#otp');
+                    
+                    // Show popup with OTP if enabled
                     if(result.otp && config.showOtp){
                     	console.log('OTP: ' + result.otp);
-                    	showTab('#showOTP');
-                		//document.getElementById("disp-otp").value = "";
-                    	$('#disp-otp').val("One time password: "+result.otp);
-                    }
-                    else{
-                    	// Show the next window (OTP)
-                    	$('#inp-otp').val(''); // emtpy the otp input field
-                    	showTab('#otp');
+                    	otp = result.otp;
+                    	
+                    	document.getElementById("disp-title").innerHTML += manifest.title;
+                    	document.getElementById("disp-otp").innerHTML += result.otp;
+                    	
+                    	document.getElementById("showOtp").style.visibility = "visible";
+                		$("#closehelp").focus();
                     }
                 }
               })
@@ -454,16 +458,11 @@ function selectBooth() {
         return false; // prevents any further submit action
     };
     
-    // after showing the OTP (submit form shows UTF-8 encoding error)
-    $("#go-otp").click(function() {
-    	if (activeTabId!=='#showOTP') return false;
-    	activeTabId=''; 
-    	
-    	$('#showOTP').hide();
-    	showProgressIcon();
-   		// Show the next window (OTP)
-        showTab('#otp');
-    });
+	$("#close-otp").click(function() {
+		$('#inp-otp').val(otp);
+		document.getElementById("showOtp").style.visibility = "hidden";
+		$("#submit-otp").prop('disabled', null);
+	});
 
     function onSubmitOTP(event) {
         if (activeTabId!=='#otp') return false;
