@@ -7,6 +7,7 @@ var winston = require('winston');
 var basicAuth = require('basic-auth-connect');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
+var bcrypt = require("bcryptjs");
 
 var config = require('./config');
 var manifest = require('./src/manifest')
@@ -64,7 +65,14 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json()); 
 app.use(express.static('./public')); // static content
 app.use( morgan('*** :remote-addr [:date] :method :url :status / :referrer [:response-time ms]', {}) ); // logging
-app.use('/admin/*', basicAuth('admin', config.serverAdminPassword)); // authentication for the admin panel only
+//app.use('/admin/*', basicAuth('admin', config.serverAdminPassword)); // authentication for the admin panel only
+if(config.serverAdminPassword != ""){
+	app.use('/admin/*', basicAuth(function(username,password){
+		var salt = bcrypt.getSalt(config.serverAdminPassword);
+		var hash = bcrypt.hashSync(password, salt);
+        return ((username === 'admin') && (hash === config.serverAdminPassword))
+    }));
+}
 
 // Insert some delay (for testing only):
 // app.use(function(req, res, next) { setTimeout(next, 300); });
