@@ -13,4 +13,4 @@ config.json
 .pydevproject
 _data_*
 _configFiles_/
-VotingBooth/webapp/pic/2tsd397wLxj96qwHyNIkxPesZW2xOQ-xsNqO47m55DA.woff2
+VotingBooth/webapp/roboto/*.ttf
