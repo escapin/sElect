@@ -8,6 +8,7 @@ var basicAuth = require('basic-auth-connect');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
 var bcrypt = require("bcryptjs");
+var read = require('read');
 
 var config = require('./config');
 var manifest = require('./src/manifest')
@@ -46,9 +47,8 @@ if (cmdlineOption === '--resume' && !logFileExists) {
     console.log('Server cannot be resumed.');
     process.exit(1);
 }
-
 // CHECK FOR WRONG OPTIONS
-if (cmdlineOption && cmdlineOption!=='--resume' && cmdlineOption!=='--serveResult') {
+if (cmdlineOption && cmdlineOption!=='--resume' && cmdlineOption!=='--serveResult' && cmdlineOption!=='--pwd') {
     console.log('ERROR: Wrong option');
     console.log('SERVER NOT STARTED.');
     process.exit(1);
@@ -101,11 +101,49 @@ if (config.useTLS) {
     	};
     app = https.createServer(tls_options, app);
 }
-var server = app.listen(config.port, function() {
-    console.log('Collecting Server running for election "%s" [%s]', manifest.title, manifest.hash);
-    winston.info('SERVER STARTED');
-    console.log('Server listening on %s, port %d', server.address().address, server.address().port);
-    if (config.useTLS) 
-        console.log('Using TLS');
-});
 
+//Write admin password to config file
+if (cmdlineOption === '--pwd'){
+	console.log('Setting up an administrator password to close the election...');
+	read({ prompt: 'Enter a password:', silent: true }, function(er, password) {
+	    verify(password);
+	 })
+}
+else{
+	start();
+}
+
+//call when user couldn't confirm the password
+function askPw(){
+	read({ prompt: 'Passwords do not match, try again:', silent: true }, function(er, password) {
+	    verify(password);
+	  })
+}
+ 
+// confirm the entered password
+function verify(passwd){
+    read({ prompt: 'Retype the password:', silent: true }, function(er, password) {
+        if (password !== passwd){
+        	askPw();
+        }
+        else {
+      	  var salt = bcrypt.genSaltSync();
+      	  var adminpw = bcrypt.hashSync(password, salt);
+      	  config.serverAdminPassword = adminpw;
+      	  fs.writeFileSync('config.json', JSON.stringify(config, null, 4), {spaces:4});
+      	  console.log('Password stored');
+      	  console.log();
+      	  start();
+        }
+      })
+}
+
+function start(){
+	var server = app.listen(config.port, function() {
+		console.log('Collecting Server running for election "%s" [%s]', manifest.title, manifest.hash);
+		winston.info('SERVER STARTED');
+		console.log('Server listening on %s, port %d', server.address().address, server.address().port);
+		if (config.useTLS) 
+			console.log('Using TLS');
+	});
+}
