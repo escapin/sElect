@@ -444,7 +444,7 @@ function selectBooth() {
                     	otp = result.otp;
                     	
                     	document.getElementById("disp-title").innerHTML += manifest.title;
-                    	document.getElementById("disp-otp").innerHTML += result.otp;
+                    	document.getElementById("disp-otp").innerHTML += '&nbsp&nbsp<b>'+result.otp+'</b>';
                     	
                     	document.getElementById("showOtp").style.visibility = "visible";
                 		$("#closehelp").focus();
