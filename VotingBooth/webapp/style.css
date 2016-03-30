@@ -192,7 +192,6 @@ div.electionid,h3.lead,h1.title,h3.subtitle,div.extra-info,p.further-info {
      top: 0px;
      width:100%;
      height:100%;
-     text-align:center;
      z-index: 1000;
      background:rgba(0, 0, 0, 0.3);
      overflow: auto;
@@ -201,11 +200,9 @@ div.electionid,h3.lead,h1.title,h3.subtitle,div.extra-info,p.further-info {
 #showOtp div {
 	 overflow: auto;
      width:33%;
-     margin: 50px auto;
      background-color: #fff;
      border:1px solid #000;
      padding: 1em;
-     text-align:center;
 }
 
 @media all and (max-width: 820px) {
