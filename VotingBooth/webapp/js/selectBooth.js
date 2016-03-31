@@ -64,7 +64,7 @@ function selectBooth() {
         // draw the verification code:
         var ctx = verCodeCanvas.getContext('2d');
         ctx.fillStyle = "white";
-        ctx.fillRect(0,0,600,100);
+        ctx.fillRect(0,0,650,100);
         ctx.fillStyle = "black";
         ctx.font = "14px helvetica";
         ctx.fillText('sElect verification code', 10, 25);
@@ -236,11 +236,11 @@ function selectBooth() {
         // Some receipts to verify
         var recIDs = receipts.map(function (rec) {return '<span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(rec.userCode, true)+'</span>' + rec.receiptID.toUpperCase()}).join(', ');
         if (receipts.length > 1) {
-            verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
-                             'that the ballots with the following verification codes have in fact been counted: <span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">', recIDs, '</span>')
+            verwriter.writep('<span style="line-height:150%;">Independently, an automatic verification procedure is being carried out to check',
+                             'that the ballots with the following verification codes have in fact been counted: <span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">', recIDs, '</span></span>')
         } else {
-            verwriter.writep('Independently, an automatic verification procedure is being carried out to check',
-                             'that the ballot with the following verification code has in fact been counted: <span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">', recIDs, '</span>')
+            verwriter.writep('<span style="line-height:150%;">Independently, an automatic verification procedure is being carried out to check',
+                             'that the ballot with the following verification code has in fact been counted: <span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">', recIDs, '</span></span>')
         }
         console.log('Receipts to verify:', recIDs);
 
@@ -273,7 +273,7 @@ function selectBooth() {
             }
             else {
                 console.log('WARNING: Receipt', i, 'not verified:', res.descr);
-                verwriter.writee('VERIFICATION FAILED: ballot with verification code ', '<span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">'+'<span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(receipts[i].userCode, true)+'</span>' + receipts[i].receiptID.toUpperCase()+'</span>',' is missing!');
+                verwriter.writee('VERIFICATION FAILED: ballot with verification code ', '<span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">'+'<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipts[i].userCode, true)+'</span>' + receipts[i].receiptID.toUpperCase()+'</span>',' is missing!');
                 verwriter.writep('Looking for the misbehaving party.')
                 ok = false;
             }
@@ -311,10 +311,10 @@ function selectBooth() {
                 var ok = true;
                 for (var i=0; i<receipts.length; ++i) {
                     var res = voter.checkColServerResult(data, receipts[i])
-                    console.log('Result for', '<span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">'+'<span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(receipts[i].userCode, true)+'</span>' + receipts[i].receiptID.toUpperCase()+'</span>', ':', res.descr);
+                    console.log('Result for', '<span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">'+'<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipts[i].userCode, true)+'</span>' + receipts[i].receiptID.toUpperCase()+'</span>', ':', res.descr);
                     if (!res.ok && res.blame) {
                         ok = false;
-                        verwriter.writee('Ballot', '<span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">'+'<span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(receipts[i].userCode, true)+'</span>' + receipts[i].receiptID.toUpperCase()+'</span>', 'has been dropped by the collecting server');
+                        verwriter.writee('Ballot', '<span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">'+'<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipts[i].userCode, true)+'</span>' + receipts[i].receiptID.toUpperCase()+'</span>', 'has been dropped by the collecting server');
                         console.log('Blaming data:', res.blamingData);
                         verwriter.writep('The following data contains information necessary to hold the misbehaving party accountable. Please copy it and provide to the voting authorities.');
                         verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
@@ -350,10 +350,10 @@ function selectBooth() {
             var ok = true;
             for (var i=0; i<receipts.length; ++i) {
                 var res = voter.checkMixServerResult(k, data, receipts[i])
-                console.log('Result for', '<span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">'+'<span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(receipts[i].userCode, true)+'</span>' + receipts[i].receiptID.toUpperCase()+'</span>', ':', res.descr);
+                console.log('Result for', '<span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">'+'<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipts[i].userCode, true)+'</span>' + receipts[i].receiptID.toUpperCase()+'</span>', ':', res.descr);
                 if (!res.ok && res.blame) {
                     ok = false;
-                    verwriter.writee('Ballot', '<span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">'+'<span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(receipts[i].userCode, true)+'</span>' + receipts[i].receiptID.toUpperCase()+'</span>', 'has been dropped by mix server nr', k);
+                    verwriter.writee('Ballot', '<span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">'+'<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipts[i].userCode, true)+'</span>' + receipts[i].receiptID.toUpperCase()+'</span>', 'has been dropped by mix server nr', k);
                     console.log('Blaming data:', res.blamingData);
                     verwriter.writep('Please copy the following data and provide it to the voting authority. The data contains information necessary to hold the misbehaving party accountable.');
                     verwriter.write('<div class="scrollable">' +JSON.stringify(res.blamingData)+ '</div>');
@@ -490,7 +490,11 @@ function selectBooth() {
         $('#otp').fadeOut(FADE_TIME, function() {
         	$('#inp-code').val(''); // empty the code input field
         	if(config.userChosenRandomness){
+        		// set to invisible the user-randomness-info paragraph
+        		// when voting procedure complete
+        		document.getElementById('user-randomness-info').syle.visibility='hidden';
         		showTab('#randomness');
+        		
         	}
         	else{
         		showTab('#choice');
@@ -557,7 +561,7 @@ function selectBooth() {
                         var recid = receipt.userCode + receipt.receiptID.toUpperCase();
                         var durl = verificationCode2DataURL(recid, printableElID);
                         
-                        recid = '<span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(receipt.userCode, true)+'</span>' + receipt.receiptID.toUpperCase();                        
+                        recid = '<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipt.userCode, true)+'</span>' + receipt.receiptID.toUpperCase();                        
                         $('#verCodeLink').attr('href', durl);
                         $('#receipt-id').html(recid); // it already escapes the string provided as necessary
                         showTab('#result');
