@@ -490,13 +490,12 @@ function selectBooth() {
         $('#otp').fadeOut(FADE_TIME, function() {
         	$('#inp-code').val(''); // empty the code input field
         	if(config.userChosenRandomness){
-        		// set to invisible the user-randomness-info paragraph
-        		// when voting procedure complete
-        		document.getElementById('user-randomness-info').syle.visibility='hidden';
         		showTab('#randomness');
-        		
         	}
         	else{
+        		// set to invisible the user-randomness-info paragraph
+        		// when voting procedure complete
+        		document.getElementById('user-randomness-info').style.visibility='hidden';
         		showTab('#choice');
         	}
         });
