@@ -11,5 +11,6 @@ var manifestFileName = process.argv[2];
 
 var ms = fs.readFileSync(manifestFileName, 'utf8');
 var norm = selectUtils.normalizeManifest(ms);
-var norm = norm.replace(/"/g, '\\"')
+norm = norm.replace(/\\/g, '\\\\') // Escape backslashes ( \ -> \\ )
+norm = norm.replace(/"/g, '\\"') // Escape Quotes ( " -> \" )
 console.log('var electionManifestRaw = "%s";', norm);
