@@ -492,8 +492,8 @@ function selectBooth() {
         	if(config.userChosenRandomness){
         		// set to visible the user-randomness-info paragraph
         		// when voting procedure complete
-        		document.getElementById('user-randomness-info').style.visibility='visible';
-        		showTab('#randomness');
+        		document.getElementById('user-randomness-info').style.display='block';
+        		showTab('#randomness');	
         	}
         	else{
         		showTab('#choice');
