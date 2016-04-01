@@ -53,19 +53,25 @@ function selectBooth() {
     }
     
     manifest.title = escapeHTML(manifest.title, true);
-    manifest.description = escapteHTML(manifest.description, true);
+    manifest.description = escapeHTML(manifest.description, true);
     manifest.startTime = escapeHTML(manifest.startTime, true);
-    manifest.voters = escapeHTML(manifest.voters, true);
+    manifest.endTime = escapeHTML(manifest.endTime, true);
     manifest.question = escapeHTML(manifest.question, true);
-    manifest.choices = escapeHTML(manifest.choices, true);
-
-    // no output, needed?
+    for(i = 0; i < manifest.choices.length; i++){
+    	manifest.choices[i] = escapeHTML(manifest.choices[i], true);
+    }
+    
+    //no output; needed?
+    /**
+    for(i = 0; i < manifest.choices.length; i++){
+		  manifest.voters[i] = escapeHTML(manifest.voters[i], true);
+	}
     manifest.collectingServer.URI = escapeHTML(manifest.collectingServer.URI, true);
     manifest.mixServers[0].URI = escapeHTML(manifest.mixServers[0].URI, true);
     manifest.mixServers[1].URI = escapeHTML(manifest.mixServers[1].URI, true);
     manifest.mixServers[2].URI = escapeHTML(manifest.mixServers[2].URI, true);
     manifest.bulletinBoards.URI = escapeHTML(manifest.bulletinBoards.URI, true);
-
+    **/
     //////////////////////////////////////////////////////////////////////////////
     /// Verification code picture saving
 
