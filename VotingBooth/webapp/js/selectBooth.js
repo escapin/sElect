@@ -51,7 +51,9 @@ function selectBooth() {
     		return MAP[c];
     	});
     }
-
+    
+    manifest.title = escapeHTML(manifest.title, true);
+    manifest.description = escapteHTML(manifest.description, true);
     //////////////////////////////////////////////////////////////////////////////
     /// Verification code picture saving
 
