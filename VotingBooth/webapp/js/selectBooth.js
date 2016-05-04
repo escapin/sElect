@@ -162,7 +162,7 @@ function selectBooth() {
         // The state is determined in a (too?) simple way, by
         // checking if the final server has ready result.
         //
-        resultOfFinalServerReady()
+        csStatus()
         .then(function (resultReady) {  
             if (resultReady) {
                 console.log('Result ready. We should verify now');
@@ -187,7 +187,7 @@ function selectBooth() {
     // Returns a promise of the state of the final mix server
     // The promise resolves to true if the result is ready and
     // to false otherwise.
-    // The promise is rejected if the final server is down of
+    // The promise is rejected if the final server is down or
     // works for a different election.
     //
     function resultOfFinalServerReady() {
@@ -205,6 +205,26 @@ function selectBooth() {
         });
     }
 
+    // Returns a promise of the state of the collecting server
+    // The promise resolves to true if the election is closed and
+    // to false otherwise.
+    // The promise is rejected if the collecting server is down or
+    // works for a different election.
+    //
+    function csStatus() {
+        return new Promise(function (resolve, reject) {
+            var url = manifest.collectingServer.URI+'/status';
+            $.get(url)
+             .fail(function () { 
+                reject('The final server is down');
+              })
+             .done(function (result) {  // we have some response
+                if (result.electionID.toUpperCase() !== electionID.toUpperCase()) 
+                    reject('The final server uses a wrong election ID')
+                else resolve (result.status==='closed');
+              });
+        });
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     /// RECEIPTS
