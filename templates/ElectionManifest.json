@@ -1,20 +1,22 @@
 {
-    "title": "Your Favorite Superhero Election",
-    "description": "This is the election of the Greatest Superhero Ever.",
+    "title": "Students' Union Election",
+    "description": "This is the election for the students' union of the computer science department.",
     "startTime": "2014.01.01 15:00 GMT+0100",
     "endTime": "2018.11.10 16:00 GMT+0100",
     "voters": [],
     "publishListOfVoters": false,
-    "question": "Who is Your Favorite Superhero?",
+    "question": "Who do you want as Chairperson of the Student's Union for the next year?",
     "choices": [
-	"Iron Man",
-	"Batman",
-	"Wonder Woman",
-	"Spider Man",
-	"Dr. Manhattan",
-	"Hulk",
-	"Superman",
-	"Bugs Bunny"
+	"John Stevens",
+	"Sara Johnson",
+	"Daniel Fischer",
+	"Kenneth Brown",
+	"Mohammed Basha",
+	"Rachel Wheeler",
+	"Chris Taylor",
+	"Lucy Romero",
+	"Patrick Bernard",
+	"Lisa Wilson"
     ],
     "collectingServer": {
         "URI": "http://localhost:3299",
