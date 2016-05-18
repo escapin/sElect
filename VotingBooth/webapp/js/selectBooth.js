@@ -28,7 +28,7 @@ function selectBooth() {
     var choice = null;
 
     var electionID = manifest.hash;
-    var printableElID = makeBreakable(electionID.slice(0,40).toUpperCase()); // only the first 40 hex chars (out of 64, backward compatibility in the GUI with SHA-1)
+    var printableElID = makeBreakable(electionID.slice(0,40).toUpperCase()); // only the first 40 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
     var electionQuestion = manifest.question ? manifest.question : "Please, make your choice:";
     var colServVerifKey = manifest.collectingServer.verification_key;
     // retrieve the encryption and verification keys of the mix servers from the manifest
