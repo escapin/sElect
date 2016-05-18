@@ -9,10 +9,15 @@ function selectBooth() {
     //////////////////////////////////////////////////////////////////////////////
     /// STATE
 
-
     // For navigation
     var activeTabId = null;
     // var activeTabId = "#welcome";
+
+    // Voter and status
+    var email = null;
+    var otp = null;
+    var randomCode = null;
+    var choice = null;
 
     // randomness and show OTP stored here
     var config = JSON.parse(configRaw);
@@ -20,12 +25,6 @@ function selectBooth() {
     var manifest = JSON.parse(electionManifestRaw);
     manifest.hash = cryptofunc.hash(electionManifestRaw).toLowerCase();
     console.log('Election hash =', manifest.hash);
-
-    // Voter and status
-    var email = null;
-    var otp = null;
-    var randomCode = null;
-    var choice = null;
 
     var electionID = manifest.hash;
     var printableElID = makeBreakable(electionID.slice(0,40).toUpperCase()); // only the first 40 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
@@ -36,42 +35,8 @@ function selectBooth() {
     var mixServVerifKeys = manifest.mixServers.map(function (ms) { return ms.verification_key; })
     // create the voter object
     var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
- // var voter = voterClient.create(electionID, colServEncKey, colServVerifKey, mixServEncKeys);
 
-    //////////////////////////////////////////////////////////////////////////////
-    /// Escape HTML
-    var MAP = { '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;'};
-
-    function escapeHTML(s, forAttribute) {
-    	return s.replace(forAttribute ? /[&<>'"]/g : /[&<>]/g, function(c) {
-    		return MAP[c];
-    	});
-    }
     
-    manifest.title = escapeHTML(manifest.title, true);
-    manifest.description = escapeHTML(manifest.description, true);
-    manifest.startTime = escapeHTML(manifest.startTime, true);
-    manifest.endTime = escapeHTML(manifest.endTime, true);
-    manifest.question = escapeHTML(manifest.question, true);
-    for(i = 0; i < manifest.choices.length; i++){
-    	manifest.choices[i] = escapeHTML(manifest.choices[i], true);
-    }
-    
-    //no output; needed?
-    /**
-    for(i = 0; i < manifest.choices.length; i++){
-		  manifest.voters[i] = escapeHTML(manifest.voters[i], true);
-	}
-    manifest.collectingServer.URI = escapeHTML(manifest.collectingServer.URI, true);
-    manifest.mixServers[0].URI = escapeHTML(manifest.mixServers[0].URI, true);
-    manifest.mixServers[1].URI = escapeHTML(manifest.mixServers[1].URI, true);
-    manifest.mixServers[2].URI = escapeHTML(manifest.mixServers[2].URI, true);
-    manifest.bulletinBoards.URI = escapeHTML(manifest.bulletinBoards.URI, true);
-    **/
     //////////////////////////////////////////////////////////////////////////////
     /// Verification code picture saving
 
@@ -667,11 +632,34 @@ function selectBooth() {
     //////////////////////////////////////////////////////////////////////////////
     /// INITIALISATION AND BINDING
     
-    // Election data
-    $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +printableElID+ ')</div>');
-    $('h3.subtitle').text(manifest.description);
+    //////////////////////////////////////////////////////////////////////////////
+    /// Escaping the HTML tags which are displayed
+    var MAP = { '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'};
+
+    function escapeHTML(s, forAttribute) {
+    	return s.replace(forAttribute ? /[&<>'"]/g : /[&<>]/g, function(c) {
+    		return MAP[c];
+    	});
+    }
+    
+    manifest.title = escapeHTML(manifest.title, true);
+    manifest.description = escapeHTML(manifest.description, true);
+    //manifest.startTime = escapeHTML(manifest.startTime, true);
+    //manifest.endTime = escapeHTML(manifest.endTime, true);
+    electionQuestion = escapeHTML(electionQuestion, true);
+    for(i = 0; i < manifest.choices.length; i++){
+    	manifest.choices[i] = escapeHTML(manifest.choices[i], true);
+    }
+    
+    
+    $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +printableElID+ ')</div>'); 
+    $('h3.subtitle').html(manifest.description);
     $('#choice-list').html(optionsAsHTML());
-    $('#question').text(electionQuestion);
+    $('#question').html(electionQuestion);
 
     // Event handlers binding
     $('#welcome form').submit(onSubmitWelcome);
