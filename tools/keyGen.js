@@ -18,7 +18,7 @@ for(var i = 0; i<keysMapsNumber; i++){
 					verificationKey: sk.verificationKey,
 					signingKey: sk.signingKey
              		}
-	console.log(keysMapsArray[i]);
+	console.log(JSON.stringify(keysMapsArray[i]));
 }
 
 
