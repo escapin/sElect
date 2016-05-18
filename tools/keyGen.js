@@ -1,18 +1,25 @@
 var crypto = require('cryptofunc');
 
-var ek = crypto.pke_keygen();
 
-// console.log(enckeys);
+var keysMapsNumber=1
 
-var sk = crypto.sig_keygen();
+if(process.argv.length > 2)
+	keysMapsNumber = process.argv[2];
 
-// console.log(sigkeys);
+var keysMapsArray = [];
 
-var keys = { encryptionKey: ek.encryptionKey, 
-             decryptionKey: ek.decryptionKey,
-             verificationKey: sk.verificationKey,
-             signingKey: sk.signingKey
-             }
+for(var i = 0; i<keysMapsNumber; i++){
 
-console.log(keys);
+	var ek = crypto.pke_keygen();
+	var sk = crypto.sig_keygen();
+
+	keysMapsArray[i] = { encryptionKey: ek.encryptionKey,
+					decryptionKey: ek.decryptionKey,
+					verificationKey: sk.verificationKey,
+					signingKey: sk.signingKey
+             		}
+	console.log(keysMapsArray[i]);
+}
+
+
 
