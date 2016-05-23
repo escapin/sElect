@@ -5,6 +5,7 @@ body {
     font-family: 'Roboto', sans-serif;
     font-size: 12pt;
     font-weight: 300;
+    word-wrap: break-word;
 }
 
 h1, h2 {
@@ -148,6 +149,10 @@ div.body {
     text-align: left;
 }
 
+td.choice{
+	word-wrap: break-word;
+	max-width: 35vw;
+}
 .error {
     color: #c00;
 }
