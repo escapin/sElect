@@ -45,17 +45,19 @@ function selectBooth() {
     verCodeCanvas.setAttribute('width', '480');
     verCodeCanvas.setAttribute('height', '100');
 
-    function verificationCode2DataURL(verificationCode, elID) {
+    function verificationCode2DataURL(verificationCode, elID, elTitle) {
         // draw the verification code:
         var ctx = verCodeCanvas.getContext('2d');
         ctx.fillStyle = "white";
-        ctx.fillRect(0,0,650,100);
+        ctx.fillRect(0,0,650,123);
         ctx.fillStyle = "black";
-        ctx.font = "14px helvetica";
+        ctx.font = "16px helvetica";
         ctx.fillText('sElect verification code', 10, 25);
-        ctx.fillText('Election ID: '+elID, 10, 45);
+        ctx.font = "14px helvetica";
+        ctx.fillText('Election ID: '+elID, 10, 48);
+        ctx.fillText('Election title: '+elTitle, 10, 68);
         ctx.font = "24px roboto";
-        ctx.fillText('Verification Code: '+verificationCode, 10, 80);
+        ctx.fillText('Verification Code: '+verificationCode, 10, 103);
         // encode the canvas picture as a data URL and return it
         return  verCodeCanvas.toDataURL('image/png');
     }
@@ -563,7 +565,7 @@ function selectBooth() {
                         
                         // prepare and show the "ballot accepted" tab
                         var recid = receipt.userCode + receipt.receiptID.toUpperCase();
-                        var durl = verificationCode2DataURL(recid, printableElID);
+                        var durl = verificationCode2DataURL(recid, printableElID, rawTitle.slice(0,40));
                         
                         recid = '<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipt.userCode, true)+'</span>' + receipt.receiptID.toUpperCase();                        
                         $('#verCodeLink').attr('href', durl);
@@ -646,6 +648,7 @@ function selectBooth() {
     	});
     }
     
+    var rawTitle = manifest.title; // for showing it on the image (last parameter of the 'verificationCode2DataURL' function) 
     manifest.title = escapeHTML(manifest.title, true);
     manifest.description = escapeHTML(manifest.description, true);
     //manifest.startTime = escapeHTML(manifest.startTime, true);
@@ -656,7 +659,7 @@ function selectBooth() {
     }
     
     
-    $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +printableElID+ ')</div>'); 
+    $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +printableElID+ ')</div>');
     $('h3.subtitle').html(manifest.description);
     $('#choice-list').html(optionsAsHTML());
     $('#question').html(electionQuestion);
