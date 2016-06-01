@@ -49,7 +49,7 @@ function selectBooth() {
         // draw the verification code:
         var ctx = verCodeCanvas.getContext('2d');
         ctx.fillStyle = "white";
-        ctx.fillRect(0,0,650,123);
+        ctx.fillRect(0,0,650,130);
         ctx.fillStyle = "black";
         ctx.font = "16px helvetica";
         ctx.fillText('sElect verification code', 10, 25);
