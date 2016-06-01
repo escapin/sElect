@@ -241,10 +241,10 @@ function selectBooth() {
         // Some receipts to verify
         var recIDs = receipts.map(function (rec) {return '<span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(rec.userCode, true)+'</span>' + rec.receiptID.toUpperCase()}).join(', ');
         if (receipts.length > 1) {
-            verwriter.writep('<span style="line-height:150%;">Independently, an automatic verification procedure is being carried out to check',
+            verwriter.writep('<span style="line-height:150%;">Independently, an automatic verification procedure was just carried out to check',
                              'that the ballots with the following verification codes have in fact been counted: <span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">', recIDs, '</span></span>')
         } else {
-            verwriter.writep('<span style="line-height:150%;">Independently, an automatic verification procedure is being carried out to check',
+            verwriter.writep('<span style="line-height:150%;">Independently, an automatic verification procedure was just carried out to check',
                              'that the ballot with the following verification code has in fact been counted: <span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">', recIDs, '</span></span>')
         }
         console.log('Receipts to verify:', recIDs);
