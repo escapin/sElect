@@ -23,7 +23,7 @@ function selectBooth() {
     var config = JSON.parse(configRaw);
     // Manifest
     var manifest = JSON.parse(electionManifestRaw);
-    manifest.hash = cryptofunc.hash(electionManifestRaw).toLowerCase();
+    manifest.hash = cryptofunc.hash(electionManifestRaw);
     console.log('Election hash =', manifest.hash);
 
     var electionID = manifest.hash;
