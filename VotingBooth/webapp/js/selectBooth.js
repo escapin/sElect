@@ -43,13 +43,13 @@ function selectBooth() {
     // Create a new canvas element (not attached to the document)
     var verCodeCanvas = document.createElement('canvas');
     verCodeCanvas.setAttribute('width', '480');
-    verCodeCanvas.setAttribute('height', '130');
+    verCodeCanvas.setAttribute('height', '125');
 
     function verificationCode2DataURL(verificationCode, elID, elTitle) {
         // draw the verification code:
         var ctx = verCodeCanvas.getContext('2d');
         ctx.fillStyle = "white";
-        ctx.fillRect(0,0,650,130);
+        ctx.fillRect(0,0,650,125);
         ctx.fillStyle = "black";
         ctx.font = "16px helvetica";
         ctx.fillText('sElect verification code', 10, 25);
