@@ -72,7 +72,7 @@
                 $("#cs-status").addClass('error').text('does not respond');
               })
              .done(function castRequestDone(result) {  // we have some response
-                if (result.electionID.toUpperCase() === electionID) {
+                if (result.electionID === electionID) {
                     var status = result.status;
                     if (status==='closed')
                         status += ' (<a href="' +csURI+ '/result.msg">signed result</a>)'
@@ -94,7 +94,7 @@
                  .done(function castRequestDone(result) {  // we have some response
                     var fsURI = '<%= manifest.mixServers[j].URI %>';
                     var statusElemIdent = '#ms<%=j%>-status';
-                    if (result.electionID.toUpperCase() === electionID) {
+                    if (result.electionID === electionID) {
                         var status = result.status;
                         if (status==='result ready')
                             status += ' (<a href="' +fsURI+ '/result.msg">signed result</a>)'
