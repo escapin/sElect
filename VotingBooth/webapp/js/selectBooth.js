@@ -129,6 +129,9 @@ function selectBooth() {
         // The state is determined in a (too?) simple way, by
         // checking if the final server has ready result.
         //
+    	if(config.showOtp){
+    		document.getElementById('mock_info').innerHTML = "<br>(Since you're trying the demo, no email will be sent to you: You can also provide a fake one!)"
+    	}
         csStatus()
         .then(function (resultReady) {  
             if (resultReady) {
