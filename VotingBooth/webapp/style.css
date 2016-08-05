@@ -43,6 +43,7 @@ p.error {
 p.success {
     color: #080;
     font-weight: bold;
+    text-align: right;
 }
 
 div.scrollable {
@@ -136,6 +137,14 @@ div.body {
 
 div.info {
     font-weight: 300;
+}
+
+#border{
+	border-radius: 3px; 
+	padding: 3px 5px; 
+	border: 1px black solid;
+	display: inline-block;
+	margin-bottom: 0.5em;
 }
 
 .toright {
