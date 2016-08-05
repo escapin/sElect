@@ -468,7 +468,7 @@ function selectBooth() {
                     	
                     	document.getElementById("disp-title").innerHTML += '&nbsp&nbsp'+manifest.title;
                     	document.getElementById("disp-otp").innerHTML = '&nbsp&nbsp<b>'+result.otp+'</b>';
-                    	document.getElementById("disp-otp").innerHTML = '&nbsp&nbsp'+printableElID;
+                    	document.getElementById("disp-id").innerHTML = '&nbsp&nbsp'+printableElID;
                     	
                     	document.getElementById("showOtp").style.visibility = "visible";
                 		$("#closehelp").focus();
