@@ -2,7 +2,7 @@ var fs = require('fs');
 var manifest = require('./manifest');
 var config = require('../config');
 var result = require('./result');
-var printableElID = makeBreakable(manifest.hash.slice(0,40).toUpperCase()); // only the first 40 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
+var printableElID = makeBreakable(manifest.hash.slice(0,16).toUpperCase()); // only the first 16 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
 
 manifest.shortHash = manifest.hash.slice(0,6) + '...';
 

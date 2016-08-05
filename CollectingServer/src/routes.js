@@ -23,7 +23,7 @@ if (openElection)
     console.log('Empty list of voters => election is open (it ballots from everybody)')
 var listOfEligibleVoters = manifest.voters.map(function(k){ return k.email; });
 
-var printableElID = makeBreakable(manifest.hash.slice(0,40).toUpperCase()); // only the first 40 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
+var printableElID = makeBreakable(manifest.hash.slice(0,16).toUpperCase()); // only the first 16 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
 
 // Map of eligible voters
 var eligibleVoters = {};
