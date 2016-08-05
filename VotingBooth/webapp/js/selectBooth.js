@@ -27,7 +27,7 @@ function selectBooth() {
     console.log('Election hash =', manifest.hash);
 
     var electionID = manifest.hash;
-    var printableElID = makeBreakable(electionID.slice(0,40).toUpperCase()); // only the first 40 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
+    var printableElID = makeBreakable(electionID.slice(0,16).toUpperCase()); // only the first 16 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
     var electionQuestion = manifest.question ? manifest.question : "Please, make your choice:";
     var colServVerifKey = manifest.collectingServer.verification_key;
     // retrieve the encryption and verification keys of the mix servers from the manifest
@@ -466,8 +466,9 @@ function selectBooth() {
                     	console.log('OTP: ' + result.otp);
                     	otp = result.otp;
                     	
-                    	document.getElementById("disp-title").innerHTML += manifest.title;
+                    	document.getElementById("disp-title").innerHTML += '&nbsp&nbsp'+manifest.title;
                     	document.getElementById("disp-otp").innerHTML = '&nbsp&nbsp<b>'+result.otp+'</b>';
+                    	document.getElementById("disp-otp").innerHTML = '&nbsp&nbsp'+printableElID;
                     	
                     	document.getElementById("showOtp").style.visibility = "visible";
                 		$("#closehelp").focus();
@@ -568,7 +569,7 @@ function selectBooth() {
                         
                         // prepare and show the "ballot accepted" tab
                         var recid = receipt.userCode + receipt.receiptID.toUpperCase();
-                        var durl = verificationCode2DataURL(recid, printableElID, rawTitle.slice(0,40));
+                        var durl = verificationCode2DataURL(recid, printableElID, rawTitle.slice(0,16));
                         
                         recid = '<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipt.userCode, true)+'</span>' + receipt.receiptID.toUpperCase();                        
                         $('#verCodeLink').attr('href', durl);
