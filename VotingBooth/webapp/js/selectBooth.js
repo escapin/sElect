@@ -663,7 +663,7 @@ function selectBooth() {
     }
     
     
-    $('h1.title').html(manifest.title + '<div class="electionid">(Election Identifier: ' +printableElID+ ')</div>');
+    $('h1.title').html(manifest.title + '<div class="electionid">Election Identifier: ' +printableElID+ '</div>');
     $('h3.subtitle').html(manifest.description);
     $('#choice-list').html(optionsAsHTML());
     $('#question').html(electionQuestion);
