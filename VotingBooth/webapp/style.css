@@ -44,6 +44,7 @@ p.success {
     color: #080;
     font-weight: bold;
     text-align: right;
+    margin-top: -0.5em;
 }
 
 div.scrollable {
