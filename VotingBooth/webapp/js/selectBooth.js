@@ -500,7 +500,7 @@ function selectBooth() {
 
         $('#otp').fadeOut(FADE_TIME, function() {
         	$('#inp-code').val(''); // empty the code input field
-        	if(config.userChosenRandomness){
+        	if(manifest.userChosenRandomness){
         		// set to visible the user-randomness-info paragraph
         		// when voting procedure complete
         		document.getElementById('user-randomness-info').style.display='block';
