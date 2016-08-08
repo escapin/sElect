@@ -167,7 +167,7 @@ function fetchData(url, cont) {
         }
         else {
         	var info = 'Cannot fetch the page: ' + url + '\t\(' + err + ')';
-            cont(info);
+            //cont(info);
         }
     });
 
