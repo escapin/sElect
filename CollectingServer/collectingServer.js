@@ -65,6 +65,8 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json()); 
 app.use(express.static('./public')); // static content
 //app.use( morgan('*** :remote-addr [:date] :method :url :status / :referrer [:response-time ms]', {}) ); // logging
+var accessLogStream = fs.createWriteStream('./access.log', {flags: 'a'});
+app.use(morgan("*** :remote-addr [:date] :method :url :status / :referrer [:response-time ms]",{stream: accessLogStream}));
 //app.use('/admin/*', basicAuth('admin', config.serverAdminPassword)); // authentication for the admin panel only
 if(config.serverAdminPassword != ""){
 	app.use('/admin/*', basicAuth(function(username,password){

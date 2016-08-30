@@ -167,7 +167,7 @@ function fetchData(url, cont) {
         }
         else {
         	var info = 'Cannot fetch the page: ' + url + '\t\(' + err + ')';
-            //cont(info);
+            cont(info);
         }
     });
 
@@ -205,7 +205,7 @@ exports.fetchAndSaveData = function() {
 		    						  exports.parseFinalResult(data);
 		    				  }
 		    				  else {
-		    					console.log("** I) \t%s  (MixServer #%s)", err, k);
+		    					//console.log("** I) \t%s  (MixServer #%s)", err, k);
 		    				  }
 		    			  }
 		    		  }(j));

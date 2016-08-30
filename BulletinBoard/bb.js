@@ -124,7 +124,9 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true })); // body parser (important for POST request)
 app.use(express.static('./public')); // static content // was: __dirname + '/public'
 app.use(errorHandler({ dumpExceptions: true, showStack: true })); // error handling (not for production)
-app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
+//app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) );
+var accessLogStream = fs.createWriteStream('./access.log', {flags: 'a'});
+app.use(morgan(":remote-addr [:date] :method :url :status / :referrer ",{stream: accessLogStream}));
 
 
 // ROUTES
