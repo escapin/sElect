@@ -250,7 +250,7 @@ function selectBooth() {
                              'that the ballots with the following verification codes have in fact been counted: <br></span>', recIDs)
         } else {
             verwriter.writep('<span style="line-height:150%;">Independently, an automatic verification procedure was just carried out to check',
-                             'that the ballot with the following verification code has in fact been counted: <br></span>', recIDs)
+                             'that the ballot with the following verification code has in fact been counted: <br></span>', recIDs.replace('-', ''))
         }
         console.log('Receipts to verify:', recIDs);
 
