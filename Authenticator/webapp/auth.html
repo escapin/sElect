@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="pure/pure-min.css">
+    <link rel="stylesheet" href="custom-pure.css">
+    <link rel="stylesheet" href="style.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="pure/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="pure/grids-responsive-min.css">
+    <!--<![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        // Mock require
+        var require = function(moduleName) {
+            console.log('Module requested:', moduleName);
+            return { 'node-forge' : forge,
+                     './cryptofunc' : cryptofunc
+                   }[moduleName];
+        };
+    </script>
+    <script src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/forge.min.js"></script>
+    <script src="js/authenticate.js"></script>
+</head>
+<body class="pure-skin-mine">
+    <!-- --------------------------------------------------------------------------------- -->
+    <div class="container" id="welcome">
+    <div class="header">
+        Secure elections powered by <em>sElect</em>
+    </div>
+    <div class="body">
+        <h3 class="lead">Welcome to </h3>
+        <h1 class="title"> TITLE OF THE ELECTION <div class="electionid">ELECTION-ID</div> </h1>
+        <h3 class="subtitle"> DESCRIPTION </h3>
+        </h3>
+
+        <form class="pure-form" action="">
+            <fieldset>
+                <legend>Please provide your e-mail address to continue:</legend>
+                <div class="pure-g">
+                    <div class="pure-u-1 pure-u-md-2-3">
+                        <input id='inp-email' class="pure-input-1" type="email" size="50" placeholder="email">
+                        <div class="extra-info"> 
+                            We will send you a (one-time) password to this e-mail address 
+                            (to be used in the next step to cast your vote). 
+                        </div>
+                    </div>
+                    <div class="pure-u-1 pure-u-md-1-3 toright">
+                        <button id='submit-email' type="submit" class="pure-button pure-button-primary" disabled>Proceed to voting</button>
+                    </div>
+                </div>    
+            </fieldset>
+        </form>
+    </div>
+    </div>
+    <!-- --------------------------------------------------------------------------------- -->
+    <div class="container" id="otp">
+    <div class="header">
+        Secure elections powered by <em>sElect</em>
+    </div>
+    <div class="body">
+        <h1 class="title"> TITLE OF THE ELECTION </h1>
+
+        <h3> 
+            An e-mail with a one-time password (OTP) has been sent to you.
+        </h3>
+
+        <form class="pure-form" action="">
+            <fieldset>
+                <legend>Please copy the OTP from this e-mail and enter it in the field below </legend>
+                <div class="pure-g">
+                    <div class="pure-u-1 pure-u-md-2-3">
+                        <input id='inp-otp' class="pure-input-1"
+                        type="text" size="50" placeholder="one-time password (sent by e-mail)">
+                        <div class="extra-info"> 
+                            If you cannot find an e-mail with an OTP, please check your spam folder.
+                        </div>
+                    </div>
+                    <div class="pure-u-1 pure-u-md-1-3 toright">
+                        <button id='submit-otp' type="submit" class="pure-button pure-button-primary" disabled>Continue</button>
+                    </div>
+                </div>    
+            </fieldset>
+        </form>
+    </div>
+    </div>
+    <!-- --------------------------------------------------------------------------------- -->
+    <div class="container" id="error">
+    <div class="header">
+        Secure elections powered by <em>sElect</em>
+    </div>
+    <div class="body">
+        <h1 class="error"> Something went wrong! </h1>
+
+        <div id='errorMsg' class='error'>ERROR MESSAGE</div>
+
+        <form class="pure-form" action="">
+            <fieldset>
+                <button type="submit" class="pure-button
+                pure-button-secondary">Start over and try again</button>
+            </fieldset>
+        </form>
+    </div>
+    </div>
+    <!-- --------------------------------------------------------------------------------- -->
+    <div id="processing">
+        <img src="pic/processing.gif">
+    </div>
+	<!-- --------------------------------------------------------------------------------- -->
+	<div id="otp-display">
+    <div class="body">
+    	  <p>This OTP would be usually sent to your E-mail. Since this is a demo, please copy the following code:</p>
+    	  <p></p>
+          <p id='showing'>here we go!</p>       
+          <input id='reload' type="button" class="pure-button pure-button-primary" value="Ok"></input>
+     </div>
+	</div>
+</body>
+</html>
+<script type="text/javascript">
+    $(document).ready(authenticate);
+</script>
