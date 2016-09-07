@@ -14,3 +14,6 @@ config.json
 _data_*
 _configFiles_/
 VotingBooth/webapp/roboto/*.ttf
+#all logs
+*.log
+LOG/
