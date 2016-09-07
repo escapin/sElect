@@ -5,6 +5,7 @@
     "endTime": "2018-11-10 16:00 UTC+0000",
     "voters": [],
     "userChosenRandomness": true,
+    "separateAuthentication": true,
     "publishListOfVoters": false,
     "question": "",
     "choices": [
