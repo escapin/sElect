@@ -27,7 +27,7 @@ function selectBooth() {
     console.log('Election hash =', manifest.hash);
 
     var electionID = manifest.hash;
-    var printableElID = makeBreakable(electionID.slice(0,40).toUpperCase()); // only the first 40 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
+    var printableElID = makeBreakable(electionID.slice(0,16).toUpperCase()); // only the first 16 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
     var electionQuestion = manifest.question ? manifest.question : "Please, make your choice:";
     var colServVerifKey = manifest.collectingServer.verification_key;
     // retrieve the encryption and verification keys of the mix servers from the manifest
@@ -129,6 +129,9 @@ function selectBooth() {
         // The state is determined in a (too?) simple way, by
         // checking if the final server has ready result.
         //
+    	if(config.showOtp){
+    		document.getElementById('mock_info').innerHTML = "<br>(Since you're trying the demo, no email will be sent to you: So, you can provide a <em>fake</em> one as well!)";
+    	}
         csStatus()
         .then(function (resultReady) {  
             if (resultReady) {
@@ -241,13 +244,13 @@ function selectBooth() {
         }
 
         // Some receipts to verify
-        var recIDs = receipts.map(function (rec) {return '<span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(rec.userCode, true)+'</span>' + rec.receiptID.toUpperCase()}).join(', ');
+        var recIDs = receipts.map(function (rec) {return '<br>&nbsp&nbsp- <span id="border"><span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(rec.userCode, true)+'</span>' + rec.receiptID.toUpperCase()+'</span>'}).join('');
         if (receipts.length > 1) {
             verwriter.writep('<span style="line-height:150%;">Independently, an automatic verification procedure was just carried out to check',
-                             'that the ballots with the following verification codes have in fact been counted: <span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">', recIDs, '</span></span>')
+                             'that the ballots with the following verification codes have in fact been counted: <br></span>', recIDs)
         } else {
             verwriter.writep('<span style="line-height:150%;">Independently, an automatic verification procedure was just carried out to check',
-                             'that the ballot with the following verification code has in fact been counted: <span style="border-radius: 3px; padding: 3px 5px; border: 1px black solid;">', recIDs, '</span></span>')
+                             'that the ballot with the following verification code has in fact been counted: <br></span>', recIDs.replace('-', ''))
         }
         console.log('Receipts to verify:', recIDs);
 
@@ -463,8 +466,9 @@ function selectBooth() {
                     	console.log('OTP: ' + result.otp);
                     	otp = result.otp;
                     	
-                    	document.getElementById("disp-title").innerHTML += manifest.title;
+                    	document.getElementById("disp-title").innerHTML += '&nbsp&nbsp'+manifest.title;
                     	document.getElementById("disp-otp").innerHTML = '&nbsp&nbsp<b>'+result.otp+'</b>';
+                    	document.getElementById("disp-id").innerHTML = '&nbsp&nbsp'+printableElID;
                     	
                     	document.getElementById("showOtp").style.visibility = "visible";
                 		$("#closehelp").focus();
@@ -496,7 +500,7 @@ function selectBooth() {
 
         $('#otp').fadeOut(FADE_TIME, function() {
         	$('#inp-code').val(''); // empty the code input field
-        	if(config.userChosenRandomness){
+        	if(manifest.userChosenRandomness){
         		// set to visible the user-randomness-info paragraph
         		// when voting procedure complete
         		document.getElementById('user-randomness-info').style.display='block';
@@ -565,7 +569,7 @@ function selectBooth() {
                         
                         // prepare and show the "ballot accepted" tab
                         var recid = receipt.userCode + receipt.receiptID.toUpperCase();
-                        var durl = verificationCode2DataURL(recid, printableElID, rawTitle.slice(0,40));
+                        var durl = verificationCode2DataURL(recid, printableElID, rawTitle.slice(0,16));
                         
                         recid = '<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipt.userCode, true)+'</span>' + receipt.receiptID.toUpperCase();                        
                         $('#verCodeLink').attr('href', durl);
@@ -659,7 +663,7 @@ function selectBooth() {
     }
     
     
-    $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +printableElID+ ')</div>');
+    $('h1.title').html(manifest.title + '<div class="electionid">Election Identifier: ' +printableElID+ '</div>');
     $('h3.subtitle').html(manifest.description);
     $('#choice-list').html(optionsAsHTML());
     $('#question').html(electionQuestion);

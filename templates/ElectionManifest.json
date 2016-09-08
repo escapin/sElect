@@ -1,9 +1,10 @@
 {
     "title": "Students' Union Election",
     "description": "Election for the Chairperson of the Students' Union of the Computer Science Department.",
-    "startTime": "2014.01.01 15:00 GMT+0100",
-    "endTime": "2018.11.10 16:00 GMT+0100",
+    "startTime": "2014-01-01 15:00 UTC+0000",
+    "endTime": "2018-11-10 16:00 UTC+0000",
     "voters": [],
+    "userChosenRandomness": true,
     "publishListOfVoters": false,
     "question": "",
     "choices": [

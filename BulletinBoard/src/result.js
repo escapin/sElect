@@ -205,7 +205,7 @@ exports.fetchAndSaveData = function() {
 		    						  exports.parseFinalResult(data);
 		    				  }
 		    				  else {
-		    					console.log("** I) \t%s  (MixServer #%s)", err, k);
+		    					//console.log("** I) \t%s  (MixServer #%s)", err, k);
 		    				  }
 		    			  }
 		    		  }(j));

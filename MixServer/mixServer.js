@@ -57,7 +57,9 @@ app.set('views', './views');    // view engine and location of the views
 app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 app.use(express.static('./public')); // static content
-app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging
+//app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging
+var accessLogStream = fs.createWriteStream('./access.log', {flags: 'a'});
+app.use(morgan(":remote-addr [:date] :method :url :status / :referrer ",{stream: accessLogStream}));
 
 // ROUTES
 app.get('/', routes.statusPage);

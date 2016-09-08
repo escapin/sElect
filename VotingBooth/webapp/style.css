@@ -43,6 +43,8 @@ p.error {
 p.success {
     color: #080;
     font-weight: bold;
+    text-align: right;
+    margin-top: -0.5em;
 }
 
 div.scrollable {
@@ -89,6 +91,13 @@ div.extra-info {
     text-shadow: 0px 0px 1px #ccf;
 }
 
+legendsub {
+	color: #ef2929;
+    font-weight: 300;
+    font-size: 9pt;
+    text-shadow: 0px 0px 1px #ccf;
+}
+
 div.error {
     color: #a00;
     text-shadow: 0px 0px 1px #f66;
@@ -129,6 +138,14 @@ div.body {
 
 div.info {
     font-weight: 300;
+}
+
+#border{
+	border-radius: 3px; 
+	padding: 3px 5px; 
+	border: 1px black solid;
+	display: inline-block;
+	margin-bottom: 0.5em;
 }
 
 .toright {
