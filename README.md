@@ -12,7 +12,7 @@ Reliably Secure Software Systems (RS3) (https://www.spp-rs3.de).
 
 * Java JDK (tested with both openjdk-7 and oraclejdk-8).
 * Java Cryptography Extension (only for oraclejdk).
-* node.js and npm.
+* node.js and npm (tested on v4.3.1 and 1.4.21, respectively).
 * wget (used in the makefiles for getting the proper libraries).
 * python (used in the root makefile for configuring the mix servers).
 
