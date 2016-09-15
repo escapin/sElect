@@ -130,7 +130,7 @@ function selectBooth() {
         // checking if the final server has ready result.
         //
     	if(config.showOtp){
-    		document.getElementById('mock_info').innerHTML = "<br>(Since you're trying the demo, no email will be sent to you: So, you can provide a <em>fake</em> one as well!)";
+    		document.getElementById('mock_info').innerHTML = "<br>(Since you're trying the demo, no email will be sent to you: You can provide a <em>fake</em> one as well.)";
     	}
         csStatus()
         .then(function (resultReady) {  
