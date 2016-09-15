@@ -125,7 +125,7 @@ votingboothclean:
 	-rm VotingBooth/webapp/pure/grids-responsive-old-ie-min.css
 	-rm VotingBooth/webapp/pure/grids-responsive-min.css
 	-rm webapp/roboto/*.ttf
-	
+
 
 bbclean:	
 	-rm BulletinBoard/public/js/jquery-1.11.1.min.js
