@@ -105,7 +105,7 @@ function onStart(){
     }
     console.log();
     console.log();
-    console.log("Length of one ballot (the last one): " + ballotsArray[ballotsArray.length-1].length + " byte.");
+    console.log("Each ballot's length (the last one's length is taken): " + ballotsArray[ballotsArray.length-1].length + " byte.");
     
     console.log();
     console.log('************ Creating message with the ballots signed as by the Collecting Server');
