@@ -27,7 +27,7 @@ updatecryptokeys_mix:
 
 
 
-devenv: javabuild npminstall configs filescopy libdownload
+devenv: javabuild npminstall configs filescopy libdownload copydownloads
 
 javadownload:
 	-mkdir -p lib
@@ -99,7 +99,11 @@ libdownload:
 	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/W4wDsBUluyw0tK3tykhXEfesZW2xOQ-xsNqO47m55DA.ttf
 	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/OLffGBTaF0XFOW1gnuHF0Z0EAVxt0G0biEntp43Qt6E.ttf
 
-
+copydownloads:
+	cp -Rf VotingBooth/webapp/roboto Authenticator/webapp/
+	cp -Rf VotingBooth/webapp/pure Authenticator/webapp/
+	cp -f VotingBooth/webapp/js/jquery-1.11.1.min.js Authenticator/webapp/js/
+	cp -f VotingBooth/webapp/js/jquery-1.11.1.min.js CollectingServer/webapp/js/
 
 devclean: cleanElection javaclean npmclean votingboothclean bbclean configsclean
 
