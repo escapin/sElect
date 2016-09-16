@@ -15,7 +15,7 @@ function selectBooth_authenticator() {
     
 	// authenticate location
 	var config = JSON.parse(configRaw);
-    var authAddress = config.authenticate;
+    var authAddress = config.authenticator;
     var parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
     var parts = parse_url.exec( authAddress );
     var authDomain = parts[1]+':'+parts[2]+parts[3] ;
@@ -23,8 +23,13 @@ function selectBooth_authenticator() {
     if(tempAddr.length > 2){
     	tempAddr = tempAddr[2].split("/");
     	authDomain = authAddress.replace("/"+tempAddr[1], '');
-    	console.log(authDomain);
     }
+    document.getElementById("csFrame").src = config.csFrame;
+    var iframe = document.getElementById("csFrame").contentWindow;
+    var url = window.location.href;
+    console.log(url);
+    var isDone = window.location.search == "?done";
+    history.pushState("", "", url.replace("?done", ""));
     	
     // Voter and status
     var email = null;
@@ -39,6 +44,7 @@ function selectBooth_authenticator() {
     // Manifest
     var manifest = JSON.parse(electionManifestRaw);
     manifest.hash = cryptofunc.hash(electionManifestRaw);
+    manifest.showOtp = config.showOtp;
     console.log('Election hash =', manifest.hash);
 
     var electionID = manifest.hash;
@@ -150,6 +156,17 @@ function selectBooth_authenticator() {
                 console.log('Result ready. We should verify now');
                 showTab('#verification');
                 doVerification();
+            }
+            else if(isDone){
+            	if(manifest.userChosenRandomness){
+            		// set to visible the user-randomness-info paragraph
+            		// when voting procedure complete
+            		document.getElementById('user-randomness-info').style.display='block';
+            		showTab('#randomness');	
+            	}
+            	else{
+            		showTab('#choice');
+            	}
             }
             else {
                 console.log('Result not ready. Go to the voting.');
@@ -446,15 +463,8 @@ function selectBooth_authenticator() {
         if (activeTabId!=='#welcome') return false;
         activeTabId=''; 
         $('#welcome').hide();
-    	if(manifest.userChosenRandomness){
-    		// set to visible the user-randomness-info paragraph
-    		// when voting procedure complete
-    		document.getElementById('user-randomness-info').style.display='block';
-    		showTab('#randomness');	
-    	}
-    	else{
-    		showTab('#choice');
-    	}
+    	iframe.postMessage({manifest: manifest}, "*");
+    	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame);
     };
     
     
@@ -490,10 +500,7 @@ function selectBooth_authenticator() {
             receipt = voter.createBallot(choice, randomCode);
             // console.log('RECEIPT:', receipt);
             showProgressIcon();
-            ready = true;
-            if(loaded){
-            	winAuth.postMessage(receipt,"*");
-            }
+            iframe.postMessage({ballot: receipt.ballot}, "*");
         });
 
         return false; // prevents any further submit action
@@ -522,7 +529,16 @@ function selectBooth_authenticator() {
     //////////////////////////////////////////////////////////////////////////////
     /// OTHER HANDLERS 
 
-
+    function enableWhenNotEmpty(button, input) {
+        return function() {
+            var v = input.val();
+            if( v==='' ) 
+                button.prop('disabled', true);
+            else 
+                button.prop('disabled', null);
+        };
+    }
+    
     function whenChoiceChanges() {
         // The selected item should be displayed in a stronger way. So:
         // Reset 'checked' class and add notchecked class for all the labels in the form
@@ -556,7 +572,7 @@ function selectBooth_authenticator() {
             if (receiptValid) {
                 storeReceipt(receipt);
                 // prepare and show the "ballot accepted" tab
-                var recid = receipt.receiptID.toUpperCase();
+                var recid = receipt.userCode + receipt.receiptID.toUpperCase();
                 var durl = verificationCode2DataURL(recid, printableElID);
                 $('#verCodeLink').attr('href', durl);
                 $('#receipt-id').text(recid);
@@ -567,13 +583,7 @@ function selectBooth_authenticator() {
             }
         }
     }
-
     
-    var winAuth;
-    
-    this.winOpen = function(){
-        winAuth = window.open(authAddress, "Login", "width=800,height=600");
-    }
 
     //////////////////////////////////////////////////////////////////////////////
     /// INITIALISATION AND BINDING
@@ -612,6 +622,7 @@ function selectBooth_authenticator() {
     $('#randomness form').submit(onSubmitRandomCode);
     $('#choice form').submit(onSubmitChoice);
     $('#error form').submit(onSubmitError);
+    $('#inp-code').on('input', enableWhenNotEmpty($('#submit-code'), $('#inp-code')));
     $('#verification form').submit(goToBB);
     $('input[name="choice"]').change(whenChoiceChanges);
     
@@ -629,17 +640,8 @@ function selectBooth_authenticator() {
     //listen to authentication booth
     window.addEventListener('message',function(event) {
     	console.log('received response from ' + event.origin + ' : ',event.data);
-    	if(event.origin !== authDomain) return;
-    	if(event.data === 'loaded'){
-    		console.log("go");
-    		loaded = true;
-    		winAuth.postMessage(manifest, "*");
-    		if(ready){
-    			winAuth.postMessage(receipt,"*");
-    		}
-    	}
-    	else{
-    		onAuthDone(event.data);
+    	if(event.data.hasOwnProperty("result")){
+    		onAuthDone(event.data.result);
     	}
     },false);
 }

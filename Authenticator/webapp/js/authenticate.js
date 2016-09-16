@@ -21,8 +21,12 @@ function authenticate(){
     var electionID = null;
     var printableElID = null; // electionID.slice(0,6) + '...';
 	
-    var votingBooth = null;
-	
+    var votingBooth = document.referrer;
+    var iframePath = decodeURIComponent(window.location.search.substring(1));
+	document.getElementById("csFrame").src = iframePath;
+	var iframe = document.getElementById("csFrame").contentWindow;
+	var url = window.location.href;
+	history.pushState("", "", url.replace(window.location.search, ""));
     //////////////////////////////////////////////////////////////////////////////
     /// AUXILIARY FUNCTIONS
 
@@ -47,8 +51,9 @@ function authenticate(){
     
 	function initiate(){
 	    // Election data
-	    $('h1.title').html(manifest.title + '<div class="electionid">(election identifier: ' +printableElID+ ')</div>');
-	    $('h3.subtitle').text(manifest.description);
+		if(manifest.showOtp){
+    		document.getElementById('mock_info').innerHTML = "<br>(Since you're trying the demo, no email will be sent to you: You can provide a <em>fake</em> one as well.)";
+    	}
 		showTab('#welcome');
 	}
 
@@ -100,12 +105,21 @@ function authenticate(){
                     showError("Server's responce: " + result.descr);
                 }
                 else {
-                    //if(result.otp != null){
-                    	//alerting(result.otp);
-                    //}
                     // Show the next window (OTP)
                     $('#inp-otp').val(''); // emtpy the otp input field
                     showTab('#otp');
+                    
+                    if(result.otp && manifest.showOtp){
+                    	console.log('OTP: ' + result.otp);
+                    	otp = result.otp;
+                    	
+                    	document.getElementById("disp-title").innerHTML += '&nbsp&nbsp'+manifest.title;
+                    	document.getElementById("disp-otp").innerHTML = '&nbsp&nbsp<b>'+result.otp+'</b>';
+                    	document.getElementById("disp-id").innerHTML = '&nbsp&nbsp'+printableElID;
+                    	
+                    	document.getElementById("showOtp").style.visibility = "visible";
+                		$("#close-otp").focus();
+                    }
                 }
               })
              .fail(function otpRequestFailed() {
@@ -114,6 +128,12 @@ function authenticate(){
         });
         return false; // prevents any further submit action
     };
+    
+	$("#close-otp").click(function() {
+		$('#inp-otp').val(otp);
+		document.getElementById("showOtp").style.visibility = "hidden";
+		$("#submit-otp").prop('disabled', null);
+	});
 
     function onSubmitOTP(event) {
         if (activeTabId!=='#otp') return false;
@@ -128,17 +148,10 @@ function authenticate(){
         $('#otp').fadeOut(FADE_TIME, function() {
         	
         	showProgressIcon();
-            // Make an (ajax) cast request:
-            $.post(manifest.collectingServer.URI+"/cast", {'email': email, 'otp': otp, 'electionID': electionID, 'ballot': receipt.ballot})
-             .fail(function otpRequestFailed() {  // request failed
-                showError('Cannot connect with the server');
-              })
-             .done(function castRequestDone(result) {  // we have some response
-                parent.window.opener.postMessage(result, votingBooth);
-                window.close();
-              });
-
         	
+        	iframe.postMessage({submitCS: {'email': email, 'otp': otp, 'electionID': electionID, 'ballot': ""}}, "*");        	
+            window.location.replace(votingBooth+"?done");
+
         });
         return false; // prevents any further submit action
     }
@@ -169,18 +182,9 @@ function authenticate(){
         };
     }
 	
-	function alerting(data){
-		$('#showing').html(data);
-		document.getElementById("otp-display").style.visibility = "visible";
-	}
-
-	$("#reload").click(function() {
-		document.getElementById("otp-display").style.visibility = "hidden";
-	});
-	
     //////////////////////////////////////////////////////////////////////////////
     /// INITIALISATION AND BINDING
-
+	
     // Event handlers binding
     $('#welcome form').submit(onSubmitWelcome);
     $('#otp form').submit(onSubmitOTP);
@@ -195,32 +199,18 @@ function authenticate(){
     
     //respond to events
     window.addEventListener('message',function(event) {
-    	//if(event.origin !== 'http://localhost') return;
-    	if(event.data.ballot !== undefined && event.origin === votingBooth){
-    		var origConf = confirm("If your VotingBooth was " + event.origin + " proceed, otherwise cancel.")
-    		if (origConf){
-    			console.log('message received from ' + event.origin +':  ' + event.data.ballot,event);
-    			receipt = event.data;
-    		}
-    		else{
-    			alert('Wrong VotingBooth, window will close');
-    			window.close();
-    		}
-    	}
-    	else if(event.data.ballot !== undefined){
-			alert("Ballot and Election ID do not match, two different VotingBooths");
-			window.close();
-    	}
-    	else if(event.data.title !== undefined){
-    		votingBooth = event.origin;
-    		console.log('Election hash = ' + event.data.hash);
-    		manifest = event.data;
+    	console.log("recieved: "+event.data);
+    	if(event.data.hasOwnProperty("manifest")){
+    		manifest = event.data.manifest;
+    		console.log('Election hash = ' + manifest.hash);
     		electionID = manifest.hash;
     		printableElID = makeBreakable(electionID.toUpperCase()); // electionID.slice(0,6) + '...';
-    	    initiate(); // shows welcome tab
+    	    $('h1.title').html(manifest.title + '<div class="electionid">Election Identifier: ' +printableElID+ '</div>');
+    	    $('h3.subtitle').html(manifest.description);
+    		initiate(); // shows welcome tab
     	}
     },false);
-    console.log('addressing parent');
-    parent.window.opener.postMessage('loaded', "*");    
-
+    document.getElementById("csFrame").addEventListener("load", function() {
+    	iframe.postMessage('loaded', "*");  
+    });
 }
