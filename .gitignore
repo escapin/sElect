@@ -17,3 +17,8 @@ VotingBooth/webapp/roboto/*.ttf
 #all logs
 *.log
 LOG/
+#copied downloads
+Authenticator/webapp/roboto
+Authenticator/webapp/pure
+*jquery-1.11.1.min.js
+
