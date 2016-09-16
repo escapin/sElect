@@ -471,7 +471,7 @@ function selectBooth() {
                     	document.getElementById("disp-id").innerHTML = '&nbsp&nbsp'+printableElID;
                     	
                     	document.getElementById("showOtp").style.visibility = "visible";
-                		$("#closehelp").focus();
+                		$("#close-otp").focus();
                     }
                 }
               })
