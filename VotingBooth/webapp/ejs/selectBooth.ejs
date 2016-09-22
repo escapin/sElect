@@ -169,18 +169,22 @@ function selectBooth() {
                 doVerification();
             }
             else if(isDone){
-            	<% if(randomness){ -%>
+            <% if(randomness){ -%>
         		// set to visible the user-randomness-info paragraph
         		// when voting procedure complete
         		document.getElementById('user-randomness-info').style.display='block';
         		showTab('#randomness');	
-            	<% }else{ -%>
+            <% }else{ -%>
             	showTab('#choice');
-            	<% } -%>
+            <% } -%>
             }
             else {
                 console.log('Result not ready. Go to the voting.');
-                showTab('#welcome');
+                showTab('#redirect');
+                document.getElementById("csFrame").addEventListener("load", function() {
+                	iframe.postMessage({manifest: manifest}, "*");
+                	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
+                });
             }
         })
         .catch(function (err) {
