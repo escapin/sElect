@@ -840,7 +840,7 @@ function selectBooth() {
     $('#error form').submit(onSubmitError);
     $('#inp-code').on('input', enableWhenNotEmpty($('#submit-code'), $('#inp-code')));
     $('#verification form').submit(goToBB);
-    $('input[name="choice"]').change(whenChoiceChanges);
+    $('input[name="choice"]').click(whenChoiceChanges);
     
     /* Advanced Button */
 	$("#govote").click(function() {
