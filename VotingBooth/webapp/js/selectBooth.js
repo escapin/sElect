@@ -18,6 +18,7 @@ function selectBooth() {
     var otp = null;
     var randomCode = null;
     var choice = null;
+    var choices = [];
 
     // randomness and show OTP stored here
     var config = JSON.parse(configRaw);
@@ -620,11 +621,31 @@ function selectBooth() {
     }
 
     function whenChoiceChanges() {
-        // The selected item should be displayed in a stronger way. So:
-        // Reset 'checked' class and add notchecked class for all the labels in the form
-        $("#choice-form label").addClass('notchecked').removeClass('checked');
-        // And do the oposite for the selected one
-        $("#choice-form label[for='" + this.id + "']").addClass('checked').removeClass('notchecked');
+    	
+    	var selectedChoice = "#choice-form label[for='" + this.id + "']";
+
+    	if($(selectedChoice).hasClass("checked")){
+        	//remove checked and add notchecked class
+        	$(selectedChoice).removeClass('checked');
+        	var index = choices.indexOf(this.id);
+        	choices.splice(index, 1)
+            $("#choice-form label").removeClass('notchecked');
+        }
+        else if(choices.length < numberOfVotes){
+        	//remove notchecked and add checked class if still votes open
+        	$(selectedChoice).addClass('checked').removeClass('notchecked');
+        	choices.push(this.id);
+        }
+        else{
+        	return false;
+        }
+        if(choices.length >= numberOfVotes){
+            $("#choice-form label").addClass('notchecked');
+            for(var i = 0; i < choices.length; i++){
+            	$("#choice-form label[for='" + choices[i] + "']").removeClass('notchecked');
+            }
+        }
+        //console.log(choices);
 
         // Update the status of the submit button (active only when something is selected)
         if($('input[name="choice"]:checked').length == 0) { // no choice selected 
@@ -633,6 +654,7 @@ function selectBooth() {
         else { // some choice selected
             $('#submit-choice').prop('disabled', null);
         }
+        return true;
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -678,7 +700,7 @@ function selectBooth() {
     $('#inp-otp').on('input', enableWhenNotEmpty($('#submit-otp'), $('#inp-otp')));
     $('#inp-code').on('input', enableWhenNotEmpty($('#submit-code'), $('#inp-code')));
     $('#verification form').submit(goToBB);
-    $('input[name="choice"]').change(whenChoiceChanges);
+    $('input[name="choice"]').click(whenChoiceChanges);
     if (isIE()) {
         $('#verCodeLink').hide();
     }
