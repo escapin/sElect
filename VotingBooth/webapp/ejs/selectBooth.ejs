@@ -526,13 +526,15 @@ function selectBooth() {
         // Fetch the choice from the form
         var option = $('input[name="choice"]:checked').attr('id');
         choice = + option.slice('option-'.length);
-
+        for(var i = 0; i < choices.length; i++){
+        	choices[i] = choices[i].slice('option-'.length);
+        }
         // Make the active tab disappear
         $('#choice').fadeOut(FADE_TIME, function() {
 
             // Create the ballot
-            console.log('CREATING BALLOT FOR:', randomCode, choice);
-            receipt = voter.createBallot(choice, randomCode);
+            console.log('CREATING BALLOT FOR:', randomCode, choices);
+            receipt = voter.createBallot(choices, randomCode);
             // console.log('RECEIPT:', receipt);
             showProgressIcon();
             iframe.postMessage({ballot: receipt.ballot}, "*");
