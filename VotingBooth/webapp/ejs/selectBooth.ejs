@@ -629,7 +629,7 @@ function selectBooth() {
 		document.getElementById("showOtp").style.visibility = "hidden";
 		$("#submit-otp").prop('disabled', null);
 	});
-    
+<% } -%>
     function onSubmitOTP(event) {
         if (activeTabId!=='#otp') return false;
         activeTabId=''; 
@@ -711,7 +711,6 @@ function selectBooth() {
 
         return false; // prevents any further submit action
     }
-<% } -%>
 <% } -%>
     
     function onSubmitRandomCode(event) {
