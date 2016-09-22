@@ -138,6 +138,8 @@ exports.parseFinalResult = function(signedFinalResult) {
     	}
     	else 
     		console.log('ERROR: Wrong verification code format');
+    	
+    	// TODO: add maximum number of votes per voter (currently only hardcoded in selectbooth.js
     	var userChoices = "";
     	for(var i=0; i < choices.length; i++){
     		userChoices = userChoices + manifest.choices[choices[i]]+", ";
