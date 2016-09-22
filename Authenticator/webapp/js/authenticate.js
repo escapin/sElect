@@ -204,7 +204,7 @@ function authenticate(){
     		manifest = event.data.manifest;
     		console.log('Election hash = ' + manifest.hash);
     		electionID = manifest.hash;
-    		printableElID = makeBreakable(electionID.toUpperCase()); // electionID.slice(0,6) + '...';
+    		printableElID = makeBreakable(electionID.slice(0,16).toUpperCase()); // electionID.slice(0,6) + '...';
     	    $('h1.title').html(manifest.title + '<div class="electionid">Election Identifier: ' +printableElID+ '</div>');
     	    $('h3.subtitle').html(manifest.description);
     		initiate(); // shows welcome tab
