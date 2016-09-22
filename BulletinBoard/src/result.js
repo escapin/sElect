@@ -120,9 +120,11 @@ exports.parseFinalResult = function(signedFinalResult) {
         }
     	var choice_verifCode = p.second;
     	p = crypto.deconcatenate(choice_verifCode);
-    	var choice = crypto.hexStringToInt(p.first);
     	var verificationCode = p.second;
-    	
+    	var choices = p.first.match(/\d{1,8}/g);
+    	for(var i=0; i < choices.length; i++){
+    		choices[i] = crypto.hexStringToInt(choices[i]);
+    	}
     	// Verification code
     	p = crypto.deconcatenate(verificationCode);
     	var receiptID;
@@ -136,15 +138,23 @@ exports.parseFinalResult = function(signedFinalResult) {
     	}
     	else 
     		console.log('ERROR: Wrong verification code format');
+    	var userChoices = "";
+    	for(var i=0; i < choices.length; i++){
+    		userChoices = userChoices + manifest.choices[choices[i]]+", ";
+    	}
+    	userChoices = userChoices.substring(0, userChoices.length-2);
     	
-    	t.push({userCode: userCode, receiptID: receiptID, vote: manifest.choices[choice]});
+    	t.push({userCode: userCode, receiptID: receiptID, vote: userChoices});
     	if(userCode !== '')
-    		console.log(userCode + "\t" + receiptID + "\t" + choice);
+    		console.log(userCode + "\t" + receiptID + "\t" + userChoices);
     	else
-    		console.log(receiptID + "\t" + choice);
+    		console.log(receiptID + "\t" + userChoices);
     	
     	// add one vote for choice 
-        ++ccount[choice];
+    	for(var i=0; i < choices.length; i++){
+    		++ccount[choices[i]];
+    	}
+        
     }
     
     // format the summary (number votes for different candidates) 
