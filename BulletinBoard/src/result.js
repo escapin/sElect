@@ -141,7 +141,7 @@ exports.parseFinalResult = function(signedFinalResult) {
     	
     	// TODO: add maximum number of votes per voter (currently only hardcoded in selectbooth.js
     	var userChoices = "";
-    	for(var i=0; i < choices.length; i++){
+    	for(var i=0; i < choices.length && i < manifest.maxChoicesPerVoter; i++){
     		userChoices = userChoices + manifest.choices[choices[i]]+", ";
     	}
     	userChoices = userChoices.substring(0, userChoices.length-2);
@@ -153,7 +153,7 @@ exports.parseFinalResult = function(signedFinalResult) {
     		console.log(receiptID + "\t" + userChoices);
     	
     	// add one vote for choice 
-    	for(var i=0; i < choices.length; i++){
+    	for(var i=0; i < choices.length && manifest.maxChoicesPerVoter; i++){
     		++ccount[choices[i]];
     	}
         

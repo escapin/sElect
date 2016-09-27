@@ -36,9 +36,7 @@ function selectBooth() {
     var email = null;
     var otp = null;
     var randomCode = null;
-    var choice = null;
     var choices = [];
-    var numberOfVotes = 3;
     var loaded = false;
 	var ready = false;
 <% }else{ -%>
@@ -46,9 +44,7 @@ function selectBooth() {
     var email = null;
     var otp = null;
     var randomCode = null;
-    var choice = null;
     var choices = [];
-    var numberOfVotes = 3;
 <% } -%>
     
  // randomness and show OTP stored here
@@ -70,6 +66,7 @@ function selectBooth() {
     var mixServVerifKeys = manifest.mixServers.map(function (ms) { return ms.verification_key; })
     // create the voter object
     var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
+    var maxChoicesPerVoter = manifest.maxChoicesPerVoter;
 
     
     //////////////////////////////////////////////////////////////////////////////
@@ -525,7 +522,6 @@ function selectBooth() {
 
         // Fetch the choice from the form
         var option = $('input[name="choice"]:checked').attr('id');
-        choice = + option.slice('option-'.length);
         for(var i = 0; i < choices.length; i++){
         	choices[i] = choices[i].slice('option-'.length);
         }
@@ -663,8 +659,10 @@ function selectBooth() {
 
         // Fetch the choice from the form
         var option = $('input[name="choice"]:checked').attr('id');
-        choice = + option.slice('option-'.length);
-
+        for(var i = 0; i < choices.length; i++){
+        	choices[i] = choices[i].slice('option-'.length);
+        }
+        
         // Make the active tab disappear
         $('#choice').fadeOut(FADE_TIME, function() {
 
@@ -775,7 +773,7 @@ function selectBooth() {
         	choices.splice(index, 1)
             $("#choice-form label").removeClass('notchecked');
         }
-        else if(choices.length < numberOfVotes){
+        else if(choices.length < maxChoicesPerVoter){
         	//remove notchecked and add checked class if still votes open
         	$(selectedChoice).addClass('checked').removeClass('notchecked');
         	choices.push(this.id);
@@ -783,7 +781,7 @@ function selectBooth() {
         else{
         	return false;
         }
-        if(choices.length >= numberOfVotes){
+        if(choices.length >= maxChoicesPerVoter){
             $("#choice-form label").addClass('notchecked');
             for(var i = 0; i < choices.length; i++){
             	$("#choice-form label[for='" + choices[i] + "']").removeClass('notchecked');
