@@ -192,7 +192,11 @@ function selectBooth() {
             console.log('Problem with the final server:', err)
             // TODO: what to do in this case (the final server is
             // down or it works for a different election ID)
-            showTab('#welcome'); // for now, we just go to voting
+            showTab('#redirect');	// for now, we just go to voting
+            document.getElementById("csFrame").addEventListener("load", function() {
+            	iframe.postMessage({manifest: manifest}, "*");
+            	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
+            }); 
         });
 
     }
@@ -566,6 +570,23 @@ function selectBooth() {
             }
         }
     }
+    
+    function onSubmitError(event) {
+        if (activeTabId!=='#error') return false;
+        activeTabId=''; 
+
+        // make the active tab disappear
+        $('#error').fadeOut(FADE_TIME, function() {
+            // start new
+        	showTab('#redirect');
+            document.getElementById("csFrame").addEventListener("load", function() {
+            	iframe.postMessage({manifest: manifest}, "*");
+            	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
+            });
+        });
+        return false; // prevents any further submit action
+    }
+    
 <% }else{ -%>
     function onSubmitWelcome(event) 
     {
@@ -711,6 +732,19 @@ function selectBooth() {
 
         return false; // prevents any further submit action
     }
+    
+    function onSubmitError(event) {
+        if (activeTabId!=='#error') return false;
+        activeTabId=''; 
+
+        // make the active tab disappear
+        $('#error').fadeOut(FADE_TIME, function() {
+            // show the welcome tab
+            showTab('#welcome');
+        });
+        return false; // prevents any further submit action
+    }
+    
 <% } -%>
     
     function onSubmitRandomCode(event) {
@@ -725,18 +759,6 @@ function selectBooth() {
         //console.log("Random Code: ", randomCode);
         $('#randomness').fadeOut(FADE_TIME, function() {
         	showTab('#choice');
-        });
-        return false; // prevents any further submit action
-    }
-    
-    function onSubmitError(event) {
-        if (activeTabId!=='#error') return false;
-        activeTabId=''; 
-
-        // make the active tab disappear
-        $('#error').fadeOut(FADE_TIME, function() {
-            // show the welcome tab
-            showTab('#welcome');
         });
         return false; // prevents any further submit action
     }
