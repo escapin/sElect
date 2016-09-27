@@ -7,6 +7,7 @@
     "userChosenRandomness": true,
     "separateAuthentication": true,
     "publishListOfVoters": false,
+    "maxChoicesPerVoter": 3,
     "question": "",
     "choices": [
 	"John Stevens",
