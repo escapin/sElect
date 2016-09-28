@@ -182,7 +182,7 @@ function selectBooth() {
             else {
                 console.log('Result not ready. Go to the voting.');
                 showTab('#redirect');
-                document.getElementById("csFrame").bindReady(function() {
+                document.getElementById("csFrame").addEventListener("load", function() {
                 	iframe.postMessage({manifest: manifest}, "*");
                 	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
                 });
