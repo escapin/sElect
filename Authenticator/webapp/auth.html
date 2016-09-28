@@ -14,17 +14,8 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 	<meta http-equiv="Pragma" content="no-cache"/>
 	<meta http-equiv="Expires" content="0"/>
-    <script>
-        // Mock require
-        var require = function(moduleName) {
-            console.log('Module requested:', moduleName);
-            return { 'node-forge' : forge,
-                     './cryptofunc' : cryptofunc
-                   }[moduleName];
-        };
-    </script>
+
     <script src="js/jquery-1.11.1.min.js"></script>
-    <script src="js/forge.min.js"></script>
     <script src="js/authenticate.js"></script>
 </head>
 <body class="pure-skin-mine">
