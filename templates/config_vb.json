@@ -1,3 +1,5 @@
 {
-    "showOtp": true
+    "showOtp": true,
+    "seperateAuthentication": false,
+    "userChosenRandomness": false
 }

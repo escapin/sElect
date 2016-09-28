@@ -182,7 +182,7 @@ function selectBooth() {
             else {
                 console.log('Result not ready. Go to the voting.');
                 showTab('#redirect');
-                document.getElementById("csFrame").bindReady(function() {
+                document.getElementById("csFrame").addEventListener("load", function() {
                 	iframe.postMessage({manifest: manifest}, "*");
                 	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
                 });
@@ -739,8 +739,8 @@ function selectBooth() {
         $('#choice').fadeOut(FADE_TIME, function() {
 
             // Create the ballot
-            console.log('CREATING BALLOT FOR:', email, randomCode, otp, choice);
-            var receipt = voter.createBallot(choice, randomCode);
+            console.log('CREATING BALLOT FOR:', email, randomCode, otp, choices);
+            var receipt = voter.createBallot(choices, randomCode);
             // console.log('RECEIPT:', receipt);
 
             showProgressIcon();
