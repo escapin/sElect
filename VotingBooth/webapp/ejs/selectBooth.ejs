@@ -13,7 +13,9 @@ function selectBooth() {
     var activeTabId = null;
     // var activeTabId = "#welcome";
     
-<% if(seperateAuthentication){ -%>
+<%
+if(seperateAuthentication){
+-%>
 	// authenticate location
 	var config = JSON.parse(configRaw);
     var authAddress = config.authenticator;
@@ -39,22 +41,30 @@ function selectBooth() {
     var choices = [];
     var loaded = false;
 	var ready = false;
-<% }else{ -%>
+<%
+}else{
+-%>
     // Voter and status
     var email = null;
     var otp = null;
     var randomCode = null;
     var choices = [];
-<% } -%>
+<%
+}
+-%>
     
- // randomness and show OTP stored here
+    // randomness and show OTP stored here
     var config = JSON.parse(configRaw);
     // Manifest
     var manifest = JSON.parse(electionManifestRaw);
     manifest.hash = cryptofunc.hash(electionManifestRaw);
-<% if(seperateAuthentication){ -%>
+<%
+if(seperateAuthentication){
+-%>
     manifest.showOtp = config.showOtp;
-<% } -%>
+<%
+}
+-%>
     console.log('Election hash =', manifest.hash);
 
     var electionID = manifest.hash;
@@ -152,7 +162,9 @@ function selectBooth() {
     //////////////////////////////////////////////////////////////////////////////
     /// INITIATE BOOTH
     
-<% if(seperateAuthentication){ -%>
+<%
+if(seperateAuthentication){
+-%>
     function initiateBooth() {
         // Determine the status of the system: (not-yet) open/closed, 
         // by querying the final mix server.
@@ -200,7 +212,9 @@ function selectBooth() {
         });
 
     }
-<% }else{ -%>
+<%
+}else{
+-%>
     function initiateBooth() {
         // Determine the status of the system: (not-yet) open/closed, 
         // by querying the final mix server.
@@ -232,7 +246,9 @@ function selectBooth() {
             showTab('#welcome'); // for now, we just go to voting
         });
     }
-<% } -%>
+<%
+}
+-%>
     
     
  // Returns a promise of the state of the final mix server
@@ -510,7 +526,9 @@ function selectBooth() {
         $('#processing').fadeIn(FADE_TIME*2);
     }
     
-<% if(seperateAuthentication){ -%>
+<%
+if(seperateAuthentication){
+-%>
     function onSubmitWelcome() 
     {
         if (activeTabId!=='#welcome') return false;
@@ -585,7 +603,9 @@ function selectBooth() {
         return false; // prevents any further submit action
     }
 
-<% }else{ -%>
+<%
+}else{
+-%>
     function onSubmitWelcome(event) 
     {
     	if (activeTabId!=='#welcome') return false;
@@ -743,7 +763,9 @@ function selectBooth() {
         return false; // prevents any further submit action
     }
     
-<% } -%>
+<%
+}
+-%>
     
     function onSubmitRandomCode(event) {
     	if(activeTabId!=='#randomness') return false;
@@ -854,7 +876,9 @@ function selectBooth() {
     
     
     
-<% if(seperateAuthentication){ -%>
+<%
+if(seperateAuthentication){
+-%>
     // Event handlers binding
     $('#randomness form').submit(onSubmitRandomCode);
     $('#choice form').submit(onSubmitChoice);
@@ -881,7 +905,9 @@ function selectBooth() {
     		onAuthDone(event.data.result);
     	}
     },false);
-<% }else{ -%>
+<%
+}else{
+-%>
     // Event handlers binding
     $('#welcome form').submit(onSubmitWelcome);
     $('#otp form').submit(onSubmitOTP);
@@ -898,5 +924,7 @@ function selectBooth() {
     }
     showProgressIcon();
     initiateBooth(); // checks the status and opens the voting or verification tab
-<% } -%>
+<%
+}
+-%>
 }
