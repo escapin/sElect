@@ -148,7 +148,7 @@ function authenticate(){
         	
         	showProgressIcon();
         	
-        	iframe.postMessage({submitCS: {'email': email, 'otp': otp, 'electionID': electionID, 'ballot': ""}}, "*");        	
+        	iframe.postMessage({credentials: {'email': email, 'otp': otp}}, "*");        	
             window.location.replace(votingBooth+"?done");
 
         });
