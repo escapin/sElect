@@ -739,8 +739,8 @@ function selectBooth() {
         $('#choice').fadeOut(FADE_TIME, function() {
 
             // Create the ballot
-            console.log('CREATING BALLOT FOR:', email, randomCode, otp, choice);
-            var receipt = voter.createBallot(choice, randomCode);
+            console.log('CREATING BALLOT FOR:', email, randomCode, otp, choices);
+            var receipt = voter.createBallot(choices, randomCode);
             // console.log('RECEIPT:', receipt);
 
             showProgressIcon();
