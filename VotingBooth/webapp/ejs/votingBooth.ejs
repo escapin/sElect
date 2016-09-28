@@ -36,7 +36,9 @@
 </head>
 <body class="pure-skin-mine">
     <!-- --------------------------------------------------------------------------------- -->
-<% if(!seperateAuthentication) { -%>
+<%
+if(!seperateAuthentication) {
+-%>
     <div class="container" id="welcome">
     <div class="header">
         Secure elections powered by <em>sElect</em>
@@ -69,7 +71,9 @@
         </form>
     </div>
     </div>
-<% }else{ -%>
+<%
+}else{
+-%>
     <div class="container" id="redirect">
     <div class="header">
         Secure elections powered by <em>sElect</em>
@@ -87,9 +91,13 @@
         </form>
     </div>
     </div>
-<% } -%>
+<%
+}
+-%>
     <!-- --------------------------------------------------------------------------------- -->
-<% if(!seperateAuthentication) { -%>
+<%
+if(!seperateAuthentication) {
+-%>
     <div class="container" id="otp">
     <div class="header">
         Secure elections powered by <em>sElect</em>
@@ -121,8 +129,12 @@
     </div>
     </div>
     <!-- --------------------------------------------------------------------------------- -->
-<% } -%>
-<% if(randomness) { -%>
+<%
+}
+-%>
+<%
+if(randomness) {
+-%>
     <div class="container" id="randomness">
     <div class="header">
         Secure elections powered by <em>sElect</em>
@@ -149,7 +161,9 @@
     </div>
     </div>
     <!-- --------------------------------------------------------------------------------- -->
-<% } -%>
+<%
+}
+-%>
     <div class="container" id="choice">
     <div class="header">
         Secure elections powered by <em>sElect</em>
@@ -244,7 +258,9 @@
     </div>
     </div>
     <!-- --------------------------------------------------------------------------------- -->
-<% if(showOtp && !seperateAuthentication) { -%>
+<%
+if(showOtp && !seperateAuthentication) {
+-%>
     <div id="showOtp">
      <div class="body" style="text-align: left; margin: 50px auto;">
           <p>In the original version of the system, you would receive an e-mail with the following text:</p>
@@ -258,14 +274,20 @@
      </div>
 	</div>
     <!-- --------------------------------------------------------------------------------- -->
-<% } -%>
+<%
+}
+-%>
     <div id="processing">
         <img src="pic/processing.gif">
     </div>
-<% if(seperateAuthentication) { -%>
+<%
+if(seperateAuthentication) {
+-%>
     <!-- --------------------------------------------------------------------------------- -->
 	<iframe id="csFrame" height="0" width="0" src="" style="visibility:hidden;display:none"></iframe>
-<% } -%>
+<%
+}
+-%>
 </body>
 </html>
 <script type="text/javascript">
