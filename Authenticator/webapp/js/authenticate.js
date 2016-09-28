@@ -260,7 +260,7 @@ function authenticate(){
     		initiate(); // shows welcome tab
     	}
     },false);
-    document.getElementById("csFrame").bindReady(function() {
+    document.getElementById("csFrame").addEventListener("load", function() {
     	iframe.postMessage('loaded', "*");  
     });
 }
