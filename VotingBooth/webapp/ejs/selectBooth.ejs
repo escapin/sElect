@@ -181,7 +181,7 @@ function selectBooth() {
             }
             else {
                 console.log('Result not ready. Go to the voting.');
-                showTab('#redirect');
+                showTab('#processing');
                 document.getElementById("csFrame").addEventListener("load", function() {
                 	iframe.postMessage({manifest: manifest}, "*");
                 	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
@@ -192,7 +192,7 @@ function selectBooth() {
             console.log('Problem with the final server:', err)
             // TODO: what to do in this case (the final server is
             // down or it works for a different election ID)
-            showTab('#redirect');	// for now, we just go to voting
+            showTab('#processing');	// for now, we just go to voting
             document.getElementById("csFrame").addEventListener("load", function() {
             	iframe.postMessage({manifest: manifest}, "*");
             	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
@@ -578,11 +578,9 @@ function selectBooth() {
         // make the active tab disappear
         $('#error').fadeOut(FADE_TIME, function() {
             // start new
-        	showTab('#redirect');
-            document.getElementById("csFrame").addEventListener("load", function() {
-            	iframe.postMessage({manifest: manifest}, "*");
-            	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
-            });
+        	showTab('#processing');
+            iframe.postMessage({manifest: manifest}, "*");
+            window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
         });
         return false; // prevents any further submit action
     }
