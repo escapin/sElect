@@ -41,7 +41,11 @@
                 <thead>
                     <tr>
                         <th>verification code</th>
-                        <th>choice </th>
+                        <% if (manifest.maxChoicesPerVoter > 1) { %>
+                        	<th>choices </th>
+                        <% } else { %>
+                        	<th>choice </th>
+                        <% }  %>
                     </tr>
                 </thead>
                 <tbody>
