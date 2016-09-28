@@ -182,7 +182,7 @@ function selectBooth() {
             else {
                 console.log('Result not ready. Go to the voting.');
                 showTab('#redirect');
-                document.getElementById("csFrame").addEventListener("load", function() {
+                document.getElementById("csFrame").bindReady(function() {
                 	iframe.postMessage({manifest: manifest}, "*");
                 	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
                 });
@@ -587,6 +587,57 @@ function selectBooth() {
         return false; // prevents any further submit action
     }
     
+    function bindReady(handler){
+
+    	var called = false;
+    	
+    	function ready() { 
+    		if (called) return;
+    		called = true;
+    		handler();
+    	}
+
+    	if ( document.addEventListener ) { // native event
+    		document.addEventListener( "DOMContentLoaded", ready, false );
+    	} else if ( document.attachEvent ) {  // IE
+
+    		try {
+    			var isFrame = window.frameElement != null;
+    		} catch(e) {}
+    		// IE, the document is not inside a frame
+    		if ( document.documentElement.doScroll && !isFrame ) {
+    			function tryScroll(){
+    				if (called) return;
+    				try {
+    					document.documentElement.doScroll("left")
+    					ready();
+    				} catch(e) {
+    					setTimeout(tryScroll, 10);
+    				}
+    			}
+    			tryScroll();
+    		}
+    		// IE, the document is inside a frame
+    		document.attachEvent("onreadystatechange", function(){
+    			if ( document.readyState === "complete" ) {
+    				ready();
+    			}
+    		})
+    	}
+    	// Old browsers
+        if (window.addEventListener)
+            window.addEventListener('load', ready, false);
+        else if (window.attachEvent)
+            window.attachEvent('onload', ready);
+        else {
+    		var fn = window.onload; // very old browser, copy old onload
+    		window.onload = function() { // replace by new onload and call the old one
+    			fn && fn();
+    			ready();
+    		}
+        }
+    }
+
 <% }else{ -%>
     function onSubmitWelcome(event) 
     {
