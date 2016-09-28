@@ -22,10 +22,12 @@ function forwardAuthentication(){
 		parent.postMessage({manifest: manifest}, "*");
 	    }
 	    else if(event.data.hasOwnProperty("credentials")){
-		sessionStorage.setItem("toBeSubmitted", JSON.stringify(event.data.submitCS));
+		sessionStorage.setItem("toBeSubmitted", JSON.stringify(event.data.credentials));
 	    }
 	    else if(event.data.hasOwnProperty("ballot")){
 		var submit = JSON.parse(sessionStorage.getItem("toBeSubmitted"));
+		var manifest = JSON.parse(sessionStorage.getItem("manifest"));
+		submit.electionID = manifest.hash;
 		submit.ballot = event.data.ballot;
 		castBallot(submit);
 	    }
