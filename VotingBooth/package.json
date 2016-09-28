@@ -1,6 +1,6 @@
 {
   "name": "StaticFileServer",
-  "description": "Simple server (of static files) for sElect voting booth",
+  "description": "Simple server (of static files) for sElect Voting Booth",
   "version": "0.2.0",
   "private": true,
   "dependencies": {
