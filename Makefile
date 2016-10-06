@@ -45,6 +45,7 @@ npminstall:
 	cd CollectingServer; npm install
 	cd MixServer; npm install
 	cd VotingBooth; npm install
+	cd Authenticator; npm install
 	cd node_modules/cryptofunc; npm install
 
 
@@ -116,6 +117,7 @@ npmclean:
 	-rm -r CollectingServer/node_modules
 	-rm -r MixServer/node_modules
 	-rm -r VotingBooth/node_modules
+	-rm -r Authenticator/node_modules
 	-rm -r node_modules/cryptofunc/node_modules
 
 votingboothclean:
