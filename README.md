@@ -134,7 +134,14 @@ cd VotingBooth
 ./run.sh
 ```
 
-The system is then available at the URL `http://localhost:3333/votingBooth.html`
+The system is then available at the URL
+`localhost:3333/votingBooth.html`.
+
+To manually close the election, you have to access `localhost:3299/admin/panel`
+with credentials:
+
+- user: admin
+- pwd: 999
 
 
 The files created during the voting process (including logs, partial,
