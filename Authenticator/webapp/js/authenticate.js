@@ -22,8 +22,8 @@ function authenticate(){
 	
     var votingBooth = document.referrer;
     var iframePath = decodeURIComponent(window.location.search.substring(1));
-	document.getElementById("csFrame").src = iframePath;
-	var iframe = document.getElementById("csFrame").contentWindow;
+	document.getElementById("authChannel").src = iframePath;
+	var iframe = document.getElementById("authChannel").contentWindow;
 	var url = window.location.href;
 	history.pushState("", "", url.replace(window.location.search, ""));
     //////////////////////////////////////////////////////////////////////////////
@@ -209,7 +209,7 @@ function authenticate(){
     		initiate(); // shows welcome tab
     	}
     },false);
-    document.getElementById("csFrame").addEventListener("load", function() {
+    document.getElementById("authChannel").addEventListener("load", function() {
     	iframe.postMessage('loaded', "*");  
     });
 }

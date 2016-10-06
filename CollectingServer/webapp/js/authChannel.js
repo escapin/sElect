@@ -1,4 +1,4 @@
-function forwardAuthentication(){
+function authChannel(){
 	
 	function castBallot(req){
 	    var manifest = JSON.parse(sessionStorage.getItem("manifest"));

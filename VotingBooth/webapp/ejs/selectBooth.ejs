@@ -18,17 +18,17 @@ if(seperateAuthentication){
 -%>
 	// authenticate location
 	var config = JSON.parse(configRaw);
-    var authAddress = config.authenticator;
+    var authenticatorURI = config.authenticator;
     var parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
-    var parts = parse_url.exec( authAddress );
+    var parts = parse_url.exec( authenticatorURI );
     var authDomain = parts[1]+':'+parts[2]+parts[3] ;
-    var tempAddr = authAddress.split(":")
+    var tempAddr = authenticatorURI.split(":")
     if(tempAddr.length > 2){
     	tempAddr = tempAddr[2].split("/");
-    	authDomain = authAddress.replace("/"+tempAddr[1], '');
+    	authDomain = authenticatorURI.replace("/"+tempAddr[1], '');
     }
-    document.getElementById("csFrame").src = config.csFrame;
-    var iframe = document.getElementById("csFrame").contentWindow;
+    document.getElementById("authChannel").src = config.authChannel;
+    var iframe = document.getElementById("authChannel").contentWindow;
     var url = window.location.href;
     console.log(url);
     var isDone = window.location.search == "?done";
@@ -194,9 +194,9 @@ if(seperateAuthentication){
             else {
                 console.log('Result not ready. Go to the voting.');
                 showTab('#processing');
-                document.getElementById("csFrame").addEventListener("load", function() {
+                document.getElementById("authChannel").addEventListener("load", function() {
                 	iframe.postMessage({manifest: manifest}, "*");
-                	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
+                	window.location.href = authenticatorURI+"?"+encodeURIComponent(config.authChannel); 
                 });
             }
         })
@@ -205,9 +205,9 @@ if(seperateAuthentication){
             // TODO: what to do in this case (the final server is
             // down or it works for a different election ID)
             showTab('#processing');	// for now, we just go to voting
-            document.getElementById("csFrame").addEventListener("load", function() {
+            document.getElementById("authChannel").addEventListener("load", function() {
             	iframe.postMessage({manifest: manifest}, "*");
-            	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
+            	window.location.href = authenticatorURI+"?"+encodeURIComponent(config.authChannel); 
             }); 
         });
 
@@ -535,7 +535,7 @@ if(seperateAuthentication){
         activeTabId=''; 
         $('#welcome').hide();
     	iframe.postMessage({manifest: manifest}, "*");
-    	window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame);
+    	window.location.href = authenticatorURI+"?"+encodeURIComponent(config.authChannel);
     }
     
     function onSubmitChoice(event) {
@@ -598,7 +598,7 @@ if(seperateAuthentication){
             // start new
         	showTab('#processing');
             iframe.postMessage({manifest: manifest}, "*");
-            window.location.href = authAddress+"?"+encodeURIComponent(config.csFrame); 
+            window.location.href = authenticatorURI+"?"+encodeURIComponent(config.authChannel); 
         });
         return false; // prevents any further submit action
     }

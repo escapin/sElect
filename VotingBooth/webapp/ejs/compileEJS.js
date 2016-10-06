@@ -9,5 +9,5 @@ var html = compiled({ seperateAuthentication: config.seperateAuthentication, ran
 fs.writeFileSync(path.join(__dirname, "../votingBooth.html"), html);
 
 compiled = ejs.compile(fs.readFileSync(path.join(__dirname, 'selectBooth.ejs'), 'utf8'));
-html = compiled({ seperateAuthentication: config.seperateAuthentication, randomness : config.userChosenRandomness, showOtp : config.showOtp });
-fs.writeFileSync(path.join(__dirname, "../js/selectBooth.js"), html);
+var js = compiled({ seperateAuthentication: config.seperateAuthentication, randomness : config.userChosenRandomness, showOtp : config.showOtp });
+fs.writeFileSync(path.join(__dirname, "../js/selectBooth.js"), js);
