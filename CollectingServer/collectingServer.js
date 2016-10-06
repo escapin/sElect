@@ -83,6 +83,8 @@ if(config.serverAdminPassword != ""){
 app.post('/otp', routes.otp);
 app.post('/cast', routes.cast);
 
+app.use(express.static('webapp'));
+
 app.get('/', routes.info);
 app.get('/status', routes.info);
 app.get('/admin/panel', routes.controlPanel);
