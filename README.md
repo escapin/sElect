@@ -122,14 +122,22 @@ cd BulletinBoard
 ./run.sh
 ```
 
+*Authenticator*:
+```
+cd Authenticator
+./run.sh
+```
+
 *Voting booth*:
 ```
 cd VotingBooth
 ./run.sh
 ```
 
+The system is then available at the URL `http://localhost:3333/votingBooth.html`
 
-The files created during the voting process (including logs and partial 
+
+The files created during the voting process (including logs, partial,
 and final results) can be removed with
 ```
 make cleanElection
@@ -140,15 +148,14 @@ In the development version, one-time passwords are not sent
 to voters via e-mail; they are logged on the console by the collecting
 server and must be copied from there.  The list of the valid voters'
 emails can be found in the file 'ElectionManifest.json' of the folder
-'template'.  Also, the closing time of the collecting server is far away
-in the future (Nov 10, 2018). The server needs to be triggered manually
-to close the election, which can be done through the status page served
-by this server.
+'template'.  Also, the closing time of the collecting server is set to
+_Nov 10, 2018_.  The server needs to be triggered manually to close the
+election, which can be done through the status page served by this
+server.
 
 **Unit Testing.**
 To run the test suite, type
 ```
 make test
 ```
-The created files can be removed by 
-`make testclean`.
+The created files can be removed by `make testclean`.
