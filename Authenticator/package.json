@@ -1,0 +1,10 @@
+{
+  "name": "Authenticator",
+  "description": "Simple server (of static files) for the sElect Authenticator",
+  "version": "0.2.0",
+  "private": true,
+  "dependencies": {
+    "express": "4.x",
+    "morgan": "^1.5.0"
+  }
+}
