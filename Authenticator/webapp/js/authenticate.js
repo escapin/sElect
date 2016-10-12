@@ -20,8 +20,24 @@ function authenticate(){
     var electionID = null;
     var printableElID = null; // electionID.slice(0,6) + '...';
 	
+    var trustedDomains = JSON.parse(trustedDomainsRaw).Authenticator;
     var votingBooth = document.referrer;
     var iframePath = decodeURIComponent(window.location.search.substring(1));
+    var parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
+    var parts = parse_url.exec( iframePath );
+    var authDomain = parts[1]+':'+parts[2]+parts[3] ;
+    var tempAddr = iframePath.split(":")
+    if(tempAddr.length > 2){
+    	tempAddr = tempAddr[2].split("/");
+    	authDomain = iframePath.replace("/"+tempAddr[1], '');
+    }
+    if(authDomain.charAt(authDomain.length-1) === '/'){
+    	authDomain = authDomain.slice(0, -1);
+    }
+    if(trustedDomains.indexOf(authDomain)<0){
+    	console.log("URI recieved from the VotingBooth is not trusted!")
+    	iframePath = "";
+    }
 	document.getElementById("authChannel").src = iframePath;
 	var iframe = document.getElementById("authChannel").contentWindow;
 	var url = window.location.href;
@@ -198,8 +214,11 @@ function authenticate(){
     
     //respond to events
     window.addEventListener('message',function(event) {
-    	console.log("recieved: "+event.data);
+    	if (event.source !== iframe || trustedDomains.indexOf(event.origin)<0){
+			return;
+		}
     	if(event.data.hasOwnProperty("manifest")){
+    		clearInterval(getManifest);
     		manifest = event.data.manifest;
     		console.log('Election hash = ' + manifest.hash);
     		electionID = manifest.hash;
@@ -209,7 +228,7 @@ function authenticate(){
     		initiate(); // shows welcome tab
     	}
     },false);
-    document.getElementById("authChannel").addEventListener("load", function() {
-    	iframe.postMessage('loaded', "*");  
-    });
+    var getManifest = window.setInterval(function() {
+    	iframe.postMessage('retrieveManifest', "*");  
+    }, 100);
 }

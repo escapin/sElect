@@ -1,5 +1,6 @@
 function authChannel(){
-	
+    var trustedDomains = JSON.parse(trustedDomainsRaw).authChannel;
+
 	function castBallot(req){
 	    var manifest = JSON.parse(sessionStorage.getItem("manifest"));
 	    // Make an (ajax) cast request:
@@ -13,14 +14,18 @@ function authChannel(){
 	}
 	
 	window.addEventListener('message',function(event) {
-	    //console.log("frame recieved: "+event.data);
-	    if(event.data.hasOwnProperty("manifest")){
+		// For Chrome, the origin property is in the event.originalEvent object.
+		var origin = event.origin || event.originalEvent.origin; 
+		if (event.source !== parent || trustedDomains.indexOf(event.origin)<0){
+			return;
+		}
+		else if(event.data.hasOwnProperty("manifest")){
 	    	sessionStorage.setItem("manifest", JSON.stringify(event.data.manifest));
-	    	parent.postMessage("recieved", "*");
+	    	parent.postMessage("received", "*");
 	    }
-	    else if(event.data === "loaded"){
-		// when the parent page is 'loaded', provide to this page the election manifest
-		var manifest = JSON.parse(sessionStorage.getItem("manifest"));
+	    else if(event.data === "retrieveManifest"){
+	    	// when the parent page is 'loaded', provide to this page the election manifest
+	    	var manifest = JSON.parse(sessionStorage.getItem("manifest"));
 			parent.postMessage({manifest: manifest}, "*");
 	    }
 	    else if(event.data.hasOwnProperty("credentials")){
