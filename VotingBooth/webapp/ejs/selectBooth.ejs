@@ -77,6 +77,7 @@ if(seperateAuthentication){
     // create the voter object
     var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
     var maxChoicesPerVoter = manifest.maxChoicesPerVoter;
+    var minChoicesPerVoter = manifest.minChoicesPerVoter;
 
     
     //////////////////////////////////////////////////////////////////////////////
@@ -831,7 +832,7 @@ if(seperateAuthentication){
         //console.log(choices);
 
         // Update the status of the submit button (active only when something is selected)
-        if($('input[name="choice"]:checked').length == 0) { // no choice selected 
+        if($('input[name="choice"]:checked').length < minChoicesPerVoter) { // not enouch choices selected 
             $('#submit-choice').prop('disabled', true);
         }
         else { // some choice selected

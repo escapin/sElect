@@ -6,6 +6,7 @@
     "voters": [],
     "publishListOfVoters": false,
     "maxChoicesPerVoter": 3,
+    "minChoicesPerVoter": 1,
     "question": "",
     "choices": [
 	"John Stevens",
