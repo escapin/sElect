@@ -77,6 +77,7 @@ if(seperateAuthentication){
     // create the voter object
     var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys, mixServVerifKeys);
     var maxChoicesPerVoter = manifest.maxChoicesPerVoter;
+    var minChoicesPerVoter = manifest.minChoicesPerVoter;
 
     
     //////////////////////////////////////////////////////////////////////////////
@@ -194,10 +195,9 @@ if(seperateAuthentication){
             else {
                 console.log('Result not ready. Go to the voting.');
                 showTab('#processing');
-                document.getElementById("authChannel").addEventListener("load", function() {
+                window.setInterval(function() {
                 	iframe.postMessage({manifest: manifest}, "*");
-                	window.location.href = authenticatorURI+"?"+encodeURIComponent(config.authChannel); 
-                });
+                }, 100);
             }
         })
         .catch(function (err) {
@@ -832,7 +832,7 @@ if(seperateAuthentication){
         //console.log(choices);
 
         // Update the status of the submit button (active only when something is selected)
-        if($('input[name="choice"]:checked').length == 0) { // no choice selected 
+        if($('input[name="choice"]:checked').length < minChoicesPerVoter) { // not enouch choices selected 
             $('#submit-choice').prop('disabled', true);
         }
         else { // some choice selected
@@ -903,6 +903,9 @@ if(seperateAuthentication){
     	console.log('received response from ' + event.origin + ' : ',event.data);
     	if(event.data.hasOwnProperty("result")){
     		onAuthDone(event.data.result);
+    	}
+    	else if(event.data === "recieved"){
+        	window.location.href = authenticatorURI+"?"+encodeURIComponent(config.authChannel); 
     	}
     },false);
 <%

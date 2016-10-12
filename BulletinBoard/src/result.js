@@ -125,6 +125,10 @@ exports.parseFinalResult = function(signedFinalResult) {
     	for(var i=0; i < choices.length; i++){
     		choices[i] = crypto.hexStringToInt(choices[i]);
     	}
+    	//dismiss voter if not enough choices selected
+    	if(choices.length < manifest.minChoicesPerVoter){
+    		continue;
+    	}
     	// Verification code
     	p = crypto.deconcatenate(verificationCode);
     	var receiptID;
