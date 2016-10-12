@@ -15,7 +15,8 @@ function authChannel(){
 	
 	window.addEventListener('message',function(event) {
 		// For Chrome, the origin property is in the event.originalEvent object.
-		var origin = event.origin || event.originalEvent.origin; 
+		var origin = event.origin || event.originalEvent.origin;
+		// the POST message must come from the parent window which, in turn, must be a trusted domain
 		if (event.source !== parent || trustedDomains.indexOf(event.origin)<0){
 			return;
 		}

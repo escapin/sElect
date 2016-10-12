@@ -34,8 +34,9 @@ function authenticate(){
     if(authDomain.charAt(authDomain.length-1) === '/'){
     	authDomain = authDomain.slice(0, -1);
     }
+    // the domain of the Authentication Channel received from the Voting Booth must be in the list of trusted domains
     if(trustedDomains.indexOf(authDomain)<0){
-    	console.log("URI recieved from the VotingBooth is not trusted!")
+    	console.log("URI of the Authentication Channel recieved from the Voting Booth is not trusted!")
     	iframePath = "";
     }
 	document.getElementById("authChannel").src = iframePath;
