@@ -19,14 +19,6 @@ if(seperateAuthentication){
 	// authenticate location
 	var config = JSON.parse(configRaw);
     var authenticatorURI = config.authenticator;
-    var parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
-    var parts = parse_url.exec( authenticatorURI );
-    var authDomain = parts[1]+':'+parts[2]+parts[3] ;
-    var tempAddr = authenticatorURI.split(":")
-    if(tempAddr.length > 2){
-    	tempAddr = tempAddr[2].split("/");
-    	authDomain = authenticatorURI.replace("/"+tempAddr[1], '');
-    }
     document.getElementById("authChannel").src = config.authChannel;
     var iframe = document.getElementById("authChannel").contentWindow;
     var url = window.location.href;
@@ -900,11 +892,13 @@ if(seperateAuthentication){
     
     //listen to authentication booth
     window.addEventListener('message',function(event) {
-    	console.log('received response from ' + event.origin + ' : ',event.data);
+    	if (event.source !== iframe){
+			return;
+		}
     	if(event.data.hasOwnProperty("result")){
     		onAuthDone(event.data.result);
     	}
-    	else if(event.data === "recieved"){
+    	else if(event.data === "received"){
         	window.location.href = authenticatorURI+"?"+encodeURIComponent(config.authChannel); 
     	}
     },false);
