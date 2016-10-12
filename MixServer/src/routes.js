@@ -150,7 +150,7 @@ function sendResultToNextMix(innerBallots) {
 		console.log('Warning: result not sent. No other mix servers.');
 	else {
 		console.log('Sending result to the next mix server (#%d)', nextIndex);
-		var nextMixServ = request.newClient(manifest.mixServers[nextIndex].URI, mixserv_options);
+		var nextMixServ = request.createClient(manifest.mixServers[nextIndex].URI, mixserv_options);
 		var data = {data: innerBallots}
 		// one could add something like {timeout:10000} to the request below, after 'data'
 		nextMixServ.post('data', data, function(err, res, body) {

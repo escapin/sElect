@@ -370,9 +370,9 @@ function closeElection() {
 function sendData(data, URI, destserv_options) {
 	winston.info("Sending data to '%s'", URI);
 	if(destserv_options)
-		var destServ = request.newClient(URI, destserv_options);
+		var destServ = request.createClient(URI, destserv_options);
 	else
-		var destServ = request.newClient(URI);
+		var destServ = request.createClient(URI);
     var toBeSent = {data: data};
     // one could add something like {timeout:10000} to the request below, after 'toBeSent'
     destServ.post('data', toBeSent, function(err, otp_res, body) {
