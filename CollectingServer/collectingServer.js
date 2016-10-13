@@ -79,20 +79,32 @@ if(config.serverAdminPassword != ""){
 // Insert some delay (for testing only):
 // app.use(function(req, res, next) { setTimeout(next, 300); });
 
+/*********************************************/
+/******* RATE LIMITER for WEB-APIs *******/
+var RateLimit = require('express-rate-limit');
+app.enable('trust proxy'); // app behind the nginx reverse proxy: the client’s IP address is taken from the left-most entry in the X-Forwarded-* header.
+var limiter = new RateLimit({
+	  windowMs: 1000, // 1 sec
+	  max: 3, // limit each IP to 3 requests per windowMs
+	  delayMs: 0 // disable delaying - full speed until the max limit is reached
+	});
+/*********************************************/
+
 // ROUTES
-app.post('/otp', routes.otp);
-app.post('/cast', routes.cast);
+app.post('/otp', limiter, routes.otp);
+app.post('/cast', limiter, routes.cast);
+
 
 app.use(express.static('webapp'));
 
-app.get('/', routes.info);
-app.get('/status', routes.info);
-app.get('/admin/panel', routes.controlPanel);
-app.get('/admin/close', routes.close);
-app.get('/result.msg', routes.serveFile(config.RESULT_FILE));
+app.get('/', limiter, routes.info);
+app.get('/status', limiter, routes.info);
+app.get('/admin/panel', limiter, routes.controlPanel);
+app.get('/admin/close', limiter, routes.close);
+app.get('/result.msg', limiter, routes.serveFile(config.RESULT_FILE));
 if(manifest.publishListOfVoters)
-	app.get('/votersList.msg', routes.serveFile(config.VOTERSLIST_FILE));
-app.get('/manifest', routes.serveFile(config.MANIFEST_FILE));
+	app.get('/votersList.msg', limiter, routes.serveFile(config.VOTERSLIST_FILE));
+app.get('/manifest', limiter, routes.serveFile(config.MANIFEST_FILE));
 
 // STARTING THE SERVER
 

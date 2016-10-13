@@ -61,6 +61,20 @@ app.use(express.static('./public')); // static content
 var accessLogStream = fs.createWriteStream('./access.log', {flags: 'a'});
 app.use(morgan(":remote-addr [:date] :method :url :status / :referrer ",{stream: accessLogStream}));
 
+/*********************************************/
+/******* RATE LIMITER for WEB-APIs *******/
+var RateLimit = require('express-rate-limit');
+app.enable('trust proxy');  // app behind the nginx reverse proxy: the client’s IP address is taken from the left-most entry in the X-Forwarded-* header.
+var limiter = new RateLimit({
+	  windowMs: 1000, // 1 sec
+	  max: 3, // limit each IP to 3 requests per windowMs
+	  delayMs: 0 // disable delaying - full speed until the max limit is reached
+	});
+/*********************************************/
+
+//apply to all requests
+app.use(limiter);
+
 // ROUTES
 app.get('/', routes.statusPage);
 app.get('/status', routes.statusPage);
