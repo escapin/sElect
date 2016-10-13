@@ -333,8 +333,8 @@ if(seperateAuthentication){
         }
 
         // Some receipts to verify
-        var recIDs = receipts.map(function (rec) {return '<br>&nbsp&nbsp- <span id="border"><span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(rec.userCode, true)+'</span>' + rec.receiptID.toUpperCase()+'</span>'}).join('');
-        if (receipts.length > 1) {
+        //var recIDs = receipts.map(function (rec) {return '<br>&nbsp&nbsp- <span id="border"><span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(rec.userCode, true)+'</span>' + rec.receiptID.toUpperCase()+'</span>'}).join('');
+        var recIDs = receipts.map(function (rec) {return '<br>&nbsp&nbsp- <span id="border"><b>'+escapeHTML(rec.userCode, true)+'</b>' + rec.receiptID.toUpperCase()+'</span>'}).join('');        if (receipts.length > 1) {
             verwriter.writep('<span style="line-height:150%;">Independently, an automatic verification procedure was just carried out to check',
                              'that the ballots with the following verification codes have in fact been counted: <br></span>', recIDs)
         } else {
@@ -570,15 +570,34 @@ if(seperateAuthentication){
                 storeReceipt(receipt);
                 // prepare and show the "ballot accepted" tab
                 var recid = receipt.userCode + receipt.receiptID.toUpperCase();
-                var durl = verificationCode2DataURL(recid, printableElID);
+                var durl = verificationCode2DataURL(recid, printableElID, rawTitle.slice(0,16));
+                
+                //recid = '<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipt.userCode, true)+'</span>' + receipt.receiptID.toUpperCase();                        
+                recid = '<b>'+escapeHTML(receipt.userCode, true)+'</b>' + receipt.receiptID.toUpperCase();                        
                 $('#verCodeLink').attr('href', durl);
-                $('#receipt-id').text(recid);
+                $('#receipt-id').html(recid); // it already escapes the string provided as necessary
                 showTab('#result');
             }
             else { // receipt not valid
                 showError('Invalid receipt');
             }
         }
+    }
+    
+    function onSubmitRandomCode(event) {
+    	if(activeTabId!=='#randomness') return false;
+    	activeTabId='';
+    	
+    	// Fetching the inp-randomCode from the form
+    	var r = $('#inp-code').val();
+    	if( !r || r==='') // it should not happen
+            return false;
+        randomCode = r.trim();
+        //console.log("Random Code: ", randomCode);
+        $('#randomness').fadeOut(FADE_TIME, function() {
+        	showTab('#choice');
+        });
+        return false; // prevents any further submit action
     }
     
     function onSubmitError(event) {
@@ -728,7 +747,8 @@ if(seperateAuthentication){
                         var recid = receipt.userCode + receipt.receiptID.toUpperCase();
                         var durl = verificationCode2DataURL(recid, printableElID, rawTitle.slice(0,16));
                         
-                        recid = '<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipt.userCode, true)+'</span>' + receipt.receiptID.toUpperCase();                        
+                        //recid = '<span style="font-family: \'Courier New\', monospace; color: #222;">'+escapeHTML(receipt.userCode, true)+'</span>' + receipt.receiptID.toUpperCase();                        
+                        recid = '<b>'+escapeHTML(receipt.userCode, true)+'</b>' + receipt.receiptID.toUpperCase();                        
                         $('#verCodeLink').attr('href', durl);
                         $('#receipt-id').html(recid); // it already escapes the string provided as necessary
                         showTab('#result');
@@ -758,22 +778,6 @@ if(seperateAuthentication){
 <%
 }
 -%>
-    
-    function onSubmitRandomCode(event) {
-    	if(activeTabId!=='#randomness') return false;
-    	activeTabId='';
-    	
-    	// Fetching the inp-randomCode from the form
-    	var r = $('#inp-code').val();
-    	if( !r || r==='') // it should not happen
-            return false;
-        randomCode = r.trim();
-        //console.log("Random Code: ", randomCode);
-        $('#randomness').fadeOut(FADE_TIME, function() {
-        	showTab('#choice');
-        });
-        return false; // prevents any further submit action
-    }
 
     function goToBB(event) {
         var url = manifest.bulletinBoards[0].URI;
