@@ -53,7 +53,7 @@ npminstall:
 configs: filesconfigs mixconfigs
 
 
-filesconfigs: 
+filesconfigs:
 	-mkdir -p _sElectConfigFiles_
 	cp templates/select.* _sElectConfigFiles_
 	cp templates/ElectionManifest.json _sElectConfigFiles_
@@ -62,6 +62,7 @@ filesconfigs:
 	cp templates/config_mix.json MixServer/config.json
 	cp templates/config_bb.json BulletinBoard/config.json
 	ln -fs ../_sElectConfigFiles_/ElectionManifest.json VotingBooth/
+	cd templates; node domains2js.js
 
 mixconfigs:
 	python configMixServers.py
