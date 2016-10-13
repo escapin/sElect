@@ -1,5 +1,5 @@
 function authChannel(){
-    var trustedDomains = JSON.parse(trustedDomainsRaw).authChannel;
+    var trustedDomains = JSON.parse(trustedDomainsRaw);
 
 	function castBallot(req){
 	    var manifest = JSON.parse(sessionStorage.getItem("manifest"));
