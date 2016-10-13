@@ -22,4 +22,4 @@ LOG/
 Authenticator/webapp/roboto
 Authenticator/webapp/pure
 *jquery-1.11.1.min.js
-
+*trustedDomains.js
