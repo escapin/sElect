@@ -20,7 +20,6 @@ function authenticate(){
     var electionID = null;
     var printableElID = null; // electionID.slice(0,6) + '...';
 	
-    var trustedDomains = JSON.parse(trustedDomainsRaw);
     var votingBooth = document.referrer;
     var iframePath = decodeURIComponent(window.location.search.substring(1));
     var parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
