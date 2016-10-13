@@ -16,7 +16,7 @@ for(var i = 0; i < authenticator.length; i++){
 }
 domains = domains.slice(0, -1) + "];";
 domains = "var "+varname+" = "+domains;
-fs.writeFileSync("../Authenticator/webapp/trustedDomains.js", domains);
+fs.writeFileSync("trustedDomains_auth.js", domains);
 
 var domains = "[";
 for(var i = 0; i < authchannel.length; i++){
@@ -24,4 +24,4 @@ for(var i = 0; i < authchannel.length; i++){
 }
 domains = domains.slice(0, -1) + "];";
 domains = "var "+varname+" = "+domains;
-fs.writeFileSync("../CollectingServer/webapp/trustedDomains.js", domains);
+fs.writeFileSync("trustedDomains_cs.js", domains);

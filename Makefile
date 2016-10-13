@@ -63,6 +63,8 @@ filesconfigs:
 	cp templates/config_bb.json BulletinBoard/config.json
 	ln -fs ../_sElectConfigFiles_/ElectionManifest.json VotingBooth/
 	cd templates; node domains2js.js
+	mv templates/trustedDomains_auth.js Authenticator/webapp/trustedDomains.js
+	mv templates/trustedDomains_cs.js CollectingServer/webapp/trustedDomains.js
 
 mixconfigs:
 	python configMixServers.py
@@ -148,6 +150,8 @@ configfilesclean:
 	-rm CollectingServer/config.json
 	-rm MixServer/config.json
 	-rm BulletinBoard/config.json
+	-rm Authenticator/webapp/trustedDomains.js
+	-rm CollectingServer/webapp/trustedDomains.js
 
 mixdirsclean:
 	@echo   Removing: 	$(shell ls MixServer | egrep "mix[0-9]+")
