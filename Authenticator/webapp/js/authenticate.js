@@ -38,18 +38,31 @@ function authenticate(){
     	// check for wildcard trustedDomains
     	var trust = false;
     	for(var i = 0; i < trustedDomains.length; i++){
-    		if(trustedDomains[i].split(".")[0] === "*"){	//wildcard
-    			var domain = trustedDomains[i].slice(2)
-    			if(domain === authDomain.slice(-1*domain.length)){
+    		if(trustedDomains[i].indexOf("://*.")>0){	//wildcard
+    			var tDomain = trustedDomains[i].split("*.")
+    			var aDomain = authDomain.replace("://", "://*.").split("*.")
+    			if(tDomain[1] === aDomain[1].slice(-1*tDomain[1].length) && tDomain[0] === aDomain[0]){
     				trust = true;
+    				break;
     			}
     		}
     	}
+    	// check for wildcard trustedDomains
+        var trust = false;
+        for(var i = 0; i < trustedDomains.length; i++){
+                if(trustedDomains[i].split(".")[0] === "*"){    //wildcard
+                        var domain = trustedDomains[i].slice(2)
+                        if(domain === authDomain.slice(-1*domain.length)){
+                                trust = true;
+                        }
+                }
+        }
     	if(!trust){
     		console.log("URI of the Authentication Channel recieved from the Voting Booth is not trusted!")
     		iframePath = "";
     	}
     }
+    
 	document.getElementById("authChannel").src = iframePath;
 	var iframe = document.getElementById("authChannel").contentWindow;
 	var url = window.location.href;
@@ -226,7 +239,7 @@ function authenticate(){
     
     //respond to events
     window.addEventListener('message',function(event) {
-    	if (event.source !== iframe || trustedDomains.indexOf(event.origin)<0){
+    	if (event.source !== iframe || event.origin !== authDomain){
 			return;
 		}
     	if(event.data.hasOwnProperty("manifest")){
