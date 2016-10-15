@@ -35,8 +35,20 @@ function authenticate(){
     }
     // the domain of the Authentication Channel received from the Voting Booth must be in the list of trusted domains
     if(trustedDomains.indexOf(authDomain)<0){
-    	console.log("URI of the Authentication Channel recieved from the Voting Booth is not trusted!")
-    	iframePath = "";
+    	// check for wildcard trustedDomains
+    	var trust = false;
+    	for(var i = 0; i < trustedDomains.length; i++){
+    		if(trustedDomains[i].split(".")[0] === "*"){	//wildcard
+    			var domain = trustedDomains[i].slice(2)
+    			if(domain === authDomain.slice(-1*domain.length)){
+    				trust = true;
+    			}
+    		}
+    	}
+    	if(!trust){
+    		console.log("URI of the Authentication Channel recieved from the Voting Booth is not trusted!")
+    		iframePath = "";
+    	}
     }
 	document.getElementById("authChannel").src = iframePath;
 	var iframe = document.getElementById("authChannel").contentWindow;
