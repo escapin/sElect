@@ -122,11 +122,18 @@ exports.parseFinalResult = function(signedFinalResult) {
     	p = crypto.deconcatenate(choice_verifCode);
     	var verificationCode = p.second;
     	var choices = p.first.match(/\d{1,8}/g);
+    	if(choices === null){
+    		continue;
+    	}
+    	var validBallot = true;
     	for(var i=0; i < choices.length; i++){
     		choices[i] = crypto.hexStringToInt(choices[i]);
+    		if(choices[i] < 0 || choices[i] > manifest.choices.length){
+    			validBallot = false;
+    		}
     	}
     	//dismiss voter if not enough choices selected
-    	if(choices.length < manifest.minChoicesPerVoter){
+    	if(!validBallot || choices.length < manifest.minChoicesPerVoter){
     		continue;
     	}
     	// Verification code
@@ -143,7 +150,6 @@ exports.parseFinalResult = function(signedFinalResult) {
     	else 
     		console.log('ERROR: Wrong verification code format');
     	
-    	// TODO: add maximum number of votes per voter (currently only hardcoded in selectbooth.js
     	var userChoices = "";
     	for(var i=0; i < choices.length && i < manifest.maxChoicesPerVoter; i++){
     		userChoices = userChoices + manifest.choices[choices[i]]+", ";
