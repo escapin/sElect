@@ -806,37 +806,43 @@ if(seperateAuthentication){
     }
     
     function whenChoiceChanges() {
-    	
-    	var selectedChoice = "#choice-form label[for='" + this.id + "']";
-    	if($(selectedChoice).hasClass("checked")){
-        	//remove checked and add notchecked class
-        	$(selectedChoice).removeClass('checked');
-        	var index = choices.indexOf(this.id);
-        	choices.splice(index, 1)
-            $("#choice-form label").removeClass('notchecked');
-        }
-        else if(choices.length < maxChoicesPerVoter){
-        	//remove notchecked and add checked class if still votes open
-        	$(selectedChoice).addClass('checked').removeClass('notchecked');
-        	choices.push(this.id);
-        }
-        else{
-        	return false;
-        }
-        if(choices.length >= maxChoicesPerVoter){
-            $("#choice-form label").addClass('notchecked');
-            for(var i = 0; i < choices.length; i++){
-            	$("#choice-form label[for='" + choices[i] + "']").removeClass('notchecked');
-            }
-        }
-        // Update the status of the submit button (active only when something is selected)
-        if($('input[name="choice"]:checked').length < minChoicesPerVoter) { // not enouch choices selected 
-            $('#submit-choice').prop('disabled', true);
-        }
-        else { // some choice selected
-            $('#submit-choice').prop('disabled', null);
-        }
-        return true;
+	    var selectedChoice = "#choice-form label[for='" + this.id + "']";
+    <% if(radioButtons){ -%>
+		if($(selectedChoice).hasClass("checked")){
+	    	//remove checked and add notchecked class
+	    	$(selectedChoice).removeClass('checked');
+	    	var index = choices.indexOf(this.id);
+	    	choices.splice(index, 1)
+	        $("#choice-form label").removeClass('notchecked');
+	    }
+	    else if(choices.length < maxChoicesPerVoter){
+	    	//remove notchecked and add checked class if still votes open
+	    	$(selectedChoice).addClass('checked').removeClass('notchecked');
+	    	choices.push(this.id);
+	    }
+	    else{
+	    	return false;
+	    }
+	    if(choices.length >= maxChoicesPerVoter){
+	        $("#choice-form label").addClass('notchecked');
+	        for(var i = 0; i < choices.length; i++){
+	        	$("#choice-form label[for='" + choices[i] + "']").removeClass('notchecked');
+	        }
+	    }
+	    return true;
+    <% }else{ -%>
+    	// Reset 'checked' class and add notchecked class for all the labels in the form
+	    $("#choice-form label").addClass('notchecked').removeClass('checked');
+	    // And do the oposite for the selected one
+	    $(selectedChoice).addClass('checked').removeClass('notchecked');
+    <% } -%>
+	    // Update the status of the submit button (active only when something is selected)
+	    if($('input[name="choice"]:checked').length < minChoicesPerVoter) { // not enouch choices selected 
+	        $('#submit-choice').prop('disabled', true);
+	    }
+	    else { // some choice selected
+	        $('#submit-choice').prop('disabled', null);
+	    }
     }
     
     //////////////////////////////////////////////////////////////////////////////
