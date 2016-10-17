@@ -835,6 +835,7 @@ if(seperateAuthentication){
 	    $("#choice-form label").addClass('notchecked').removeClass('checked');
 	    // And do the oposite for the selected one
 	    $(selectedChoice).addClass('checked').removeClass('notchecked');
+	    choices = [this.id];
     <% } -%>
 	    // Update the status of the submit button (active only when something is selected)
 	    if($('input[name="choice"]:checked').length < minChoicesPerVoter) { // not enouch choices selected 
