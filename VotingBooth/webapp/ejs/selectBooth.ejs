@@ -140,7 +140,7 @@ if(seperateAuthentication){
         var choices = manifest.choices;
         for (var i=0; i<choices.length; ++i) {
             var choice = choices[i];
-        <% if(radioButtons){ -%>
+        <% if(!radioButtons){ -%>
             var slabel = '<label for="option-' +i+ '" class="pure-checkbox">\n';
             var sinput = '<input id="option-' +i+ '" type="checkbox" name="choice" value="option' +1+ 
                          '"> ' +choice+ '</label>\n';
@@ -807,7 +807,7 @@ if(seperateAuthentication){
     
     function whenChoiceChanges() {
 	    var selectedChoice = "#choice-form label[for='" + this.id + "']";
-    <% if(radioButtons){ -%>
+    <% if(!radioButtons){ -%>
 		if($(selectedChoice).hasClass("checked")){
 	    	//remove checked and add notchecked class
 	    	$(selectedChoice).removeClass('checked');
