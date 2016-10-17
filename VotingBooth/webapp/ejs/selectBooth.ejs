@@ -116,23 +116,6 @@ if(seperateAuthentication){
         return r;
     }
 
-    function optionsAsHTML() {
-        var options = '';
-        var choices = manifest.choices;
-        for (var i=0; i<choices.length; ++i) {
-            var choice = choices[i];
-            // console.log(choice);
-            var slabel = '<label for="option-' +i+ '" class="pure-checkbox">\n';
-            // console.log(slabel);
-            var sinput = '<input id="option-' +i+ '" type="checkbox" name="choice" value="option' +1+ 
-                         '"> ' +choice+ '</label>\n';
-            // console.log(sinput);
-            options += slabel;
-            options += sinput;
-        }
-        return options;
-    }
-
     // Returns a promise of the data from the given url.
     //
     function fetchData(url) {
@@ -151,6 +134,28 @@ if(seperateAuthentication){
                   inputPromise // the initial promise
                );
     }
+    
+    function optionsAsHTML() {
+        var options = '';
+        var choices = manifest.choices;
+        for (var i=0; i<choices.length; ++i) {
+            var choice = choices[i];
+        <% if(radioButtons){ -%>
+            var slabel = '<label for="option-' +i+ '" class="pure-checkbox">\n';
+            var sinput = '<input id="option-' +i+ '" type="checkbox" name="choice" value="option' +1+ 
+                         '"> ' +choice+ '</label>\n';
+        <% }else{ -%>
+            var slabel = '<label for="option-' +i+ '" class="pure-radio">\n';
+            var sinput = '<input id="option-' +i+ '" type="radio" name="choice" value="option' +1+ 
+                         '"> ' +choice+ '</label>\n';
+        <% } -%>
+            options += slabel;
+            options += sinput;
+        }
+        return options;
+    }
+    
+
 
     //////////////////////////////////////////////////////////////////////////////
     /// INITIATE BOOTH
@@ -217,7 +222,7 @@ if(seperateAuthentication){
         // checking if the final server has ready result.
         //
     <% if(showOtp){ -%>
-    		document.getElementById('mock_info').innerHTML = "<br>(Since you're trying the demo, no email will be sent to you: You can provide a <em>fake</em> one as well.)";
+    	document.getElementById('mock_info').innerHTML = "<br>(Since you're trying the demo, no email will be sent to you: You can provide a <em>fake</em> one as well.)";
     <% } -%>
         csStatus()
         .then(function (resultReady) {  
@@ -803,7 +808,6 @@ if(seperateAuthentication){
     function whenChoiceChanges() {
     	
     	var selectedChoice = "#choice-form label[for='" + this.id + "']";
-
     	if($(selectedChoice).hasClass("checked")){
         	//remove checked and add notchecked class
         	$(selectedChoice).removeClass('checked');
@@ -825,8 +829,6 @@ if(seperateAuthentication){
             	$("#choice-form label[for='" + choices[i] + "']").removeClass('notchecked');
             }
         }
-        //console.log(choices);
-
         // Update the status of the submit button (active only when something is selected)
         if($('input[name="choice"]:checked').length < minChoicesPerVoter) { // not enouch choices selected 
             $('#submit-choice').prop('disabled', true);
