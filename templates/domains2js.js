@@ -3,8 +3,8 @@
 var fs = require('fs');
 var selectUtils = require('selectUtils');
 
-var fileName = "trustedDomains.json"
-var varname = "trustedDomains";
+var fileName = "trustedOrigins.json"
+var varname = "trustedOrigins";
 
 var ms = JSON.parse(fs.readFileSync(fileName, 'utf8'));
 var authenticator = ms.Authenticator;
@@ -16,7 +16,7 @@ for(var i = 0; i < authenticator.length; i++){
 }
 domains = domains.slice(0, -1) + "];";
 domains = "var "+varname+" = "+domains;
-fs.writeFileSync("trustedDomains_auth.js", domains);
+fs.writeFileSync("trustedOrigins_auth.js", domains);
 
 var domains = "[";
 for(var i = 0; i < authchannel.length; i++){
@@ -24,4 +24,4 @@ for(var i = 0; i < authchannel.length; i++){
 }
 domains = domains.slice(0, -1) + "];";
 domains = "var "+varname+" = "+domains;
-fs.writeFileSync("trustedDomains_cs.js", domains);
+fs.writeFileSync("trustedOrigins_cs.js", domains);

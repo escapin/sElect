@@ -24,24 +24,24 @@ function authenticate(){
     var iframePath = decodeURIComponent(window.location.search.substring(1));
     var parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
     var parts = parse_url.exec( iframePath );
-    var authDomain = parts[1]+':'+parts[2]+parts[3] ;
+    var authOrigin = parts[1]+':'+parts[2]+parts[3] ;
     var tempAddr = iframePath.split(":")
     if(tempAddr.length > 2){
     	tempAddr = tempAddr[2].split("/");
-    	authDomain = iframePath.replace("/"+tempAddr[1], '');
+    	authOrigin = iframePath.replace("/"+tempAddr[1], '');
     }
-    if(authDomain.charAt(authDomain.length-1) === '/'){
-    	authDomain = authDomain.slice(0, -1);
+    if(authOrigin.charAt(authOrigin.length-1) === '/'){
+    	authOrigin = authOrigin.slice(0, -1);
     }
     // the domain of the Authentication Channel received from the Voting Booth must be in the list of trusted domains
-    if(trustedDomains.indexOf(authDomain)<0){
-    	// check for wildcard trustedDomains
+    if(trustedOrigins.indexOf(authOrigin)<0){
+    	// check for wildcard trustedOrigins
     	var trust = false;
-    	for(var i = 0; i < trustedDomains.length; i++){
-    		if(trustedDomains[i].indexOf("://*.")>0){	//wildcard
-    			var tDomain = trustedDomains[i].split("*.")
-    			var aDomain = authDomain.replace("://", "://*.").split("*.")
-    			if(tDomain[1] === aDomain[1].slice(-1*tDomain[1].length) && tDomain[0] === aDomain[0]){
+    	for(var i = 0; i < trustedOrigins.length; i++){
+    		if(trustedOrigins[i].indexOf("://*.")>0){	//wildcard
+    			var tOrigin = trustedOrigins[i].split("*.")
+    			var aOrigin = authOrigin.replace("://", "://*.").split("*.")
+    			if(tOrigin[1] === aOrigin[1].slice(-1*tOrigin[1].length) && tOrigin[0] === aOrigin[0]){
     				trust = true;
     				break;
     			}
@@ -229,7 +229,7 @@ function authenticate(){
     
     //respond to events
     window.addEventListener('message',function(event) {
-    	if (event.source !== iframe || event.origin !== authDomain){
+    	if (event.source !== iframe || event.origin !== authOrigin){
 			return;
 		}
     	if(event.data.hasOwnProperty("manifest")){
