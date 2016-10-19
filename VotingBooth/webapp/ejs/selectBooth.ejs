@@ -829,7 +829,6 @@ if(seperateAuthentication){
 	        	$("#choice-form label[for='" + choices[i] + "']").removeClass('notchecked');
 	        }
 	    }
-	    return true;
     <% }else{ -%>
     	// Reset 'checked' class and add notchecked class for all the labels in the form
 	    $("#choice-form label").addClass('notchecked').removeClass('checked');
@@ -844,6 +843,7 @@ if(seperateAuthentication){
 	    else { // some choice selected
 	        $('#submit-choice').prop('disabled', null);
 	    }
+	    return true;
     }
     
     //////////////////////////////////////////////////////////////////////////////
