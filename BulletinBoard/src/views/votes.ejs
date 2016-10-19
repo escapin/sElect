@@ -51,7 +51,7 @@
                 <tbody>
                     <% for(var i=0; i<result.length; i++) { %>
                        <tr>
-                       	   <td class="verificationCode"> <b><%= result[i].userCode %></b><%=result[i].receiptID.toUpperCase() %></td>
+                       	   <td class="verificationCode"><span style="font-family: \'Courier New\', monospace; color: #777;"><%= result[i].userCode %></span><%=result[i].receiptID.toUpperCase() %></td>
                            <td class="vote"> <%= result[i].vote %> </td>
                        </tr>
                     <% } %>
