@@ -27,7 +27,7 @@ updatecryptokeys_mix:
 
 
 
-devenv: javabuild npminstall configs filescopy libdownload copydownloads
+devenv: javabuild npminstall configs filescopy libdownload copydownloads roboto
 
 javadownload:
 	-mkdir -p lib
@@ -63,8 +63,8 @@ filesconfigs:
 	cp templates/config_bb.json BulletinBoard/config.json
 	ln -fs ../_sElectConfigFiles_/ElectionManifest.json VotingBooth/
 	cd templates; node domains2js.js
-	mv templates/trustedDomains_auth.js Authenticator/webapp/trustedDomains.js
-	mv templates/trustedDomains_cs.js CollectingServer/webapp/trustedDomains.js
+	mv templates/trustedOrigins_auth.js Authenticator/webapp/trustedOrigins.js
+	mv templates/trustedOrigins_cs.js CollectingServer/webapp/trustedOrigins.js
 
 mixconfigs:
 	python configMixServers.py
@@ -94,6 +94,8 @@ libdownload:
 	cd BulletinBoard/public/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-old-ie-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-min.css
 	cd BulletinBoard/public/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css 
+
+roboto:
 	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/Jzo62I39jc0gQRrbndN6nfesZW2xOQ-xsNqO47m55DA.ttf
 	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/Hgo13k-tfSpn0qi1SFdUfaCWcynf_cDxXwCLxiixG1c.ttf
 	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/zN7GBFwfMP4uA6AR0HCoLQ.ttf
