@@ -101,8 +101,8 @@ describe( 'Voting process', function()
     	for(i=voters.length-1; i>=0; --i){
             // create ballot (a receipt containing a ballot); i-th voter votes for i-th candidate:
     		userCodes[i] = "attack vector !@#$%^&*(a 感谢您联系" + crypto.nonce().slice(0,6);
-    		receipts[i] = voter.createBallot(i, userCodes[i]);
-    		expect (receipts[i].choice) .toBe(i);
+    		receipts[i] = voter.createBallot([i], userCodes[i]);
+    		expect (crypto.hexStringToInt(receipts[i].choice[0])) .toEqual(i);
     		expect (receipts[i].userCode) .toBe(userCodes[i]);
         }
     });
@@ -296,8 +296,10 @@ describe( 'Voting process', function()
         	expect(p.first).toBe(electionID);
         	var choice_verifCode = p.second;
         	p = unpair(choice_verifCode);
-        	var choice = crypto.hexStringToInt(p.first);
-        	var verificationCode = p.second;
+        	var choice = p.first.match(/\d{1,8}/g);
+        	for(var i=0; i < choice.length; i++)
+        		choice[i] = crypto.hexStringToInt(choice[i]);
+            var verificationCode = p.second;
         	p = unpair(verificationCode);
         	expect(p.first === TAG_VERIFCODEAUTO || p.first === TAG_VERIFCODEUSER).toBe(true);
         	if(p.first === TAG_VERIFCODEAUTO)
@@ -345,7 +347,7 @@ describe( 'Voting process', function()
 
         // Let us now take a voter whose ballot was ignored (was
         // not cast):
-        var rec = voter.createBallot(i, crypto.nonce().slice(0,6));
+        var rec = voter.createBallot([i], crypto.nonce().slice(0,6));
         var res = voter.checkColServerResult(cs.getResult(), rec);
         expect(res.ok).toBe(false);
         expect(res.descr).toBe('Ballot not found');

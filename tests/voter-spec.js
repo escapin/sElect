@@ -33,10 +33,10 @@ describe( 'Voter Client', function()
         var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys);
 
         // Create a ballot: [choice, userCode]
-        var choice = 3;
+        var choice = [1, 2];
+        var choiceCloned = [1, 2];
         var userCode = "attack vector !@#$%^&*(a 感谢您联系";
-        var receipt = voter.createBallot(choice, userCode);
-
+        var receipt = voter.createBallot(choiceCloned, userCode);
         // Create the signature of the collecting server
         var message = pair(TAG_ACCEPTED, pair(electionID, receipt.ballot));
         var signature = crypto.sign(colServerKey.signingKey, message);
@@ -49,7 +49,12 @@ describe( 'Voter Client', function()
         expect(receiptOK).toBe(true);
 
         // Re-create the ballot using the randomness in the receipt:
-        var choiceMsg = crypto.int32ToHexString(choice);
+        var choiceMsg = "";
+        var tmp;
+    	for(var i=0; i < choice.length; i++){
+    		tmp = crypto.int32ToHexString(choiceCloned[i]);
+    		choiceMsg = choiceMsg + tmp;
+    	}
         var userCodeMsg = strHexConversion.hexEncode(userCode);
         var N = mixServEncKeys.length;
         var verifCode = pair(TAG_VERIFCODEUSER, pair(receipt.receiptID, userCodeMsg));
@@ -73,7 +78,10 @@ describe( 'Voter Client', function()
         p = crypto.deconcatenate(x);
         expect(p.first).toBe(electionID);
         p = crypto.deconcatenate(p.second);
-        expect(crypto.hexStringToInt(p.first)).toBe(choice);
+        var choices = p.first.match(/\d{1,8}/g);
+    	for(var i=0; i < choices.length; i++)
+    		choices[i] = crypto.hexStringToInt(choices[i]);
+        expect(choices).toEqual(choice);
         p = crypto.deconcatenate(p.second);
         expect(p.first).toBe(TAG_VERIFCODEUSER);
         p = crypto.deconcatenate(p.second);
@@ -89,9 +97,10 @@ describe( 'Voter Client', function()
     	        var voter = voterClient.create(electionID, colServVerifKey, mixServEncKeys);
 
     	        // Create a ballot: [choice, userCode]
-    	        var choice = 3;
+    	        var choice = [1, 2];
+    	        var choiceCloned = [1, 2];
     	        
-    	        var receipt = voter.createBallot(choice);
+    	        var receipt = voter.createBallot(choiceCloned);
 
     	        expect(receipt.userCode).toBe('');
     	        
@@ -107,7 +116,12 @@ describe( 'Voter Client', function()
     	        expect(receiptOK).toBe(true);
 
     	        // Re-create the ballot using the randomness in the receipt:
-    	        var choiceMsg = crypto.int32ToHexString(choice);
+    	        var choiceMsg = "";
+    	        var tmp;
+    	    	for(var i=0; i < choice.length; i++){
+    	    		tmp = crypto.int32ToHexString(choiceCloned[i]);
+    	    		choiceMsg = choiceMsg + tmp;
+    	    	}
     	        var N = mixServEncKeys.length;
     	        var verifCode = pair(TAG_VERIFCODEAUTO, receipt.receiptID);
     	        var x = pair(electionID, pair(choiceMsg, verifCode));
@@ -130,7 +144,10 @@ describe( 'Voter Client', function()
     	        p = crypto.deconcatenate(x);
     	        expect(p.first).toBe(electionID);
     	        p = crypto.deconcatenate(p.second);
-    	        expect(crypto.hexStringToInt(p.first)).toBe(choice);
+    	        var choices = p.first.match(/\d{1,8}/g);
+    	    	for(var i=0; i < choices.length; i++)
+    	    		choices[i] = crypto.hexStringToInt(choices[i]);
+    	        expect(choices).toEqual(choice);
     	        p = crypto.deconcatenate(p.second);
     	        expect(p.first).toBe(TAG_VERIFCODEAUTO);
     	        expect(p.second).toBe(receipt.receiptID);
