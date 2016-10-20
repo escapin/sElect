@@ -177,7 +177,7 @@ testdownload:
 	-mkdir -p lib
 	wget -P lib -nc http://central.maven.org/maven2/junit/junit/${JUNIT_v}/junit-${JUNIT_v}.jar
 	wget -P lib -nc http://central.maven.org/maven2/org/bouncycastle/bcprov-${BCPROV_t}/${BCPROV_v}/bcprov-${BCPROV_t}-${BCPROV_v}.jar
-	wget -P lib -nc https://hamcrest.googlecode.com/files/hamcrest-core-${HARMCRESTCORE_v}.jar
+	wget -P lib -nc https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/${HARMCRESTCORE_v}/hamcrest-core-${HARMCRESTCORE_v}.jar
 
 testconfigs:
 	-mkdir -p bin
