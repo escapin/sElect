@@ -22,7 +22,6 @@ if(seperateAuthentication){
     document.getElementById("authChannel").src = config.authChannel;
     var iframe = document.getElementById("authChannel").contentWindow;
     var url = window.location.href;
-    console.log(url);
     var isDone = window.location.search == "?done";
     history.pushState("", "", url.replace("?done", ""));
 	
@@ -202,10 +201,9 @@ if(seperateAuthentication){
             // TODO: what to do in this case (the final server is
             // down or it works for a different election ID)
             showTab('#processing');	// for now, we just go to voting
-            document.getElementById("authChannel").addEventListener("load", function() {
+            window.setInterval(function() {
             	iframe.postMessage({manifest: manifest}, "*");
-            	window.location.href = authenticatorURI+"?"+encodeURIComponent(config.authChannel); 
-            }); 
+            }, 100);
         });
 
     }
@@ -913,7 +911,7 @@ if(seperateAuthentication){
     		onAuthDone(event.data.result);
     	}
     	else if(event.data === "received"){
-        	window.location.href = authenticatorURI+"?"+encodeURIComponent(config.authChannel); 
+        	window.location.href = authenticatorURI; 
     	}
     },false);
 <%

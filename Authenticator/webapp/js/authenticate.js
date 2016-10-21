@@ -19,9 +19,13 @@ function authenticate(){
 
     var electionID = null;
     var printableElID = null; // electionID.slice(0,6) + '...';
-	
-    var votingBooth = document.referrer;
-    var iframePath = decodeURIComponent(window.location.search.substring(1));
+    
+    var config = JSON.parse(configRaw);
+    var votingBooth = config.votingBooth;
+    document.getElementById("authChannel").src = config.authChannel;
+    var iframe = document.getElementById("authChannel").contentWindow;
+    
+    var iframePath = config.authChannel;
     var parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
     var parts = parse_url.exec( iframePath );
     var authOrigin = parts[1]+':'+parts[2]+parts[3] ;
@@ -33,30 +37,7 @@ function authenticate(){
     if(authOrigin.charAt(authOrigin.length-1) === '/'){
     	authOrigin = authOrigin.slice(0, -1);
     }
-    // the domain of the Authentication Channel received from the Voting Booth must be in the list of trusted domains
-    if(trustedOrigins.indexOf(authOrigin)<0){
-    	// check for wildcard trustedOrigins
-    	var trust = false;
-    	for(var i = 0; i < trustedOrigins.length; i++){
-    		if(trustedOrigins[i].indexOf("://*.")>0){	//wildcard
-    			var tOrigin = trustedOrigins[i].split("*.")
-    			var aOrigin = authOrigin.replace("://", "://*.").split("*.")
-    			if(tOrigin[1] === aOrigin[1].slice(-1*tOrigin[1].length) && tOrigin[0] === aOrigin[0]){
-    				trust = true;
-    				break;
-    			}
-    		}
-    	}
-    	if(!trust){
-    		console.log("URI of the Authentication Channel recieved from the Voting Booth is not trusted!")
-    		iframePath = "";
-    	}
-    }
     
-	document.getElementById("authChannel").src = iframePath;
-	var iframe = document.getElementById("authChannel").contentWindow;
-	var url = window.location.href;
-	history.pushState("", "", url.replace(window.location.search, ""));
     //////////////////////////////////////////////////////////////////////////////
     /// AUXILIARY FUNCTIONS
 
