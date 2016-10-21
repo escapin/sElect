@@ -222,6 +222,9 @@ function authenticate(){
     	    $('h3.subtitle').html(manifest.description);
     		initiate(); // shows welcome tab
     	}
+    	else if(event.data.hasOwnProperty("err")){
+    		window.location.href = votingBooth;
+    	}
     },false);
     var getManifest = window.setInterval(function() {
     	iframe.postMessage('retrieveManifest', "*");  

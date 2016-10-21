@@ -25,8 +25,13 @@ function authChannel(){
 	    }
 	    else if(event.data === "retrieveManifest"){
 	    	// when the parent page is 'loaded', provide to this page the election manifest
-	    	var manifest = JSON.parse(sessionStorage.getItem("manifest"));
-			parent.postMessage({manifest: manifest}, "*");
+	    	if(manifest === null){
+	    		parent.postMessage({err: "no manifest is stored"}, "*");
+	    	}
+	    	else{
+		    	var manifest = JSON.parse(sessionStorage.getItem("manifest"));
+				parent.postMessage({manifest: manifest}, "*");
+	    	}
 	    }
 	    else if(event.data.hasOwnProperty("credentials")){
 	    	// email and otp
