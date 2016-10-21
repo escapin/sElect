@@ -31,8 +31,7 @@ function authenticate(){
     var authOrigin = parts[1]+':'+parts[2]+parts[3] ;
     var tempAddr = iframePath.split(":")
     if(tempAddr.length > 2){
-    	tempAddr = tempAddr[2].split("/");
-    	authOrigin = iframePath.replace("/"+tempAddr[1], '');
+    	authOrigin = parts[1]+':'+parts[2]+iframePath.split("/")[2];
     }
     if(authOrigin.charAt(authOrigin.length-1) === '/'){
     	authOrigin = authOrigin.slice(0, -1);
