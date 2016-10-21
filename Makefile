@@ -58,10 +58,12 @@ filesconfigs:
 	cp templates/select.* _sElectConfigFiles_
 	cp templates/ElectionManifest.json _sElectConfigFiles_
 	cp templates/config_vb.json VotingBooth/config.json
+	cp templates/config_auth.json Authenticator/config.json
 	cp templates/config_cs.json CollectingServer/config.json
 	cp templates/config_mix.json MixServer/config.json
 	cp templates/config_bb.json BulletinBoard/config.json
 	ln -fs ../_sElectConfigFiles_/ElectionManifest.json VotingBooth/
+	ln -fs ../_sElectConfigFiles_/ElectionManifest.json Authenticator/
 	cd templates; node domains2js.js
 	mv templates/trustedOrigins_auth.js Authenticator/webapp/trustedOrigins.js
 	mv templates/trustedOrigins_cs.js CollectingServer/webapp/trustedOrigins.js
