@@ -22,12 +22,20 @@ var openElection = (manifest.voters.length === 0); // emtpy list of voters means
 if (openElection)
     console.log('Empty list of voters => election is open (it ballots from everybody)')
 var listOfEligibleVoters = manifest.voters.map(function(k){ return k.email; });
-
 var printableElID = makeBreakable(manifest.hash.slice(0,16).toUpperCase()); // only the first 16 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
 
 // Map of eligible voters
 var eligibleVoters = {};
 for (var i=0; i<listOfEligibleVoters.length; ++i) eligibleVoters[listOfEligibleVoters[i]] = true;
+
+//Check for hidden Voters
+var votersFileExists = fs.existsSync('../eligibleVoters.json');
+if(votersFileExists){
+	var votersFile = JSON.parse(fs.readFileSync("../_configFiles_/handlerConfigFile.json"));
+	var listOfHiddenVoters = votersFile.voters.map(function(k){ return k.email; });
+	for (var i=0; i<listOfHiddenVoters.length; ++i) eligibleVoters[listOfHiddenVoters[i]] = true;
+}
+	
 
 // Checks if the voter is eligible. In an election is open, then every voter is eligible.
 function isEligibleVoter(voter) {
