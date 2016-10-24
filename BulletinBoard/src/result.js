@@ -174,8 +174,9 @@ exports.parseFinalResult = function(signedFinalResult) {
     for (var i=0; i<ccount.length; ++i) {
         summary.push({choice : manifest.choices[i],  votes : ccount[i] });
     }
-
+    summary.sort(function(a,b){return a.votes-b.votes})
     exports.summary = summary;
+    summary.reverse();
     exports.finalResult = t;
 }
 
