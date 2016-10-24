@@ -8,6 +8,7 @@ var csCore = require('./csCore.js');
 var sendEmail = require('./sendEmail');
 var crypto = require('cryptofunc');
 var selectUtils = require('selectUtils');
+var bcrypt = require("bcryptjs");
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // State
@@ -22,24 +23,31 @@ var openElection = (manifest.voters.length === 0); // emtpy list of voters means
 if (openElection)
     console.log('Empty list of voters => election is open (it ballots from everybody)')
 var listOfEligibleVoters = manifest.voters;
-var printableElID = makeBreakable(manifest.hash.slice(0,16).toUpperCase()); // only the first 16 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
 
-// Map of eligible voters
-var eligibleVoters = {};
-for (var i=0; i<listOfEligibleVoters.length; ++i) eligibleVoters[listOfEligibleVoters[i]] = true;
+var printableElID = makeBreakable(manifest.hash.slice(0,16).toUpperCase()); // only the first 16 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
 
 //Check for hidden Voters
 var votersFileExists = fs.existsSync('./eligibleVoters.json');
 if(votersFileExists){
 	var votersFile = JSON.parse(fs.readFileSync("./eligibleVoters.json"));
 	var listOfHiddenVoters = votersFile.voters;
-	for (var i=0; i<listOfHiddenVoters.length; ++i) eligibleVoters[listOfHiddenVoters[i]] = true;
 }
 	
 
 // Checks if the voter is eligible. In an election is open, then every voter is eligible.
 function isEligibleVoter(voter) {
-    return  (openElection && validEmail(voter)) || (eligibleVoters.hasOwnProperty(voter) && eligibleVoters[voter]===true);
+	if(openElection && validEmail(voter)) return true;
+	for (var i=0; i<listOfEligibleVoters.length; ++i){
+		if(voter === listOfEligibleVoters[i]) return true;
+	}
+	if(votersFileExists){
+		for (var i=0; i<listOfHiddenVoters.length; ++i){
+			var salt = bcrypt.getSalt(listOfHiddenVoters[i]);
+			var hash = bcrypt.hashSync(voter, salt);
+			if(hash === listOfHiddenVoters[i]) return true;
+		}
+	}
+	return false;
 }
 
 var emailPattern = /^\S+@\S+$/;
