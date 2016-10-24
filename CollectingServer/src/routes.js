@@ -29,9 +29,9 @@ var eligibleVoters = {};
 for (var i=0; i<listOfEligibleVoters.length; ++i) eligibleVoters[listOfEligibleVoters[i]] = true;
 
 //Check for hidden Voters
-var votersFileExists = fs.existsSync('../eligibleVoters.json');
+var votersFileExists = fs.existsSync('./eligibleVoters.json');
 if(votersFileExists){
-	var votersFile = JSON.parse(fs.readFileSync("../_configFiles_/handlerConfigFile.json"));
+	var votersFile = JSON.parse(fs.readFileSync("./eligibleVoters.json"));
 	var listOfHiddenVoters = votersFile.voters.map(function(k){ return k.email; });
 	for (var i=0; i<listOfHiddenVoters.length; ++i) eligibleVoters[listOfHiddenVoters[i]] = true;
 }
