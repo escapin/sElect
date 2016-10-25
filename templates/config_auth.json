@@ -1,0 +1,5 @@
+{
+    "showOtp": true,
+    "votingBooth": "http://localhost:3333/votingBooth.html",
+    "authChannel": "http://localhost:3299/authChannel.html"
+}
