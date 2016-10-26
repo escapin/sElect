@@ -877,8 +877,8 @@ if(seperateAuthentication){
     $('h1.title').html(manifest.title + '<div class="electionid">Election Identifier: ' +printableElID+ '</div>');
     $('h3.subtitle').html(manifest.description);
     $('#choice-list').html(optionsAsHTML());
-    $('#question').html(electionQuestion);
-    $('#furtherInfo').html("\n"+manifest.furtherInfo);
+    $('#question').html(electionQuestion+'<br><ldetails id="furtherInfo"></ldetails>');
+    $('#furtherInfo').html(manifest.furtherInfo);
     
     
     
