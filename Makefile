@@ -78,8 +78,8 @@ filescopy:
 	cp node_modules/strHexConversion.js VotingBooth/webapp/js/strHexConversion.js
 
 libdownload:
-	-rm VotingBooth/webapp/js/jquery-1.11.1.min.js
-	cd VotingBooth/webapp/js; wget http://code.jquery.com/jquery-1.11.1.min.js
+	-rm VotingBooth/webapp/js/jquery-2.1.1.min.js
+	cd VotingBooth/webapp/js; wget http://code.jquery.com/jquery-2.1.1.min.js
 	-rm VotingBooth/webapp/js/bluebird.min.js
 	cd VotingBooth/webapp/js; wget https://cdn.jsdelivr.net/bluebird/latest/bluebird.min.js
 	-rm VotingBooth/webapp/pure/pure-min.css
@@ -88,8 +88,8 @@ libdownload:
 	cd VotingBooth/webapp/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-old-ie-min.css
 	-rm VotingBooth/webapp/pure/grids-responsive-min.css
 	cd VotingBooth/webapp/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css 
-	-rm BulletinBoard/public/js/jquery-1.11.1.min.js
-	cd BulletinBoard/public/js; wget http://code.jquery.com/jquery-1.11.1.min.js
+	-rm BulletinBoard/public/js/jquery-2.1.1.min.js
+	cd BulletinBoard/public/js; wget http://code.jquery.com/jquery-2.1.1.min.js
 	-rm BulletinBoard/public/pure/pure-min.css
 	cd BulletinBoard/public/pure; wget http://yui.yahooapis.com/pure/0.5.0/pure-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-old-ie-min.css
@@ -110,8 +110,8 @@ roboto:
 copydownloads:
 	cp -Rf VotingBooth/webapp/roboto Authenticator/webapp/
 	cp -Rf VotingBooth/webapp/pure Authenticator/webapp/
-	cp -f VotingBooth/webapp/js/jquery-1.11.1.min.js Authenticator/webapp/js/
-	cp -f VotingBooth/webapp/js/jquery-1.11.1.min.js CollectingServer/webapp/js/
+	cp -f VotingBooth/webapp/js/jquery-2.1.1.min.js Authenticator/webapp/js/
+	cp -f VotingBooth/webapp/js/jquery-2.1.1.min.js CollectingServer/webapp/js/
 
 devclean: cleanElection javaclean npmclean votingboothclean bbclean configsclean
 
@@ -132,7 +132,7 @@ votingboothclean:
 	-rm VotingBooth/webapp/js/voterClient.js
 	-rm VotingBooth/webapp/js/cryptofunc.js
 	-rm VotingBooth/webapp/ElectionManifest.js
-	-rm VotingBooth/webapp/js/jquery-1.11.1.min.js
+	-rm VotingBooth/webapp/js/jquery-2.1.1.min.js
 	-rm VotingBooth/webapp/js/bluebird.min.js
 	-rm VotingBooth/webapp/pure/pure-min.css
 	-rm VotingBooth/webapp/pure/grids-responsive-old-ie-min.css
@@ -141,7 +141,7 @@ votingboothclean:
 
 
 bbclean:	
-	-rm BulletinBoard/public/js/jquery-1.11.1.min.js
+	-rm BulletinBoard/public/js/jquery-2.1.1.min.js
 	-rm BulletinBoard/public/pure/pure-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-old-ie-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-min.css
