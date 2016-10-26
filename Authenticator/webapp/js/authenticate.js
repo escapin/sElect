@@ -64,9 +64,41 @@ function authenticate(){
 		if(manifest.showOtp){
     		document.getElementById('mock_info').innerHTML = "<br>(Since you're trying the demo, no email will be sent to you: You can provide a <em>fake</em> one as well.)";
     	}
-		showTab('#welcome');
+		
+		csStatus()
+        .then(function (resultReady) {  
+            if (resultReady) {
+                window.location.href = votingBooth;
+            }
+            else{
+        		showTab('#welcome');
+            }
+        })
+        .catch(function (err) {
+            console.log('Problem with the final server:', err)
+            // TODO: what to do in this case (the final server is
+            // down or it works for a different election ID)
+            showTab('#processing');	// for now, we just go to voting
+            window.setInterval(function() {
+            	iframe.postMessage({manifest: manifest}, "*");
+            }, 100);
+        });
 	}
 
+    function csStatus() {
+        return new Promise(function (resolve, reject) {
+            var url = manifest.collectingServer.URI+'/status';
+            $.get(url)
+             .fail(function () { 
+                reject('The final server is down');
+              })
+             .done(function (result) {  // we have some response
+                if (result.electionID.toUpperCase() !== electionID.toUpperCase()) 
+                    reject('The final server uses a wrong election ID')
+                else resolve (result.status==='closed');
+              });
+        });
+    }
 	
     //////////////////////////////////////////////////////////////////////////////
     /// HANDLERS FOR SUMBITTING DATA 
