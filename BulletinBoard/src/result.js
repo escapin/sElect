@@ -152,9 +152,9 @@ exports.parseFinalResult = function(signedFinalResult) {
     	
     	var userChoices = "";
     	for(var i=0; i < choices.length && i < manifest.maxChoicesPerVoter; i++){
-    		userChoices = userChoices + manifest.choices[choices[i]]+", ";
+    		userChoices = userChoices + manifest.choices[choices[i]]+" | ";
     	}
-    	userChoices = userChoices.substring(0, userChoices.length-2);
+    	userChoices = userChoices.substring(0, userChoices.length-3);
     	
     	t.push({userCode: userCode, receiptID: receiptID, vote: userChoices});
     	if(userCode !== '')
@@ -174,6 +174,7 @@ exports.parseFinalResult = function(signedFinalResult) {
     for (var i=0; i<ccount.length; ++i) {
         summary.push({choice : manifest.choices[i],  votes : ccount[i] });
     }
+    t.sort(function(a,b){return (a.userCode+a.receiptID).localeCompare(b.userCode+b.receiptID) });
     summary.sort(function(a,b){return a.votes-b.votes})
     exports.summary = summary;
     summary.reverse();

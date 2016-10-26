@@ -865,6 +865,7 @@ if(seperateAuthentication){
     var rawTitle = manifest.title; // for showing it on the image (last parameter of the 'verificationCode2DataURL' function) 
     manifest.title = escapeHTML(manifest.title, true);
     manifest.description = escapeHTML(manifest.description, true);
+    manifest.furtherInfo = escapeHTML(manifest.furtherInfo, true);
     //manifest.startTime = escapeHTML(manifest.startTime, true);
     //manifest.endTime = escapeHTML(manifest.endTime, true);
     electionQuestion = escapeHTML(electionQuestion, true);
@@ -877,6 +878,7 @@ if(seperateAuthentication){
     $('h3.subtitle').html(manifest.description);
     $('#choice-list').html(optionsAsHTML());
     $('#question').html(electionQuestion);
+    $('#furtherInfo').html("\n"+manifest.furtherInfo);
     
     
     

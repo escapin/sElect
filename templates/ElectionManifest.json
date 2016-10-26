@@ -8,6 +8,7 @@
     "maxChoicesPerVoter": 3,
     "minChoicesPerVoter": 1,
     "question": "",
+    "furtherInfo": "",
     "choices": [
 	"John Stevens",
 	"Sara Johnson",
