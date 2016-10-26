@@ -23,10 +23,10 @@ var listOfEligibleVoters = manifest.voters;
 var printableElID = makeBreakable(manifest.hash.slice(0,16).toUpperCase()); // only the first 16 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
 var openElection = false;
 //Check for hidden Voters
-var votersFileExists = fs.existsSync('./eligibleVoters.json');
+var votersFileExists = fs.existsSync('./confidentialVoters.json');
 if(votersFileExists){
-	var votersFile = JSON.parse(fs.readFileSync("./eligibleVoters.json"));
-	var listOfHiddenVoters = votersFile.voters;
+	var votersFile = JSON.parse(fs.readFileSync("./confidentialVoters.json"));
+	var listOfConfidentialVoters = votersFile.voters;
 }
 else{
 	openElection = (manifest.voters.length === 0); // emtpy list of voters means that the election is open (everybody can vote)
@@ -41,10 +41,8 @@ function isEligibleVoter(voter) {
 		if(voter === listOfEligibleVoters[i]) return true;
 	}
 	if(votersFileExists){
-		for (var i=0; i<listOfHiddenVoters.length; ++i){
-			var salt = bcrypt.getSalt(listOfHiddenVoters[i]);
-			var hash = bcrypt.hashSync(voter, salt);
-			if(hash === listOfHiddenVoters[i]) return true;
+		for (var i=0; i<listOfConfidentialVoters.length; ++i){
+			if(voter === listOfConfidentialVoters[i]) return true;
 		}
 	}
 	return false;
