@@ -64,7 +64,6 @@ function authenticate(){
 		if(manifest.showOtp){
     		document.getElementById('mock_info').innerHTML = "<br>(Since you're trying the demo, no email will be sent to you: You can provide a <em>fake</em> one as well.)";
     	}
-		
 		csStatus()
         .then(function (resultReady) {  
             if (resultReady) {
@@ -78,10 +77,7 @@ function authenticate(){
             console.log('Problem with the final server:', err)
             // TODO: what to do in this case (the final server is
             // down or it works for a different election ID)
-            showTab('#processing');	// for now, we just go to voting
-            window.setInterval(function() {
-            	iframe.postMessage({manifest: manifest}, "*");
-            }, 100);
+            window.location.href = votingBooth;
         });
 	}
 
