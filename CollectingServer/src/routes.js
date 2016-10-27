@@ -391,8 +391,9 @@ function sendData(data, URI, destserv_options) {
     // one could add something like {timeout:10000} to the request below, after 'toBeSent'
     destServ.post('data', toBeSent, function(err, otp_res, body) {
         if (err) {
-            winston.info(" ...Error: Cannot send the result to '%s': %s", URI, err);
-        }
+            winston.info(" ...Error: Cannot send the result to '%s': ", URI, err);
+            winston.info(">" + err + "<");
+        }1
         else {
             winston.info(" ...Result sent to '%s'", URI);
             winston.info(" ...Response: ", body);

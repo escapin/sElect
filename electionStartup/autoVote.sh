@@ -6,11 +6,12 @@ maxChoicesPerVoter=3
 maxTabs=$(($numberOfChoices/$maxChoicesPerVoter))
 email="scapin.enrico+"
 provider="@gmail.com"
-numberOfVoters=99
-counter=10
+numberOfVoters=50
+counter=35
 
+sleep 3
 while [ $counter -lt $numberOfVoters ]; do
-	sleep 3
+	sleep 1.8
 	xdotool key Tab
 	xdotool type $email$counter$provider
 	xdotool key Return
