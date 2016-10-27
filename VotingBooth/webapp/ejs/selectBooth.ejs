@@ -354,8 +354,8 @@ if(seperateAuthentication){
         fetchData(url)
         .catch(function (err) {
             console.log('Cannot get the result from the final server:', err);
-            verwriter.writee('Cannot get the final result of the election.', err);
-            verwriter.writep('Please, visit (reopen) this web page again later.', err);
+            verwriter.writee('Cannot get the final result of the election.');
+            verwriter.writep('Please, visit (reopen) this web page again later.');
         })
         .then(function (data) {
             console.log('Result of the final mix server fetched:');
