@@ -393,7 +393,7 @@ function sendData(data, URI, destserv_options) {
         if (err) {
             winston.info(" ...Error: Cannot send the result to '%s': ", URI, err);
             winston.info(">" + err + "<");
-        }1
+        }
         else {
             winston.info(" ...Result sent to '%s'", URI);
             winston.info(" ...Response: ", body);
