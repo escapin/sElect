@@ -38,11 +38,11 @@ if (openElection)
 function isEligibleVoter(voter) {
 	if(openElection && validEmail(voter)) return true;
 	for (var i=0; i<listOfEligibleVoters.length; ++i){
-		if(voter === listOfEligibleVoters[i]) return true;
+		if(voter.toLowerCase() === listOfEligibleVoters[i].toLowerCase()) return true;
 	}
 	if(votersFileExists){
 		for (var i=0; i<listOfConfidentialVoters.length; ++i){
-			if(voter === listOfConfidentialVoters[i]) return true;
+			if(voter.toLowerCase() === listOfConfidentialVoters[i].toLowerCase()) return true;
 		}
 	}
 	return false;
