@@ -86,7 +86,7 @@ if(seperateAuthentication){
         ctx.fillRect(0,0,650,125);
         ctx.fillStyle = "black";
         ctx.font = "16px helvetica";
-        ctx.fillText('sElect verification code', 10, 25);
+        ctx.fillText('Your verification code for sElect', 10, 25);
         ctx.font = "14px helvetica";
         ctx.fillText('Election ID: '+elID, 10, 48);
         ctx.fillText('Election title: '+elTitle, 10, 68);
@@ -547,7 +547,7 @@ if(seperateAuthentication){
         $('#choice').fadeOut(FADE_TIME, function() {
 
             // Create the ballot
-            console.log('CREATING BALLOT FOR:', randomCode, choices);
+            //console.log('CREATING BALLOT FOR:', randomCode, choices);
             receipt = voter.createBallot(choices, randomCode);
             // console.log('RECEIPT:', receipt);
             showProgressIcon();
