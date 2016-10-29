@@ -82,14 +82,22 @@ if(seperateAuthentication){
     function verificationCode2DataURL(verificationCode, elID, elTitle) {
         // draw the verification code:
         var ctx = verCodeCanvas.getContext('2d');
+
+        // hacking the width of the canvas for adapting to the length of the election title
+        ctx.font = "14px helvetica";
+        electionTitleText = 'Election title: '+elTitle;
+        var textWidth = Math.ceil(ctx.measureText(electionTitleText).width)+20;
+        var correctWidth = textWidth>480? textWidth:480;
+        verCodeCanvas.setAttribute('width', correctWidth);
+
         ctx.fillStyle = "white";
-        ctx.fillRect(0,0,650,125);
+        ctx.fillRect(0,0,correctWidth,125);
         ctx.fillStyle = "black";
         ctx.font = "16px helvetica";
         ctx.fillText('Your verification code for sElect', 10, 25);
         ctx.font = "14px helvetica";
         ctx.fillText('Election ID: '+elID, 10, 48);
-        ctx.fillText('Election title: '+elTitle, 10, 68);
+        ctx.fillText(electionTitleText, 10, 68);
         ctx.font = "24px roboto";
         ctx.fillText('Verification Code: '+verificationCode, 10, 103);
         // encode the canvas picture as a data URL and return it
@@ -574,7 +582,7 @@ if(seperateAuthentication){
                 storeReceipt(receipt);
                 // prepare and show the "ballot accepted" tab
                 var recid = receipt.userCode + receipt.receiptID.toUpperCase();
-                var durl = verificationCode2DataURL(recid, printableElID, rawTitle.slice(0,16));
+                var durl = verificationCode2DataURL(recid, printableElID, rawTitle);
                 
                 recid = '<span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(receipt.userCode, true)+'</span>' + receipt.receiptID.toUpperCase();                        
                 //recid = '<b>'+escapeHTML(receipt.userCode, true)+'</b>' + receipt.receiptID.toUpperCase();                        
@@ -749,7 +757,7 @@ if(seperateAuthentication){
                         
                         // prepare and show the "ballot accepted" tab
                         var recid = receipt.userCode + receipt.receiptID.toUpperCase();
-                        var durl = verificationCode2DataURL(recid, printableElID, rawTitle.slice(0,16));
+                        var durl = verificationCode2DataURL(recid, printableElID, rawTitle);
                         
                         recid = '<span style="font-family: \'Courier New\', monospace; color: #777;">'+escapeHTML(receipt.userCode, true)+'</span>' + receipt.receiptID.toUpperCase();                        
                         //recid = '<b>'+escapeHTML(receipt.userCode, true)+'</b>' + receipt.receiptID.toUpperCase();                        
