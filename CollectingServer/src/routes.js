@@ -157,7 +157,7 @@ var log = fs.createWriteStream(config.ACCEPTED_BALLOTS_LOG_FILE, {flags:'a', enc
 
 exports.otp = function otp(req, res) 
 {
-    var email = req.body.email.trim();
+    var email = req.body.email.trim().toLowerCase();
     var reqElId = req.body.electionID;
 
     if (!status.isActive()) { // if the status is not active, reject the request
@@ -253,7 +253,7 @@ exports.otp = function otp(req, res)
 
 exports.cast = function cast(req, res) 
 {
-    var email = req.body.email.trim();
+    var email = req.body.email.trim().toLowerCase();
     var otp = req.body.otp.trim();
     var ballot = req.body.ballot;
     var reqElID = req.body.electionID;
