@@ -1,13 +1,13 @@
 #!/bin/bash
 # Works with Firefox in autofocus
 
-numberOfChoices=25
+numberOfChoices=8
 maxChoicesPerVoter=3
 maxTabs=$(($numberOfChoices/$maxChoicesPerVoter))
-email="scapin.enrico+"
-provider="@gmail.com"
+email="voter+"
+provider="@test.org"
 numberOfVoters=50
-counter=35
+counter=0
 
 sleep 3
 while [ $counter -lt $numberOfVoters ]; do

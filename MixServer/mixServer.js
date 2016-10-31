@@ -55,7 +55,10 @@ var app = express();
 app.use(cors()); // enable all CORS request
 app.set('views', './views');    // view engine and location of the views
 app.set('view engine', 'ejs');
-app.use(bodyParser.json());
+if(config.bodyParserLimit)
+	app.use(bodyParser.json({limit: config.bodyParserLimit}));
+else
+	app.use(bodyParser.json());
 app.use(express.static('./public')); // static content
 //app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging
 var accessLogStream = fs.createWriteStream('./access.log', {flags: 'a'});
