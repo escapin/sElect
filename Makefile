@@ -154,8 +154,8 @@ configfilesclean:
 	-rm CollectingServer/config.json
 	-rm MixServer/config.json
 	-rm BulletinBoard/config.json
-	-rm Authenticator/webapp/trustedDomains.js
-	-rm CollectingServer/webapp/trustedDomains.js
+	-rm Authenticator/webapp/trustedOrigins.js
+	-rm CollectingServer/webapp/trustedOrigins.js
 
 mixdirsclean:
 	@echo   Removing: 	$(shell ls MixServer | egrep "mix[0-9]+")
