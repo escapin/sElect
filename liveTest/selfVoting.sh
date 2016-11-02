@@ -2,7 +2,7 @@
 
 # Requires 'xdotool'
 # Works with Firefox in autofocus
-# sElect settings: {userChosenRandomness: false; showOtp: true}
+# sElect settings must be: {userChosenRandomness: false; showOtp: true}
 
 numberOfChoices=8
 maxChoicesPerVoter=3
