@@ -27,6 +27,21 @@ function splitter(msg, callback) {
     }
 }
 
+function isMalformed(voterChoices){
+	if(voterChoices.length < manifest.minvoterChoicesPerVoter || voterChoices.length > manifest.maxvoterChoicesPerVoter)
+		return true;
+	
+	voterChoices.sort(function(a,b){return a-b});
+	for(var i=0; i < voterChoices.length; i++){
+		if(voterChoices[i] < 0 || voterChoices[i] > manifest.voterChoices.length)
+			return true;
+		if(i>0 && voterChoices[i] === voterChoices[i-1])
+			return true;
+	}
+	
+	return false;
+}
+
 // expected data format:
 // 		SIGN_collectinServer[electionID, receiptID, votersList]
 //
@@ -113,8 +128,7 @@ exports.parseFinalResult = function(signedFinalResult) {
     console.log("*** Parsing the voters' choices.");
     var malformedExists = false;
     for (var i=0; !data.empty(); ++i) {
-    	console.log(i);
-    	var malformed = false;
+    	//console.log(i);
     	p = crypto.deconcatenate(data.nextMessage());
     	// Check the election id
     	if(p.first.toUpperCase() !== manifest.hash.toUpperCase()) {
@@ -124,29 +138,19 @@ exports.parseFinalResult = function(signedFinalResult) {
     	var choice_verifCode = p.second;
     	p = crypto.deconcatenate(choice_verifCode);
     	var verificationCode = p.second;
-    	var choices = p.first.match(/\d{1,8}/g);
-    	if(choices === null){
+    	var voterChoices = p.first.match(/\d{1,8}/g);
+    	if(voterChoices === null){
     		console.log("no choices made for this ballot");
     		continue;
     	}
-    	var validBallot = true;
-    	for(var i=0; i < choices.length; i++){
-    		choices[i] = crypto.hexStringToInt(choices[i]);
-    		if(choices[i] < 0 || choices[i] > manifest.choices.length){
-    			validBallot = false;
-    		}
-    	}
-    	//dismiss voter if not enough choices selected
-    	if(!validBallot || choices.length < manifest.minChoicesPerVoter || choices.length > manifest.maxChoicesPerVoter){
-    		malformed = true;
+    	
+    	for(var i=0; i < voterChoices.length; i++)
+    		voterChoices[i] = crypto.hexStringToInt(voterChoices[i]);
+    	
+    	var malformed = isMalformed(voterChoices);
+    	if(malformed) 
     		malformedExists = true;
-    	}
-    	for(var i = 1; i < choices.length; i++){
-    		if(choices[i] === choices[i-1]){
-    			malformed = true;
-    			malformedExists = true;
-    		}
-    	}
+    	
     	// Verification code
     	p = crypto.deconcatenate(verificationCode);
     	var receiptID;
@@ -162,8 +166,8 @@ exports.parseFinalResult = function(signedFinalResult) {
     		console.log('ERROR: Wrong verification code format');
     	
     	var userChoices = "";
-    	for(var i=0; i < choices.length && i < manifest.maxChoicesPerVoter; i++){
-    		userChoices = userChoices + manifest.choices[choices[i]]+" | ";
+    	for(var i=0; i < voterChoices.length && i < manifest.maxChoicesPerVoter; i++){
+    		userChoices = userChoices + manifest.choices[voterChoices[i]]+" | ";
     	}
     	userChoices = userChoices.substring(0, userChoices.length-3);
     	
@@ -173,9 +177,9 @@ exports.parseFinalResult = function(signedFinalResult) {
     	else
     		console.log(receiptID + "\t" + userChoices);
     	// add one vote for choice 
-    	for(var i=0; i < choices.length && manifest.maxChoicesPerVoter; i++){
+    	for(var i=0; i < voterChoices.length && manifest.maxChoicesPerVoter; i++){
     		if(!malformed)
-    			++ccount[choices[i]];
+    			++ccount[voterChoices[i]];
     	}
         
     }
