@@ -28,12 +28,12 @@ function splitter(msg, callback) {
 }
 
 function isMalformed(voterChoices){
-	if(voterChoices.length < manifest.minvoterChoicesPerVoter || voterChoices.length > manifest.maxvoterChoicesPerVoter)
+	if(voterChoices.length < manifest.minChoicesPerVoter || voterChoices.length > manifest.maxChoicesPerVoter)
 		return true;
 	
 	voterChoices.sort(function(a,b){return a-b});
 	for(var i=0; i < voterChoices.length; i++){
-		if(voterChoices[i] < 0 || voterChoices[i] > manifest.voterChoices.length)
+		if(voterChoices[i] < 0 || voterChoices[i] > manifest.choices.length)
 			return true;
 		if(i>0 && voterChoices[i] === voterChoices[i-1])
 			return true;
