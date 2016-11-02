@@ -4,7 +4,6 @@
 /mix/
 /_sElectConfigFiles_/
 /lib/
-/VotingBooth/ElectionManifest.json
 bin/
 tmp/
 # all 'node_modules' directories except for that in the root dir
@@ -22,4 +21,3 @@ LOG/
 Authenticator/webapp/roboto
 Authenticator/webapp/pure
 *jquery-2.1.1.min.js
-*trustedDomains.js
