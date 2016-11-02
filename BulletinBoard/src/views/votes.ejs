@@ -36,7 +36,11 @@
             	Please check that your choice is listed next to your 
             	verification code.         
             </h3>
-
+            <% if(result[0].malformedExists) { %>
+            	<ldetails>
+            		Test
+            	</ldetails>
+            <% } %>
             <table class="pure-table pure-table-horizontal">
                 <thead>
                     <tr>
@@ -51,7 +55,11 @@
                 <tbody>
                     <% for(var i=0; i<result.length; i++) { %>
                        <tr>
-                       	   <td class="verificationCode"><span style="font-family: \'Courier New\', monospace; color: #777;"><%= result[i].userCode %></span><%=result[i].receiptID.toUpperCase() %></td>
+                           <% if(result[i].malformed) { %>
+                       	       <td class="verificationCode"><s style="color:red"><span style="font-family: \'Courier New\', monospace; color: #777;"><%= result[i].userCode %></span><span style="color: black;"><%=result[i].receiptID.toUpperCase() %></span></s></td>
+                           <% }else{ %>
+                       	       <td class="verificationCode"><span style="font-family: \'Courier New\', monospace; color: #777;"><%= result[i].userCode %></span><%=result[i].receiptID.toUpperCase() %></td>
+                           <% } %>
                            <td class="vote"> <%= result[i].vote %> </td>
                        </tr>
                     <% } %>

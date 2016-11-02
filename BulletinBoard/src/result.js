@@ -111,7 +111,10 @@ exports.parseFinalResult = function(signedFinalResult) {
     var t = [];
     var ccount = manifest.choices.map(function(x) {return 0;}); // initialize the counters for choices with 0's
     console.log("*** Parsing the voters' choices.");
+    var malformedExists = false;
     for (var i=0; !data.empty(); ++i) {
+    	console.log(i);
+    	var malformed = false;
     	p = crypto.deconcatenate(data.nextMessage());
     	// Check the election id
     	if(p.first.toUpperCase() !== manifest.hash.toUpperCase()) {
@@ -123,6 +126,7 @@ exports.parseFinalResult = function(signedFinalResult) {
     	var verificationCode = p.second;
     	var choices = p.first.match(/\d{1,8}/g);
     	if(choices === null){
+    		console.log("no choices made for this ballot");
     		continue;
     	}
     	var validBallot = true;
@@ -133,8 +137,15 @@ exports.parseFinalResult = function(signedFinalResult) {
     		}
     	}
     	//dismiss voter if not enough choices selected
-    	if(!validBallot || choices.length < manifest.minChoicesPerVoter){
-    		continue;
+    	if(!validBallot || choices.length < manifest.minChoicesPerVoter || choices.length > manifest.maxChoicesPerVoter){
+    		malformed = true;
+    		malformedExists = true;
+    	}
+    	for(var i = 1; i < choices.length; i++){
+    		if(choices[i] === choices[i-1]){
+    			malformed = true;
+    			malformedExists = true;
+    		}
     	}
     	// Verification code
     	p = crypto.deconcatenate(verificationCode);
@@ -156,15 +167,15 @@ exports.parseFinalResult = function(signedFinalResult) {
     	}
     	userChoices = userChoices.substring(0, userChoices.length-3);
     	
-    	t.push({userCode: userCode, receiptID: receiptID, vote: userChoices});
+    	t.push({userCode: userCode, receiptID: receiptID, vote: userChoices, malformed: malformed});
     	if(userCode !== '')
     		console.log(userCode + "\t" + receiptID + "\t" + userChoices);
     	else
     		console.log(receiptID + "\t" + userChoices);
-    	
     	// add one vote for choice 
     	for(var i=0; i < choices.length && manifest.maxChoicesPerVoter; i++){
-    		++ccount[choices[i]];
+    		if(!malformed)
+    			++ccount[choices[i]];
     	}
         
     }
@@ -175,6 +186,8 @@ exports.parseFinalResult = function(signedFinalResult) {
         summary.push({choice : manifest.choices[i],  votes : ccount[i] });
     }
     t.sort(function(a,b){return (a.userCode+a.receiptID).localeCompare(b.userCode+b.receiptID) });
+    if(malformedExists)
+    	t[0].malformedExists = true;
     summary.sort(function(a,b){return a.votes-b.votes})
     exports.summary = summary;
     summary.reverse();
@@ -332,5 +345,4 @@ exports.loadResult = function () {
 //    }
 
 }
-
 

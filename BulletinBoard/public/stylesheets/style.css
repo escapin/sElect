@@ -178,3 +178,9 @@ td.choice{
 h3.subtitle, td.verificationCode, td.vote, td.voters, td.choice, td.voters, td.details, span.descriptionBB {
 	color: black !important;
 }
+
+ldetails {
+	color: black;
+    font-weight: 300;
+    font-size: 11pt;
+}
