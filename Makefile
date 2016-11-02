@@ -146,14 +146,17 @@ bbclean:
 	-rm BulletinBoard/public/pure/grids-responsive-old-ie-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-min.css
 
-configsclean: configfilesclean mixdirsclean
+configsclean: filesconfigsclean mixdirsclean
 
-configfilesclean:
+filesconfigsclean:
 	-rm -r _sElectConfigFiles_
 	-rm VotingBooth/config.json
+	-rm Authenticator/config.json
 	-rm CollectingServer/config.json
 	-rm MixServer/config.json
 	-rm BulletinBoard/config.json
+	-rm Authenticator/ElectionManifest.json
+	-rm VotingBooth/ElectionManifest.json
 	-rm Authenticator/webapp/trustedOrigins.js
 	-rm CollectingServer/webapp/trustedOrigins.js
 
