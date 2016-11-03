@@ -180,7 +180,7 @@ h3.subtitle, td.verificationCode, td.vote, td.voters, td.choice, td.voters, td.d
 }
 
 ldetails {
-	color: black;
+	color: red;
     font-weight: 300;
     font-size: 11pt;
 }
