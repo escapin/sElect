@@ -56,7 +56,7 @@
                     <% for(var i=0; i<result.length; i++) { %>
                        <tr>
                            <% if(result[i].malformed) { %>
-                       	       <td class="verificationCode"><s style="color:red"><span style="font-family: \'Courier New\', monospace; color: #777;"><%= result[i].userCode %></span><span style="color: black;"><%=result[i].receiptID.toUpperCase() %></span></s></td>
+                       	       <td class="verificationCode"><span style="font-family: \'Courier New\', monospace; color: #777;"><%= result[i].userCode %></span><%=result[i].receiptID.toUpperCase() %></td>
                                <td class="vote"> <s style="color:red"><span style="color: black;"><%= result[i].vote %></span></s> </td>
                        	   <% }else{ %>
                        	       <td class="verificationCode"><span style="font-family: \'Courier New\', monospace; color: #777;"><%= result[i].userCode %></span><%=result[i].receiptID.toUpperCase() %></td>
