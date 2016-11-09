@@ -24,7 +24,6 @@ h3 {
     font-weight: 300;
     color: #444;
     text-shadow: 0px 0px 1px #bbb;
-    margin-bottom: -0.5em;
 }
 
 h1 {
@@ -184,5 +183,4 @@ ldetails {
 	color: red;
     font-weight: 300;
     font-size: 11pt;
-    line-height: 4em;
 }
