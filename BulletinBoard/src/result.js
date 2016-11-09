@@ -132,26 +132,29 @@ exports.parseFinalResult = function(signedFinalResult) {
     	p = crypto.deconcatenate(data.nextMessage());
     	// Check the election id
     	if(p.first.toUpperCase() !== manifest.hash.toUpperCase()) {
-        	console.log('ERROR: Wrong election ID');
+        	console.log('ERROR: Wrong election ID: ' + p.first);
             return;
         }
-    	var choice_verifCode = p.second;
-    	p = crypto.deconcatenate(choice_verifCode);
-    	var verificationCode = p.second;
-    	var voterChoices = p.first.match(/\d{1,8}/g);
+    	
+    	var choices_verifcode = p.second;
+    	p = crypto.deconcatenate(p.second);
+    	var voterChoices = [];
+    	while(p.first !== "ffffffff" && p.first !== ""){
+    		p = crypto.deconcatenate(p.first);
+    		voterChoices.push(crypto.hexStringToInt(p.second));
+    	}
+
     	if(voterChoices === null){
     		console.log("no choices made for this ballot");
     		continue;
     	}
-    	
-    	for(var i=0; i < voterChoices.length; i++)
-    		voterChoices[i] = crypto.hexStringToInt(voterChoices[i]);
     	
     	var malformed = isMalformed(voterChoices);
     	if(malformed) 
     		malformedExists = true;
     	
     	// Verification code
+    	var verificationCode = crypto.deconcatenate(choices_verifcode).second;
     	p = crypto.deconcatenate(verificationCode);
     	var receiptID;
     	var userCode='';
