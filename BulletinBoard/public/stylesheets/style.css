@@ -137,6 +137,7 @@ div.body {
 .pure-skin-mine table.pure-table  {
     border:none;
     background:white;
+    margin-top: 1em;
 }
 .pure-skin-mine table.pure-table td  {
     background:white;
