@@ -139,6 +139,7 @@ exports.parseFinalResult = function(signedFinalResult) {
     	var choices_verifcode = p.second;
     	p = crypto.deconcatenate(p.second);
     	var voterChoices = [];
+    	// parsing from the last choice to the first one ("ffffffff" at the beginning is the delimiter)
     	while(p.first !== "ffffffff" && p.first !== ""){
     		p = crypto.deconcatenate(p.first);
     		voterChoices.push(crypto.hexStringToInt(p.second));
