@@ -137,12 +137,15 @@ exports.parseFinalResult = function(signedFinalResult) {
         }
     	
     	var choices_verifcode = p.second;
-    	p = crypto.deconcatenate(p.second);
+    	p = crypto.deconcatenate(choices_verifcode);
+    	console.log(p.first);
+    	var verificationCode = p.second
     	var voterChoices = [];
     	// parsing from the last choice to the first one ("ffffffff" at the beginning is the delimiter)
-    	while(p.first !== "ffffffff" && p.first !== ""){
+    	while(p.first !== "ffffffff" && p.second !== ""){
     		p = crypto.deconcatenate(p.first);
     		voterChoices.push(crypto.hexStringToInt(p.second));
+    		console.log(p.second);
     	}
 
     	if(voterChoices === null){
@@ -155,7 +158,6 @@ exports.parseFinalResult = function(signedFinalResult) {
     		malformedExists = true;
     	
     	// Verification code
-    	var verificationCode = crypto.deconcatenate(choices_verifcode).second;
     	p = crypto.deconcatenate(verificationCode);
     	var receiptID;
     	var userCode='';
