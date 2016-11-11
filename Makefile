@@ -112,6 +112,7 @@ copydownloads:
 	cp -Rf VotingBooth/webapp/pure Authenticator/webapp/
 	cp -f VotingBooth/webapp/js/jquery-2.1.1.min.js Authenticator/webapp/js/
 	cp -f VotingBooth/webapp/js/jquery-2.1.1.min.js CollectingServer/webapp/js/
+	cp -Rf VotingBooth/webapp/pure BulletinBoard/public/
 
 devclean: cleanElection javaclean npmclean votingboothclean bbclean configsclean
 
