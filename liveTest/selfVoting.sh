@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Requires 'xdotool'
-# Works with Firefox in autofocus
 # sElect settings must be: {userChosenRandomness: false; showOtp: true}
+# Works ONLY with Firefox in autofocus, with the keyboard layout set to "English(US)"
+
 
 numberOfChoices=8
 maxChoicesPerVoter=3
