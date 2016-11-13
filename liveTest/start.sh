@@ -16,3 +16,7 @@ gnome-terminal --working-directory=$DIR/../mix/00 -e './run.sh'
 gnome-terminal --working-directory=$DIR/../mix/01 -e './run.sh'
 gnome-terminal --working-directory=$DIR/../mix/02 -e './run.sh'
 gnome-terminal --working-directory=$DIR/../Authenticator -e './run.sh'
+
+
+# if no other node processes are active, to close all these
+# gnome-terminal is enough to do 'killall node'
