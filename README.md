@@ -137,7 +137,6 @@ cd VotingBooth
 The web-page of the system (the voting booth) is then available at `localhost:3333/votingBooth.html`.
 
 - To manually close the election, you have to access `localhost:3299/admin/panel` with credentials:
-
 	* user: admin
 	* pwd: 999
 
