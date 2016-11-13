@@ -76,6 +76,9 @@ filescopy:
 	cp node_modules/voterClient.js VotingBooth/webapp/js/voterClient.js
 	cp node_modules/cryptofunc/index.js VotingBooth/webapp/js/cryptofunc.js
 	cp node_modules/strHexConversion.js VotingBooth/webapp/js/strHexConversion.js
+	cp templates/favicon/* VotingBooth/webapp/
+	cp templates/favicon/* Authenticator/webapp/
+	cp templates/favicon/* BulletinBoard/src/views/
 
 libdownload:
 	-rm VotingBooth/webapp/js/jquery-2.1.1.min.js
