@@ -205,7 +205,7 @@ exports.otp = function otp(req, res)
                 winston.info('Sending an email to \'%s\' with OTP  ', email, otp_store[email]);
                 var emailContent = 'This e-mail contains your one-time password (OTP) for the sElect voting system.\n';
                 emailContent += 'Election ID: ' + printableElID + '\nElection title: ' + manifest.title + '\n\n';
-                emailContent += 'Your One-Time Password (OTP): ' + otp_store[email] + '\n\n';
+                emailContent += 'Your One Time Password (OTP): ' + otp_store[email] + '\n\n';
                 emailContent += "Please copy the one-time password above and enter it in this election's web page (field 'one-time password').\n\n";
                 emailContent += 'If you have not logged into the sElect voting system using this e-mail address, please ignore this e-mail.\n';
                 sendEmail(email, 'Your One Time Password for sElect', emailContent, function (err,info) {
