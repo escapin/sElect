@@ -15,7 +15,7 @@ counter=0
 
 sleep 3
 while [ $counter -lt $numberOfVoters ]; do
-	sleep 1.8
+        sleep 1.8
 	xdotool key Tab
 	xdotool type $email$counter$provider
 	xdotool key Return
@@ -43,6 +43,7 @@ while [ $counter -lt $numberOfVoters ]; do
 	xdotool key Return
 	sleep 1
 	xdotool key ctrl+r
+	echo -n -e "\rSimulated voters so far: $counter"
 	let counter=counter+1
 done
 
