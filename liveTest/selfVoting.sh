@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Requires 'xdotool'
+# Tested on Ubuntu 14.04 LTS
+# Requires the 'xdotool' package
 # sElect settings must be: {userChosenRandomness: false; showOtp: true}
 # Works ONLY with Firefox in autofocus, with the keyboard layout set to "English(US)"
 
@@ -15,15 +16,15 @@ counter=0
 
 sleep 3
 while [ $counter -lt $numberOfVoters ]; do
-	sleep 1.8
+	sleep 2
 	xdotool key Tab
 	xdotool type $email$counter$provider
 	xdotool key Return
-	sleep 1
+	sleep 1.1
 	xdotool key Return
-	sleep 0.3
+	sleep 0.4
 	xdotool key Tab
-	sleep 0.3
+	sleep 0.4
 	xdotool key Return
 	sleep 1
 	choices=$(( ( RANDOM % $maxChoicesPerVoter ) +1 ))
