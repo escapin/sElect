@@ -21,3 +21,10 @@ LOG/
 Authenticator/webapp/roboto
 Authenticator/webapp/pure
 *jquery-2.1.1.min.js
+#ignore favicon
+*/webapp/favicon*
+*/webapp/android-icon*
+*/webapp/apple-icon*
+*/src/views/favicon*
+*/src/views/android-icon*
+*/src/views/apple-icon*
