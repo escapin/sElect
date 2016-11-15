@@ -1,4 +1,5 @@
 var fs = require('fs');
+var dateFormat = require('dateformat');
 var manifest = require('./manifest');
 var config = require('../config');
 var result = require('./result');
@@ -36,8 +37,8 @@ function makeBreakable(str) {
 
 //////////////////////////////////////////////////////////////
 
-var openingTime = new Date(manifest.startTime);
-var closingTime = new Date(manifest.endTime);
+var openingTime = manifest.startTime;
+var closingTime = manifest.endTime;
 console.log(manifest.startTime);
 console.log(manifest.endTime);
 

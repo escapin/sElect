@@ -1,16 +1,22 @@
     </div>
     </body>
     <script>
+    	//closing time
 	    var closingTime = $("#closingTime").html().trim().split(" ");
     	var clientDate = new Date(closingTime[0]+"T"+closingTime[1]+"Z");
     	clientDate = clientDate.toString().split(":");
     	clientDate = clientDate[0]+":"+clientDate[1]
     	$("#closingTime").html(clientDate);
-    	var openingTime = $("#openingTime").html().trim().split(" ");
-     	var clientDate = new Date(openingTime[0]+"T"+openingTime[1]+"Z");
-    	clientDate = clientDate.toString().split(":");
-    	clientDate = clientDate[0]+":"+clientDate[1]
-     	$("#openingTime").html(clientDate);
+    	$("#closingTime").html(clientDate);
+    	
+    	//opening time
+    	if($("#openingTime").html()){
+	    	var openingTime = $("#openingTime").html().trim().split(" ");
+	     	var clientDate = new Date(openingTime[0]+"T"+openingTime[1]+"Z");
+	    	clientDate = clientDate.toString().split(":");
+	    	clientDate = clientDate[0]+":"+clientDate[1]
+	     	$("#openingTime").html(clientDate);
+    	}
     </script>
 </html>
 
