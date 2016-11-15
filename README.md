@@ -152,14 +152,9 @@ make cleanElection
 ```
 
 **Remark.**
-In the development version, one-time passwords are not sent
-to voters via e-mail; they are logged on the console by the collecting
-server and must be copied from there.  The list of the valid voters'
-emails can be found in the file 'ElectionManifest.json' of the folder
-'template'.  Also, the closing time of the collecting server is set to
-_Nov 10, 2018_.  The server needs to be triggered manually to close the
-election, which can be done through the status page served by this
-server.
+* In the development version, one-time passwords are sent directly to the voting booth which shows them in a pop-up. 
+* The closing time of the collecting server is set to _Nov 10, 2018_.
+* All the dates are displayed in the current browser's timezone.
 
 **Unit Testing.**
 To run the test suite, type
