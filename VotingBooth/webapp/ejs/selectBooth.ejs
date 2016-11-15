@@ -70,7 +70,10 @@ if(seperateAuthentication){
     var maxChoicesPerVoter = manifest.maxChoicesPerVoter;
     var minChoicesPerVoter = manifest.minChoicesPerVoter;
 
-    
+    var closingTime = manifest.endTime.trim().split(" ");
+	var clientDate = new Date(closingTime[0]+"T"+closingTime[1]+"Z");
+	clientDate = clientDate.format("dddd, mmm dS yyyy, HH:MM");
+	$("#closingTime").html("Closing Time: "+clientDate);
     //////////////////////////////////////////////////////////////////////////////
     /// Verification code picture saving
 
