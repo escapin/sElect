@@ -1,5 +1,4 @@
 var fs = require('fs');
-var dateFormat = require('dateformat');
 var manifest = require('./manifest');
 var config = require('../config');
 var result = require('./result');
