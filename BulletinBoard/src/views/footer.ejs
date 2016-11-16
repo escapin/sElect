@@ -3,6 +3,28 @@
     <script>
     	//closing time
 	    var closingTime = $("#closingTime").html().trim().split(" ");
+	    if(closingTime[1].indexOf("+") > -1){
+	    	var tmp = closingTime[1].split("+");
+	    	var localTime = tmp[0].split(":");
+	    	var timeOffset = tmp[1].split(":");
+	    	var utcHours = +localTime[0] - +timeOffset[0];
+	    	var utcMin = +localTime[1] - +timeOffset[1]
+	    	var utcHours = utcHours < 10 ? "0"+utcHours : utcHours
+	    	var utcMin = utcMin < 10 ? "0"+utcMin : utcMin
+
+	    	closingTime[1] = utcHours + ":" + utcMin;    	
+	    }
+	    else if(closingTime[1].indexOf("-") > -1){
+	    	var tmp = closingTime[1].split("+");
+	    	var localTime = tmp[0].split(":");
+	    	var timeOffset = tmp[1].split(":");
+	    	var utcHours = +localTime[0] + +timeOffset[0];
+	    	var utcMin = +localTime[1] + +timeOffset[1]
+	    	var utcHours = utcHours < 10 ? "0"+utcHours : utcHours
+	    	var utcMin = utcMin < 10 ? "0"+utcMin : utcMin
+
+	    	closingTime[1] = utcHours + ":" + utcMin;    
+	    }
     	var clientDate = new Date(closingTime[0]+"T"+closingTime[1]+"Z");
     	clientDate = clientDate.format("dddd, mmm dS yyyy, HH:MM");
     	$("#closingTime").html(clientDate);
@@ -10,7 +32,29 @@
     	
     	//opening time
     	if($("#openingTime").html()){
-	    	var openingTime = $("#openingTime").html().trim().split(" ");
+	    	var openingTime = $("#openingTime").html().trim().split(" ");	    
+	    	if(openingTime[1].indexOf("+") > -1){
+		    	var tmp = openingTime[1].split("+");
+		    	var localTime = tmp[0].split(":");
+		    	var timeOffset = tmp[1].split(":");
+		    	var utcHours = +localTime[0] - +timeOffset[0];
+		    	var utcMin = +localTime[1] - +timeOffset[1]
+		    	var utcHours = utcHours < 10 ? "0"+utcHours : utcHours
+		    	var utcMin = utcMin < 10 ? "0"+utcMin : utcMin
+
+		    	openingTime[1] = utcHours + ":" + utcMin;    	
+		    }
+		    else if(openingTime[1].indexOf("-") > -1){
+		    	var tmp = openingTime[1].split("+");
+		    	var localTime = tmp[0].split(":");
+		    	var timeOffset = tmp[1].split(":");
+		    	var utcHours = +localTime[0] + +timeOffset[0];
+		    	var utcMin = +localTime[1] + +timeOffset[1]
+		    	var utcHours = utcHours < 10 ? "0"+utcHours : utcHours
+		    	var utcMin = utcMin < 10 ? "0"+utcMin : utcMin
+
+		    	openingTime[1] = utcHours + ":" + utcMin;    
+		    }
 	     	var clientDate = new Date(openingTime[0]+"T"+openingTime[1]+"Z");
 	     	clientDate = clientDate.format("dddd, mmm dS yyyy, HH:MM");
 	     	$("#openingTime").html(clientDate);
