@@ -71,6 +71,29 @@ if(seperateAuthentication){
     var minChoicesPerVoter = manifest.minChoicesPerVoter;
 
     var closingTime = manifest.endTime.trim().split(" ");
+    if(closingTime[1].indexOf("+") > -1){
+    	var tmp = closingTime[1].split("+");
+    	var localTime = tmp[0].split(":");
+    	var timeOffset = tmp[1].split(":");
+    	var utcHours = +localTime[0] - +timeOffset[0];
+    	var utcMin = +localTime[1] - +timeOffset[1]
+    	var utcHours = utcHours < 10 ? "0"+utcHours : utcHours
+    	var utcMin = utcMin < 10 ? "0"+utcMin : utcMin
+
+    	closingTime[1] = utcHours + ":" + utcMin;    	
+    }
+    else if(closingTime[1].indexOf("-") > -1){
+    	var tmp = closingTime[1].split("+");
+    	var localTime = tmp[0].split(":");
+    	var timeOffset = tmp[1].split(":");
+    	var utcHours = +localTime[0] + +timeOffset[0];
+    	var utcMin = +localTime[1] + +timeOffset[1]
+    	var utcHours = utcHours < 10 ? "0"+utcHours : utcHours
+    	var utcMin = utcMin < 10 ? "0"+utcMin : utcMin
+
+    	closingTime[1] = utcHours + ":" + utcMin;    
+    }
+    console.log(closingTime[1]);
 	var clientDate = new Date(closingTime[0]+"T"+closingTime[1]+"Z");
 	clientDate = clientDate.format("dddd, mmm dS yyyy, HH:MM");
 	$('[id^="closingTime"]').html("<em>Election closing time:</em> "+clientDate);
