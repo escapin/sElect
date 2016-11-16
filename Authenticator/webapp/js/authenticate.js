@@ -65,7 +65,7 @@ function authenticate(){
 	    var closingTime = manifest.endTime.trim().split(" ");
 		var clientDate = new Date(closingTime[0]+"T"+closingTime[1]+"Z");
 		clientDate = clientDate.format("dddd, mmm dS yyyy, HH:MM");
-		$('[id^="closingTime"]').html("Election closing time: "+clientDate);
+		$('[id^="closingTime"]').html("<em>Election closing time:</em> "+clientDate);
 		
 		if(manifest.showOtp){
     		document.getElementById('mock_info').innerHTML = "<br>(Since you're trying the demo, no email will be sent to you: You can provide a <em>fake</em> one as well.)";
