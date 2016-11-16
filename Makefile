@@ -27,7 +27,7 @@ updatecryptokeys_mix:
 
 
 
-devenv: javabuild npminstall configs filescopy libdownload copydownloads roboto
+devenv: javabuild npminstall configs filescopy libdownload roboto copydownloads
 
 javadownload:
 	-mkdir -p lib
