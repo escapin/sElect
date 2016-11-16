@@ -63,7 +63,7 @@ function authenticate(){
 	    // Election data
 		
 	    var closingTime = manifest.endTime.trim().split(" ");
-		var clientDate = new Date(closingTime[0]+"T"+closingTime[1]+"Z");
+		var clientDate = new Date(closingTime[0]+"T"+closingTime[1].split("+")[0]+"Z");
 		clientDate = clientDate.format("dddd, mmm dS yyyy, HH:MM");
 		$('[id^="closingTime"]').html("<em>Election closing time:</em> "+clientDate);
 		
