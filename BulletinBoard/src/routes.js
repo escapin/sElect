@@ -36,8 +36,8 @@ function makeBreakable(str) {
 
 //////////////////////////////////////////////////////////////
 
-var openingTime = new Date(manifest.startTime);
-var closingTime = new Date(manifest.endTime);
+var openingTime = manifest.startTime;
+var closingTime = manifest.endTime;
 console.log(manifest.startTime);
 console.log(manifest.endTime);
 
@@ -57,7 +57,7 @@ exports.summary = function(req, res) {
 };
 
 exports.votes = function(req, res) {
-    var ready = result.finalResult !== null;
+    var ready = (result.finalResult !== null);
     res.render('votes', {
             printableElID: printableElID,
             manifest: manifest,
@@ -82,12 +82,25 @@ exports.voters = function(req, res) {
 }
 
 exports.details = function(req, res) {
-    var ready = result.finalResult !== null;
+    var ready = (result.finalResult !== null);
+    var numberOfChoices = "-";
+    var numberOfVoters = "-";
+    if (ready){
+    	numberOfChoices = 0;
+        summary = result.summary;
+        for(var i = 0; i < summary.length; i++){
+        	numberOfChoices += summary[i].votes;
+        }
+        numberOfVoters = result.finalResult.length;
+        
+    }
     res.render('details', {
             printableElID: printableElID,
             manifest: manifest,
             ready: ready,
             closingTime: closingTime,
             openingTime: openingTime,
+            numberOfChoices: numberOfChoices,
+            numberOfVoters: numberOfVoters,
         });
 }

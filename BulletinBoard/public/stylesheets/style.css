@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic);
+@import url(roboto/font.css);
 
 body {
     background: white;
@@ -24,6 +24,7 @@ h3 {
     font-weight: 300;
     color: #444;
     text-shadow: 0px 0px 1px #bbb;
+    margin-bottom: 0.2em;
 }
 
 h1 {
@@ -137,6 +138,7 @@ div.body {
 .pure-skin-mine table.pure-table  {
     border:none;
     background:white;
+    margin-top: 1em;
 }
 .pure-skin-mine table.pure-table td  {
     background:white;
@@ -177,4 +179,10 @@ td.choice{
 
 h3.subtitle, td.verificationCode, td.vote, td.voters, td.choice, td.voters, td.details, span.descriptionBB {
 	color: black !important;
+}
+
+ldetails {
+	color: red;
+    font-weight: 300;
+    font-size: 11pt;
 }

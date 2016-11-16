@@ -12,7 +12,7 @@ Reliably Secure Software Systems (RS3) (https://www.spp-rs3.de).
 
 * Java JDK (tested with both openjdk-7 and oraclejdk-8).
 * Java Cryptography Extension (only for oraclejdk).
-* node.js and npm.
+* node.js and npm (tested on v4.3.1 and 1.4.21, respectively).
 * wget (used in the makefiles for getting the proper libraries).
 * python (used in the root makefile for configuring the mix servers).
 
@@ -122,33 +122,43 @@ cd BulletinBoard
 ./run.sh
 ```
 
+*Authenticator*:
+```
+cd Authenticator
+./run.sh
+```
+
 *Voting booth*:
 ```
 cd VotingBooth
 ./run.sh
 ```
 
+The web-page of the system (the voting booth) is then available at `localhost:3333/votingBooth.html`.
 
-The files created during the voting process (including logs and partial 
+- To manually close the election, you have to access `localhost:3299/admin/panel` with credentials:
+
+	* user: admin
+	* pwd: 999
+
+
+- Once the election is closed, to check the election result, visit/reload the voting booth page again `localhost:3333/votingBooth.html`.
+
+
+The files created during the voting process (including logs, partial,
 and final results) can be removed with
 ```
 make cleanElection
 ```
 
 **Remark.**
-In the development version, one-time passwords are not sent
-to voters via e-mail; they are logged on the console by the collecting
-server and must be copied from there.  The list of the valid voters'
-emails can be found in the file 'ElectionManifest.json' of the folder
-'template'.  Also, the closing time of the collecting server is far away
-in the future (Nov 10, 2018). The server needs to be triggered manually
-to close the election, which can be done through the status page served
-by this server.
+* In the development version, one-time passwords are sent directly to the voting booth which shows them in a pop-up. 
+* The closing time of the collecting server is set to _Nov 10, 2018_.
+* All the dates are displayed in the current browser's timezone.
 
 **Unit Testing.**
 To run the test suite, type
 ```
 make test
 ```
-The created files can be removed by 
-`make testclean`.
+The created files can be removed by `make testclean`.

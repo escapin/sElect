@@ -1,3 +1,7 @@
 {
-    "showOtp": true
+    "showOtp": true,
+    "seperateAuthentication": true,
+    "userChosenRandomness": true,
+    "authenticator": "http://localhost:3334/authenticator.html",
+    "authChannel": "http://localhost:3299/authChannel.html"
 }

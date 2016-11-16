@@ -1,0 +1,13 @@
+{
+	"Authenticator": [
+		"http://localhost", 
+		"http://localhost:8443",
+		"http://localhost:3299"
+	],
+	"authChannel": [
+		"http://localhost", 
+		"http://localhost:8443", 
+		"http://localhost:3333",
+		"http://localhost:3334"
+	]
+}

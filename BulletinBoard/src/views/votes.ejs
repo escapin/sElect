@@ -25,7 +25,7 @@
                 The result is not ready yet.
             </h2>
             <h3>
-                The election should be closed at: <%= closingTime %>.
+                The election should be closed at: <span id="closingTime"><%= closingTime %></span>.
             </h3>
         <% } else { %>
 
@@ -36,19 +36,32 @@
             	Please check that your choice is listed next to your 
             	verification code.         
             </h3>
-
+            <% if(result[0].malformedExists) { %>
+            	<ldetails>
+            		(The crossed entries refer to malformed ballots: they have not been considered in the final result.)
+            	</ldetails>
+            <% } %>
             <table class="pure-table pure-table-horizontal">
                 <thead>
                     <tr>
                         <th>verification code</th>
-                        <th>choice </th>
+                        <% if (manifest.maxChoicesPerVoter > 1) { %>
+                        	<th>choices </th>
+                        <% } else { %>
+                        	<th>choice </th>
+                        <% }  %>
                     </tr>
                 </thead>
                 <tbody>
                     <% for(var i=0; i<result.length; i++) { %>
                        <tr>
-                           <td class="verificationCode"> <span style="font-family: 'Courier New', monospace; color: #222;"><%= result[i].userCode %></span><%=result[i].receiptID.toUpperCase() %></td>
-                           <td class="vote"> <%= result[i].vote %> </td>
+                           <% if(result[i].malformed) { %>
+                       	       <td class="verificationCode"><span style="font-family: \'Courier New\', monospace; color: #777;"><%= result[i].userCode %></span><%=result[i].receiptID.toUpperCase() %></td>
+                               <td class="vote"> <s style="color:red"><span style="color: black;"><%= result[i].vote %></span></s> </td>
+                       	   <% }else{ %>
+                       	       <td class="verificationCode"><span style="font-family: \'Courier New\', monospace; color: #777;"><%= result[i].userCode %></span><%=result[i].receiptID.toUpperCase() %></td>
+                               <td class="vote"> <%= result[i].vote %> </td>
+                       	   <% } %>
                        </tr>
                     <% } %>
                 </tbody>

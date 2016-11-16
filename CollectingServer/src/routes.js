@@ -8,6 +8,7 @@ var csCore = require('./csCore.js');
 var sendEmail = require('./sendEmail');
 var crypto = require('cryptofunc');
 var selectUtils = require('selectUtils');
+var bcrypt = require("bcryptjs");
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // State
@@ -18,20 +19,33 @@ var mail_timestamp = {};
 var electionID = manifest.hash;
 var colSerSigKey = config.signing_key;
 var cs = csCore.create(electionID, colSerSigKey);
-var openElection = (manifest.voters.length === 0); // emtpy list of voters means that the election is open (everybody can vote)
-if (openElection)
-    console.log('Empty list of voters => election is open (it ballots from everybody)')
-var listOfEligibleVoters = manifest.voters.map(function(k){ return k.email; });
-
+var listOfEligibleVoters = manifest.voters;
 var printableElID = makeBreakable(manifest.hash.slice(0,16).toUpperCase()); // only the first 16 hex chars (out of 64, for backward compatibility with SHA-1 in the GUI)
-
-// Map of eligible voters
-var eligibleVoters = {};
-for (var i=0; i<listOfEligibleVoters.length; ++i) eligibleVoters[listOfEligibleVoters[i]] = true;
+var openElection = false;
+//Check for hidden Voters
+var votersFileExists = fs.existsSync('./confidentialVoters.json');
+if(votersFileExists){
+	var votersFile = JSON.parse(fs.readFileSync("./confidentialVoters.json"));
+	var listOfConfidentialVoters = votersFile.voters;
+}
+else{
+	openElection = (manifest.voters.length === 0); // emtpy list of voters means that the election is open (everybody can vote)
+}
+if (openElection)
+    console.log('Empty list of voters => election is open (it ballots from everybody)')	
 
 // Checks if the voter is eligible. In an election is open, then every voter is eligible.
 function isEligibleVoter(voter) {
-    return  (openElection && validEmail(voter)) || (eligibleVoters.hasOwnProperty(voter) && eligibleVoters[voter]===true);
+	if(openElection && validEmail(voter)) return true;
+	for (var i=0; i<listOfEligibleVoters.length; ++i){
+		if(voter.toLowerCase() === listOfEligibleVoters[i].toLowerCase()) return true;
+	}
+	if(votersFileExists){
+		for (var i=0; i<listOfConfidentialVoters.length; ++i){
+			if(voter.toLowerCase() === listOfConfidentialVoters[i].toLowerCase()) return true;
+		}
+	}
+	return false;
 }
 
 var emailPattern = /^\S+@\S+$/;
@@ -143,7 +157,7 @@ var log = fs.createWriteStream(config.ACCEPTED_BALLOTS_LOG_FILE, {flags:'a', enc
 
 exports.otp = function otp(req, res) 
 {
-    var email = req.body.email.trim();
+    var email = req.body.email.trim().toLowerCase();
     var reqElId = req.body.electionID;
 
     if (!status.isActive()) { // if the status is not active, reject the request
@@ -189,9 +203,10 @@ exports.otp = function otp(req, res)
             if (!sentRecently) {
                 // Sent an e-mail with the OTP
                 winston.info('Sending an email to \'%s\' with OTP  ', email, otp_store[email]);
-                var emailContent = 'This e-mail contains your one time password (OTP) for the sElect voting system.\n';
+                var emailContent = 'This e-mail contains your one-time password (OTP) for the sElect voting system.\n';
                 emailContent += 'Election ID: ' + printableElID + '\nElection title: ' + manifest.title + '\n\n';
-                emailContent += 'One Time Password (OTP): ' + otp_store[email] + '\n\n';
+                emailContent += 'Your One Time Password (OTP): ' + otp_store[email] + '\n\n';
+                emailContent += "Please copy the one-time password above and enter it in this election's web page (field 'one-time password').\n\n";
                 emailContent += 'If you have not logged into the sElect voting system using this e-mail address, please ignore this e-mail.\n';
                 sendEmail(email, 'Your One Time Password for sElect', emailContent, function (err,info) {
                 	if (err) {
@@ -239,7 +254,7 @@ exports.otp = function otp(req, res)
 
 exports.cast = function cast(req, res) 
 {
-    var email = req.body.email.trim();
+    var email = req.body.email.trim().toLowerCase();
     var otp = req.body.otp.trim();
     var ballot = req.body.ballot;
     var reqElID = req.body.electionID;
@@ -370,14 +385,15 @@ function closeElection() {
 function sendData(data, URI, destserv_options) {
 	winston.info("Sending data to '%s'", URI);
 	if(destserv_options)
-		var destServ = request.newClient(URI, destserv_options);
+		var destServ = request.createClient(URI, destserv_options);
 	else
-		var destServ = request.newClient(URI);
+		var destServ = request.createClient(URI);
     var toBeSent = {data: data};
     // one could add something like {timeout:10000} to the request below, after 'toBeSent'
     destServ.post('data', toBeSent, function(err, otp_res, body) {
         if (err) {
             winston.info(" ...Error: Cannot send the result to '%s': ", URI, err);
+            winston.info(">" + err + "<");
         }
         else {
             winston.info(" ...Result sent to '%s'", URI);

@@ -14,7 +14,8 @@ npm_install:
 	cd ../node_modules/cryptofunc; npm install
 	cd ../CollectingServer; npm install
 	cd ../MixServer; npm install
-	
+
 clean:
 	-rm -r node_modules
+	-rm -r _CollectingServer_results
 	-rm -r _data_Test

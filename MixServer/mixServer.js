@@ -55,11 +55,28 @@ var app = express();
 app.use(cors()); // enable all CORS request
 app.set('views', './views');    // view engine and location of the views
 app.set('view engine', 'ejs');
-app.use(bodyParser.json());
+if(config.bodyParserLimit)
+	app.use(bodyParser.json({limit: config.bodyParserLimit}));
+else
+	app.use(bodyParser.json());
 app.use(express.static('./public')); // static content
 //app.use( morgan(':remote-addr [:date] :method :url :status / :referrer ', {}) ); // logging
 var accessLogStream = fs.createWriteStream('./access.log', {flags: 'a'});
 app.use(morgan(":remote-addr [:date] :method :url :status / :referrer ",{stream: accessLogStream}));
+
+/*********************************************/
+/******* RATE LIMITER for WEB-APIs *******/
+var RateLimit = require('express-rate-limit');
+app.enable('trust proxy');  // app behind the nginx reverse proxy: the client’s IP address is taken from the left-most entry in the X-Forwarded-* header.
+var limiter = new RateLimit({
+	  windowMs: 1000, // 1 sec
+	  max: 3, // limit each IP to 3 requests per windowMs
+	  delayMs: 0 // disable delaying - full speed until the max limit is reached
+	});
+/*********************************************/
+
+//apply to all requests
+app.use(limiter);
 
 // ROUTES
 app.get('/', routes.statusPage);

@@ -1,16 +1,32 @@
 .classpath
 .project
+.settings/
 /mix/
 /_sElectConfigFiles_/
 /lib/
-/VotingBooth/ElectionManifest.json
 bin/
-tmp/
 # all 'node_modules' directories except for that in the root dir
 **/*/node_modules/
-*.swp
 config.json
 .pydevproject
 _data_*
 _configFiles_/
-VotingBooth/webapp/roboto/*.ttf
+*jquery-2.1.1.min.js
+# all logs
+*.log
+LOG/
+#copied downloads
+Authenticator/webapp/roboto
+Authenticator/webapp/pure
+BulletinBoard/public/roboto
+*jquery-2.1.1.min.js
+#ignore favicon
+*/webapp/favicon*
+*/webapp/android-icon*
+*/webapp/apple-icon*
+*/src/views/favicon*
+*/src/views/android-icon*
+*/src/views/apple-icon*
+\#*
+*~
+*.swp

@@ -23,13 +23,21 @@
 
             <table class="pure-table pure-table-horizontal">
                 <tbody>
+                	<tr>
+                		<td class="details">Number of <em>voters</em><br>who successfully voted:</td>
+                		<td class="details"> <%= numberOfVoters %> </td>
+                	</tr>
+                	<tr>
+                		<td class="details">Total number of casted <em>votes</em>:</td>
+                		<td class="details"> <%= numberOfChoices %> </td>
+                	</tr>
                     <tr>
                         <td class="details">Opening time:</td>
-                        <td class="details"> <%= openingTime %> </td>
+                        <td id="openingTime" class="details"> <%= openingTime %> </td>
                     </tr>
                     <tr>
                         <td class="details">Closing time:</td>
-                        <td class="details"> <%= closingTime %> </td>
+                        <td id="closingTime" class="details"> <%= closingTime %> </td>
                     </tr>
                     <tr>
                         <td class="details">Full election manifest:</td>

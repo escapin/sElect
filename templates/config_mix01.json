@@ -5,6 +5,7 @@
     "TLS_CERT_FILE": "../../_sElectConfigFiles_/select.crt",
     "TLS_CHAINTRUST_FILE": "../../_sElectConfigFiles_/select.chain",
     "useTLS": false,
+    "bodyParserLimit": "100kb",
     "DATA_FOLDER": "_data_",
     "INPUT_FILE": "_data_/ballots01_input.msg",
     "OUTPUT_FILE": "_data_/ballots01_output.msg",
