@@ -109,13 +109,27 @@ div.header {
     margin-top: 40px;
     max-width: 800px;
     padding: 0px;
-    text-align: right;
+    text-align: left;
 
     font-size: small;
     color:#999;
 }
 
 div.header em {
+    font-weight: 500;
+}
+
+div.footer {
+	margin: 8px auto;
+    max-width: 800px;
+    padding: 0px;
+    text-align: right;
+
+    font-size: small;
+    color:#999;
+}
+
+div.footer em {
     font-weight: 500;
 }
 
