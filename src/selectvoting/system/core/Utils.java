@@ -139,4 +139,29 @@ public class Utils
 			return map.containsKey(key);
 		}
 	}
+	
+	public static byte[] concatenateMessageArray(byte[][] messages) {
+		byte[] msg = new byte[0];
+		int i = messages.length - 1;
+		while(i >= 0){
+			try {
+				msg = MessageTools.concatenate(messages[i], msg);
+			} catch (Throwable t) {}
+			i--;
+		}
+
+		return msg;
+	}
+	
+	
+	public static byte[][] copyOf(byte[][] arr) {
+		if (arr==null) return arr;
+		byte[][] copy = new byte[arr.length][];;
+		for (int i = 0; i < arr.length; i++){
+		try {
+				copy[i] = MessageTools.copyOf(arr[i]);
+			} catch (Throwable t) {}
+		}
+		return copy;	
+	}	
 }
