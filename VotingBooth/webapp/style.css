@@ -115,8 +115,7 @@ div.header {
     margin-top: 40px;
     max-width: 800px;
     padding: 0px;
-    text-align: left;
-
+    text-align: right;
     font-size: small;
     color:#999;
 }
@@ -148,7 +147,6 @@ div.container {
 div.body {
     background: white;
     margin: 0 auto;
-    margin-bottom:2ex;
     -max-width: 800px;
     padding: 25px;
     -border: solid 0px #ccc;
