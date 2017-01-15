@@ -22,8 +22,34 @@
 
 <% if (active) { %>
     <hr>
-    <h3><a href='close'>[close the election]</a></h3>
+    <button onclick="showPrompt()">Close Election</button>
 <% } %>
 
+
+<div id="popup">
+<div class="body">
+     <p>Are you sure you want to close this election?</p>
+     <p></p>
+     <button style="float: right;" onclick="closeElection()">Yes</button>  
+     <button onclick="cancel()">No</button>  
+</div>
+</div>
+<script>
+function showPrompt() {
+	document.getElementById("popup").style.visibility = "visible";
+}
+function cancel(){
+	document.getElementById("popup").style.visibility = "hidden";
+}
+function closeElection(){
+	document.getElementById("popup").style.visibility = "hidden";
+	csServer = window.location.href + "/../close";
+	
+	xhr = new XMLHttpRequest();
+	xhr.open('POST', csServer);
+	xhr.send();
+	location.reload()
+}
+</script>
 </body>
 </html>

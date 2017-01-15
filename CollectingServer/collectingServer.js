@@ -100,7 +100,7 @@ app.use(express.static('webapp'));
 app.get('/', limiter, routes.info);
 app.get('/status', limiter, routes.info);
 app.get('/admin/panel', limiter, routes.controlPanel);
-app.get('/admin/close', limiter, routes.close);
+app.post('/admin/close', limiter, routes.close);
 app.get('/result.msg', limiter, routes.serveFile(config.RESULT_FILE));
 if(manifest.publishListOfVoters)
 	app.get('/votersList.msg', limiter, routes.serveFile(config.VOTERSLIST_FILE));
