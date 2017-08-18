@@ -6,11 +6,13 @@ var config = require('../config');
 var transporter = nodemailer.createTransport(smtpTransport({
     host: config.smtp_host,
     port: config.smtp_port,
-    // 'auth' field to be used only if requested by the specific smtp server
-    //auth: {
-    //    user: config.smtp_user,
-    //    pass: config.smtp_pass
-    //},
+    // the following two lines are used to force nodemailer to use STARTTLS
+    secure: false,
+    requireTLS: true,
+    auth: {
+        user: config.smtp_user,
+        pass: config.smtp_pass
+    },
     tls: {rejectUnauthorized: false}
 }));
 
