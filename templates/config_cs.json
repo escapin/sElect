@@ -25,5 +25,5 @@
     "smtp_port": 25,
     "smtp_user": "username",
     "smtp_pass": "password",
-    "sender": 'sElect <no-reply@select.org>'
+    "sender": "sElect <no-reply@select.org>"
 }
