@@ -6,6 +6,9 @@ var config = require('../config');
 var transporter = nodemailer.createTransport(smtpTransport({
     host: config.smtp_host,
     port: config.smtp_port,
+    // the following two lines are used to force nodemailer to use STARTTLS
+    secure: false,
+    requireTLS: true,
     auth: {
         user: config.smtp_user,
         pass: config.smtp_pass
@@ -17,7 +20,7 @@ var transporter = nodemailer.createTransport(smtpTransport({
 function sendEmail(address, subject, text, callback) 
 {
     var mailOptions = {
-        from: 'sElect <no-reply@select.org>',
+        from: config.sender,
         to: address,
         subject: subject,
         text: text

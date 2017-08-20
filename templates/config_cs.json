@@ -24,5 +24,6 @@
     "smtp_host": "my.smtp.server.com",
     "smtp_port": 25,
     "smtp_user": "username",
-    "smtp_pass": "password"
+    "smtp_pass": "password",
+    "sender": "sElect <no-reply@select.org>"
 }
