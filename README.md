@@ -62,7 +62,7 @@ net_.
 
 ## Security Properties
 
-*Verifiability* is achieved in a very direct way: once the result has
+**Verifiability** is achieved in a very direct way: once the result has
 been published, every voter can simply check whether her verification
 code is included in the published election result, along with the
 voter's choice. For this mechanism to work, one needs to make sure that
@@ -70,7 +70,7 @@ the client program is honest and indeed uses a randomly chosen, and
 hence unique, verification code.
 
 Furthermore, sElect also provides a reasonable level of
-*accountability*: when a voter has a signed acknowledgment from the
+**accountability**: when a voter has a signed acknowledgment from the
 collecting server and then the verification fails (the expected
 verification code is not listed as required), it is possible to tell
 which of the servers has misbehaved and even (by making use of the
@@ -81,11 +81,11 @@ election result: cryptographic checks are performed and, if a problem is
 encountered, the specific misbehaving party is singled out and binding
 evidence of the misbehavior is produced.
 
-sElect provides *privacy* under the assumption that at least one of the
-mix servers is honest. The steps taken by an honest server, by design,
-hide the link between its input and output entries. Therefore, no one
-can link the ballot of a given voter to his/her choice-identifier-pair
-in the final output.
+sElect provides **privacy** under the assumption that at least one of
+the mix servers is honest. The steps taken by an honest server, by
+design, hide the link between its input and output entries. Therefore,
+no one can link the ballot of a given voter to his/her
+choice-identifier-pair in the final output.
 
 
 ## Development Environment
