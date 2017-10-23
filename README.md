@@ -1,7 +1,7 @@
 # sElect - Secure Elections
 
 sElect is a remote electronic voting system designed to provide 
-**privacy** and **verifiability**.
+**privacy**, **verifiability**, and  **accountability**.
 
 One of our goals is to establish privacy on the **implementation level**
 (code level). The code-level verification of the core of the system
@@ -20,43 +20,41 @@ The system has been developed and deployed on Ubuntu Server 14.04.2 LTS.
 
 ## The Design
 
-To achieve its security goals (verifiability and privacy), 
-the sElect voting system uses only standard cryptographic
-operations, such as public key encryption and digital signatures
-(unlike most other e-voting systems that aim at providing these security
-goals). The design is also relatively simple (considering, again,
-the security goals the system is designed to achieve).
+Unlike most other e-voting systems that aim at providing verifiability,
+accountability, and privacy, sElect uses only standard cryptographic
+operations, such as public key encryption and digital signatures. The
+design is also relatively simple (considering, again, the security goals
+the system is designed to achieve).
 
-There are three core components of the system: the **client
-program**, the **collecting server** and a cascade of **mix severs**.
-All servers post data, such as lists of voters, intermediate results, and 
-the final result on a publicly available bulletin board, 
-for which we also provide a reference implementation.
+There are three core components of the system: a **client program**
+(implemented as static web-page), a **collecting server** and a cascade
+of **mix severs**.  All the data outputted by these servers, such as
+lists of voters, intermediate and final results, are also collected by a
+publicly available **bulletin board**, for which we also provide a
+reference implementation.
 
 **Voting phase.** In the voting phase, every voter prepare her ballots
 using the client program.  A ballot contains the voter's choice (for
-example, the name of the candidate chosen by the voter) and a 
-verification code, whose first nine characters are inserted by the 
-user, whereas the remaining are randomly chosen by the system.
-To construct the ballot, the choice along with the verification code 
-is encrypted several times with the public key of each mix server, 
-from the last to the first.  
-Such a (complete) ballot is then submitted to the collecting server which
-authenticates the voter and, if the authentication succeeds, replies by
-sending back a digitally signed acknowledgment.
+example, the name of the candidate chosen by the voter) and a
+verification code, which can either entirely chosen by the system or
+also partially inserted by the user. Cryptographic nonce is used as
+randomly generated (part of) the verification code. To construct the
+ballot, the choice along with the verification code is encrypted several
+times with the public key of each mix server, from the last to the
+first.  Such a (complete) ballot is then submitted to the collecting
+server which authenticates the voter and, if the authentication
+succeeds, replies by sending back a digitally signed acknowledgment.
 
 **Mixing phase.** When the voting phase is over, the system enters the
 mixing phase. In this phase, the collecting server outputs the list of
 ciphertexts to the first mix server which decrypts the outer encryption
-layer, shuffles the inner ballots and sends the signed result both to
-the next mix server and to the bulletin board.
-
-
-Next, the bulletin board reads the list of (unencrypted) ballots
-produced by the last mix server. It then publishes the
-resulting list containing the voters' choices along with verification
-codes, again in alphabetical order and digitally signed. This
-list constitutes the official result of the election process.
+layer, shuffles the inner ballots and sends the signed result to the
+next mix server. Next, the bulletin board reads the list of
+(unencrypted) ballots produced by the last mix server. It then publishes
+the resulting list containing the voters' choices along with
+verification codes, again in alphabetical order and digitally
+signed. This list constitutes the official result of the election
+process.
 
 Altogether, the core of sElect is a variant of a _Chaumian mix
 net_.
@@ -71,13 +69,17 @@ voter's choice. For this mechanism to work, one needs to make sure that
 the client program is honest and indeed uses a randomly chosen, and
 hence unique, verification code.
 
-Furthermore, sElect also provides a
-reasonable level of _accountability_: when a voter has a signed
-acknowledgment from the collecting server and then the
-verification fails (the expected verification code is not listed
-as required), it is possible to tell which of the servers has
-misbehaved and even (by making use of the digital signatures)
-to provide an evidence for this misbehavior.
+Furthermore, sElect also provides a reasonable level of
+_accountability_: when a voter has a signed acknowledgment from the
+collecting server and then the verification fails (the expected
+verification code is not listed as required), it is possible to tell
+which of the servers has misbehaved and even (by making use of the
+digital signatures) to provide an evidence for this misbehavior.  For
+this purpose, a _fully automated verification procedure_ implemented in
+the client program is triggered at the act of looking at the election
+result: cryptographic checks are performed and, if a problem is
+encountered, the specific misbehaving party is singled out and binding
+evidence of the misbehavior is produced.
 
 sElect provides _privacy_ under the assumption that at least one of the
 mix servers is honest. The steps taken by an honest server, by design,
