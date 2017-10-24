@@ -68,7 +68,9 @@ been published, every voter can simply check whether her verification
 code is included in the published election result, along with the
 voter's choice. For this mechanism to work, one needs to make sure that
 the client program is honest and indeed uses a randomly chosen, and
-hence unique, verification code.
+hence unique, verification code. In case part of the verification code
+is randomly chosen by the user, the assumption of an honest verification
+client is not even necessary.
 
 Furthermore, sElect also provides a reasonable level of
 **accountability**: when a voter has a signed acknowledgment from the
