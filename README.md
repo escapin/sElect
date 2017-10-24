@@ -85,10 +85,10 @@ encountered, the specific misbehaving party is singled out and binding
 evidence of this misbehavior is produced.
 
 sElect provides **privacy** under the assumption that at least one of
-the mix servers is honest. The steps taken by an honest server, by
+the mix servers is honest. The steps taken by an honest mix server, by
 design, hide the link between its input and output entries. Therefore,
 no one can link the ballot of a given voter to his/her
-choice-identifier-pair in the final output.
+choice-identifier pair in the final output.
 
 
 ## Development Environment
