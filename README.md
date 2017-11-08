@@ -1,4 +1,4 @@
-# sElect - Secure Elections
+# sElect - Secure and Simple Elections
 
 sElect is a remote electronic voting system designed to provide 
 **privacy**, **verifiability**, and  **accountability**.
