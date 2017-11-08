@@ -1,6 +1,3 @@
-# java libraries: version
-#BCPROV_t=jdk15on
-#BCPROV_v=1.51
 BCPROV_t=jdk16
 BCPROV_v=1.46
 JUNIT_v=4.12
@@ -38,7 +35,7 @@ javabuild: javadownload
 	javac -sourcepath src \
           -classpath "lib/*" \
           -d bin \
-          src/selectvoting/system/wrappers/*.java    
+          src/selectvoting/wrappers/*.java
 
 npminstall:
 	cd BulletinBoard; npm install
