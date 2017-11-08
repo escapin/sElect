@@ -1,4 +1,4 @@
-package selectvoting.system.core;
+package selectvoting.core;
 
 public class Tag {
 

@@ -1,6 +1,6 @@
-package functionalities.nonce;
+package funct.nonce;
 
-import infsec.lib.crypto.CryptoLib;
+import lib.crypto.CryptoLib;
 
 public class NonceGen {
 	public NonceGen() {

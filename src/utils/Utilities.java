@@ -1,4 +1,4 @@
-package infsec.utils;
+package utils;
 
 import java.nio.charset.Charset;
 

@@ -1,19 +1,19 @@
 package selectvoting.tests;
 
 
-import infsec.utils.MessageTools;
 import junit.framework.TestCase;
+import selectvoting.core.MixServer;
+import selectvoting.core.Tag;
+import selectvoting.core.Utils;
+import selectvoting.core.Utils.MessageSplitIter;
 
 import org.junit.Test;
 
-import functionalities.digsig.Signer;
-import functionalities.digsig.Verifier;
-import functionalities.nonce.NonceGen;
-import functionalities.pkenc.Decryptor;
-import selectvoting.system.core.MixServer;
-import selectvoting.system.core.Tag;
-import selectvoting.system.core.Utils;
-import selectvoting.system.core.Utils.MessageSplitIter;
+import funct.digsig.Signer;
+import funct.digsig.Verifier;
+import funct.nonce.NonceGen;
+import funct.pkenc.Decryptor;
+import utils.MessageTools;
 
 
 public class TestMixServer extends TestCase  

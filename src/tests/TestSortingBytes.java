@@ -1,19 +1,18 @@
 package tests;
 
 
-import infsec.utils.MessageTools;
-import infsec.utils.Utilities;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import junit.framework.TestCase;
+import selectvoting.core.Utils;
 
 import org.junit.Test;
 
-import functionalities.nonce.NonceGen;
-import functionalities.pkenc.Decryptor;
-import selectvoting.system.core.Utils;
+import funct.nonce.NonceGen;
+import funct.pkenc.Decryptor;
+import utils.MessageTools;
+import utils.Utilities;
 
 
 public class TestSortingBytes extends TestCase  

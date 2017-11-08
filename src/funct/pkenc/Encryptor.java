@@ -1,7 +1,8 @@
-package functionalities.pkenc;
+package funct.pkenc;
 
-import infsec.lib.crypto.CryptoLib;
-import static infsec.utils.MessageTools.copyOf;
+import static utils.MessageTools.copyOf;
+
+import lib.crypto.CryptoLib;
 
 /**
  * Real functionality for public-key encryption: Encryptor

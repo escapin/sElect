@@ -1,4 +1,4 @@
-package infsec.lib.crypto;
+package lib.crypto;
 
 public class KeySize {
 		protected static final int pkKeySize 	= 1024; // Bits key size for public key crypto

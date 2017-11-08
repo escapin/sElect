@@ -1,15 +1,16 @@
-package selectvoting.system.wrappers;
-
-import infsec.utils.Utilities;
+package selectvoting.wrappers;
 
 import java.nio.file.*;
+
+import funct.digsig.Signer;
+import funct.digsig.Verifier;
+import funct.pkenc.Decryptor;
+import selectvoting.core.MixServer;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-import functionalities.digsig.Signer;
-import functionalities.digsig.Verifier;
-import functionalities.pkenc.Decryptor;
-import selectvoting.system.core.MixServer;
+import utils.Utilities;
 
 public class MixServerWrapperMain {
 	private static String string(byte[] message) { return Utilities.byteArrayToHexString(message); }

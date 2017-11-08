@@ -1,9 +1,9 @@
-package selectvoting.system.core;
-
-import infsec.utils.MessageTools;
+package selectvoting.core;
 
 import java.util.Arrays;
 import java.util.Hashtable;
+
+import utils.MessageTools;
 
 public class Utils 
 {

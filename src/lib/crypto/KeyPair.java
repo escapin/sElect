@@ -1,4 +1,4 @@
-package infsec.lib.crypto;
+package lib.crypto;
 
 public class KeyPair {
 	public byte[] publicKey;

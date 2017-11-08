@@ -1,6 +1,4 @@
-package infsec.lib.crypto;
-
-import infsec.utils.MessageTools;
+package lib.crypto;
 
 import java.security.KeyException;
 import java.security.KeyFactory;
@@ -26,6 +24,8 @@ import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import utils.MessageTools;
 
 // TODO: check how exceptions/errors are handled
 

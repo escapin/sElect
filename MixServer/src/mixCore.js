@@ -17,7 +17,7 @@ exports.create = function(encKey, decKey, verifKey, signKey, precServVerifKey, e
 	function processBallots(inputFile_path, outputFile_path, callbackExec, onClose) {
 		
 		mixServer = child_process.exec('java -cp ' + classpathString + " " +
- 		                    		                'selectvoting.system.wrappers.MixServerWrapperMain' + " " +
+ 		                    		                'selectvoting.wrappers.MixServerWrapperMain' + " " +
 		                    		                encKey + " " + decKey + " " + verifKey + " " + signKey + " " + precServVerifKey  
 		                    		                + " " + electionID + " " + inputFile_path + " " + outputFile_path, 
 		                    		                	callbackExec);

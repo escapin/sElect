@@ -1,8 +1,9 @@
-package functionalities.digsig;
+package funct.digsig;
 
-import infsec.lib.crypto.CryptoLib;
-import infsec.lib.crypto.KeyPair;
-import static infsec.utils.MessageTools.copyOf;
+import static utils.MessageTools.copyOf;
+
+import lib.crypto.CryptoLib;
+import lib.crypto.KeyPair;
 
 /**
  * An object encapsulating a signing/verification key pair and allowing a user to

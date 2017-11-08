@@ -1,10 +1,10 @@
-package selectvoting.system.wrappers;
+package selectvoting.wrappers;
 
-import infsec.utils.Utilities;
-import functionalities.digsig.Signer;
-import functionalities.digsig.Verifier;
-import functionalities.pkenc.Decryptor;
-import selectvoting.system.core.MixServer;
+import funct.digsig.Signer;
+import funct.digsig.Verifier;
+import funct.pkenc.Decryptor;
+import selectvoting.core.MixServer;
+import utils.Utilities;
 
 public class MixServerWrapper {
 	private static String string(byte[] message) { return Utilities.byteArrayToHexString(message); }

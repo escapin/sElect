@@ -1,7 +1,8 @@
-package functionalities.digsig;
+package funct.digsig;
 
-import static infsec.utils.MessageTools.copyOf;
-import infsec.lib.crypto.CryptoLib;
+import static utils.MessageTools.copyOf;
+
+import lib.crypto.CryptoLib;
 
 /**
  * An object encapsulating the verification key and allowing a user to verify
