@@ -11,7 +11,7 @@ the DFG Priority Programme Reliably Secure Software Systems (RS3)
 
 
 The protocol of sElect has also been cryptographically analyzed in
-[[KMST16][http://eprint.iacr.org/2016/438]].
+[[KMST16](http://eprint.iacr.org/2016/438)].
 
 
 ## Dependencies
