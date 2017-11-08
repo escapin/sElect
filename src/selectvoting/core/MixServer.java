@@ -1,7 +1,6 @@
 package selectvoting.core;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import funct.digsig.Signer;
 import funct.digsig.Verifier;
