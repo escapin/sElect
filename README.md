@@ -155,10 +155,14 @@ and final results) can be removed with
 make cleanElection
 ```
 
-**Remark.**
-* In the development version, one-time passwords are sent directly to the voting booth which shows them in a pop-up. 
-* The closing time of the collecting server is set to _Nov 10, 2018_.
+**Remarks.**
+
 * All the dates are displayed in the current browser's timezone.
+* The closing time of the collecting server is set to _Nov 10, 2018_
+  (it will be sooner too soon...or even in the past! 0_0).
+* In development mode, the OTP (one-time password) is sent directly to the voting booth which shows it in a pop-up. 
+
+
 
 **Unit Testing.**
 To run the test suite, type
