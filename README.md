@@ -53,9 +53,8 @@ layer, shuffles the inner ballots and sends the signed result to the
 next mix server. Next, the bulletin board reads the list of
 (unencrypted) ballots produced by the last mix server. It then publishes
 the resulting list containing the voters' choices along with
-verification codes, again in alphabetical order and digitally
-signed. This list constitutes the official result of the election
-process.
+verification codes, in alphabetical order and digitally signed. This
+list constitutes the official result of the election process.
 
 Altogether, the core of sElect is a variant of a _Chaumian mix
 net_.
@@ -65,11 +64,11 @@ net_.
 
 **Verifiability** is achieved in a very direct way: once the result has
 been published, every voter can simply check whether her verification
-code is included in the published election result, along with the
-voter's choice. For this mechanism to work, one needs to make sure that
-the client program is honest and indeed uses a randomly chosen, and
-hence unique, verification code. In case part of the verification code
-is randomly chosen by the user, the assumption of an honest verification
+code is included in the published election result, along with her
+choice. For this mechanism to work, one needs to make sure that the
+client program is honest and indeed uses a randomly chosen, and hence
+unique, verification code. In case part of the verification code is
+randomly chosen by the user, the assumption of an honest verification
 client is not even necessary.
 
 Furthermore, sElect also provides a reasonable level of
@@ -82,13 +81,13 @@ this purpose, a _fully automated verification procedure_ implemented in
 the client program is triggered as soon as the voter looks at the
 election result: cryptographic checks are performed and, if a problem is
 encountered, the specific misbehaving party is singled out and binding
-evidence of this misbehavior is produced.
+evidence of this misbehavior is produced to hold him accountable.
 
 sElect provides **privacy** under the assumption that at least one of
 the mix servers is honest. The steps taken by an honest mix server, by
 design, hide the link between its input and output entries. Therefore,
-no one can link the ballot of a given voter to his/her
-choice-identifier pair in the final output.
+no one can link the ballot of a given voter to her choice/identifier
+pair in the final output.
 
 
 ## Development Environment
