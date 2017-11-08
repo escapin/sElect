@@ -3,24 +3,31 @@
 sElect is a remote electronic voting system designed to provide 
 **privacy**, **verifiability**, and  **accountability**.
 
-One of our goals is to establish privacy on the **implementation level**
-(code level). The code-level verification of the core of the system
-(implemented in Java) is carried out within the DFG Priority Programme
-Reliably Secure Software Systems (RS3) (https://www.spp-rs3.de).
+One of our research goals has been to establish privacy directly on the
+**implementation level** (code level). The code-level verification of
+the core of the system (implemented in Java) has been carried out within
+the DFG Priority Programme Reliably Secure Software Systems (RS3)
+(https://www.spp-rs3.de).
+
+
+The protocol of sElect has also been cryptographically analyzed in
+[[KMST16][http://eprint.iacr.org/2016/438]].
+
 
 ## Dependencies
 
-* Java JDK (tested with both openjdk-7 and oraclejdk-8).
-* Java Cryptography Extension (only for oraclejdk).
-* node.js and npm (tested on v6.11.2 LTS and 3.10.10, respectively).
-* wget (used in the makefiles for getting the proper libraries).
-* python (used in the root makefile for configuring the mix servers).
+* Java JDK - tested with both openjdk-7 and oraclejdk-8.
+* Java Cryptography Extension - only needed for oraclejdk.
+* node.js and npm - tested on v6.11.2 LTS and 3.10.10, respectively.
+* wget - used in the Makefile(s) for getting the proper libraries.
+* python - used in the root Makefile for configuring the mix servers.
 
-The system has been developed and deployed on Ubuntu Server 14.04.2 LTS.
+The system has been developed and deployed on Ubuntu Server 16.04.3 LTS.
+
 
 ## The Design
 
-Unlike most other e-voting systems that aim at providing verifiability,
+Unlike most other e-voting systems aiming at providing verifiability,
 accountability, and privacy, sElect uses only standard cryptographic
 operations, such as public key encryption and digital signatures. The
 design is also relatively simple (considering, again, the security goals

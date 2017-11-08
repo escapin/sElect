@@ -194,7 +194,7 @@ testconfigs:
           -classpath "lib/*" \
           -d bin \
           src/tests/*.java \
-          src/selectvoting/system/wrappers/*.java
+          src/selectvoting/wrappers/*.java
 
 	cd node_modules/cryptofunc; npm install
 	cd CollectingServer; npm install
