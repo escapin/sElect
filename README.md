@@ -1,26 +1,33 @@
 # sElect - Secure and Simple Elections
 
-sElect is a remote electronic voting system designed to provide 
-**privacy**, **verifiability**, and  **accountability**.
+sElect is a lightweight remote electronic voting system designed to provide three security properties:
 
-One of our research goals has been to establish privacy directly on the
+- **privacy** of the votes: no component of the system is able to find out how each voter voted. 
+- end-to-end **verifiability**: in case a component misbehaves (manipulates or removes some ballots), 
+ then this misbehavior is noticed by the voters with high probability.
+- **accountability**: a stronger form of verifiability ensuring that in case a component misbehaves, 
+ blaming evidence is shown to the voters to properly hold this component accountable.
+
+The protocol of sElect has been cryptographically analyzed in 
+[[KMST16](http://eprint.iacr.org/2016/438)] w.r.t. these three security properties.
+
+The other research goal has been to establish privacy directly on the
 **implementation level** (code level). The code-level verification of
 the core of the system (implemented in Java) has been carried out within
 the DFG Priority Programme Reliably Secure Software Systems (RS3)
 (https://www.spp-rs3.de).
 
 
-The protocol of sElect has also been cryptographically analyzed in
-[[KMST16](http://eprint.iacr.org/2016/438)].
 
 
 ## Dependencies
 
 * Java JDK - tested with both openjdk-7 and oraclejdk-8.
 * Java Cryptography Extension - only needed for oraclejdk.
-* node.js and npm - tested on v6.11.2 LTS and 3.10.10, respectively.
-* wget - used in the Makefile(s) for getting the proper libraries.
-* python - used in the root Makefile for configuring the mix servers.
+* Node JS and Npm - tested on v6.11.2 LTS and 3.10.10, respectively.
+* Python - tested with Python 2.7.10
+* wget - only used in the Makefile(s) for getting the proper libraries.
+
 
 The system has been developed and deployed on Ubuntu Server 16.04.3 LTS.
 
@@ -33,12 +40,11 @@ operations, such as public key encryption and digital signatures. The
 design is also relatively simple (considering, again, the security goals
 the system is designed to achieve).
 
-There are three core components of the system: a **client program**
-(implemented as static web-page), a **collecting server** and a cascade
-of **mix severs**.  All the data outputted by these servers, such as
-lists of voters, intermediate and final results, are also collected by a
-publicly available **bulletin board**, for which we also provide a
-reference implementation.
+There are five components of the system: an **authenticator**, a **voting booth**
+(both of them implemented as static web-pages), a **collecting server**, and a cascade
+of **mix severs**.  All the data outputted by these servers, i.e.,
+the lists of voters and the intermediate and final results, are collected and 
+reported by a publicly available **bulletin board**.
 
 **Voting phase.** In the voting phase, every voter prepare her ballots
 using the client program.  A ballot contains the voter's choice (for
@@ -165,8 +171,7 @@ make cleanElection
 **Remarks.**
 
 * All the dates are displayed in the current browser's timezone.
-* The closing time of the collecting server is set to _Nov 10, 2018_
-  (it will be sooner too soon...or even in the past! 0_0).
+* The closing time of the collecting server is set to _Nov 10, 2018_.
 * In development mode, the OTP (one-time password) is sent directly to the voting booth which shows it in a pop-up. 
 
 
