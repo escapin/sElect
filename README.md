@@ -18,8 +18,6 @@ the DFG Priority Programme Reliably Secure Software Systems (RS3)
 (https://www.spp-rs3.de).
 
 
-
-
 ## Dependencies
 
 * Java JDK - tested with both openjdk-7 and oraclejdk-8.
@@ -27,7 +25,6 @@ the DFG Priority Programme Reliably Secure Software Systems (RS3)
 * Node JS and Npm - tested on v6.11.2 LTS and 3.10.10, respectively.
 * Python - tested with Python 2.7.10
 * wget - only used in the Makefile(s) for getting the proper libraries.
-
 
 The system has been developed and deployed on Ubuntu Server 16.04.3 LTS.
 
@@ -79,10 +76,10 @@ net_.
 been published, every voter can simply check whether her verification
 code is included in the published election result, along with her
 choice. For this mechanism to work, one needs to make sure that the
-client program is honest and indeed uses a randomly chosen, and hence
+voting booth is honest and indeed uses a randomly chosen, and hence
 unique, verification code. In case part of the verification code is
 randomly chosen by the user, the assumption of an honest verification
-client is not even necessary.
+client is not necessary anymore.
 
 Furthermore, sElect also provides a reasonable level of
 **accountability**: when a voter has a signed acknowledgment from the
@@ -90,17 +87,17 @@ collecting server and then the verification fails (the expected
 verification code is not listed as required), it is possible to tell
 which of the servers has misbehaved and even (by making use of the
 digital signatures) to provide an evidence for this misbehavior.  For
-this purpose, a _fully automated verification procedure_ implemented in
-the client program is triggered as soon as the voter looks at the
+this purpose, a _fully automated verification procedure_ implemented 
+within the voting booth is triggered as soon as the voter looks at the
 election result: cryptographic checks are performed and, if a problem is
-encountered, the specific misbehaving party is singled out and binding
+encountered, the specific misbehaving party is singled out and blaming
 evidence of this misbehavior is produced to hold him accountable.
 
-sElect provides **privacy** under the assumption that at least one of
-the mix servers is honest. The steps taken by an honest mix server, by
-design, hide the link between its input and output entries. Therefore,
-no one can link the ballot of a given voter to her choice/identifier
-pair in the final output.
+sElect provides **privacy** of the votes under the assumption that at 
+least one of the mix servers is honest. The steps taken by an honest 
+mix server, by design, hide the link between its input and output entries. 
+Therefore, no one can link the ballot of a given voter to her 
+choice/identifier pair in the final output.
 
 
 ## Development Environment
