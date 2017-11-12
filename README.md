@@ -3,8 +3,8 @@
 sElect is a lightweight remote electronic voting system designed to
 provide three security properties:
 
-- **privacy** of the votes: no component of the system is able to find
-  out how each voter voted;
+- **privacy** of the votes: no one (in particular, no component of 
+  the system) is able to find out how each voter voted;
 - end-to-end **verifiability**: in case a component misbehaves
  (manipulates or removes some ballots), then this misbehavior is noticed
  by the voters with high probability;
@@ -13,7 +13,7 @@ provide three security properties:
  properly hold this component accountable.
 
 The protocol of sElect has been cryptographically analyzed in
-[[KMST16](http://eprint.iacr.org/2016/438)] w.r.t. these three security
+[[KMST16](https://eprint.iacr.org/2016/438)] w.r.t. these three security
 properties.
 
 The other research goal has been to establish privacy directly on the
