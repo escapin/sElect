@@ -5,7 +5,7 @@
   "private": true,
   "dependencies": {
     "body-parser": ">= 1.9.0",
-    "ejs": "1.x",
+    "ejs": "^2.5.5",
     "errorhandler": ">= 1.2.0",
     "express": "4.x",
     "express-rate-limit": "^2.5.0",
