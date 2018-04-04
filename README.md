@@ -70,7 +70,7 @@ layer, shuffles the inner ballots, and sends the signed result to the
 next mix server. Next, the bulletin board reads the list of
 (unencrypted) ballots produced by the last mix server. It then publishes
 the resulting list containing the voters' choices along with
-verification codes, in alphabetical order and digitally signed. This
+the verification codes, in alphabetical order and digitally signed. This
 list constitutes the official result of the election process.
 
 Altogether, the core of sElect is a variant of a _Chaumian mix
