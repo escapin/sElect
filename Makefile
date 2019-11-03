@@ -29,6 +29,7 @@ devenv: javabuild npminstall configs filescopy libdownload roboto copydownloads
 javadownload:
 	-mkdir -p lib
 	wget -P lib -nc http://central.maven.org/maven2/org/bouncycastle/bcprov-${BCPROV_t}/${BCPROV_v}/bcprov-${BCPROV_t}-${BCPROV_v}.jar
+	wget -P lib -nc http://central.maven.org/maven2/junit/junit/${JUNIT_v}/junit-${JUNIT_v}.jar
 
 javabuild: javadownload
 	-mkdir -p bin
