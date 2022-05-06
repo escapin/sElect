@@ -1,6 +1,6 @@
-BCPROV_t=jdk16
-BCPROV_v=1.46
-JUNIT_v=4.12
+BCPROV_t=jdk18on
+BCPROV_v=171
+JUNIT_v=4.13.2
 HARMCRESTCORE_v=1.3
 
 default:
@@ -28,8 +28,8 @@ devenv: javabuild npminstall configs filescopy libdownload roboto copydownloads
 
 javadownload:
 	-mkdir -p lib
-	wget -P lib -nc http://central.maven.org/maven2/org/bouncycastle/bcprov-${BCPROV_t}/${BCPROV_v}/bcprov-${BCPROV_t}-${BCPROV_v}.jar
-	wget -P lib -nc http://central.maven.org/maven2/junit/junit/${JUNIT_v}/junit-${JUNIT_v}.jar
+	wget -P lib -nc https://www.bouncycastle.org/download/bcprov-${BCPROV_t}-${BCPROV_v}.jar
+	wget -P lib -nc https://repo1.maven.org/maven2/junit/junit/${JUNIT_v}/junit-${JUNIT_v}.jar
 
 javabuild: javadownload
 	-mkdir -p bin
@@ -88,7 +88,7 @@ libdownload:
 	-rm VotingBooth/webapp/pure/grids-responsive-old-ie-min.css
 	cd VotingBooth/webapp/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-old-ie-min.css
 	-rm VotingBooth/webapp/pure/grids-responsive-min.css
-	cd VotingBooth/webapp/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css 
+	cd VotingBooth/webapp/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css
 	-rm BulletinBoard/public/js/jquery-2.1.1.min.js
 	cd BulletinBoard/public/js; wget http://code.jquery.com/jquery-2.1.1.min.js
 	-rm BulletinBoard/public/pure/pure-min.css
@@ -96,7 +96,7 @@ libdownload:
 	-rm BulletinBoard/public/pure/grids-responsive-old-ie-min.css
 	cd BulletinBoard/public/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-old-ie-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-min.css
-	cd BulletinBoard/public/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css 
+	cd BulletinBoard/public/pure; wget http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css
 
 roboto:
 	cd VotingBooth/webapp/roboto; wget -N https://fonts.gstatic.com/s/roboto/v15/Jzo62I39jc0gQRrbndN6nfesZW2xOQ-xsNqO47m55DA.ttf
@@ -118,7 +118,7 @@ copydownloads:
 devclean: cleanElection javaclean npmclean votingboothclean bbclean configsclean
 
 
-javaclean:	
+javaclean:
 	-rm -r bin
 
 npmclean:
@@ -142,7 +142,7 @@ votingboothclean:
 	-rm webapp/roboto/*.ttf
 
 
-bbclean:	
+bbclean:
 	-rm BulletinBoard/public/js/jquery-2.1.1.min.js
 	-rm BulletinBoard/public/pure/pure-min.css
 	-rm BulletinBoard/public/pure/grids-responsive-old-ie-min.css
@@ -182,8 +182,8 @@ test: testdownload testconfigs testrun
 
 testdownload:
 	-mkdir -p lib
-	wget -P lib -nc http://central.maven.org/maven2/junit/junit/${JUNIT_v}/junit-${JUNIT_v}.jar
-	wget -P lib -nc http://central.maven.org/maven2/org/bouncycastle/bcprov-${BCPROV_t}/${BCPROV_v}/bcprov-${BCPROV_t}-${BCPROV_v}.jar
+	wget -P lib -nc https://repo1.maven.org/maven2/junit/junit/${JUNIT_v}/junit-${JUNIT_v}.jar
+	wget -P lib -nc https://www.bouncycastle.org/download/bcprov-${BCPROV_t}-${BCPROV_v}.jar
 	wget -P lib -nc https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/${HARMCRESTCORE_v}/hamcrest-core-${HARMCRESTCORE_v}.jar
 
 testconfigs:
