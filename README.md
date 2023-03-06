@@ -186,3 +186,14 @@ To run the test suite, type
 make test
 ```
 The created files can be removed by `make testclean`.
+
+
+
+
+Reliably Secure Software Systems (RS3) has been a Priority Programme from the German Research Foundation (D.F.G., see https://www.dfg.de/en/index.jsp) which assumed that a paradigm shift in IT-security was necessary in order to reliably guarantee the security of complex software systems.
+
+The current trust-based and mechanism-centric approaches to IT-security were to be complemented by property-oriented solutions. This paradigm shift was to enable a trustworthy certification of system-wide, technical security guarantees that adequately respects the semantics of programs and of security requirements. 
+
+Bridging the gap from security in-the-small to security in-the-large involved the improvement of conceptual foundations, the development of analysis and engineering tools, and their migration into practice. Collaborations between multiple sub-disciplines of Computer Science and Engineering, primarily formal methods, IT-security, and programming languages, were necessary to achieve the objectives of the programme.
+
+The overall goal of the programme was to support the reliable certification of useful, system-wide security guarantees based on a well-founded understanding of programs and of security aspects. It ran from 2010 to 2017 and it was articulated in 3 different phases where, at the end of each phase, the budget was re-discussed and re-allocated depending on the obtained results.
